@@ -43,6 +43,15 @@
                                     <mainClass>Start</mainClass>
                                 </manifest>
                             </archive>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>assets/minecraft/lang/en_US.lang</exclude>
+                                        <exclude>assets/minecraft/lang/fr_FR.lang</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>
