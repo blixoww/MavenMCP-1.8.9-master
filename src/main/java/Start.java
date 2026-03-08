@@ -33,8 +33,6 @@ public class Start {
         // Minecraft a besoin aussi de : --version, --assetsDir, --assetIndex
         Main.main(concat(new String[]{
                 "--version",    "MavenMCP",
-                "--assetsDir",  "assets",
-                "--assetIndex", "1.8",
                 "--userProperties", "{}"
         }, args));
     }
