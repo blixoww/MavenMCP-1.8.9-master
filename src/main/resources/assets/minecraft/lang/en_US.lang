@@ -1049,7 +1049,6 @@ item.expBottle.name=Bottle o' Enchanting
 item.fireball.name=Fire Charge
 item.writingBook.name=Book and Quill
 item.writtenBook.name=Written Book
-item.ruby.name=Ruby
 item.flowerPot.name=Flower Pot
 item.emptyMap.name=Empty Map
 item.carrots.name=Carrot
@@ -2678,77 +2677,71 @@ item.banner.straight_cross.magenta=Magenta Cross
 item.banner.straight_cross.orange=Orange Cross
 item.banner.straight_cross.white=White Cross
 
-# ── Items matériaux custom ────────────────────────────────────────────────────
-item.steel_ingot.name=Lingot d'Acier
-item.ruby.name=Rubis
-item.cobalt_ingot.name=Cobalt
+# ── Custom material items ─────────────────────────────────────────────────────
+item.steel_ingot.name=Steel Ingot
+item.ruby.name=Ruby
+item.cobalt_ingot.name=Cobalt Ingot
 
-# ── Minerais custom ───────────────────────────────────────────────────────────
-tile.oreRuby.name=Minerai de Rubis
-tile.oreCobalt.name=Minerai de Cobalt
+# ── Custom ores ───────────────────────────────────────────────────────────────
+tile.oreCobalt.name=Cobalt Ore
 
-# ── Outils Acier ──────────────────────────────────────────────────────────────
-item.steel_sword.name=Épée en Acier
-item.steel_pickaxe.name=Pioche en Acier
-item.steel_shovel.name=Pelle en Acier
-item.steel_axe.name=Hache en Acier
-item.steel_hoe.name=Houe en Acier
+# ── Steel tools ───────────────────────────────────────────────────────────────
+item.steel_sword.name=Steel Sword
+item.steel_pickaxe.name=Steel Pickaxe
+item.steel_shovel.name=Steel Shovel
+item.steel_axe.name=Steel Axe
+item.steel_hoe.name=Steel Hoe
 
-# ── Armures Acier ─────────────────────────────────────────────────────────────
-item.steel_helmet.name=Casque en Acier
-item.steel_chestplate.name=Plastron en Acier
-item.steel_leggings.name=Jambières en Acier
-item.steel_boots.name=Bottes en Acier
+# ── Steel armor ───────────────────────────────────────────────────────────────
+item.steel_helmet.name=Steel Helmet
+item.steel_chestplate.name=Steel Chestplate
+item.steel_leggings.name=Steel Leggings
+item.steel_boots.name=Steel Boots
 
-# ── Outils en Émeraude ─────────────────────────────────────────────────────
+# ── Emerald tools ─────────────────────────────────────────────────────────────
+item.emerald_sword.name=Emerald Sword
+item.emerald_pickaxe.name=Emerald Pickaxe
+item.emerald_shovel.name=Emerald Shovel
+item.emerald_axe.name=Emerald Axe
+item.emerald_hoe.name=Emerald Hoe
 
-item.emerald_sword.name=Épée en Émeraude
-item.emerald_pickaxe.name=Pioche en Émeraude
-item.emerald_shovel.name=Pelle en Émeraude
-item.emerald_axe.name=Hache en Émeraude
-item.emerald_hoe.name=Houe en Émeraude
+# ── Emerald armor ─────────────────────────────────────────────────────────────
+item.emerald_helmet.name=Emerald Helmet
+item.emerald_chestplate.name=Emerald Chestplate
+item.emerald_leggings.name=Emerald Leggings
+item.emerald_boots.name=Emerald Boots
 
-# ── Armures en Émeraude ─────────────────────────────────────────────────────
-item.emerald_helmet.name=Casque en Émeraude
-item.emerald_chestplate.name=Plastron en Émeraude
-item.emerald_leggings.name=Jambières en Émeraude
-item.emerald_boots.name=Bottes en Émeraude
+# ── Ruby tools ────────────────────────────────────────────────────────────────
+item.ruby_sword.name=Ruby Sword
+item.ruby_pickaxe.name=Ruby Pickaxe
+item.ruby_shovel.name=Ruby Shovel
+item.ruby_axe.name=Ruby Axe
+item.ruby_hoe.name=Ruby Hoe
 
-# ── Outils en Rubis ───────────────────────────────────────────────────────
+# ── Ruby armor ────────────────────────────────────────────────────────────────
+item.ruby_helmet.name=Ruby Helmet
+item.ruby_chestplate.name=Ruby Chestplate
+item.ruby_leggings.name=Ruby Leggings
+item.ruby_boots.name=Ruby Boots
 
-item.ruby_sword.name=Épée en Rubis
-item.ruby_pickaxe.name=Pioche en Rubis
-item.ruby_shovel.name=Pelle en Rubis
-item.ruby_axe.name=Hache en Rubis
-item.ruby_hoe.name=Houe en Rubis
+# ── Cobalt tools ──────────────────────────────────────────────────────────────
+item.cobalt_sword.name=Cobalt Sword
+item.cobalt_pickaxe.name=Cobalt Pickaxe
+item.cobalt_shovel.name=Cobalt Shovel
+item.cobalt_axe.name=Cobalt Axe
+item.cobalt_hoe.name=Cobalt Hoe
 
-# ── Armures en Rubis ───────────────────────────────────────────────────────
-item.ruby_helmet.name=Casque en Rubis
-item.ruby_chestplate.name=Plastron en Rubis
-item.ruby_leggings.name=Jambières en Rubis
-item.ruby_boots.name=Bottes en Rubis
+# ── Cobalt armor ──────────────────────────────────────────────────────────────
+item.cobalt_helmet.name=Cobalt Helmet
+item.cobalt_chestplate.name=Cobalt Chestplate
+item.cobalt_leggings.name=Cobalt Leggings
+item.cobalt_boots.name=Cobalt Boots
 
-# ── Outils en Cobalt ───────────────────────────────────────────────────────
+# ── Steel chest ───────────────────────────────────────────────────────────────
+tile.steelChest.name=Steel Chest
+container.steelChest=Steel Chest
 
-item.cobalt_sword.name=Épée en Cobalt
-item.cobalt_pickaxe.name=Pioche en Cobalt
-item.cobalt_shovel.name=Pelle en Cobalt
-item.cobalt_axe.name=Hache en Cobalt
-item.cobalt_hoe.name=Houe en Cobalt
-
-# ── Armures en Cobalt ───────────────────────────────────────────────────────
-
-item.cobalt_helmet.name=Casque en Cobalt
-item.cobalt_chestplate.name=Plastron en Cobalt
-item.cobalt_leggings.name=Jambières en Cobalt
-item.cobalt_boots.name=Bottes en Cobalt
-
-# ── Coffre en Acier ───────────────────────────────────────────────────────────
-tile.steelChest.name=Coffre en Acier
-container.steelChest=Coffre en Acier
-
-# ── Blocks ─────────────────────────────────────────────────────────
-
-tile.steel_block.name=Bloc d'Acier
-tile.ruby_block.name=Bloc de Rubis
-tile.cobalt_block.name=Bloc de Cobalt
+# ── Blocks ────────────────────────────────────────────────────────────────────
+tile.steel_block.name=Steel Block
+tile.ruby_block.name=Ruby Block
+tile.cobalt_block.name=Cobalt Block

@@ -149,7 +149,7 @@ public class GameSettings
     public KeyBinding keyBindStreamCommercials = new KeyBinding("key.streamCommercial", 0, "key.categories.stream");
     public KeyBinding keyBindStreamToggleMic = new KeyBinding("key.streamToggleMic", 0, "key.categories.stream");
     public KeyBinding keyBindZoom = new KeyBinding("Zoom", 0, "key.categories.gameplay");
-    public KeyBinding keyBindHDV  = new KeyBinding("key.hdv", 35, "key.categories.misc"); // 35 = H par défaut
+    public KeyBinding keyBindHDV  = new KeyBinding("HDV", 35, "key.categories.misc"); // 35 = H par défaut
 
     // Activation du mode Toggle Sneak/Sprint (option dans le menu)
     public boolean toggleSneakEnabled = false;

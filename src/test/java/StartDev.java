@@ -13,7 +13,7 @@ import net.minecraft.client.main.Main;
  * Marcelektro
  */
 
-public class Start {
+public class StartDev {
     public static void main(String[] args) {
         // Provide natives
         // Currently supported Linux and Windows
