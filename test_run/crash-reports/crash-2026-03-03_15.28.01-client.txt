@@ -1,0 +1,86 @@
+---- Minecraft Crash Report ----
+// Don't do that.
+
+Time: 03/03/26 15:28
+Description: Rendering screen
+
+java.lang.NullPointerException: Rendering screen
+	at net.minecraft.item.ItemStack.getDisplayName(ItemStack.java:580)
+	at net.minecraft.item.ItemStack.getTooltip(ItemStack.java:647)
+	at net.minecraft.client.gui.GuiScreen.renderToolTip(GuiScreen.java:160)
+	at net.minecraft.client.gui.inventory.GuiCraftGuide.drawRecipeMode(GuiCraftGuide.java:520)
+	at net.minecraft.client.gui.inventory.GuiCraftGuide.drawScreen(GuiCraftGuide.java:418)
+	at net.minecraft.client.renderer.EntityRenderer.updateCameraAndRender(EntityRenderer.java:1191)
+	at net.minecraft.client.Minecraft.runGameLoop(Minecraft.java:1148)
+	at net.minecraft.client.Minecraft.run(Minecraft.java:427)
+	at net.minecraft.client.main.Main.main(Main.java:113)
+	at Start.main(Start.java:22)
+
+
+A detailed walkthrough of the error, its code path and all known details is as follows:
+---------------------------------------------------------------------------------------
+
+-- Head --
+Stacktrace:
+	at net.minecraft.item.ItemStack.getDisplayName(ItemStack.java:580)
+	at net.minecraft.item.ItemStack.getTooltip(ItemStack.java:647)
+	at net.minecraft.client.gui.GuiScreen.renderToolTip(GuiScreen.java:160)
+	at net.minecraft.client.gui.inventory.GuiCraftGuide.drawRecipeMode(GuiCraftGuide.java:520)
+	at net.minecraft.client.gui.inventory.GuiCraftGuide.drawScreen(GuiCraftGuide.java:418)
+
+-- Screen render details --
+Details:
+	Screen name: net.minecraft.client.gui.inventory.GuiCraftGuide
+	Mouse location: Scaled: (328, 163). Absolute: (985, 519)
+	Screen size: Scaled: (640, 337). Absolute: (1920, 1009). Scale factor of 3
+
+-- Affected level --
+Details:
+	Level name: MpServer
+	All players: 1 total; [EntityPlayerSP['Player56'/257, l='MpServer', x=-765,49, y=69,00, z=-263,10]]
+	Chunk stats: MultiplayerChunkCache: 380, 380
+	Level seed: 0
+	Level generator: ID 00 - default, ver 1. Features enabled: false
+	Level generator options: 
+	Level spawn location: -136,00,64,00,-120,00 - World: (-136,64,-120), Chunk: (at 8,4,8 in -9,-8; contains blocks -144,0,-128 to -129,255,-113), Region: (-1,-1; contains chunks -32,-32 to -1,-1, blocks -512,0,-512 to -1,255,-1)
+	Level time: 222576 game time, 20501 day time
+	Level dimension: 0
+	Level storage version: 0x00000 - Unknown?
+	Level weather: Rain time: 0 (now: true), thunder time: 0 (now: false)
+	Level game mode: Game mode: survival (ID 0). Hardcore: false. Cheats: false
+	Forced entities: 74 total; [EntityItem['item.item.egg'/384, l='MpServer', x=-780,34, y=71,00, z=-204,31], EntityItem['item.item.egg'/385, l='MpServer', x=-782,94, y=71,00, z=-200,13], EntityChicken['Chicken'/387, l='MpServer', x=-770,47, y=69,00, z=-189,72], EntityBat['Bat'/394, l='MpServer', x=-755,40, y=33,01, z=-337,67], EntityPlayerSP['Player56'/257, l='MpServer', x=-765,49, y=69,00, z=-263,10], EntitySheep['Sheep'/408, l='MpServer', x=-740,56, y=63,00, z=-338,50], EntitySheep['Sheep'/409, l='MpServer', x=-737,59, y=64,00, z=-338,13], EntityChicken['Chicken'/410, l='MpServer', x=-742,66, y=69,00, z=-315,81], EntityChicken['Chicken'/411, l='MpServer', x=-742,75, y=69,50, z=-209,44], EntityChicken['Chicken'/412, l='MpServer', x=-752,00, y=70,00, z=-222,28], EntityItem['item.item.egg'/413, l='MpServer', x=-741,19, y=69,00, z=-209,19], EntityItem['item.item.egg'/414, l='MpServer', x=-739,94, y=71,00, z=-222,25], EntityChicken['Chicken'/415, l='MpServer', x=-742,00, y=74,00, z=-199,88], EntityChicken['Chicken'/416, l='MpServer', x=-742,38, y=69,59, z=-206,50], EntityItem['item.item.egg'/417, l='MpServer', x=-742,19, y=69,00, z=-207,81], EntityCow['Cow'/428, l='MpServer', x=-731,50, y=65,00, z=-337,50], EntityCow['Cow'/429, l='MpServer', x=-731,50, y=64,00, z=-339,50], EntityItem['item.item.egg'/430, l='MpServer', x=-734,34, y=71,00, z=-308,06], EntityChicken['Chicken'/431, l='MpServer', x=-733,47, y=71,00, z=-308,50], EntityItem['item.item.egg'/432, l='MpServer', x=-732,22, y=70,00, z=-302,97], EntityItem['item.item.egg'/433, l='MpServer', x=-725,22, y=67,00, z=-266,44], EntityChicken['Chicken'/434, l='MpServer', x=-730,75, y=68,00, z=-247,91], EntityChicken['Chicken'/435, l='MpServer', x=-721,94, y=70,00, z=-234,81], EntityChicken['Chicken'/436, l='MpServer', x=-730,59, y=71,00, z=-230,59], EntityItem['item.item.egg'/437, l='MpServer', x=-729,63, y=70,00, z=-232,63], EntityCow['Cow'/438, l='MpServer', x=-732,72, y=71,00, z=-220,91], EntityChicken['Chicken'/439, l='MpServer', x=-728,34, y=71,00, z=-197,59], EntityOcelot['Ocelot'/320, l='MpServer', x=-836,50, y=71,00, z=-284,50], EntityCow['Cow'/322, l='MpServer', x=-843,47, y=65,00, z=-239,56], EntityCow['Cow'/323, l='MpServer', x=-844,47, y=66,00, z=-238,47], EntityOcelot['Ocelot'/324, l='MpServer', x=-833,50, y=65,00, z=-237,50], EntityBat['Bat'/325, l='MpServer', x=-845,50, y=20,10, z=-199,25], EntityBat['Bat'/456, l='MpServer', x=-716,06, y=53,18, z=-296,20], EntityBat['Bat'/457, l='MpServer', x=-708,49, y=57,48, z=-292,51], EntitySquid['Squid'/329, l='MpServer', x=-821,66, y=62,28, z=-301,56], EntityCow['Cow'/458, l='MpServer', x=-719,56, y=69,00, z=-286,34], EntityOcelot['Ocelot'/330, l='MpServer', x=-831,00, y=71,00, z=-288,16], EntityChicken['Chicken'/459, l='MpServer', x=-709,66, y=69,00, z=-261,63], EntityOcelot['Ocelot'/331, l='MpServer', x=-830,44, y=72,00, z=-288,75], EntityChicken['Chicken'/460, l='MpServer', x=-707,91, y=68,00, z=-260,78], EntityOcelot['Ocelot'/332, l='MpServer', x=-822,15, y=66,00, z=-282,19], EntityItem['item.item.egg'/461, l='MpServer', x=-708,72, y=68,00, z=-260,63], EntityOcelot['Ocelot'/333, l='MpServer', x=-828,47, y=66,00, z=-232,81], EntityItem['item.item.egg'/462, l='MpServer', x=-709,16, y=69,00, z=-224,34], EntityOcelot['Ocelot'/334, l='MpServer', x=-831,50, y=67,00, z=-229,09], EntityChicken['Chicken'/463, l='MpServer', x=-709,59, y=69,74, z=-223,47], EntityOcelot['Ocelot'/335, l='MpServer', x=-826,65, y=67,00, z=-240,04], EntityChicken['Chicken'/464, l='MpServer', x=-717,38, y=72,00, z=-210,59], EntityBat['Bat'/336, l='MpServer', x=-823,56, y=50,10, z=-208,66], EntityItem['item.item.egg'/465, l='MpServer', x=-716,22, y=71,00, z=-211,19], EntityBat['Bat'/466, l='MpServer', x=-718,44, y=36,73, z=-197,10], EntityBat['Bat'/339, l='MpServer', x=-803,50, y=43,05, z=-308,47], EntityBat['Bat'/467, l='MpServer', x=-717,38, y=38,12, z=-200,73], EntityChicken['Chicken'/340, l='MpServer', x=-812,53, y=62,66, z=-299,66], EntityBat['Bat'/468, l='MpServer', x=-717,36, y=36,02, z=-197,29], EntityChicken['Chicken'/341, l='MpServer', x=-807,44, y=68,00, z=-223,22], EntityItem['item.item.egg'/469, l='MpServer', x=-707,72, y=70,00, z=-206,94], EntityItem['item.item.egg'/342, l='MpServer', x=-802,69, y=70,00, z=-206,34], EntityChicken['Chicken'/476, l='MpServer', x=-689,19, y=69,00, z=-310,09], EntityChicken['Chicken'/477, l='MpServer', x=-695,78, y=67,00, z=-202,13], EntityChicken['Chicken'/478, l='MpServer', x=-702,06, y=70,00, z=-193,78], EntityChicken['Chicken'/358, l='MpServer', x=-787,91, y=73,00, z=-326,22], EntityItem['item.item.egg'/359, l='MpServer', x=-790,59, y=73,00, z=-323,13], EntitySquid['Squid'/360, l='MpServer', x=-794,21, y=60,03, z=-262,66], EntitySquid['Squid'/361, l='MpServer', x=-791,46, y=59,02, z=-259,70], EntityItem['item.item.egg'/362, l='MpServer', x=-796,69, y=68,00, z=-234,00], EntityCow['Cow'/363, l='MpServer', x=-796,63, y=65,00, z=-239,38], EntityChicken['Chicken'/364, l='MpServer', x=-797,50, y=70,00, z=-222,06], EntityChicken['Chicken'/365, l='MpServer', x=-787,50, y=72,00, z=-202,84], EntityItem['item.item.egg'/379, l='MpServer', x=-771,63, y=69,00, z=-275,72], EntityChicken['Chicken'/380, l='MpServer', x=-769,81, y=69,00, z=-277,63], EntitySquid['Squid'/381, l='MpServer', x=-785,81, y=62,46, z=-259,63], EntityChicken['Chicken'/382, l='MpServer', x=-775,28, y=71,00, z=-205,50], EntityCow['Cow'/383, l='MpServer', x=-775,50, y=71,00, z=-206,44]]
+	Retry entities: 0 total; []
+	Server brand: vanilla
+	Server type: Integrated singleplayer server
+Stacktrace:
+	at net.minecraft.client.multiplayer.WorldClient.addWorldInfoToCrashReport(WorldClient.java:390)
+	at net.minecraft.client.Minecraft.addGraphicsAndWorldToCrashReport(Minecraft.java:2778)
+	at net.minecraft.client.Minecraft.run(Minecraft.java:448)
+	at net.minecraft.client.main.Main.main(Main.java:113)
+	at Start.main(Start.java:22)
+
+-- System Details --
+Details:
+	Minecraft Version: 1.8.9
+	Operating System: Windows 10 (amd64) version 10.0
+	Java Version: 1.8.0_181, Oracle Corporation
+	Java VM Version: Java HotSpot(TM) 64-Bit Server VM (mixed mode), Oracle Corporation
+	Memory: 606292376 bytes (578 MB) / 1139277824 bytes (1086 MB) up to 7432306688 bytes (7088 MB)
+	JVM Flags: 0 total; 
+	IntCache: cache: 0, tcache: 0, allocated: 13, tallocated: 95
+	Launched Version: MavenMCP
+	LWJGL: 2.9.4
+	OpenGL: AMD Radeon RX 7800 XT GL version 4.6.0 Compatibility Profile Context 26.2.2.260209, ATI Technologies Inc.
+	GL Caps: Using GL 1.3 multitexturing.
+Using GL 1.3 texture combiners.
+Using framebuffer objects because OpenGL 3.0 is supported and separate blending is supported.
+Shaders are available because OpenGL 2.1 is supported.
+VBOs are available because OpenGL 1.5 is supported.
+
+	Using VBOs: No
+	Is Modded: Very likely; Jar signature invalidated
+	Type: Client (map_client.txt)
+	Resource Packs: 
+	Current Language: English (US)
+	Profiler Position: N/A (disabled)
+	CPU: 16x AMD Ryzen 7 7700X 8-Core Processor 
