@@ -13,29 +13,30 @@ import java.util.Arrays;
  * Marcelektro
  */
 
-import java.io.*;
-import java.util.Arrays;
-import net.minecraft.client.main.Main;
-
 public class Start {
     public static void main(String[] args) {
         // Cherche les natives à côté du JAR, sinon fallback test_natives
-        String nativesPath;
         File jarSideNatives = new File(
                 new File(Start.class.getProtectionDomain()
                         .getCodeSource().getLocation().getPath())
                         .getParentFile(), "natives"
         );
         if (jarSideNatives.exists()) {
-            nativesPath = jarSideNatives.getAbsolutePath();
+            System.setProperty("org.lwjgl.librarypath", jarSideNatives.getAbsolutePath());
         } else {
-            nativesPath = new File("../test_natives/" +
+            System.setProperty("org.lwjgl.librarypath", new File("../test_natives/" +
                     (System.getProperty("os.name").startsWith("Windows") ? "windows" : "linux")
-            ).getAbsolutePath();
+            ).getAbsolutePath());
         }
-        System.setProperty("org.lwjgl.librarypath", nativesPath);
 
-        Main.main(concat(new String[]{"--version", "MavenMCP", "--accessToken", "0", "--assetsDir", "assets", "--assetIndex", "1.8", "--userProperties", "{}"}, args));
+        // Le launcher fournit : --username, --uuid, --accessToken, --gameDir
+        // Minecraft a besoin aussi de : --version, --assetsDir, --assetIndex
+        Main.main(concat(new String[]{
+                "--version",    "MavenMCP",
+                "--assetsDir",  "assets",
+                "--assetIndex", "1.8",
+                "--userProperties", "{}"
+        }, args));
     }
 
     public static <T> T[] concat(T[] first, T[] second) {
