@@ -1,0 +1,56 @@
+# .github/workflows/release.yml
+# Place ce fichier dans : .github/workflows/release.yml
+
+name: Build & Release Auto
+
+on:
+  push:
+    branches:
+      - master   # Se déclenche à chaque push sur master
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Java 8
+        uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+
+      - name: Build avec Maven
+        run: mvn package -DskipTests
+
+      # Génère un tag automatique basé sur la date + numéro du commit
+      - name: Générer le tag
+        id: tag
+        run: |
+          TAG="v$(date +'%Y%m%d%H%M')-${GITHUB_SHA::7}"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      # Supprime la release "latest" existante si elle existe
+      - name: Supprimer l'ancienne release latest
+        uses: dev-drprasad/delete-tag-and-release@v0.2.1
+        with:
+          tag_name: latest
+          delete_release: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true   # pas d'erreur si elle n'existe pas encore
+
+      # Crée la nouvelle release taguée "latest"
+      # Le launcher cherche toujours "latest" donc pas besoin de changer la config
+      - name: Créer la Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: latest
+          name: "Dernière version — ${{ steps.tag.outputs.tag }}"
+          body: "Mise à jour automatique du ${{ steps.tag.outputs.tag }}"
+          files: target/MCP-1.8.9-jar-with-dependencies.jar
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
