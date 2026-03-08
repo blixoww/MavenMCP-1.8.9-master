@@ -1,5 +1,4 @@
 # .github/workflows/release.yml
-# Place ce fichier dans : .github/workflows/release.yml
 
 name: Build & Release Auto
 
@@ -9,7 +8,7 @@ on:
       - master
 
 permissions:
-  contents: write   # obligatoire pour créer des releases
+  contents: write
 
 jobs:
   build-and-release:
@@ -28,21 +27,33 @@ jobs:
       - name: Build avec Maven
         run: mvn package -DskipTests
 
-      # Tag unique : date + 7 premiers caractères du commit
-      - name: Générer le tag
+      # Zippe le dossier test_natives/windows en natives.zip
+      - name: Zipper les natives
+        run: zip -r natives.zip test_natives/windows/
+
+      - name: Generer le tag
         id: tag
         run: |
           TAG="build-$(date +'%Y%m%d-%H%M')-${GITHUB_SHA::7}"
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
-      # Cree la release, make_latest true = le launcher trouvera toujours celle-ci
-      - name: Créer la Release
+      - name: Creer la Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.tag.outputs.tag }}
           name: ${{ steps.tag.outputs.tag }}
-          body: "Mise à jour automatique"
-          files: target/MCP-1.8.9-jar-with-dependencies.jar
+          body: "Mise a jour automatique"
+          files: |
+            target/MCP-1.8.9-jar-with-dependencies.jar
+            natives.zip
           make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+
+
+
+
+
+
