@@ -40,7 +40,7 @@
                             </descriptorRefs>
                             <archive>
                                 <manifest>
-                                    <mainClass>start</mainClass>
+                                    <mainClass>Start</mainClass>
                                 </manifest>
                             </archive>
                         </configuration>
