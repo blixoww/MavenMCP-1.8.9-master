@@ -1,5 +1,15 @@
+# .github/workflows/release.yml
+# Place ce fichier dans : .github/workflows/release.yml
+
+name: Build & Release Auto
+
+on:
+  push:
+    branches:
+      - master
+
 permissions:
-  contents: write
+  contents: write   # obligatoire pour créer des releases
 
 jobs:
   build-and-release:
@@ -18,12 +28,14 @@ jobs:
       - name: Build avec Maven
         run: mvn package -DskipTests
 
+      # Tag unique : date + 7 premiers caractères du commit
       - name: Générer le tag
         id: tag
         run: |
           TAG="build-$(date +'%Y%m%d-%H%M')-${GITHUB_SHA::7}"
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
+      # Cree la release, make_latest true = le launcher trouvera toujours celle-ci
       - name: Créer la Release
         uses: softprops/action-gh-release@v1
         with:
@@ -34,13 +46,3 @@ jobs:
           make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-on:
-
-
-
-
-
-
-
-
