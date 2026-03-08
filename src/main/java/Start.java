@@ -13,11 +13,27 @@ import java.util.Arrays;
  * Marcelektro
  */
 
+import java.io.*;
+import java.util.Arrays;
+import net.minecraft.client.main.Main;
+
 public class Start {
     public static void main(String[] args) {
-        // Provide natives
-        // Currently supported Linux and Windows
-        System.setProperty("org.lwjgl.librarypath", new File("../test_natives/" + (System.getProperty("os.name").startsWith("Windows") ? "windows" : "linux")).getAbsolutePath());
+        // Cherche les natives à côté du JAR, sinon fallback test_natives
+        String nativesPath;
+        File jarSideNatives = new File(
+                new File(Start.class.getProtectionDomain()
+                        .getCodeSource().getLocation().getPath())
+                        .getParentFile(), "natives"
+        );
+        if (jarSideNatives.exists()) {
+            nativesPath = jarSideNatives.getAbsolutePath();
+        } else {
+            nativesPath = new File("../test_natives/" +
+                    (System.getProperty("os.name").startsWith("Windows") ? "windows" : "linux")
+            ).getAbsolutePath();
+        }
+        System.setProperty("org.lwjgl.librarypath", nativesPath);
 
         Main.main(concat(new String[]{"--version", "MavenMCP", "--accessToken", "0", "--assetsDir", "assets", "--assetIndex", "1.8", "--userProperties", "{}"}, args));
     }
