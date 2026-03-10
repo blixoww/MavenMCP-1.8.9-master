@@ -1041,6 +1041,12 @@ public class RenderItem implements IResourceManagerReloadListener {
         this.registerItem(Items.ruby, "ruby");
         this.registerItem(Items.cobalt_ingot, "cobalt_ingot");
         this.registerItem(Items.steel_ingot, "steel_ingot");
+
+        // ── Items custom manquants ──────────────────────────────────────────────
+        this.registerItem(Items.multi_tool, "multi_tool");
+        this.registerItem(Items.obsidian_door, "obsidian_door");
+        this.registerBlock(Blocks.obsidian_door, "obsidian_door");
+        this.registerBlock(Blocks.random_ore, "random_ore");
     }
 
     public void onResourceManagerReload(IResourceManager resourceManager) {

@@ -307,45 +307,6 @@ public class KeyStrokeWidget extends BaseWidget {
     }
 
     /**
-     * Barre espace : fond noir + bande RGB pleine hauteur animée de gauche à droite
-     */
-    private void drawSpaceBar(int x, int y, int w, int h, long now) {
-        boolean pressed = false;
-        if (IDX_SPACE < keys.length) try {
-            pressed = keys[IDX_SPACE].isKeyDown();
-        } catch (Throwable t) {
-        }
-
-        // Fond noir
-        Gui.drawRect(x, y, x + w, y + h, pressed ? BOX_PRESSED : BOX_NORMAL);
-        drawBorder1px(x, y, w, h, pressed ? BOX_BORDER_PRESSED : BOX_BORDER);
-
-        // Bande RGB animée — toute la hauteur intérieure, défilement de gauche à droite
-        int rgbX = x + 1;
-        int rgbY = y + 1;
-        int rgbW = w - 2;
-        int rgbH = h - 2;
-        if (rgbW > 0 && rgbH > 0) {
-            // timeOffset : avance de 0 à 1 toutes les 3 secondes
-            float timeOffset = (now % 3000L) / 3000.0f;
-            for (int i = 0; i < rgbW; i++) {
-                // hue : position dans le spectre + décalage temporel → défilement gauche→droite
-                float hue = (timeOffset + i / (float) rgbW) % 1.0f;
-                int rgb = java.awt.Color.HSBtoRGB(hue, 1.0f, 0.95f) & 0x00FFFFFF;
-                Gui.drawRect(rgbX + i, rgbY, rgbX + i + 1, rgbY + rgbH, 0xFF000000 | rgb);
-            }
-        }
-
-        // Flash discret par-dessus
-        long elapsed = now - lastSpacePress;
-        if (elapsed < FLASH_DURATION) {
-            float t = elapsed / (float) FLASH_DURATION;
-            int fa = (int) (FLASH_MAX * (1f - t * t) * 255f);
-            if (fa > 0) Gui.drawRect(x, y, x + w, y + h, (fa << 24) | 0xFFFFFF);
-        }
-    }
-
-    /**
      * Nouvelle version de la barre espace : fond noir transparent, bande RGB plus fine et centrée
      */
     private void drawSpaceBarImproved(int x, int y, int w, int h, long now) {

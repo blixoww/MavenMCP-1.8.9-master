@@ -242,6 +242,10 @@ public class Blocks {
     public static final Block ruby_block;
     public static final Block cobalt_block;
 
+    // ── Nouveaux blocs custom ──────────────────────────────────────────────────
+    public static final Block obsidian_door;
+    public static final Block random_ore;
+
     /**
      * Returns the Block in the blockRegistry with the specified name.
      *
@@ -460,6 +464,9 @@ public class Blocks {
             steel_block = getRegisteredBlock("steel_block");
             ruby_block = getRegisteredBlock("ruby_block");
             cobalt_block = getRegisteredBlock("cobalt_block");
+
+            obsidian_door = getRegisteredBlock("obsidian_door");
+            random_ore = getRegisteredBlock("random_ore");
         }
     }
 }

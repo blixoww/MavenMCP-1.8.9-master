@@ -1305,6 +1305,10 @@ public class Block {
         registerBlock(202, "ruby_block", (new Block(Material.iron, MapColor.redColor)).setHardness(5.0F).setResistance(10.0F).setStepSound(soundTypeMetal).setUnlocalizedName("ruby_block").setCreativeTab(CreativeTabs.tabBlock));
         registerBlock(203, "cobalt_block", (new Block(Material.iron, MapColor.blueColor)).setHardness(5.0F).setResistance(10.0F).setStepSound(soundTypeMetal).setUnlocalizedName("cobalt_block").setCreativeTab(CreativeTabs.tabBlock));
 
+        // ── Nouveaux blocs custom ─────────────────────────────────────────────────
+        registerBlock(204, "obsidian_door", (new BlockObsidianDoor()).disableStats());
+        registerBlock(205, "random_ore", (new BlockRandomOre()).setCreativeTab(CreativeTabs.tabBlock));
+
         blockRegistry.validateKey();
 
         for (Block block13 : blockRegistry) {

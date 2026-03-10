@@ -63,6 +63,7 @@ public class BiomeDecorator
     protected WorldGenerator rubyGen;
     protected WorldGenerator cobaltGen;
     protected WorldGenerator emeraldOreGen;
+    protected WorldGenerator randomOreGen;
     protected WorldGenFlowers yellowFlowerGen = new WorldGenFlowers(Blocks.yellow_flower, BlockFlower.EnumFlowerType.DANDELION);
 
     /** Field that holds mushroomBrown WorldGenFlowers */
@@ -177,9 +178,11 @@ public class BiomeDecorator
             this.diamondGen = new WorldGenMinable(Blocks.diamond_ore.getDefaultState(), this.chunkProviderSettings.diamondSize);
             this.lapisGen = new WorldGenMinable(Blocks.lapis_ore.getDefaultState(), this.chunkProviderSettings.lapisSize);
             // Minerais custom : veine de 4 blocs max
-            this.rubyGen      = new WorldGenMinable(Blocks.ruby_ore.getDefaultState(),   4);
-            this.cobaltGen    = new WorldGenMinable(Blocks.cobalt_ore.getDefaultState(), 3);
+            this.rubyGen      = new WorldGenMinable(Blocks.ruby_ore.getDefaultState(),   5);
+            this.cobaltGen    = new WorldGenMinable(Blocks.cobalt_ore.getDefaultState(), 5);
             this.emeraldOreGen = new WorldGenMinable(Blocks.emerald_ore.getDefaultState(), this.chunkProviderSettings.diamondSize);
+            // Random ore : un peu moins rare que le diamant (comme l'or)
+            this.randomOreGen = new WorldGenMinable(Blocks.random_ore.getDefaultState(), this.chunkProviderSettings.goldSize);
             this.genDecorations(biome);
             this.currentWorld = null;
             this.randomGenerator = null;
@@ -500,11 +503,13 @@ public class BiomeDecorator
         this.genStandardOre1(this.chunkProviderSettings.redstoneCount, this.redstoneGen, this.chunkProviderSettings.redstoneMinHeight, this.chunkProviderSettings.redstoneMaxHeight);
         this.genStandardOre1(this.chunkProviderSettings.diamondCount, this.diamondGen, this.chunkProviderSettings.diamondMinHeight, this.chunkProviderSettings.diamondMaxHeight);
         this.genStandardOre2(this.chunkProviderSettings.lapisCount, this.lapisGen, this.chunkProviderSettings.lapisCenterHeight, this.chunkProviderSettings.lapisSpread);
-        // Émeraude : même rareté que diamant, partout (et non plus seulement en montagne)
-        this.genStandardOre1(this.chunkProviderSettings.diamondCount, this.emeraldOreGen, this.chunkProviderSettings.diamondMinHeight, this.chunkProviderSettings.diamondMaxHeight);
-        // Ruby : ~même rareté que diamant (2 veines/chunk max, y 1-16)
-        this.genStandardOre1(2, this.rubyGen,   1, 16);
-        // Cobalt : plus rare que diamant (1 veine/chunk max, y 1-10)
-        this.genStandardOre1(1, this.cobaltGen, 1, 10);
+        // Émeraude : plus présente (3 veines/chunk, partout)
+        this.genStandardOre1(3, this.emeraldOreGen, this.chunkProviderSettings.diamondMinHeight, this.chunkProviderSettings.diamondMaxHeight);
+        // Ruby : aussi fréquent que l'émeraude (3 veines/chunk, y 1-16)
+        this.genStandardOre1(3, this.rubyGen,   1, 16);
+        // Cobalt : bien plus présent (4 veines/chunk, y 1-24)
+        this.genStandardOre1(4, this.cobaltGen, 1, 24);
+        // Random Ore : un peu moins rare que le diamant (comme l'or)
+        this.genStandardOre1(this.chunkProviderSettings.goldCount * 2, this.randomOreGen, this.chunkProviderSettings.goldMinHeight, this.chunkProviderSettings.goldMaxHeight);
     }
 }

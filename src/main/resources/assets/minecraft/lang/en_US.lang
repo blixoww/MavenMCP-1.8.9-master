@@ -2745,3 +2745,14 @@ container.steelChest=Steel Chest
 tile.steel_block.name=Steel Block
 tile.ruby_block.name=Ruby Block
 tile.cobalt_block.name=Cobalt Block
+
+# ── Multi Tool ────────────────────────────────────────────────────────────────
+item.multi_tool.name=Multi Tool
+
+# ── Obsidian Door ─────────────────────────────────────────────────────────────
+item.doorObsidian.name=Obsidian Door
+tile.obsidian_door.name=Obsidian Door
+
+# ── Random Ore ────────────────────────────────────────────────────────────────
+tile.random_ore.name=Random Ore
+

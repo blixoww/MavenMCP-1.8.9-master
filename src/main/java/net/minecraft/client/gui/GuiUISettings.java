@@ -55,7 +55,7 @@ public class GuiUISettings extends GuiScreen {
 
         ArrayList<UIElement> list = new ArrayList<>();
         for (UIElement e : ui.all()) {
-            if (!"crosshair".equals(e.getId())) list.add(e);
+            list.add(e);
         }
         int total = list.size();
         int maxVis = Math.min(getMaxVisible(), total);
@@ -168,7 +168,7 @@ public class GuiUISettings extends GuiScreen {
 
         ArrayList<UIElement> list = new ArrayList<>();
         for (UIElement e : ui.all()) {
-            if (!"crosshair".equals(e.getId())) list.add(e);
+            list.add(e);
         }
         int total = list.size();
         int maxVis = Math.min(getMaxVisible(), total);

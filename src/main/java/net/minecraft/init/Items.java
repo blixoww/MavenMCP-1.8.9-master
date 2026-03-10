@@ -249,6 +249,10 @@ public class Items
     public static final Item cobalt_axe;
     public static final Item cobalt_hoe;
 
+    // Nouveaux items custom
+    public static final Item multi_tool;
+    public static final Item obsidian_door;
+
     private static Item getRegisteredItem(String name)
     {
         return (Item)Item.itemRegistry.getObject(new ResourceLocation(name));
@@ -492,6 +496,9 @@ public class Items
             cobalt_shovel = getRegisteredItem("cobalt_shovel");
             cobalt_axe = getRegisteredItem("cobalt_axe");
             cobalt_hoe = getRegisteredItem("cobalt_hoe");
+
+            multi_tool = getRegisteredItem("multi_tool");
+            obsidian_door = getRegisteredItem("obsidian_door");
         }
     }
 }

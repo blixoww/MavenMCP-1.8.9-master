@@ -184,6 +184,34 @@ public class CraftingManager
         this.addRecipe(new ItemStack(Blocks.daylight_detector), new Object[] {"GGG", "QQQ", "WWW", 'G', Blocks.glass, 'Q', Items.quartz, 'W', Blocks.wooden_slab});
         this.addRecipe(new ItemStack(Blocks.hopper), new Object[] {"I I", "ICI", " I ", 'I', Items.iron_ingot, 'C', Blocks.chest});
         this.addRecipe(new ItemStack(Items.armor_stand, 1), new Object[] {"///", " / ", "/_/", '/', Items.stick, '_', new ItemStack(Blocks.stone_slab, 1, BlockStoneSlab.EnumType.STONE.getMetadata())});
+
+        // ── Recettes custom ───────────────────────────────────────────────────────
+        // Multi Tool : 3 blocs de cobalt en haut, 2 cobalt sur les côtés, 2 bâtons en bas au centre
+        // CCC
+        // C C   (cobalt sur les côtés)
+        //  S    bâton
+        //  S    bâton
+        // Grille 3x4 → réduite en 3x3 avec :
+        // Row 0 : cobalt_block cobalt_block cobalt_block
+        // Row 1 : cobalt_ingot <vide> cobalt_ingot
+        // Row 2 : <vide> stick <vide>
+        this.addRecipe(new ItemStack(Items.multi_tool, 1), new Object[] {
+                "CCC",
+                "I I",
+                " S ",
+                'C', Blocks.cobalt_block,
+                'I', Items.cobalt_ingot,
+                'S', Items.stick
+        });
+
+        // Porte en obsidienne : même pattern qu'une porte classique (2 colonnes x 3 lignes = 6 obsidiennes)
+        this.addRecipe(new ItemStack(Items.obsidian_door, 3), new Object[] {
+                "##",
+                "##",
+                "##",
+                '#', Blocks.obsidian
+        });
+
         Collections.sort(this.recipes, new Comparator<IRecipe>()
         {
             public int compare(IRecipe p_compare_1_, IRecipe p_compare_2_)

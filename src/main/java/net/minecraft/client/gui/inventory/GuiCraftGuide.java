@@ -1,6 +1,7 @@
 package net.minecraft.client.gui.inventory;
 
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiRenderUtils;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
@@ -15,180 +16,185 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * GuiCraftGuide — SIMPLE VERSION avec potions hardcodées
+ * GuiCraftGuide — Lunar Client-inspired professional redesign
+ * PvP Faction | MCP 1.8.9
+ *
+ * Visual style:
+ *  · Ultra-dark panels with multi-layer shadow & gradient headers
+ *  · Electric-blue accent system (#3D8EFF) with mode-tinted variants
+ *  · 3-D inset slots with smooth hover pulse
+ *  · Smooth scrolling with momentum
+ *  · Search bar with icon & focus animation
+ *  · Animated chevron arrows in recipe views
+ *  · Fully screen-adaptive sizing (works at any resolution)
  */
 public class GuiCraftGuide extends GuiScreen {
 
-    private static final int C_BG = 0xDD0A0A14;
-    private static final int C_PANEL = 0xFF15151F;
-    private static final int C_PANEL2 = 0xFF1C1C2E;
-    private static final int C_BORDER = 0xFF4A90E2;
-    private static final int C_BORDER2 = 0xFF2A3A5A;
-    private static final int C_SLOT = 0xFF1F1F30;
-    private static final int C_SLOT_HOV = 0x55FF6B35;
-    private static final int C_SLOT_SEL = 0x88FF8C00;
-    private static final int C_TEXT_TTL = 0xFFFFB347;
-    private static final int C_TEXT_DTL = 0xFF7A8BA5;
-    private static final int C_HINT = 0xFF5A6A8A;
-    private static final int C_SCR_BG = 0xFF1F2635;
-    private static final int C_SCR_FG = 0xFF4A90E2;
-    private static final int C_SCR_HL = 0xFF6CB4FF;
-    private static final int C_BTN_BG = 0xFF2A3A5A;
-    private static final int C_BTN_HV = 0xFF4A90E2;
+    // ── Palette ────────────────────────────────────────────────────────────────
+    private static final int C_OVERLAY        = 0xCC030511;
+    private static final int C_PANEL          = 0xFF0B0C17;
+    private static final int C_PANEL_HDR      = 0xFF080A14;
+    private static final int C_PANEL_INNER    = 0xFF0E0F1C;
+    private static final int C_RECIPE_BG      = 0xFF09090F;
+    private static final int C_ACCENT         = 0xFF3D8EFF;
+    private static final int C_ACCENT_DIM     = 0xFF0C1A38;
+    private static final int C_BREW           = 0xFF00BBEE;
+    private static final int C_FURNACE        = 0xFFFF7822;
+    private static final int C_GOLD           = 0xFFE8A030;
+    private static final int C_BORDER_MID     = 0xFF182040;
+    private static final int C_BORDER_DIM     = 0xFF080C18;
+    private static final int C_SLOT           = 0xFF0B0C18;
+    private static final int C_SLOT_LT        = 0xFF1C1E30;
+    private static final int C_SLOT_DK        = 0xFF040408;
+    private static final int C_SCR_TRACK      = 0xFF060710;
+    private static final int C_SCR_THUMB      = 0xFF1A2C50;
+    private static final int C_SCR_ACTIVE     = 0xFF3D8EFF;
+    private static final int C_BTN            = 0xFF0B1022;
+    private static final int C_BTN_HOV        = 0xFF162038;
+    private static final int C_BTN_BDR        = 0xFF162040;
+    private static final int C_TXT_TITLE      = 0xFFFFFFFF;
+    private static final int C_TXT_DIM        = 0xFF445870;
+    private static final int C_TXT_HINT       = 0xFF2A3648;
+    private static final int C_TXT_GOLD       = 0xFFE8A030;
+    private static final int C_TXT_BREW       = 0xFF44CCFF;
 
-    private static final int COLS = 9;
-    private static final int ROWS = 5;
-    private static final int SZ = 18;
-    private static final int SBW = 8;
-    private static final int SBP = 4;
-    private static final int PAD = 10;
-    private static final int GRID_W = COLS * SZ;
-    private static final int PANEL_W = PAD + GRID_W + SBP + SBW + PAD;
-    private static final int TITLE_H = 15;
-    private static final int SEARCH_Y = TITLE_H + 4;
-    private static final int SEARCH_H = 16;
-    private static final int GRID_OFF = SEARCH_Y + SEARCH_H + 4;
-    private static final int HINT_H = 9;
-    private static final int PANEL_H = GRID_OFF + ROWS * SZ + 4 + HINT_H + 4;
-    private static final int BTN_W = 55;
-    private static final int BTN_H = 14;
+    // ── Grid constants (base values, scaled in initGui) ────────────────────────
+    private int COLS = 9;
+    private int SZ   = 18;
+    private static final int SBW  = 6;
+    private static final int SBP  = 4;
 
-    private static final Set<String> BLOCKED = new HashSet<>(Arrays.asList(
-            "tile.litFurnace", "tile.farmland", "tile.doorWood", "tile.doorIron",
-            "tile.litRedstoneOre", "tile.redstoneLamp.on", "tile.pistonHead",
-            "tile.pistonMoving", "tile.cake", "tile.skull", "tile.carrots",
-            "tile.potatoes", "tile.wheat", "tile.netherWart", "tile.cocoa",
-            "tile.pumpkinStem", "tile.melonStem", "tile.tripWire",
-            "tile.beetroots", "tile.portal", "tile.endPortal", "tile.endGateway",
-            "tile.fire", "tile.water", "tile.lava", "tile.air"
-    ));
+    // ── Dynamic layout ─────────────────────────────────────────────────────────
+    private int pad, panelW, panelH, panelX, panelY;
+    private int gridX, gridY, sbX, sbY, sbH, GRID_W;
+    private int titleH, searchY, searchH, gridOff, btnW, btnH;
+    private int visibleRows;
+    private int footerY;
 
-    // Classe simple pour une recette de potion
+    // ── Smooth scroll ──────────────────────────────────────────────────────────
+    private float smoothScroll = 0f;
+    private int targetScroll = 0;
+
+    // ── Search focus animation ─────────────────────────────────────────────────
+    private float searchFocusAnim = 0f;
+
+    // ── Potion recipe system ───────────────────────────────────────────────────
     static class PotionRecipe {
         int inputMeta, outputMeta;
         ItemStack ingredient;
         String name;
-
         PotionRecipe(int in, int out, ItemStack ingr, String n) {
-            inputMeta = in;
-            outputMeta = out;
-            ingredient = ingr;
-            name = n;
+            inputMeta = in; outputMeta = out; ingredient = ingr; name = n;
         }
     }
 
-    // Map : outputMeta → liste des recettes possibles
     private static final Map<Integer, List<PotionRecipe>> POTION_RECIPES = new HashMap<>();
 
     static {
         ItemStack glowstone = new ItemStack(Items.glowstone_dust);
-        ItemStack redstone = new ItemStack(Items.redstone);
+        ItemStack redstone  = new ItemStack(Items.redstone);
         ItemStack gunpowder = new ItemStack(Items.gunpowder);
         ItemStack fermented = new ItemStack(Items.fermented_spider_eye);
-// AWKWARD
-        POTION_RECIPES.computeIfAbsent(16, k -> new ArrayList<>()).add(new PotionRecipe(0, 16, new ItemStack(Items.nether_wart), "Awkward"));
-// REGENERATION
-        int base = 8193;
-        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(16, base, new ItemStack(Items.ghast_tear), "Régénération"));
-        POTION_RECIPES.computeIfAbsent(base + 32, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 32, glowstone, "Régénération II"));
-        POTION_RECIPES.computeIfAbsent(base + 64, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 64, redstone, "Régénération Étendue"));
-        POTION_RECIPES.computeIfAbsent(base + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 8192, gunpowder, "Régénération Splash"));
-        POTION_RECIPES.computeIfAbsent((base + 32) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 32, (base + 32) + 8192, gunpowder, "Régénération II Splash"));
-        POTION_RECIPES.computeIfAbsent((base + 64) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 64, (base + 64) + 8192, gunpowder, "Régénération Étendue Splash"));
-// SWIFTNESS
-        base = 8194;
-        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(16, base, new ItemStack(Items.sugar), "Rapidité"));
-        POTION_RECIPES.computeIfAbsent(base + 32, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 32, glowstone, "Rapidité II"));
-        POTION_RECIPES.computeIfAbsent(base + 64, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 64, redstone, "Rapidité Étendue"));
-        POTION_RECIPES.computeIfAbsent(base + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 8192, gunpowder, "Rapidité Splash"));
-        POTION_RECIPES.computeIfAbsent((base + 32) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 32, (base + 32) + 8192, gunpowder, "Rapidité II Splash"));
-        POTION_RECIPES.computeIfAbsent((base + 64) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 64, (base + 64) + 8192, gunpowder, "Rapidité Étendue Splash"));
-// FIRE RESISTANCE
-        base = 8195;
-        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(16, base, new ItemStack(Items.magma_cream), "Résistance au Feu"));
-        POTION_RECIPES.computeIfAbsent(base + 64, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 64, redstone, "Résistance au Feu Étendue"));
-        POTION_RECIPES.computeIfAbsent(base + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 8192, gunpowder, "Résistance au Feu Splash"));
-        POTION_RECIPES.computeIfAbsent((base + 64) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 64, (base + 64) + 8192, gunpowder, "Résistance au Feu Étendue Splash"));
-// POISON
-        base = 8196;
-        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(16, base, new ItemStack(Items.spider_eye), "Poison"));
-        POTION_RECIPES.computeIfAbsent(base + 32, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 32, glowstone, "Poison II"));
-        POTION_RECIPES.computeIfAbsent(base + 64, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 64, redstone, "Poison Étendu"));
-        POTION_RECIPES.computeIfAbsent(base + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 8192, gunpowder, "Poison Splash"));
-        POTION_RECIPES.computeIfAbsent((base + 32) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 32, (base + 32) + 8192, gunpowder, "Poison II Splash"));
-        POTION_RECIPES.computeIfAbsent((base + 64) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 64, (base + 64) + 8192, gunpowder, "Poison Étendu Splash"));
-// HEALING
-        base = 8197;
-        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(16, base, new ItemStack(Items.speckled_melon), "Soin"));
-        POTION_RECIPES.computeIfAbsent(base + 32, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 32, glowstone, "Soin II"));
-        POTION_RECIPES.computeIfAbsent(base + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 8192, gunpowder, "Soin Splash"));
-        POTION_RECIPES.computeIfAbsent((base + 32) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 32, (base + 32) + 8192, gunpowder, "Soin II Splash"));
-// NIGHT VISION
-        base = 8198;
-        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(16, base, new ItemStack(Items.golden_carrot), "Vision Nocturne"));
-        POTION_RECIPES.computeIfAbsent(base + 64, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 64, redstone, "Vision Nocturne Étendue"));
-        POTION_RECIPES.computeIfAbsent(base + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 8192, gunpowder, "Vision Nocturne Splash"));
-        POTION_RECIPES.computeIfAbsent((base + 64) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 64, (base + 64) + 8192, gunpowder, "Vision Nocturne Étendue Splash"));
-// STRENGTH
-        base = 8201;
-        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(16, base, new ItemStack(Items.blaze_powder), "Force"));
-        POTION_RECIPES.computeIfAbsent(base + 32, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 32, glowstone, "Force II"));
-        POTION_RECIPES.computeIfAbsent(base + 64, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 64, redstone, "Force Étendue"));
-        POTION_RECIPES.computeIfAbsent(base + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 8192, gunpowder, "Force Splash"));
-        POTION_RECIPES.computeIfAbsent((base + 32) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 32, (base + 32) + 8192, gunpowder, "Force II Splash"));
-        POTION_RECIPES.computeIfAbsent((base + 64) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 64, (base + 64) + 8192, gunpowder, "Force Étendue Splash"));
-// LEAPING
-        base = 8203;
-        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(16, base, new ItemStack(Items.rabbit_foot), "Saut"));
-        POTION_RECIPES.computeIfAbsent(base + 32, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 32, glowstone, "Saut II"));
-        POTION_RECIPES.computeIfAbsent(base + 64, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 64, redstone, "Saut Étendu"));
-        POTION_RECIPES.computeIfAbsent(base + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 8192, gunpowder, "Saut Splash"));
-        POTION_RECIPES.computeIfAbsent((base + 32) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 32, (base + 32) + 8192, gunpowder, "Saut II Splash"));
-        POTION_RECIPES.computeIfAbsent((base + 64) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 64, (base + 64) + 8192, gunpowder, "Saut Étendu Splash"));
-// WATER BREATHING
-        base = 8205;
-        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(16, base, new ItemStack(Items.fish, 1, 3), "Respiration Aquatique"));
-        POTION_RECIPES.computeIfAbsent(base + 64, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 64, redstone, "Respiration Aquatique Étendue"));
-        POTION_RECIPES.computeIfAbsent(base + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 8192, gunpowder, "Respiration Aquatique Splash"));
-        POTION_RECIPES.computeIfAbsent((base + 64) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 64, (base + 64) + 8192, gunpowder, "Respiration Aquatique Étendue Splash"));
-// WEAKNESS
-        base = 8200;
-        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(0, base, fermented, "Faiblesse"));
-        POTION_RECIPES.computeIfAbsent(base + 64, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 64, redstone, "Faiblesse Étendue"));
-        POTION_RECIPES.computeIfAbsent(base + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 8192, gunpowder, "Faiblesse Splash"));
-        POTION_RECIPES.computeIfAbsent((base + 64) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 64, (base + 64) + 8192, gunpowder, "Faiblesse Étendue Splash"));
-// SLOWNESS
-        base = 8202;
-        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(8194, base, fermented, "Lenteur"));
-        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(8203, base, fermented, "Lenteur"));
-        POTION_RECIPES.computeIfAbsent(base + 64, k -> new ArrayList<>()).add(new PotionRecipe(8258, base + 64, fermented, "Lenteur Étendue"));
-        POTION_RECIPES.computeIfAbsent(base + 64, k -> new ArrayList<>()).add(new PotionRecipe(8267, base + 64, fermented, "Lenteur Étendue"));
-        POTION_RECIPES.computeIfAbsent(base + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 8192, gunpowder, "Lenteur Splash"));
-        POTION_RECIPES.computeIfAbsent((base + 64) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 64, (base + 64) + 8192, gunpowder, "Lenteur Étendue Splash"));
-// HARMING
-        base = 8204;
-        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(8197, base, fermented, "Dommages"));
-        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(8196, base, fermented, "Dommages"));
-        POTION_RECIPES.computeIfAbsent(base + 32, k -> new ArrayList<>()).add(new PotionRecipe(8229, base + 32, fermented, "Dommages II"));
-        POTION_RECIPES.computeIfAbsent(base + 32, k -> new ArrayList<>()).add(new PotionRecipe(8228, base + 32, fermented, "Dommages II"));
-        POTION_RECIPES.computeIfAbsent(base + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 8192, gunpowder, "Dommages Splash"));
-        POTION_RECIPES.computeIfAbsent((base + 32) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 32, (base + 32) + 8192, gunpowder, "Dommages II Splash"));
-// INVISIBILITY
-        base = 8206;
-        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(8198, base, fermented, "Invisibilité"));
-        POTION_RECIPES.computeIfAbsent(base + 64, k -> new ArrayList<>()).add(new PotionRecipe(8262, base + 64, fermented, "Invisibilité Étendue"));
-        POTION_RECIPES.computeIfAbsent(base + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 8192, gunpowder, "Invisibilité Splash"));
-        POTION_RECIPES.computeIfAbsent((base + 64) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 64, (base + 64) + 8192, gunpowder, "Invisibilité Étendue Splash"));
+        POTION_RECIPES.computeIfAbsent(16, k->new ArrayList<>()).add(new PotionRecipe(0,16,new ItemStack(Items.nether_wart),"Awkward"));
+        int base=8193;
+        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(16,base,new ItemStack(Items.ghast_tear),"Régénération"));
+        POTION_RECIPES.computeIfAbsent(base+32,k->new ArrayList<>()).add(new PotionRecipe(base,base+32,glowstone,"Régénération II"));
+        POTION_RECIPES.computeIfAbsent(base+64,k->new ArrayList<>()).add(new PotionRecipe(base,base+64,redstone,"Régénération Étendue"));
+        POTION_RECIPES.computeIfAbsent(base+8192,k->new ArrayList<>()).add(new PotionRecipe(base,base+8192,gunpowder,"Régénération Splash"));
+        POTION_RECIPES.computeIfAbsent((base+32)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+32,(base+32)+8192,gunpowder,"Régénération II Splash"));
+        POTION_RECIPES.computeIfAbsent((base+64)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+64,(base+64)+8192,gunpowder,"Régénération Étendue Splash"));
+        base=8194;
+        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(16,base,new ItemStack(Items.sugar),"Rapidité"));
+        POTION_RECIPES.computeIfAbsent(base+32,k->new ArrayList<>()).add(new PotionRecipe(base,base+32,glowstone,"Rapidité II"));
+        POTION_RECIPES.computeIfAbsent(base+64,k->new ArrayList<>()).add(new PotionRecipe(base,base+64,redstone,"Rapidité Étendue"));
+        POTION_RECIPES.computeIfAbsent(base+8192,k->new ArrayList<>()).add(new PotionRecipe(base,base+8192,gunpowder,"Rapidité Splash"));
+        POTION_RECIPES.computeIfAbsent((base+32)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+32,(base+32)+8192,gunpowder,"Rapidité II Splash"));
+        POTION_RECIPES.computeIfAbsent((base+64)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+64,(base+64)+8192,gunpowder,"Rapidité Étendue Splash"));
+        base=8195;
+        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(16,base,new ItemStack(Items.magma_cream),"Résistance au Feu"));
+        POTION_RECIPES.computeIfAbsent(base+64,k->new ArrayList<>()).add(new PotionRecipe(base,base+64,redstone,"Résistance au Feu Étendue"));
+        POTION_RECIPES.computeIfAbsent(base+8192,k->new ArrayList<>()).add(new PotionRecipe(base,base+8192,gunpowder,"Résistance au Feu Splash"));
+        POTION_RECIPES.computeIfAbsent((base+64)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+64,(base+64)+8192,gunpowder,"Résistance au Feu Étendue Splash"));
+        base=8196;
+        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(16,base,new ItemStack(Items.spider_eye),"Poison"));
+        POTION_RECIPES.computeIfAbsent(base+32,k->new ArrayList<>()).add(new PotionRecipe(base,base+32,glowstone,"Poison II"));
+        POTION_RECIPES.computeIfAbsent(base+64,k->new ArrayList<>()).add(new PotionRecipe(base,base+64,redstone,"Poison Étendu"));
+        POTION_RECIPES.computeIfAbsent(base+8192,k->new ArrayList<>()).add(new PotionRecipe(base,base+8192,gunpowder,"Poison Splash"));
+        POTION_RECIPES.computeIfAbsent((base+32)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+32,(base+32)+8192,gunpowder,"Poison II Splash"));
+        POTION_RECIPES.computeIfAbsent((base+64)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+64,(base+64)+8192,gunpowder,"Poison Étendu Splash"));
+        base=8197;
+        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(16,base,new ItemStack(Items.speckled_melon),"Soin"));
+        POTION_RECIPES.computeIfAbsent(base+32,k->new ArrayList<>()).add(new PotionRecipe(base,base+32,glowstone,"Soin II"));
+        POTION_RECIPES.computeIfAbsent(base+8192,k->new ArrayList<>()).add(new PotionRecipe(base,base+8192,gunpowder,"Soin Splash"));
+        POTION_RECIPES.computeIfAbsent((base+32)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+32,(base+32)+8192,gunpowder,"Soin II Splash"));
+        base=8198;
+        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(16,base,new ItemStack(Items.golden_carrot),"Vision Nocturne"));
+        POTION_RECIPES.computeIfAbsent(base+64,k->new ArrayList<>()).add(new PotionRecipe(base,base+64,redstone,"Vision Nocturne Étendue"));
+        POTION_RECIPES.computeIfAbsent(base+8192,k->new ArrayList<>()).add(new PotionRecipe(base,base+8192,gunpowder,"Vision Nocturne Splash"));
+        POTION_RECIPES.computeIfAbsent((base+64)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+64,(base+64)+8192,gunpowder,"Vision Nocturne Étendue Splash"));
+        base=8201;
+        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(16,base,new ItemStack(Items.blaze_powder),"Force"));
+        POTION_RECIPES.computeIfAbsent(base+32,k->new ArrayList<>()).add(new PotionRecipe(base,base+32,glowstone,"Force II"));
+        POTION_RECIPES.computeIfAbsent(base+64,k->new ArrayList<>()).add(new PotionRecipe(base,base+64,redstone,"Force Étendue"));
+        POTION_RECIPES.computeIfAbsent(base+8192,k->new ArrayList<>()).add(new PotionRecipe(base,base+8192,gunpowder,"Force Splash"));
+        POTION_RECIPES.computeIfAbsent((base+32)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+32,(base+32)+8192,gunpowder,"Force II Splash"));
+        POTION_RECIPES.computeIfAbsent((base+64)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+64,(base+64)+8192,gunpowder,"Force Étendue Splash"));
+        base=8203;
+        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(16,base,new ItemStack(Items.rabbit_foot),"Saut"));
+        POTION_RECIPES.computeIfAbsent(base+32,k->new ArrayList<>()).add(new PotionRecipe(base,base+32,glowstone,"Saut II"));
+        POTION_RECIPES.computeIfAbsent(base+64,k->new ArrayList<>()).add(new PotionRecipe(base,base+64,redstone,"Saut Étendu"));
+        POTION_RECIPES.computeIfAbsent(base+8192,k->new ArrayList<>()).add(new PotionRecipe(base,base+8192,gunpowder,"Saut Splash"));
+        POTION_RECIPES.computeIfAbsent((base+32)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+32,(base+32)+8192,gunpowder,"Saut II Splash"));
+        POTION_RECIPES.computeIfAbsent((base+64)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+64,(base+64)+8192,gunpowder,"Saut Étendu Splash"));
+        base=8205;
+        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(16,base,new ItemStack(Items.fish,1,3),"Respiration Aquatique"));
+        POTION_RECIPES.computeIfAbsent(base+64,k->new ArrayList<>()).add(new PotionRecipe(base,base+64,redstone,"Respiration Aquatique Étendue"));
+        POTION_RECIPES.computeIfAbsent(base+8192,k->new ArrayList<>()).add(new PotionRecipe(base,base+8192,gunpowder,"Respiration Aquatique Splash"));
+        POTION_RECIPES.computeIfAbsent((base+64)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+64,(base+64)+8192,gunpowder,"Respiration Aquatique Étendue Splash"));
+        base=8200;
+        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(0,base,fermented,"Faiblesse"));
+        POTION_RECIPES.computeIfAbsent(base+64,k->new ArrayList<>()).add(new PotionRecipe(base,base+64,redstone,"Faiblesse Étendue"));
+        POTION_RECIPES.computeIfAbsent(base+8192,k->new ArrayList<>()).add(new PotionRecipe(base,base+8192,gunpowder,"Faiblesse Splash"));
+        POTION_RECIPES.computeIfAbsent((base+64)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+64,(base+64)+8192,gunpowder,"Faiblesse Étendue Splash"));
+        base=8202;
+        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(8194,base,fermented,"Lenteur"));
+        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(8203,base,fermented,"Lenteur"));
+        POTION_RECIPES.computeIfAbsent(base+64,k->new ArrayList<>()).add(new PotionRecipe(8258,base+64,fermented,"Lenteur Étendue"));
+        POTION_RECIPES.computeIfAbsent(base+64,k->new ArrayList<>()).add(new PotionRecipe(8267,base+64,fermented,"Lenteur Étendue"));
+        POTION_RECIPES.computeIfAbsent(base+8192,k->new ArrayList<>()).add(new PotionRecipe(base,base+8192,gunpowder,"Lenteur Splash"));
+        POTION_RECIPES.computeIfAbsent((base+64)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+64,(base+64)+8192,gunpowder,"Lenteur Étendue Splash"));
+        base=8204;
+        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(8197,base,fermented,"Dommages"));
+        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(8196,base,fermented,"Dommages"));
+        POTION_RECIPES.computeIfAbsent(base+32,k->new ArrayList<>()).add(new PotionRecipe(8229,base+32,fermented,"Dommages II"));
+        POTION_RECIPES.computeIfAbsent(base+32,k->new ArrayList<>()).add(new PotionRecipe(8228,base+32,fermented,"Dommages II"));
+        POTION_RECIPES.computeIfAbsent(base+8192,k->new ArrayList<>()).add(new PotionRecipe(base,base+8192,gunpowder,"Dommages Splash"));
+        POTION_RECIPES.computeIfAbsent((base+32)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+32,(base+32)+8192,gunpowder,"Dommages II Splash"));
+        base=8206;
+        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(8198,base,fermented,"Invisibilité"));
+        POTION_RECIPES.computeIfAbsent(base+64,k->new ArrayList<>()).add(new PotionRecipe(8262,base+64,fermented,"Invisibilité Étendue"));
+        POTION_RECIPES.computeIfAbsent(base+8192,k->new ArrayList<>()).add(new PotionRecipe(base,base+8192,gunpowder,"Invisibilité Splash"));
+        POTION_RECIPES.computeIfAbsent((base+64)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+64,(base+64)+8192,gunpowder,"Invisibilité Étendue Splash"));
     }
 
+    private static final Set<String> BLOCKED = new HashSet<>(Arrays.asList(
+            "tile.litFurnace","tile.farmland","tile.doorWood","tile.doorIron",
+            "tile.litRedstoneOre","tile.redstoneLamp.on","tile.pistonHead",
+            "tile.pistonMoving","tile.cake","tile.skull","tile.carrots",
+            "tile.potatoes","tile.wheat","tile.netherWart","tile.cocoa",
+            "tile.pumpkinStem","tile.melonStem","tile.tripWire",
+            "tile.beetroots","tile.portal","tile.endPortal","tile.endGateway",
+            "tile.fire","tile.water","tile.lava","tile.air"
+    ));
+
+    // ── State ──────────────────────────────────────────────────────────────────
     private GuiTextField searchBox;
-    private final List<ItemStack> allItems = new ArrayList<>();
-    private final List<ItemStack> filtered = new ArrayList<>();
+    private final List<ItemStack> allItems    = new ArrayList<>();
+    private final List<ItemStack> filtered    = new ArrayList<>();
     private final List<ItemStack> historyStack = new ArrayList<>();
-    private int scroll = 0;
+    private boolean draggingSB = false;
 
-    private enum Mode {LIST, CRAFT, BREWING, FURNACE}
-
+    private enum Mode { LIST, CRAFT, BREWING, FURNACE }
     private Mode mode = Mode.LIST;
     private ItemStack selected;
     private IRecipe craftRecipe;
@@ -196,60 +202,509 @@ public class GuiCraftGuide extends GuiScreen {
     private List<PotionRecipe> brewRecipesForItem = new ArrayList<>();
     private int brewRecipeIndex = 0;
     private PotionRecipe currentBrewRecipe = null;
-
-    private int panelX, panelY, gridX, gridY, sbX, sbY, sbH;
-    private boolean draggingSB = false;
     private GuiButton btnBack, btnMenu;
 
-    public GuiCraftGuide(GuiScreen parent) {
-    }
+    public GuiCraftGuide(GuiScreen parent) {}
+
+    // ── Init ──────────────────────────────────────────────────────────────────
 
     @Override
     public void initGui() {
         buttonList.clear();
         historyStack.clear();
-        mode = Mode.LIST;
-        selected = null;
-        craftRecipe = null;
-        furnaceInput = null;
-        currentBrewRecipe = null;
-        brewRecipesForItem = new ArrayList<>();
-        brewRecipeIndex = 0;
+        mode = Mode.LIST; selected = null; craftRecipe = null;
+        furnaceInput = null; currentBrewRecipe = null;
+        brewRecipesForItem = new ArrayList<>(); brewRecipeIndex = 0;
 
-        panelX = (width - PANEL_W) / 2;
-        panelY = (height - PANEL_H) / 2;
-        gridX = panelX + PAD;
-        gridY = panelY + GRID_OFF;
-        sbX = gridX + GRID_W + SBP;
-        sbY = gridY;
-        sbH = ROWS * SZ;
+        // Adaptive scaling based on screen resolution
+        SZ = GuiRenderUtils.clamp(height / 18, 16, 24);
+        COLS = GuiRenderUtils.clamp((width - 60) / SZ, 7, 11);
+        visibleRows = GuiRenderUtils.clamp((height - 150) / SZ, 3, 8);
+        GRID_W = COLS * SZ;
+        pad = Math.max(10, width / 50);
+        titleH = Math.max(24, height / 18);
+        searchH = 18;
+        searchY = titleH + 6;
+        gridOff = searchY + searchH + 6;
+        btnH = 18;
+        btnW = Math.max(60, width / 8);
 
-        searchBox = new GuiTextField(0, fontRendererObj, panelX + PAD, panelY + SEARCH_Y, PANEL_W - PAD * 2, SEARCH_H);
+        panelW = GuiRenderUtils.clamp(pad + GRID_W + SBP + SBW + pad, 200, width - 20);
+        panelH = GuiRenderUtils.clamp(gridOff + visibleRows * SZ + 12 + btnH + 30, 180, height - 20);
+        panelX = (width  - panelW) / 2;
+        panelY = (height - panelH) / 2;
+        gridX  = panelX + pad;
+        gridY  = panelY + gridOff;
+        sbX    = gridX + GRID_W + SBP;
+        sbY    = gridY;
+        sbH    = visibleRows * SZ;
+        footerY = gridY + sbH + 4;
+
+        btnBack = new GuiButton(1, panelX + pad + 2, panelY + panelH - btnH - 6, btnW, btnH, "Retour");
+        btnMenu = new GuiButton(2, panelX + panelW - pad - btnW - 2, panelY + panelH - btnH - 6, btnW, btnH, "Menu");
+
+        searchBox = new GuiTextField(0, fontRendererObj,
+                panelX + pad + 16, panelY + searchY,
+                panelW - pad * 2 - SBP - SBW - 16, searchH);
         searchBox.setMaxStringLength(40);
         searchBox.setFocused(true);
 
-        btnBack = new GuiButton(1, panelX + PAD + 2, panelY + PANEL_H - BTN_H - 2, BTN_W, BTN_H, "« Retour");
-        btnMenu = new GuiButton(2, panelX + PANEL_W - PAD - BTN_W - 2, panelY + PANEL_H - BTN_H - 2, BTN_W, BTN_H, "Menu");
-
         if (allItems.isEmpty()) {
             for (Item item : Item.itemRegistry) {
-                if (item == null) continue;
-                // Les potions sont ajoutées séparément à partir de POTION_RECIPES
-                if (item == Items.potionitem) continue;
+                if (item == null || item == Items.potionitem) continue;
                 List<ItemStack> sub = new ArrayList<>();
                 item.getSubItems(item, null, sub);
                 for (ItemStack s : sub) if (s != null && !isBlocked(s)) allItems.add(s);
             }
-            // Ajouter les potions depuis POTION_RECIPES pour garantir la correspondance des metas
-            Set<Integer> addedPotionMetas = new HashSet<>();
-            for (Map.Entry<Integer, List<PotionRecipe>> entry : POTION_RECIPES.entrySet()) {
-                int meta = entry.getKey();
-                if (addedPotionMetas.add(meta)) {
-                    allItems.add(new ItemStack(Items.potionitem, 1, meta));
+            Set<Integer> added = new HashSet<>();
+            for (Map.Entry<Integer,List<PotionRecipe>> e : POTION_RECIPES.entrySet())
+                if (added.add(e.getKey()))
+                    allItems.add(new ItemStack(Items.potionitem, 1, e.getKey()));
+        }
+        filter("");
+    }
+
+    // ── Draw helpers ──────────────────────────────────────────────────────────
+
+    private void drawSlot3D(int x, int y) {
+        drawRect(x, y, x + SZ, y + SZ, C_SLOT);
+        drawRect(x, y, x + SZ, y + 1, C_SLOT_LT);
+        drawRect(x, y, x + 1, y + SZ, C_SLOT_LT);
+        drawRect(x, y + SZ - 1, x + SZ, y + SZ, C_SLOT_DK);
+        drawRect(x + SZ - 1, y, x + SZ, y + SZ, C_SLOT_DK);
+    }
+
+    private void drawSlotOutput(int x, int y, int borderColor) {
+        drawSlot3D(x, y);
+        int base = borderColor & 0x00FFFFFF;
+        drawRect(x - 2, y - 2, x + SZ + 2, y + SZ + 2, 0x10000000 | base);
+        drawRect(x - 1, y - 1, x + SZ + 1, y + SZ + 1, 0x20000000 | base);
+        drawRect(x, y, x + SZ, y + 1, borderColor);
+        drawRect(x, y, x + 1, y + SZ, borderColor);
+        drawRect(x, y + SZ - 1, x + SZ, y + SZ, C_BORDER_DIM);
+        drawRect(x + SZ - 1, y, x + SZ, y + SZ, C_BORDER_DIM);
+    }
+
+    private void drawSlotHover(int x, int y) {
+        long t = System.currentTimeMillis() % 1200;
+        float p = t < 600 ? t / 600f : (1200f - t) / 600f;
+        int a = (int)(0x30 + 0x30 * p);
+        drawRect(x, y, x + SZ, y + SZ, (a << 24) | 0x3D8EFF);
+        drawRect(x, y, x + SZ, y + 1, ((int)(0x80 + 0x40 * p) << 24) | 0x3D8EFF);
+    }
+
+    private void drawNavButton(int x, int y, int w, int h, String text, boolean hover, int accentCol) {
+        GuiRenderUtils.drawStyledButton(x, y, w, h, hover ? C_BTN_HOV : C_BTN, hover ? accentCol : C_BTN_BDR, hover);
+        int txtColor = hover ? 0xFFFFFFFF : 0xFFAABBCC;
+        drawCenteredString(fontRendererObj, text, x + w / 2, y + (h - 8) / 2, txtColor);
+    }
+
+    private void drawSeparator(int x, int y, int w, int accent) {
+        GuiRenderUtils.drawGradientRect(x, y, x + w / 3, y + 1, 0x00000000, accent);
+        drawRect(x + w / 3, y, x + w * 2 / 3, y + 1, accent);
+        GuiRenderUtils.drawGradientRect(x + w * 2 / 3, y, x + w, y + 1, accent, 0x00000000);
+    }
+
+    private void drawModeBadge(int x, int y, String label, int bg, int border) {
+        int tw = fontRendererObj.getStringWidth(label);
+        drawRect(x, y, x + tw + 8, y + 12, bg);
+        drawRect(x, y, x + tw + 8, y + 1, border);
+        drawRect(x, y, x + 1, y + 12, border);
+        fontRendererObj.drawStringWithShadow(label, x + 4, y + 2, border);
+    }
+
+    // ── Main draw ─────────────────────────────────────────────────────────────
+
+    @Override
+    public void drawScreen(int mx, int my, float pt) {
+        // Update animations
+        smoothScroll = GuiRenderUtils.lerp(smoothScroll, targetScroll, 0.25f);
+        if (Math.abs(smoothScroll - targetScroll) < 0.05f) smoothScroll = targetScroll;
+
+        float searchTarget = (searchBox != null && searchBox.isFocused()) ? 1.0f : 0.0f;
+        searchFocusAnim = GuiRenderUtils.lerp(searchFocusAnim, searchTarget, 0.15f);
+
+        // Background overlay
+        drawRect(0, 0, width, height, C_OVERLAY);
+        int accent = modeAccent();
+
+        if (mode == Mode.LIST) {
+            // Panel with shadow + rounded corners (only for list mode)
+            GuiRenderUtils.drawRoundedPanel(panelX, panelY, panelW, panelH, C_PANEL, C_PANEL_HDR, titleH, accent);
+            // Inner area
+            drawRect(panelX + 1, panelY + titleH + 1, panelX + panelW - 1, panelY + panelH - 1, C_PANEL_INNER);
+
+            // Title
+            fontRendererObj.drawStringWithShadow("\u00a7l\u2726 Guide de Craft", panelX + pad, panelY + (titleH - 8) / 2, C_TXT_TITLE);
+
+            // Item count
+            String countStr = filtered.size() + " items";
+            int countX = panelX + panelW - pad - fontRendererObj.getStringWidth(countStr);
+            fontRendererObj.drawStringWithShadow("\u00a77" + countStr, countX, panelY + (titleH - 8) / 2, C_TXT_DIM);
+
+            drawSearchBox(mx, my);
+            drawItemGrid(mx, my);
+            drawFooter();
+        } else {
+            // Recipe mode draws its own panel with dynamic height
+            drawRecipeMode(mx, my);
+        }
+        super.drawScreen(mx, my, pt);
+    }
+
+    private void drawSearchBox(int mx, int my) {
+        int sx = panelX + pad, sy = panelY + searchY;
+        int sw = panelW - pad * 2 - SBP - SBW;
+
+        // Outer border
+        drawRect(sx - 1, sy - 1, sx + sw + 1, sy + searchH + 1, C_BORDER_DIM);
+        // Background
+        drawRect(sx, sy, sx + sw, sy + searchH, 0xFF080A14);
+        // Top inset shadow
+        drawRect(sx, sy, sx + sw, sy + 1, 0xFF020305);
+        drawRect(sx, sy, sx + 1, sy + searchH, 0xFF020305);
+
+        // Animated focus underline
+        int focusColor = GuiRenderUtils.colorLerp(C_BORDER_MID, C_ACCENT, searchFocusAnim);
+        drawRect(sx, sy + searchH - 1, sx + sw, sy + searchH, focusColor);
+        if (searchFocusAnim > 0.1f) {
+            int glowAlpha = (int)(0x18 * searchFocusAnim);
+            drawRect(sx, sy + searchH - 2, sx + sw, sy + searchH - 1, (glowAlpha << 24) | (C_ACCENT & 0x00FFFFFF));
+        }
+
+        // Search icon
+        int iconColor = GuiRenderUtils.colorLerp(C_TXT_HINT, C_ACCENT, searchFocusAnim);
+        GuiRenderUtils.drawSearchIcon(sx + 3, sy + (searchH - 10) / 2 + 1, iconColor);
+
+        // Placeholder text
+        if (searchBox.getText().isEmpty()) {
+            fontRendererObj.drawStringWithShadow("\u00a7o Rechercher...", sx + 16, sy + (searchH - 8) / 2, C_TXT_HINT);
+        }
+        searchBox.drawTextBox();
+    }
+
+    private void drawItemGrid(int mx, int my) {
+        // Scrollbar track
+        drawRect(sbX, sbY, sbX + SBW, sbY + sbH, C_SCR_TRACK);
+        drawRect(sbX, sbY, sbX + SBW, sbY + 1, C_BORDER_DIM);
+        drawRect(sbX, sbY + sbH - 1, sbX + SBW, sbY + sbH, C_BORDER_DIM);
+
+        int ms = maxScroll();
+        if (ms > 0) {
+            int th = thumbH();
+            float scrollFrac = smoothScroll / ms;
+            int ty = sbY + (int)(scrollFrac * (sbH - th));
+            boolean h = inside(mx, my, sbX, sbY, SBW, sbH) || draggingSB;
+            int thumbColor = h ? C_SCR_ACTIVE : C_SCR_THUMB;
+            drawRect(sbX + 1, ty, sbX + SBW - 1, ty + th, thumbColor);
+            if (h) {
+                drawRect(sbX, ty, sbX + SBW, ty + 1, C_ACCENT);
+                drawRect(sbX, ty + th - 1, sbX + SBW, ty + th, C_ACCENT);
+            }
+        }
+
+        // Items
+        RenderHelper.enableGUIStandardItemLighting();
+        GlStateManager.enableDepth();
+
+        int scrollRow = (int) smoothScroll;
+        float scrollFract = smoothScroll - scrollRow;
+        int pixelOffset = (int)(scrollFract * SZ);
+        int base = scrollRow * COLS;
+        ItemStack hov = null;
+
+        for (int row = 0; row <= visibleRows; row++) {
+            for (int col = 0; col < COLS; col++) {
+                int i = base + row * COLS + col;
+                if (i >= filtered.size()) break;
+                ItemStack s = filtered.get(i);
+                int x = gridX + col * SZ;
+                int y = gridY + row * SZ - pixelOffset;
+
+                // Skip if outside visible area
+                if (y + SZ <= gridY || y >= gridY + sbH) continue;
+
+                drawSlot3D(x, y);
+                itemRender.renderItemAndEffectIntoGUI(s, x + 1, y + 1);
+                itemRender.renderItemOverlayIntoGUI(fontRendererObj, s, x + 1, y + 1, null);
+                if (inside(mx, my, x, y, SZ, SZ) && y >= gridY && y + SZ <= gridY + sbH) {
+                    drawSlotHover(x, y);
+                    hov = s;
                 }
             }
         }
-        filter("");
+
+        GlStateManager.disableDepth();
+        RenderHelper.disableStandardItemLighting();
+        if (hov != null) renderToolTip(hov, mx, my);
+
+        // Empty state
+        if (filtered.isEmpty()) {
+            int emptyY = gridY + sbH / 2 - 16;
+            drawRect(panelX + pad, emptyY - 4, panelX + panelW - pad, emptyY + 28, 0x22FFFFFF);
+            drawCenteredString(fontRendererObj, "\u00a77Aucun r\u00e9sultat trouv\u00e9", panelX + panelW / 2, emptyY + 2, C_TXT_DIM);
+            drawCenteredString(fontRendererObj, "\u00a78Essayez un autre terme de recherche", panelX + panelW / 2, emptyY + 14, 0xFF2A3040);
+        }
+    }
+
+    private void drawFooter() {
+        GuiRenderUtils.drawGradientRect(panelX + 1, footerY, panelX + panelW - 1, footerY + 14, 0x00000000, 0x22000000);
+        drawRect(panelX + 1, footerY + 14, panelX + panelW - 1, footerY + 15, 0x11FFFFFF);
+        String hint = "\u00a77Clic\u00a78: recette  \u00a77\u00b7  Molette\u00a78: d\u00e9filer  \u00a77\u00b7  \n ESC\u00a78: fermer";
+        drawCenteredString(fontRendererObj, hint, panelX + panelW / 2, footerY + 3, C_TXT_DIM);
+    }
+
+    private void drawRecipeMode(int mx, int my) {
+        if (selected == null) return;
+        int accent = modeAccent();
+
+        // ── Calculate content height to properly size the panel ──
+        // Breadcrumb area
+        int breadcrumbH = historyStack.isEmpty() ? 0 : 14;
+        // Recipe area height depends on mode
+        int recipeAreaH;
+        if (mode == Mode.BREWING) {
+            recipeAreaH = BREW_H + 12 + 12; // brew box + recipe name
+            if (brewRecipesForItem != null && brewRecipesForItem.size() > 1) recipeAreaH += 14; // indicator line
+        } else if (mode == Mode.CRAFT) {
+            recipeAreaH = 3 * SZ + 24; // grid + output text + margin
+        } else {
+            recipeAreaH = SZ + 20; // furnace: single row + margin
+        }
+        // Total needed: header + breadcrumb + separator + title + recipe + buttons + margins
+        int neededH = titleH + 8 + breadcrumbH + 10 + 14 + recipeAreaH + 16 + btnH + 12;
+        int recPanelH = Math.max(panelH, neededH);
+        int recPanelY = (height - recPanelH) / 2;
+
+        // Redraw panel background for recipe mode with correct height
+        GuiRenderUtils.drawRoundedPanel(panelX, recPanelY, panelW, recPanelH, C_PANEL, C_PANEL_HDR, titleH, accent);
+        drawRect(panelX + 1, recPanelY + titleH + 1, panelX + panelW - 1, recPanelY + recPanelH - 1, C_PANEL_INNER);
+
+        // Item icon in header
+        int iconX = panelX + pad + 2, iconY = recPanelY + (titleH - SZ) / 2;
+        RenderHelper.enableGUIStandardItemLighting();
+        GlStateManager.enableDepth();
+        itemRender.renderItemAndEffectIntoGUI(selected, iconX, iconY);
+        GlStateManager.disableDepth();
+        RenderHelper.disableStandardItemLighting();
+
+        // Item name (truncated to fit)
+        String name = selected.getDisplayName();
+        int maxNameW = panelW - pad * 2 - SZ - 90;
+        if (fontRendererObj.getStringWidth(name) > maxNameW)
+            name = fontRendererObj.trimStringToWidth(name, maxNameW) + "..";
+        fontRendererObj.drawStringWithShadow("\u00a7l" + name, iconX + SZ + 4, recPanelY + (titleH - 8) / 2, C_TXT_TITLE);
+
+        // Mode badge (right side of header)
+        String badge = mode == Mode.BREWING ? " ALAMBIC " : mode == Mode.FURNACE ? "  FOUR  " : "  CRAFT  ";
+        int badgeX = panelX + panelW - pad - fontRendererObj.getStringWidth(badge) - 10;
+        drawModeBadge(badgeX, recPanelY + (titleH - 12) / 2, badge, C_ACCENT_DIM, accent);
+
+        // Breadcrumb navigation
+        int curY = recPanelY + titleH + 6;
+        if (!historyStack.isEmpty()) {
+            StringBuilder crumb = new StringBuilder();
+            for (int i = Math.max(0, historyStack.size() - 2); i < historyStack.size(); i++) {
+                if (crumb.length() > 0) crumb.append(" \u00a77\u203A ");
+                crumb.append("\u00a78").append(historyStack.get(i).getDisplayName());
+            }
+            crumb.append(" \u00a77\u203A \u00a7f").append(selected.getDisplayName());
+            String crumbStr = crumb.toString();
+            int crumbMaxW = panelW - pad * 2;
+            if (fontRendererObj.getStringWidth(crumbStr) > crumbMaxW)
+                crumbStr = fontRendererObj.trimStringToWidth(crumbStr, crumbMaxW);
+            fontRendererObj.drawStringWithShadow(crumbStr, panelX + pad, curY, C_TXT_DIM);
+            curY += 14;
+        }
+        drawSeparator(panelX + pad, curY, panelW - pad * 2, accent);
+        curY += 10;
+        int cx = panelX + panelW / 2;
+        ItemStack hovItem = null;
+
+        // Recipe title
+        String recipeTitle = mode == Mode.CRAFT ? "Crafting" : mode == Mode.BREWING ? "Alchimie" : "Fourneau";
+        drawCenteredString(fontRendererObj, "\u00a77" + recipeTitle, cx, curY, C_TXT_DIM);
+        curY += 14;
+
+        RenderHelper.enableGUIStandardItemLighting();
+        GlStateManager.enableDepth();
+        if (mode == Mode.BREWING && currentBrewRecipe != null)
+            hovItem = drawBrewingRecipe(mx, my, cx, curY);
+        else if (mode == Mode.CRAFT && craftRecipe != null)
+            hovItem = drawCraftGrid(mx, my, cx, curY);
+        else if (mode == Mode.FURNACE && furnaceInput != null)
+            hovItem = drawFurnaceRecipe(mx, my, cx, curY);
+        GlStateManager.disableDepth();
+        RenderHelper.disableStandardItemLighting();
+        if (hovItem != null) renderToolTip(hovItem, mx, my);
+
+        // Navigation buttons — positioned at bottom of recipe panel, not overlapping content
+        int btnAreaY = recPanelY + recPanelH - btnH - 8;
+        btnBack.yPosition = btnAreaY;
+        btnBack.xPosition = panelX + pad + 2;
+        btnMenu.yPosition = btnAreaY;
+        btnMenu.xPosition = panelX + panelW - pad - btnW - 2;
+        boolean backHov = inside(mx, my, btnBack.xPosition, btnBack.yPosition, btnW, btnH);
+        boolean menuHov = inside(mx, my, btnMenu.xPosition, btnMenu.yPosition, btnW, btnH);
+        drawNavButton(btnBack.xPosition, btnBack.yPosition, btnW, btnH, "\u25C4 Retour", backHov, accent);
+        drawNavButton(btnMenu.xPosition, btnMenu.yPosition, btnW, btnH, "Menu", menuHov, C_ACCENT);
+        if (!historyStack.isEmpty()) {
+            String depth = historyStack.size() + " niv.";
+            drawCenteredString(fontRendererObj, "\u00a77" + depth, cx, btnBack.yPosition + 5, C_TXT_DIM);
+        }
+    }
+
+    private ItemStack drawCraftGrid(int mx, int my, int cx, int top) {
+        ItemStack[] grid = getGrid(craftRecipe);
+        int gw = 3 * SZ;
+        int totalW = gw + 30 + SZ;
+        int sx0 = cx - totalW / 2;
+        ItemStack hov = null;
+
+        // Recipe background
+        drawRect(sx0 - 6, top - 6, sx0 + gw + 10, top + 3 * SZ + 6, C_RECIPE_BG);
+        drawRect(sx0 - 6, top - 6, sx0 + gw + 10, top - 5, C_BORDER_MID);
+        drawRect(sx0 - 6, top - 6, sx0 - 5, top + 3 * SZ + 6, C_BORDER_MID);
+        drawRect(sx0 - 6, top + 3 * SZ + 5, sx0 + gw + 10, top + 3 * SZ + 6, C_BORDER_DIM);
+        drawRect(sx0 + gw + 9, top - 6, sx0 + gw + 10, top + 3 * SZ + 6, C_BORDER_DIM);
+
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                int idx = row * 3 + col;
+                int sx = sx0 + col * SZ, sy = top + row * SZ;
+                drawSlot3D(sx, sy);
+                if (grid[idx] != null) {
+                    itemRender.renderItemAndEffectIntoGUI(grid[idx], sx + 1, sy + 1);
+                    if (inside(mx, my, sx, sy, SZ, SZ)) {
+                        drawSlotHover(sx, sy);
+                        hov = grid[idx];
+                    }
+                }
+            }
+        }
+
+        // Animated chevron arrow
+        long t = System.currentTimeMillis() % 1000;
+        float arrowAnim = t / 1000f;
+        int arrowX = sx0 + gw + 8;
+        int arrowY = top + SZ + SZ / 2;
+        GuiRenderUtils.drawChevronArrow(arrowX, arrowY, 6, 0xE8A030, arrowAnim);
+
+        // Output slot
+        int rx = sx0 + gw + 26, ry = top + SZ;
+        drawSlotOutput(rx, ry, C_GOLD);
+        ItemStack out = craftRecipe.getRecipeOutput();
+        itemRender.renderItemAndEffectIntoGUI(out, rx + 1, ry + 1);
+        itemRender.renderItemOverlayIntoGUI(fontRendererObj, out, rx + 1, ry + 1, null);
+        if (inside(mx, my, rx, ry, SZ, SZ)) hov = out;
+        if (out.stackSize > 1)
+            fontRendererObj.drawStringWithShadow("\u00a76x" + out.stackSize, rx, ry + SZ + 4, C_TXT_GOLD);
+        return hov;
+    }
+
+    private ItemStack drawFurnaceRecipe(int mx, int my, int cx, int top) {
+        int lx = cx - (SZ + 32 + SZ) / 2;
+        ItemStack hov = null;
+
+        // Recipe background
+        drawRect(lx - 6, top - 6, lx + SZ + 32 + SZ + 6, top + SZ + 6, C_RECIPE_BG);
+        drawRect(lx - 6, top - 6, lx + SZ + 32 + SZ + 6, top - 5, C_BORDER_MID);
+        drawRect(lx - 6, top - 6, lx - 5, top + SZ + 6, C_BORDER_MID);
+        drawRect(lx - 6, top + SZ + 5, lx + SZ + 32 + SZ + 6, top + SZ + 6, C_BORDER_DIM);
+        drawRect(lx + SZ + 32 + SZ + 5, top - 6, lx + SZ + 32 + SZ + 6, top + SZ + 6, C_BORDER_DIM);
+
+        ItemStack input = fixWildcard(furnaceInput);
+        drawSlot3D(lx, top);
+        itemRender.renderItemAndEffectIntoGUI(input, lx + 1, top + 1);
+        if (inside(mx, my, lx, top, SZ, SZ)) {
+            drawSlotHover(lx, top);
+            hov = input;
+        }
+
+        // Animated arrow
+        long t = System.currentTimeMillis() % 1000;
+        GuiRenderUtils.drawChevronArrow(lx + SZ + 6, top + SZ / 2, 6, 0xFF7822, t / 1000f);
+
+        int rx = lx + SZ + 32;
+        drawSlotOutput(rx, top, C_FURNACE);
+        itemRender.renderItemAndEffectIntoGUI(selected, rx + 1, top + 1);
+        if (inside(mx, my, rx, top, SZ, SZ)) hov = selected;
+        return hov;
+    }
+
+    private static final int BREW_W = 96, BREW_H = 70;
+
+    private ItemStack drawBrewingRecipe(int mx, int my, int cx, int top) {
+        if (currentBrewRecipe == null) return null;
+        int bx = cx - BREW_W / 2;
+        ItemStack hov = null;
+
+        // Background
+        drawRect(bx - 4, top - 4, bx + BREW_W + 4, top + BREW_H + 4, C_RECIPE_BG);
+        drawRect(bx - 4, top - 4, bx + BREW_W + 4, top - 3, C_BREW);
+        drawRect(bx - 4, top - 4, bx - 3, top + BREW_H + 4, C_BREW);
+        drawRect(bx - 4, top + BREW_H + 3, bx + BREW_W + 4, top + BREW_H + 4, C_BORDER_DIM);
+        drawRect(bx + BREW_W + 3, top - 4, bx + BREW_W + 4, top + BREW_H + 4, C_BORDER_DIM);
+
+        // Glow
+        int glowBase = C_BREW & 0x00FFFFFF;
+        drawRect(bx - 5, top - 5, bx + BREW_W + 5, top + BREW_H + 5, 0x08000000 | glowBase);
+
+        // Ingredient (top center)
+        int ingX = bx + BREW_W / 2 - SZ / 2, ingY = top + 4;
+        drawSlot3D(ingX, ingY);
+        itemRender.renderItemAndEffectIntoGUI(currentBrewRecipe.ingredient, ingX + 1, ingY + 1);
+        if (inside(mx, my, ingX, ingY, SZ, SZ)) {
+            drawSlotHover(ingX, ingY);
+            hov = currentBrewRecipe.ingredient;
+        }
+
+        // Animated drip
+        long t = System.currentTimeMillis() % 1000;
+        int dropY = ingY + SZ + (int)(8 * (t / 1000f));
+        int dropAlpha = (int)(0xCC * (1f - t / 1000f));
+        drawRect(ingX + SZ / 2 - 1, dropY, ingX + SZ / 2 + 1, dropY + 3, (dropAlpha << 24) | 0x00BBEE);
+
+        // Input potion (bottom left)
+        int inX = bx + 8, inY = top + BREW_H - SZ - 6;
+        drawSlot3D(inX, inY);
+        ItemStack inputPotion = new ItemStack(Items.potionitem, 1, currentBrewRecipe.inputMeta);
+        itemRender.renderItemAndEffectIntoGUI(inputPotion, inX + 1, inY + 1);
+        if (inside(mx, my, inX, inY, SZ, SZ)) {
+            drawSlotHover(inX, inY);
+            hov = inputPotion;
+        }
+
+        // Arrow
+        GuiRenderUtils.drawChevronArrow(inX + SZ + 4, inY + SZ / 2, 5, 0x00BBEE, (t % 800) / 800f);
+
+        // Output potion (bottom right)
+        int outX = bx + BREW_W - SZ - 8, outY = inY;
+        drawSlotOutput(outX, outY, C_BREW);
+        ItemStack outputPotion = new ItemStack(Items.potionitem, 1, currentBrewRecipe.outputMeta);
+        itemRender.renderItemAndEffectIntoGUI(outputPotion, outX + 1, outY + 1);
+        if (inside(mx, my, outX, outY, SZ, SZ)) hov = outputPotion;
+
+        // Multiple recipe indicator + Recipe name — stacked without overlap
+        int textY = top + BREW_H + 8;
+        if (brewRecipesForItem.size() > 1) {
+            String ind = (brewRecipeIndex + 1) + "/" + brewRecipesForItem.size();
+            fontRendererObj.drawStringWithShadow("\u00a77" + ind, bx + BREW_W - fontRendererObj.getStringWidth(ind), textY, C_TXT_DIM);
+            fontRendererObj.drawStringWithShadow("\u00a77Clic-droit: autre voie", bx, textY, C_TXT_DIM);
+            textY += 12;
+        }
+
+        // Recipe name
+        drawCenteredString(fontRendererObj, "\u00a7b" + currentBrewRecipe.name, cx, textY, C_TXT_BREW);
+        return hov;
+    }
+
+    // ── Logic ──────────────────────────────────────────────────────────────────
+
+    private int modeAccent() {
+        if (mode == Mode.BREWING) return C_BREW;
+        if (mode == Mode.FURNACE) return C_FURNACE;
+        return C_ACCENT;
     }
 
     private boolean isBlocked(ItemStack s) {
@@ -265,70 +720,55 @@ public class GuiCraftGuide extends GuiScreen {
         String lq = q.trim().toLowerCase();
         for (ItemStack s : allItems)
             if (lq.isEmpty() || s.getDisplayName().toLowerCase().contains(lq)) filtered.add(s);
-        scroll = 0;
+        targetScroll = 0;
+        smoothScroll = 0;
     }
 
-    private int maxScroll() {
-        return Math.max(0, (filtered.size() + COLS - 1) / COLS - ROWS);
-    }
+    private int maxScroll() { return Math.max(0, (filtered.size() + COLS - 1) / COLS - visibleRows); }
 
     private int thumbH() {
         int total = (filtered.size() + COLS - 1) / COLS;
-        if (total <= ROWS) return sbH;
-        return Math.max(18, sbH * ROWS / total);
+        if (total <= visibleRows) return sbH;
+        return Math.max(16, sbH * visibleRows / total);
     }
 
     private void applyScrollFromMouse(int my) {
         int th = thumbH(), ms = maxScroll();
         if (ms == 0) return;
-        scroll = Math.round((float) (my - sbY - th / 2) * ms / (sbH - th));
-        scroll = Math.max(0, Math.min(scroll, ms));
+        targetScroll = Math.round((float)(my - sbY - th / 2) * ms / (sbH - th));
+        targetScroll = Math.max(0, Math.min(targetScroll, ms));
     }
 
     private boolean isSameStack(ItemStack a, ItemStack b) {
         if (a == null || b == null) return false;
-        if (a.getItem() != b.getItem()) return false;
-        return a.getItemDamage() == b.getItemDamage();
+        return a.getItem() == b.getItem() && a.getItemDamage() == b.getItemDamage();
     }
 
     private void openRecipe(ItemStack stack) {
         if (stack == null) return;
-        // Si on clique sur l'item déjà sélectionné, ne rien faire
         if (selected != null && isSameStack(selected, stack)) return;
-        ItemStack previousSelected = selected;
+        ItemStack prev = selected;
         loadRecipe(stack);
-        if ((mode == Mode.CRAFT && craftRecipe != null) || (mode == Mode.BREWING && !brewRecipesForItem.isEmpty())) {
-            if (previousSelected != null) {
-                // Vérifier que l'item précédent n'est pas déjà au sommet de l'historique
-                boolean alreadyTop = !historyStack.isEmpty() && isSameStack(historyStack.get(historyStack.size() - 1), previousSelected);
-                if (!alreadyTop) {
-                    historyStack.add(previousSelected);
-                }
+        if ((mode == Mode.CRAFT && craftRecipe != null)
+                || (mode == Mode.BREWING && !brewRecipesForItem.isEmpty())
+                || (mode == Mode.FURNACE && furnaceInput != null)) {
+            if (prev != null) {
+                boolean top = !historyStack.isEmpty() && isSameStack(historyStack.get(historyStack.size() - 1), prev);
+                if (!top) historyStack.add(prev);
             }
         }
     }
 
     private void goBack() {
-        if (!historyStack.isEmpty()) {
-            loadRecipe(historyStack.remove(historyStack.size() - 1));
-        } else {
-            mode = Mode.LIST;
-            selected = null;
-        }
+        if (!historyStack.isEmpty()) loadRecipe(historyStack.remove(historyStack.size() - 1));
+        else { mode = Mode.LIST; selected = null; }
     }
 
-    private void goMenu() {
-        mode = Mode.LIST;
-        selected = null;
-        historyStack.clear();
-    }
+    private void goMenu() { mode = Mode.LIST; selected = null; historyStack.clear(); }
 
     private void loadRecipe(ItemStack stack) {
-        selected = stack;
-        craftRecipe = null;
-        currentBrewRecipe = null;
-        brewRecipesForItem.clear();
-        brewRecipeIndex = 0;
+        selected = stack; craftRecipe = null; currentBrewRecipe = null;
+        brewRecipesForItem.clear(); brewRecipeIndex = 0; furnaceInput = null;
         if (stack.getItem() == Items.potionitem) {
             int meta = stack.getItemDamage();
             if (POTION_RECIPES.containsKey(meta)) {
@@ -348,18 +788,15 @@ public class GuiCraftGuide extends GuiScreen {
                 break;
             }
         }
-
         if (craftRecipe == null) {
-            Map<ItemStack, ItemStack> furnaceRecipes = FurnaceRecipes.instance().getSmeltingList();
-            for (Map.Entry<ItemStack, ItemStack> entry : furnaceRecipes.entrySet()) {
-                ItemStack out = entry.getValue();
+            for (Map.Entry<ItemStack, ItemStack> e : FurnaceRecipes.instance().getSmeltingList().entrySet()) {
+                ItemStack out = e.getValue();
                 if (out != null && out.getItem() == stack.getItem() && out.getItemDamage() == stack.getItemDamage()) {
-                    furnaceInput = entry.getKey();
+                    furnaceInput = e.getKey();
                     break;
                 }
             }
         }
-
         if (craftRecipe != null) mode = Mode.CRAFT;
         else if (furnaceInput != null) mode = Mode.FURNACE;
         else if (!brewRecipesForItem.isEmpty()) mode = Mode.BREWING;
@@ -380,7 +817,8 @@ public class GuiCraftGuide extends GuiScreen {
             for (int row = 0; row < sr.getRecipeHeight(); row++)
                 for (int col = 0; col < sr.getRecipeWidth(); col++) {
                     int src = row * sr.getRecipeWidth() + col;
-                    if (src < sr.getRecipeItems().length) g[row * 3 + col] = fixWildcard(sr.getRecipeItems()[src]);
+                    if (src < sr.getRecipeItems().length)
+                        g[row * 3 + col] = fixWildcard(sr.getRecipeItems()[src]);
                 }
         } else if (recipe instanceof ShapelessRecipes) {
             List<ItemStack> items = ((ShapelessRecipes) recipe).getRecipeItems();
@@ -393,337 +831,89 @@ public class GuiCraftGuide extends GuiScreen {
         return mx >= x && mx < x + w && my >= y && my < y + h;
     }
 
-    private void drawButtonCustom(int x, int y, int w, int h, String text, boolean hover) {
-        int bgCol = hover ? C_BTN_HV : C_BTN_BG;
-        drawRect(x, y, x + w, y + h, bgCol);
-        drawRect(x, y, x + w, y + 1, C_BORDER);
-        drawRect(x, y + h - 1, x + w, y + h, C_BORDER2);
-        drawCenteredString(fontRendererObj, text, x + w / 2, y + 3, 0xFFFFFFFF);
-    }
-
-    @Override
-    public void drawScreen(int mx, int my, float pt) {
-        drawRect(0, 0, width, height, C_BG);
-        drawRect(panelX, panelY, panelX + PANEL_W, panelY + PANEL_H, C_PANEL);
-        drawBorder(panelX, panelY, PANEL_W, PANEL_H, C_BORDER);
-        drawRect(panelX + 4, panelY + TITLE_H - 1, panelX + PANEL_W - 4, panelY + TITLE_H, C_BORDER2);
-        drawCenteredString(fontRendererObj, "§e§lGuide de Craft", panelX + PANEL_W / 2, panelY + 3, C_TEXT_TTL);
-
-        if (mode == Mode.LIST) {
-            searchBox.drawTextBox();
-            drawList(mx, my);
-        } else {
-            drawRecipeMode(mx, my);
-        }
-        super.drawScreen(mx, my, pt);
-    }
-
-    private void drawBorder(int x, int y, int w, int h, int col) {
-        drawRect(x, y, x + w, y + 1, col);
-        drawRect(x, y + h - 1, x + w, y + h, col);
-        drawRect(x, y, x + 1, y + h, col);
-        drawRect(x + w - 1, y, x + w, y + h, col);
-    }
-
-    private void drawSlot(int x, int y) {
-        drawRect(x, y, x + SZ, y + SZ, C_SLOT);
-        drawRect(x, y, x + SZ, y + 1, C_BORDER2);
-        drawRect(x, y, x + 1, y + SZ, C_BORDER2);
-    }
-
-    private void drawList(int mx, int my) {
-        int ms = maxScroll();
-        drawRect(sbX, sbY, sbX + SBW, sbY + sbH, C_SCR_BG);
-        drawBorder(sbX, sbY, SBW, sbH, C_BORDER2);
-        if (ms > 0) {
-            int th = thumbH();
-            int ty = sbY + scroll * (sbH - th) / ms;
-            drawRect(sbX + 1, ty, sbX + SBW - 1, ty + th,
-                    (inside(mx, my, sbX, sbY, SBW, sbH) || draggingSB) ? C_SCR_HL : C_SCR_FG);
-        }
-
-        RenderHelper.enableGUIStandardItemLighting();
-        GlStateManager.enableDepth();
-
-        int base = scroll * COLS;
-        ItemStack hov = null;
-
-        for (int row = 0; row < ROWS; row++) {
-            for (int col = 0; col < COLS; col++) {
-                int i = base + row * COLS + col;
-                if (i >= filtered.size()) break;
-                ItemStack s = filtered.get(i);
-                int x = gridX + col * SZ, y = gridY + row * SZ;
-                drawSlot(x, y);
-                itemRender.renderItemAndEffectIntoGUI(s, x + 1, y + 1);
-                itemRender.renderItemOverlayIntoGUI(fontRendererObj, s, x + 1, y + 1, null);
-                if (inside(mx, my, x, y, SZ, SZ)) {
-                    drawRect(x, y, x + SZ, y + SZ, C_SLOT_HOV);
-                    hov = s;
-                }
-            }
-        }
-
-        GlStateManager.disableDepth();
-        RenderHelper.disableStandardItemLighting();
-
-        if (hov != null) renderToolTip(hov, mx, my);
-        if (filtered.isEmpty())
-            drawCenteredString(fontRendererObj, "Aucun item", panelX + PANEL_W / 2, gridY + ROWS * SZ / 2, C_HINT);
-    }
-
-    private void drawRecipeMode(int mx, int my) {
-        if (selected == null) return;
-        int cx = panelX + PANEL_W / 2;
-
-        drawRect(panelX + 4, panelY + TITLE_H - 1, panelX + PANEL_W - 4, panelY + TITLE_H, C_BORDER2);
-
-        int rpY = panelY + TITLE_H + 2;
-        int rpH = PANEL_H - TITLE_H - 2;
-        drawRect(panelX + 4, rpY, panelX + PANEL_W - 4, rpY + rpH - 2, C_PANEL2);
-
-        int iconX = panelX + PAD + 4, iconY = rpY + 4;
-        RenderHelper.enableGUIStandardItemLighting();
-        GlStateManager.enableDepth();
-        itemRender.renderItemAndEffectIntoGUI(selected, iconX, iconY);
-        GlStateManager.disableDepth();
-        RenderHelper.disableStandardItemLighting();
-
-        String name = selected.getDisplayName();
-        int maxNW = panelX + PANEL_W - PAD - (iconX + SZ + 4);
-        if (fontRendererObj.getStringWidth(name) > maxNW)
-            name = fontRendererObj.trimStringToWidth(name, maxNW) + "..";
-        drawString(fontRendererObj, "§e" + name, iconX + SZ + 4, iconY + 1, C_TEXT_TTL);
-
-        String badge = mode == Mode.BREWING ? "[ Alambic ]" : mode == Mode.FURNACE ? " [ Four ] " : "[ Craft ]";
-        drawString(fontRendererObj, badge, iconX + SZ + 4, iconY + SZ - 2, C_TEXT_DTL);
-
-        int sep2 = rpY + 4 + SZ + 6;
-        drawRect(panelX + 8, sep2, panelX + PANEL_W - 8, sep2 + 1, C_BORDER2);
-
-        int contentY = sep2 + 8;
-        ItemStack hovItem = null;
-
-        RenderHelper.enableGUIStandardItemLighting();
-        GlStateManager.enableDepth();
-
-        if (mode == Mode.BREWING && currentBrewRecipe != null) {
-            hovItem = drawBrewingRecipe(mx, my, cx, contentY);
-        } else if (craftRecipe != null) {
-            hovItem = drawCraftGrid(mx, my, cx, contentY);
-        } else if (furnaceInput != null) {
-            hovItem = drawFurnaceRecipe(mx, my, cx, contentY);
-        }
-
-        GlStateManager.disableDepth();
-        RenderHelper.disableStandardItemLighting();
-
-        if (hovItem != null) renderToolTip(hovItem, mx, my);
-
-        boolean backHov = inside(mx, my, btnBack.xPosition, btnBack.yPosition, btnBack.getButtonWidth(), btnBack.getButtonHeight());
-        boolean menuHov = inside(mx, my, btnMenu.xPosition, btnMenu.yPosition, btnMenu.getButtonWidth(), btnMenu.getButtonHeight());
-        drawButtonCustom(btnBack.xPosition, btnBack.yPosition, btnBack.getButtonWidth(), btnBack.getButtonHeight(), btnBack.displayString, backHov);
-        drawButtonCustom(btnMenu.xPosition, btnMenu.yPosition, btnMenu.getButtonWidth(), btnMenu.getButtonHeight(), btnMenu.displayString, menuHov);
-    }
-
-    private ItemStack drawFurnaceRecipe(int mx, int my, int cx, int top) {
-        int lx = cx - (SZ + 20 + SZ) / 2;
-        ItemStack hov = null;
-
-        ItemStack input = fixWildcard(furnaceInput);
-        drawSlot(lx, top);
-        itemRender.renderItemAndEffectIntoGUI(input, lx + 1, top + 1);
-        if (inside(mx, my, lx, top, SZ, SZ)) {
-            drawRect(lx, top, lx + SZ, top + SZ, C_SLOT_SEL);
-            hov = input;
-        }
-
-        drawCenteredString(fontRendererObj, "§6▶", lx + SZ + 10, top + 5, 0xFFFFFFFF);
-
-        int rx = lx + SZ + 20;
-        drawSlot(rx, top);
-        drawBorder(rx, top, SZ, SZ, C_BORDER);
-        itemRender.renderItemAndEffectIntoGUI(selected, rx + 1, top + 1);
-        if (inside(mx, my, rx, top, SZ, SZ)) hov = selected;
-
-        return hov;
-    }
-
-    private ItemStack drawCraftGrid(int mx, int my, int cx, int top) {
-        ItemStack[] grid = getGrid(craftRecipe);
-        int gw = 3 * SZ;
-        int totalW = gw + 16 + SZ;
-        int sx0 = cx - totalW / 2;
-        ItemStack hov = null;
-
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 3; col++) {
-                int idx = row * 3 + col;
-                int sx = sx0 + col * SZ, sy = top + row * SZ;
-                drawSlot(sx, sy);
-                if (grid[idx] != null) {
-                    itemRender.renderItemAndEffectIntoGUI(grid[idx], sx + 1, sy + 1);
-                    if (inside(mx, my, sx, sy, SZ, SZ)) {
-                        drawRect(sx, sy, sx + SZ, sy + SZ, C_SLOT_SEL);
-                        hov = grid[idx];
-                    }
-                }
-            }
-        }
-
-        drawString(fontRendererObj, "§6»", sx0 + gw + 3, top + SZ + 4, 0xFFFFFFFF);
-
-        int rx = sx0 + gw + 16, ry = top + SZ;
-        drawSlot(rx, ry);
-        drawBorder(rx, ry, SZ, SZ, C_BORDER);
-        ItemStack out = craftRecipe.getRecipeOutput();
-        itemRender.renderItemAndEffectIntoGUI(out, rx + 1, ry + 1);
-        itemRender.renderItemOverlayIntoGUI(fontRendererObj, out, rx + 1, ry + 1, null);
-
-        return hov;
-    }
-
-    private static final int BREW_GUI_W = 75;
-    private static final int BREW_GUI_H = 55;
-
-    private int[] brewSlotPositions(int bx, int by) {
-        int ingX = bx + BREW_GUI_W / 2 - SZ / 2;
-        int ingY = by + 8;
-        int inX = bx + 6;
-        int inY = by + BREW_GUI_H - SZ - 8;
-        int outX = bx + BREW_GUI_W - SZ - 6;
-        return new int[]{ingX, ingY, inX, inY, outX, inY};
-    }
-
-    private ItemStack drawBrewingRecipe(int mx, int my, int cx, int top) {
-        if (currentBrewRecipe == null) return null;
-
-        int bx = cx - BREW_GUI_W / 2;
-        int[] s = brewSlotPositions(bx, top);
-        int ingX = s[0], ingY = s[1], inX = s[2], inY = s[3], outX = s[4], outY = s[5];
-        ItemStack hov = null;
-
-        drawRect(bx, top, bx + BREW_GUI_W, top + BREW_GUI_H, C_PANEL2);
-        drawBorder(bx, top, BREW_GUI_W, BREW_GUI_H, C_BORDER2);
-
-        // Ingrédient
-        drawSlot(ingX, ingY);
-        itemRender.renderItemAndEffectIntoGUI(currentBrewRecipe.ingredient, ingX + 1, ingY + 1);
-        if (inside(mx, my, ingX, ingY, SZ, SZ)) {
-            drawRect(ingX, ingY, ingX + SZ, ingY + SZ, C_SLOT_SEL);
-            hov = currentBrewRecipe.ingredient;
-        }
-
-        drawCenteredString(fontRendererObj, "§6↓", ingX + SZ / 2, ingY + SZ + 1, 0xFF7A8BA5);
-
-        // Input potion
-        ItemStack inputPotion = new ItemStack(Items.potionitem, 1, currentBrewRecipe.inputMeta);
-        drawSlot(inX, inY);
-        itemRender.renderItemAndEffectIntoGUI(inputPotion, inX + 1, inY + 1);
-        if (inside(mx, my, inX, inY, SZ, SZ)) {
-            drawRect(inX, inY, inX + SZ, inY + SZ, C_SLOT_SEL);
-            hov = inputPotion;
-        }
-
-        drawString(fontRendererObj, "§6→", inX + SZ + 2, inY + SZ / 2 - 2, 0xFFFFB347);
-
-        // Output potion
-        ItemStack outputPotion = new ItemStack(Items.potionitem, 1, currentBrewRecipe.outputMeta);
-        drawSlot(outX, outY);
-        drawBorder(outX, outY, SZ, SZ, C_BORDER);
-        itemRender.renderItemAndEffectIntoGUI(outputPotion, outX + 1, outY + 1);
-        if (inside(mx, my, outX, outY, SZ, SZ)) hov = outputPotion;
-
-        if (brewRecipesForItem.size() > 1) {
-            String recipeIndicator = (brewRecipeIndex + 1) + "/" + brewRecipesForItem.size();
-            drawCenteredString(fontRendererObj, "§7" + recipeIndicator, bx + BREW_GUI_W / 2, top - 8, C_TEXT_DTL);
-        }
-
-        return hov;
-    }
+    // ── Input ──────────────────────────────────────────────────────────────────
 
     @Override
     protected void mouseClicked(int mx, int my, int btn) throws IOException {
         super.mouseClicked(mx, my, btn);
         searchBox.mouseClicked(mx, my, btn);
-
         if (mode != Mode.LIST) {
-            if (inside(mx, my, btnBack.xPosition, btnBack.yPosition, btnBack.getButtonWidth(), btnBack.getButtonHeight())) {
-                goBack();
-                return;
+            if (inside(mx, my, btnBack.xPosition, btnBack.yPosition, btnW, btnH)) { goBack(); return; }
+            if (inside(mx, my, btnMenu.xPosition, btnMenu.yPosition, btnW, btnH)) { goMenu(); return; }
+            // Calculate contentY to match drawRecipeMode exactly
+            int breadcrumbH = historyStack.isEmpty() ? 0 : 14;
+            int recipeAreaH;
+            if (mode == Mode.BREWING) {
+                recipeAreaH = BREW_H + 12 + 12;
+                if (brewRecipesForItem != null && brewRecipesForItem.size() > 1) recipeAreaH += 14;
+            } else if (mode == Mode.CRAFT) {
+                recipeAreaH = 3 * SZ + 24;
+            } else {
+                recipeAreaH = SZ + 20;
             }
-            if (inside(mx, my, btnMenu.xPosition, btnMenu.yPosition, btnMenu.getButtonWidth(), btnMenu.getButtonHeight())) {
-                goMenu();
-                return;
-            }
-
-            int rpY = panelY + TITLE_H + 2;
-            int sep2 = rpY + 4 + SZ + 6;
-            int contentY = sep2 + 8;
-            int cx = panelX + PANEL_W / 2;
-
+            int neededH = titleH + 8 + breadcrumbH + 10 + 14 + recipeAreaH + 16 + btnH + 12;
+            int recPanelH = Math.max(panelH, neededH);
+            int recPanelY = (height - recPanelH) / 2;
+            int curY = recPanelY + titleH + 6 + breadcrumbH;
+            curY += 10; // after separator
+            curY += 14; // after recipe title
+            int contentY = curY;
+            int cx = panelX + panelW / 2;
             if (btn == 0) {
                 if (mode == Mode.CRAFT && craftRecipe != null) {
                     ItemStack[] grid = getGrid(craftRecipe);
-                    int sx0 = cx - (3 * SZ + 16 + SZ) / 2;
-                    for (int row = 0; row < 3; row++)
-                        for (int col = 0; col < 3; col++) {
-                            int idx = row * 3 + col;
-                            if (idx >= grid.length || grid[idx] == null) continue;
-                            if (inside(mx, my, sx0 + col * SZ, contentY + row * SZ, SZ, SZ)) {
-                                openRecipe(grid[idx]);
-                                return;
-                            }
+                    int sx0 = cx - (3 * SZ + 30 + SZ) / 2;
+                    for (int row = 0; row < 3; row++) for (int col = 0; col < 3; col++) {
+                        int idx = row * 3 + col;
+                        if (idx >= grid.length || grid[idx] == null) continue;
+                        if (inside(mx, my, sx0 + col * SZ, contentY + row * SZ, SZ, SZ)) {
+                            openRecipe(grid[idx]); return;
                         }
+                    }
                 }
-
                 if (mode == Mode.FURNACE && furnaceInput != null) {
-                    int lx = cx - (SZ + 20 + SZ) / 2;
-                    if (inside(mx, my, lx, contentY, SZ, SZ)) {
-                        openRecipe(furnaceInput);
-                        return;
-                    }
+                    int lx = cx - (SZ + 32 + SZ) / 2;
+                    if (inside(mx, my, lx, contentY, SZ, SZ)) { openRecipe(furnaceInput); return; }
                 }
-
                 if (mode == Mode.BREWING && currentBrewRecipe != null) {
-                    int bx = cx - BREW_GUI_W / 2;
-                    int[] sp = brewSlotPositions(bx, contentY);
-                    int ingX = sp[0], ingY = sp[1], inX = sp[2], inY = sp[3];
-
-                    if (inside(mx, my, ingX, ingY, SZ, SZ)) {
-                        openRecipe(currentBrewRecipe.ingredient);
-                        return;
-                    }
+                    int bx = cx - BREW_W / 2;
+                    int ingX = bx + BREW_W / 2 - SZ / 2, ingY = contentY + 4;
+                    int inX = bx + 8, inY = contentY + BREW_H - SZ - 6;
+                    if (inside(mx, my, ingX, ingY, SZ, SZ)) { openRecipe(currentBrewRecipe.ingredient); return; }
                     if (inside(mx, my, inX, inY, SZ, SZ)) {
                         openRecipe(new ItemStack(Items.potionitem, 1, currentBrewRecipe.inputMeta));
                         return;
                     }
                 }
-
             } else if (btn == 1 && mode == Mode.BREWING && brewRecipesForItem.size() > 1) {
                 brewRecipeIndex = (brewRecipeIndex + 1) % brewRecipesForItem.size();
                 currentBrewRecipe = brewRecipesForItem.get(brewRecipeIndex);
-                return;
             }
             return;
         }
-
         if (btn == 0) {
             if (inside(mx, my, sbX, sbY, SBW, sbH)) {
                 draggingSB = true;
                 applyScrollFromMouse(my);
                 return;
             }
-            int base = scroll * COLS;
-            for (int row = 0; row < ROWS; row++)
+            int scrollRow = (int) smoothScroll;
+            float scrollFract = smoothScroll - scrollRow;
+            int pixelOffset = (int)(scrollFract * SZ);
+            int base = scrollRow * COLS;
+            for (int row = 0; row <= visibleRows; row++) {
                 for (int col = 0; col < COLS; col++) {
                     int i = base + row * COLS + col;
                     if (i >= filtered.size()) return;
-                    if (inside(mx, my, gridX + col * SZ, gridY + row * SZ, SZ, SZ)) {
+                    int x = gridX + col * SZ;
+                    int y = gridY + row * SZ - pixelOffset;
+                    if (y + SZ <= gridY || y >= gridY + sbH) continue;
+                    if (inside(mx, my, x, y, SZ, SZ)) {
                         openRecipe(filtered.get(i));
                         return;
                     }
                 }
+            }
         }
     }
 
@@ -744,16 +934,13 @@ public class GuiCraftGuide extends GuiScreen {
         super.handleMouseInput();
         if (mode != Mode.LIST) return;
         int w = Mouse.getEventDWheel(), ms = maxScroll();
-        if (w < 0 && scroll < ms) scroll++;
-        if (w > 0 && scroll > 0) scroll--;
+        if (w < 0 && targetScroll < ms) targetScroll++;
+        if (w > 0 && targetScroll > 0) targetScroll--;
     }
 
     @Override
     protected void keyTyped(char ch, int key) throws IOException {
-        if (mode != Mode.LIST && key == 1) {
-            goMenu();
-            return;
-        }
+        if (mode != Mode.LIST && key == 1) { goMenu(); return; }
         if (searchBox.textboxKeyTyped(ch, key)) filter(searchBox.getText());
         else super.keyTyped(ch, key);
     }
@@ -764,3 +951,4 @@ public class GuiCraftGuide extends GuiScreen {
         else if (btn.id == 2) goMenu();
     }
 }
+

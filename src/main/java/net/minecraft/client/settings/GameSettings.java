@@ -160,16 +160,6 @@ public class GameSettings
     public boolean isToggleSprintActive = false;
     public boolean isZoomActive = false;
 
-    // Configuration du crosshair personnalisable
-    public int crosshairType = 0; // 0: vanilla, 1: CS-style, 2: point
-    public int crosshairColor = 0xFFFFFFFF; // Couleur par défaut (blanc opaque)
-    public int crosshairSize = 5;           // Taille des branches
-    public int crosshairThickness = 2;      // Épaisseur des branches
-    public int crosshairGap = 3;            // Gap central (CS:GO style)
-    public boolean crosshairRainbow = false; // Mode arc-en-ciel
-    // Whether to use the original Minecraft textured crosshair when crosshairType==0.
-    // If true, the game will draw the original texture; if false, the customizable vanilla crosshair is drawn.
-    public boolean crosshairUseVanillaTexture = true;
     public KeyBinding[] keyBindsHotbar = new KeyBinding[] {new KeyBinding("key.hotbar.1", 2, "key.categories.inventory"), new KeyBinding("key.hotbar.2", 3, "key.categories.inventory"), new KeyBinding("key.hotbar.3", 4, "key.categories.inventory"), new KeyBinding("key.hotbar.4", 5, "key.categories.inventory"), new KeyBinding("key.hotbar.5", 6, "key.categories.inventory"), new KeyBinding("key.hotbar.6", 7, "key.categories.inventory"), new KeyBinding("key.hotbar.7", 8, "key.categories.inventory"), new KeyBinding("key.hotbar.8", 9, "key.categories.inventory"), new KeyBinding("key.hotbar.9", 10, "key.categories.inventory")};
     public KeyBinding[] keyBindings;
     protected Minecraft mc;
@@ -1062,40 +1052,6 @@ public class GameSettings
                         this.toggleSprintEnabled = astring[1].equals("true");
                     }
 
-                    if (astring[0].equals("crosshairType"))
-                    {
-                        this.crosshairType = Integer.parseInt(astring[1]);
-                    }
-
-                    if (astring[0].equals("crosshairColor"))
-                    {
-                        this.crosshairColor = (int) Long.parseLong(astring[1]);
-                    }
-
-                    if (astring[0].equals("crosshairSize"))
-                    {
-                        this.crosshairSize = Integer.parseInt(astring[1]);
-                    }
-
-                    if (astring[0].equals("crosshairThickness"))
-                    {
-                        this.crosshairThickness = Integer.parseInt(astring[1]);
-                    }
-
-                    if (astring[0].equals("crosshairGap"))
-                    {
-                        this.crosshairGap = Integer.parseInt(astring[1]);
-                    }
-
-                    if (astring[0].equals("crosshairRainbow"))
-                    {
-                        this.crosshairRainbow = "true".equals(astring[1]);
-                    }
-
-                    if (astring[0].equals("crosshairUseVanillaTexture"))
-                    {
-                        this.crosshairUseVanillaTexture = astring[1].equals("true");
-                    }
 
                     for (KeyBinding keybinding : this.keyBindings)
                     {
@@ -1229,13 +1185,6 @@ public class GameSettings
             printwriter.println("realmsNotifications:" + this.realmsNotifications);
             printwriter.println("toggleSneakEnabled:" + this.toggleSneakEnabled);
             printwriter.println("toggleSprintEnabled:" + this.toggleSprintEnabled);
-            printwriter.println("crosshairType:" + this.crosshairType);
-            printwriter.println("crosshairColor:" + this.crosshairColor);
-            printwriter.println("crosshairSize:" + this.crosshairSize);
-            printwriter.println("crosshairThickness:" + this.crosshairThickness);
-            printwriter.println("crosshairGap:" + this.crosshairGap);
-            printwriter.println("crosshairRainbow:" + this.crosshairRainbow);
-            printwriter.println("crosshairUseVanillaTexture:" + this.crosshairUseVanillaTexture);
 
             for (KeyBinding keybinding : this.keyBindings)
             {

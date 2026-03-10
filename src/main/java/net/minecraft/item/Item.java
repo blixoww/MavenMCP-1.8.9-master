@@ -891,6 +891,7 @@ public class Item {
         registerItemBlock(Blocks.steel_block);
         registerItemBlock(Blocks.ruby_block);
         registerItemBlock(Blocks.cobalt_block);
+        registerItemBlock(Blocks.random_ore);
 
         // ── Items matériaux custom ───────────────────────────────────────────────
         registerItem(452, "steel_ingot", (new Item()).setUnlocalizedName("steel_ingot").setCreativeTab(CreativeTabs.tabMaterials));
@@ -920,6 +921,10 @@ public class Item {
         registerItem(468, "cobalt_shovel", (new ItemSpade(Item.ToolMaterial.COBALT)).setUnlocalizedName("cobalt_shovel"));
         registerItem(469, "cobalt_axe", (new ItemAxe(Item.ToolMaterial.COBALT)).setUnlocalizedName("cobalt_axe"));
         registerItem(470, "cobalt_hoe", (new ItemHoe(Item.ToolMaterial.COBALT)).setUnlocalizedName("cobalt_hoe"));
+
+        // ── Nouveaux items custom ──────────────────────────────────────────────────
+        registerItem(471, "multi_tool", (new ItemMultiTool()).setUnlocalizedName("multi_tool").setCreativeTab(CreativeTabs.tabTools));
+        registerItem(472, "obsidian_door", (new ItemDoor(Blocks.obsidian_door)).setUnlocalizedName("doorObsidian"));
 
         registerItem(2256, "record_13", (new ItemRecord("13")).setUnlocalizedName("record"));
         registerItem(2257, "record_cat", (new ItemRecord("cat")).setUnlocalizedName("record"));

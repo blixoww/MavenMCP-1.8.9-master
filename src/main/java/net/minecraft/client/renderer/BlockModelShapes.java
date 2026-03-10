@@ -315,5 +315,6 @@ public class BlockModelShapes
                 return new ModelResourceLocation(s + "_double_slab", s1);
             }
         });
+        this.registerBlockWithStateMapper(Blocks.obsidian_door, (new StateMap.Builder()).ignore(new IProperty[] {BlockDoor.POWERED}).build());
     }
 }

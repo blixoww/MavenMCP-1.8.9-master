@@ -147,7 +147,7 @@ public abstract class BaseWidget implements UIElement {
         }
     }
 
-    // Recalcule la position absolue depuis relX/relY si la résolution a changé
+    // Recalcule la position absolue depuis relX/relY pour la résolution actuelle
     public void updateAbsolutePosition() {
         if (relX < 0.0d || relY < 0.0d) return;
         Minecraft mc = Minecraft.getMinecraft();
@@ -156,7 +156,7 @@ public abstract class BaseWidget implements UIElement {
                 ScaledResolution sr = new ScaledResolution(mc);
                 int sw = sr.getScaledWidth();
                 int sh = sr.getScaledHeight();
-                if (sw > 0 && sh > 0 && (sw != refW || sh != refH)) {
+                if (sw > 0 && sh > 0) {
                     int newMaxX = Math.max(1, sw - this.getWidth());
                     int newMaxY = Math.max(1, sh - this.getHeight());
                     int nx = (int) Math.round(this.relX * newMaxX);

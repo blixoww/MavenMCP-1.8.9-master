@@ -15,6 +15,7 @@ public class UIManager {
     private final Gson gson = new Gson();
     private static final UIManager INSTANCE = new UIManager();
     private boolean editorActive = false;
+    private boolean needsPositionRecalc = false;
 
     public static UIManager getInstance() {
         return INSTANCE;
@@ -65,9 +66,6 @@ public class UIManager {
         ToggleSprintWidget toggleSprintW = new ToggleSprintWidget("toggle_sprint", 90, 210);
         toggleSprintW.setColor(0xFF44EE77);
         register(toggleSprintW);
-        CrosshairWidget crosshairW = new CrosshairWidget("crosshair", 200, 10);
-        crosshairW.setColor(0xFFFFFFFF);
-        register(crosshairW);
         boolean loaded = loadConfig();
         if (!loaded) {
             // Par defaut: tout desactive sauf FPS
@@ -137,6 +135,16 @@ public class UIManager {
     }
 
     public void renderAll(int mouseX, int mouseY, float partialTicks) {
+        // Recalculate proportional positions after config load (resolution is now known)
+        if (needsPositionRecalc) {
+            needsPositionRecalc = false;
+            for (UIElement e : widgets.values()) {
+                if (e instanceof BaseWidget) {
+                    ((BaseWidget) e).updateAbsolutePosition();
+                }
+            }
+        }
+
         // update dynamic values for simple widgets
         try {
             Minecraft mc = Minecraft.getMinecraft();
@@ -294,6 +302,7 @@ public class UIManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        needsPositionRecalc = true;
         return true;
     }
 }

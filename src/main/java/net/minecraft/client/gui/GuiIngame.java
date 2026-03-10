@@ -286,45 +286,6 @@ public class GuiIngame extends Gui {
         this.mc.getTextureManager().bindTexture(icons);
         GlStateManager.enableBlend();
 
-        if (this.showCrosshair()) {
-            net.minecraft.client.settings.GameSettings gs = this.mc.gameSettings;
-            int cx = i / 2;
-            int cy = j / 2;
-
-            // Si l'utilisateur a choisi le style vanilla, respecter le flag crosshairUseVanillaTexture
-            if (gs.crosshairType == 0) {
-                if (!gs.crosshairUseVanillaTexture) {
-                    try {
-                        net.minecraft.client.gui.ui.CrosshairWidget.renderFromSettings(gs, cx, cy);
-                    } catch (Throwable t) {
-                        // En cas d'erreur, fallback au crosshair vanilla texturé
-                        GlStateManager.tryBlendFuncSeparate(775, 769, 1, 0);
-                        GlStateManager.enableAlpha();
-                        this.drawTexturedModalRect(cx - 7, cy - 7, 0, 0, 16, 16);
-                    }
-                } else {
-                    // Utiliser la texture vanilla d'origine
-                    GlStateManager.tryBlendFuncSeparate(775, 769, 1, 0);
-                    GlStateManager.enableAlpha();
-                    this.drawTexturedModalRect(cx - 7, cy - 7, 0, 0, 16, 16);
-                }
-            } else {
-                // Styles non-vanilla : on ne les affiche que si le widget crosshair est activé
-                net.minecraft.client.gui.ui.UIElement crosshairEl =
-                        net.minecraft.client.gui.ui.UIManager.getInstance().get("crosshair");
-                boolean crosshairWidgetActive = crosshairEl != null && crosshairEl.isEnabled();
-
-                if (crosshairWidgetActive) {
-                    // Le widget prendra en charge le rendu dans uiManager.renderAll()
-                } else {
-                    // Widget non activé → on affiche le crosshair vanilla texturé par défaut
-                    GlStateManager.tryBlendFuncSeparate(775, 769, 1, 0);
-                    GlStateManager.enableAlpha();
-                    this.drawTexturedModalRect(cx - 7, cy - 7, 0, 0, 16, 16);
-                }
-            }
-        }
-
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.mcProfiler.startSection("bossHealth");
@@ -506,7 +467,7 @@ public class GuiIngame extends Gui {
         GlStateManager.disableLighting();
         GlStateManager.enableAlpha();
 
-        // Render custom UI widgets (Toggle Sneak/Sprint, Crosshair, etc.)
+        // Render custom UI widgets (Toggle Sneak/Sprint, etc.)
         try {
             uiManager.renderAll(0, 0, partialTicks);
         } catch (Exception e) {
@@ -643,27 +604,6 @@ public class GuiIngame extends Gui {
         this.mc.mcProfiler.endSection();
     }
 
-    protected boolean showCrosshair() {
-        if (this.mc.gameSettings.showDebugInfo && !this.mc.thePlayer.hasReducedDebug() && !this.mc.gameSettings.reducedDebugInfo) {
-            return false;
-        } else if (this.mc.playerController.isSpectator()) {
-            if (this.mc.pointedEntity != null) {
-                return true;
-            } else {
-                if (this.mc.objectMouseOver != null && this.mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-                    BlockPos blockpos = this.mc.objectMouseOver.getBlockPos();
-
-                    if (this.mc.theWorld.getTileEntity(blockpos) instanceof IInventory) {
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-        } else {
-            return true;
-        }
-    }
 
     public void renderStreamIndicator(ScaledResolution scaledRes) {
         this.streamIndicator.render(scaledRes.getScaledWidth() - 10, 10);
