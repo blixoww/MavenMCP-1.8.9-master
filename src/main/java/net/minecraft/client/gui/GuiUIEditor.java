@@ -1405,9 +1405,9 @@ public class GuiUIEditor extends GuiScreen {
     private void drawCrosshairEditor() {
         net.minecraft.client.settings.GameSettings gs = Minecraft.getMinecraft().gameSettings;
         if (crosshairEditorX == Integer.MIN_VALUE && this.width > 0)
-            crosshairEditorX = Math.max(4, this.width / 2 - 160);
+            crosshairEditorX = Math.max(4, this.width / 2 - 130);
         int px = crosshairEditorX, py = crosshairEditorY;
-        final int W = 320, ACCENT = 0xFF00CCFF;
+        final int W = 260, ACCENT = 0xFF00CCFF;
 
         // ── Calcul hauteur dynamique ─────────────────────────────────────────
         int contentH = 22 + 4; // header + padding
@@ -1724,7 +1724,7 @@ public class GuiUIEditor extends GuiScreen {
         net.minecraft.client.settings.GameSettings gs = Minecraft.getMinecraft().gameSettings;
         if (crosshairEditorX == Integer.MIN_VALUE) return;
         int px = crosshairEditorX, py = crosshairEditorY;
-        final int W = 320;
+        final int W = 260;
 
         // Fermer (priorité maximale)
         if (hbChEditorClose[2] != 0 && inRect(mouseX, mouseY, hbChEditorClose[0], hbChEditorClose[1], hbChEditorClose[2], hbChEditorClose[3])) {

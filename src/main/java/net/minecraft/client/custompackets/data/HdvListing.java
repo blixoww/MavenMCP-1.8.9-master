@@ -22,6 +22,7 @@ public class HdvListing {
     private long totalPrice;
     private int quantity;
     private long expiresAt;
+    private boolean sold; // true = vendu, non encore collecté
 
     public HdvListing() {}
 
@@ -35,6 +36,24 @@ public class HdvListing {
             l.totalPrice = buf.readLong();
             l.quantity   = buf.readVarIntFromBuffer();
             l.expiresAt  = buf.readLong();
+            l.sold       = false;
+            return l;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /** Lecture d'une annonce "mes annonces" avec flag sold */
+    public static HdvListing readMyListing(PacketBuffer buf) {
+        try {
+            HdvListing l = new HdvListing();
+            l.id         = buf.readVarIntFromBuffer();
+            l.sellerName = buf.readStringFromBuffer(64);
+            l.item       = buf.readItemStackFromBuffer();
+            l.totalPrice = buf.readLong();
+            l.quantity   = buf.readVarIntFromBuffer();
+            l.expiresAt  = buf.readLong();
+            l.sold       = buf.readBoolean();
             return l;
         } catch (Exception e) {
             return null;
@@ -50,6 +69,7 @@ public class HdvListing {
 
     public int getQuantity()      { return quantity; }
     public long getExpiresAt()    { return expiresAt; }
+    public boolean isSold()       { return sold; }
 
     /** Calcule le prix unitaire approximatif. */
     public long getPricePerUnit() {
@@ -60,6 +80,6 @@ public class HdvListing {
     public String toString() {
         return "HdvListing{id=" + id + ", seller='" + sellerName + "', item="
                 + (item != null ? item.getDisplayName() : "null")
-                + ", total=" + totalPrice + ", qty=" + quantity + '}';
+                + ", total=" + totalPrice + ", qty=" + quantity + ", sold=" + sold + '}';
     }
 }

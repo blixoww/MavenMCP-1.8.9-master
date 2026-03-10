@@ -14,14 +14,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Interface Hôtel des Ventes — refonte complète.
- *
- * Onglets : [Acheter] [Mes annonces] [Vendre]
- *
- * Protocole binaire S2C aligné avec HdvManager.serializeListing (serveur) :
- *   VarInt id | String sellerName | readItemStackFromBuffer | Long price | VarInt qty | Long expiresAt
- */
 public class GuiHDV extends GuiScreen {
 
     // ── Palette ──────────────────────────────────────────────────────────────
@@ -37,6 +29,7 @@ public class GuiHDV extends GuiScreen {
     private static final int C_WHITE   = 0xFFFFFFFF;
     private static final int C_SEL     = 0x441A4A2A;
     private static final int C_HOV     = 0x221A3060;
+    private static final int C_SOLD_BG = 0x44226A22; // fond vert pour ligne vendue
 
     // ── Onglets ───────────────────────────────────────────────────────────────
     private static final int TAB_BUY  = 0;
@@ -48,12 +41,15 @@ public class GuiHDV extends GuiScreen {
     private int px, py, pw, ph;
 
     // ── Données ───────────────────────────────────────────────────────────────
-    private final List<HdvListing> listings = new ArrayList<>();
-    private long    playerBalance = 0L;
-    private boolean loading       = true;
-    private String  statusMsg     = "";
-    private int     statusTimer   = 0;
-    private boolean statusOk      = true;
+    private final List<HdvListing> listings   = new ArrayList<>();
+    private final List<HdvListing> myListings = new ArrayList<>(); // actives + vendues
+    private long    pendingEarnings = 0L;
+    private long    playerBalance   = 0L;
+    private boolean loading         = true;
+    private boolean loadingMine     = true;
+    private String  statusMsg       = "";
+    private int     statusTimer     = 0;
+    private boolean statusOk        = true;
 
     // ── Achat ─────────────────────────────────────────────────────────────────
     private HdvListing confirmListing = null;
@@ -66,7 +62,7 @@ public class GuiHDV extends GuiScreen {
     private GuiTextField priceField;
     private GuiTextField qtyField;
 
-    // ── Recherche ──────��──────────────────────────────────────────────────────
+    // ── Recherche ─────────────────────────────────────────────────────────────
     private GuiTextField searchField;
 
     // ── Scroll ────────────────────────────────────────────────────────────────
@@ -74,7 +70,7 @@ public class GuiHDV extends GuiScreen {
     private static final int ROW_H = 32;
     private int listY0, listH;
 
-    // ── Hitboxes [x, y, w, h] — w=0 invalide ─────────────────────────────────
+    // ── Hitboxes ─────────────────────────────────────────────────────────────
     private final int[]   hbClose     = new int[4];
     private final int[]   hbTabBuy    = new int[4];
     private final int[]   hbTabMine   = new int[4];
@@ -96,8 +92,8 @@ public class GuiHDV extends GuiScreen {
     private final int[]   hbOkBuy     = new int[4];
     private final int[]   hbCancelBuy = new int[4];
     private final int[][] hbRows      = new int[16][4];
-    private final int[][] hbCancelRow = new int[16][4];
-    private final int[][] hbInvSlots  = new int[36][4];
+    private final int[][] hbCancelRow = new int[16][4]; // bouton "Retirer" pour les actives
+    private final int[]   hbInvSlots[] = new int[36][4];
 
     // ════════════════════════════════════════════════════════════════════════
     //  INIT
@@ -105,7 +101,6 @@ public class GuiHDV extends GuiScreen {
 
     @Override
     public void initGui() {
-        // S'assurer que le système de packets est initialisé et les canaux enregistrés
         net.minecraft.client.custompackets.CustomPacketSystem.init();
 
         pw = Math.min(740, width  - 16);
@@ -120,43 +115,56 @@ public class GuiHDV extends GuiScreen {
         priceField.setMaxStringLength(10);
         priceField.setText(String.valueOf(sellPrice));
 
-        qtyField = new GuiTextField(2, fontRendererObj, 0, 0, 40, 12); // Champ quantité
+        qtyField = new GuiTextField(2, fontRendererObj, 0, 0, 40, 12);
         qtyField.setMaxStringLength(4);
         qtyField.setText(String.valueOf(sellQty));
 
         invalidateHb();
 
-        // ── IMPORTANT : enregistrer les listeners AVANT requestList() ──────
-        HdvPacketHandler.setListListener(nl -> {
-            Minecraft.getMinecraft().addScheduledTask(() -> {
-                listings.clear();
-                listings.addAll(nl);
-                loading = false;
-                scroll  = 0;
-            });
-        });
-        HdvPacketHandler.setActionListener((ok, msg) -> {
-            Minecraft.getMinecraft().addScheduledTask(() -> {
-                statusMsg   = msg;
-                statusTimer = 120;
-                statusOk    = ok;
-                if (ok) { loading = true; HdvPacketHandler.requestList(0, ""); }
-            });
-        });
+        HdvPacketHandler.setListListener(nl -> Minecraft.getMinecraft().addScheduledTask(() -> {
+            listings.clear();
+            listings.addAll(nl);
+            loading = false;
+            scroll  = 0;
+        }));
+
+        HdvPacketHandler.setActionListener((ok, msg) -> Minecraft.getMinecraft().addScheduledTask(() -> {
+            statusMsg   = msg;
+            statusTimer = 120;
+            statusOk    = ok;
+            if (ok) {
+                loading = true;
+                HdvPacketHandler.requestList(0, "");
+                // Après une action réussie, recharger aussi mes annonces
+                loadingMine = true;
+                HdvPacketHandler.requestMyListings();
+            }
+        }));
+
+        HdvPacketHandler.setMyListingsListener((mine, earnings) -> Minecraft.getMinecraft().addScheduledTask(() -> {
+            myListings.clear();
+            myListings.addAll(mine);
+            pendingEarnings = earnings;
+            loadingMine = false;
+        }));
+
         PlayerDataHandler.setListener(data -> playerBalance = data.getBalance());
         PlayerData pd = PlayerDataHandler.getCachedData();
         if (pd != null) playerBalance = pd.getBalance();
 
-        // Pré-charger le cache existant (annonces déjà reçues avant l'ouverture du GUI)
         List<HdvListing> cached = new ArrayList<>(HdvPacketHandler.getCachedListings());
-        if (!cached.isEmpty()) {
-            listings.clear();
-            listings.addAll(cached);
-            loading = false;
+        if (!cached.isEmpty()) { listings.clear(); listings.addAll(cached); loading = false; }
+
+        List<HdvListing> cachedMine = new ArrayList<>(HdvPacketHandler.getCachedMyListings());
+        if (!cachedMine.isEmpty()) {
+            myListings.clear();
+            myListings.addAll(cachedMine);
+            pendingEarnings = HdvPacketHandler.getCachedPendingEarnings();
+            loadingMine = false;
         }
 
-        // Demander une mise à jour fraîche au serveur
         requestList();
+        HdvPacketHandler.requestMyListings();
     }
 
     private void requestList() {
@@ -166,12 +174,18 @@ public class GuiHDV extends GuiScreen {
         HdvPacketHandler.requestList(0, f);
     }
 
-    /** Appelé directement par HdvPacketHandler quand des listings sont reçus. */
-    public void onListingsReceived(java.util.List<HdvListing> nl) {
+    public void onListingsReceived(List<HdvListing> nl) {
         listings.clear();
         listings.addAll(nl);
         loading = false;
         scroll  = 0;
+    }
+
+    public void onMyListingsReceived(List<HdvListing> mine, long earnings) {
+        myListings.clear();
+        myListings.addAll(mine);
+        pendingEarnings = earnings;
+        loadingMine = false;
     }
 
     private void invalidateHb() {
@@ -196,7 +210,6 @@ public class GuiHDV extends GuiScreen {
         GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
 
-        // Panel
         drawRect(px, py, px + pw, py + ph, C_BG);
         drawBorder(px, py, pw, ph, C_BORDER);
         drawRect(px, py, px + pw, py + 1, C_ACCENT);
@@ -211,7 +224,6 @@ public class GuiHDV extends GuiScreen {
             case TAB_SELL: drawSellTab(mx, my); break;
         }
 
-        // Message de statut
         if (statusTimer > 0) {
             statusTimer--;
             int alpha = Math.min(255, statusTimer * 6);
@@ -225,8 +237,6 @@ public class GuiHDV extends GuiScreen {
         GlStateManager.disableBlend();
         super.drawScreen(mx, my, pt);
     }
-
-    // ── Header ───────────────────────────────────────────────────────────────
 
     private void drawHeader(int mx, int my) {
         drawRect(px, py, px + pw, py + 26, C_HEADER);
@@ -244,13 +254,10 @@ public class GuiHDV extends GuiScreen {
         hb(hbClose, cx, cy, 14, 14);
     }
 
-    // ── Onglets ──────────────────────────────────────────────────────────────
-
     private void drawTabs(int mx, int my) {
         String[] labels = {"Acheter", "Mes annonces", "Vendre"};
         int[][] hbs = {hbTabBuy, hbTabMine, hbTabSell};
         int tw = 130, th = 18, ty = py + 28, startX = px + 8;
-
         for (int i = 0; i < 3; i++) {
             int tx = startX + i * (tw + 4);
             boolean active = (activeTab == i), hov = in(mx, my, tx, ty, tw, th);
@@ -271,8 +278,6 @@ public class GuiHDV extends GuiScreen {
 
     private void drawBuyTab(int mx, int my) {
         int cy = py + 48;
-
-        // Barre de recherche
         int sfW = pw - 90;
         drawRect(px + 8, cy - 1, px + 8 + sfW + 2, cy + 13, 0xFF060D1A);
         drawBorder(px + 8, cy - 1, sfW + 2, 14,
@@ -285,7 +290,6 @@ public class GuiHDV extends GuiScreen {
             if (searchField.getText().isEmpty())
                 fontRendererObj.drawString("Rechercher...", px + 12, cy + 2, 0x44AAAAAA);
         }
-
         int bsx = px + 8 + sfW + 4, bsy = cy - 1;
         boolean bh = in(mx, my, bsx, bsy, 70, 14);
         drawRect(bsx, bsy, bsx + 70, bsy + 14, bh ? 0xFF1A3A6A : 0xFF0D2040);
@@ -294,14 +298,12 @@ public class GuiHDV extends GuiScreen {
         hb(hbSearchBtn, bsx, bsy, 70, 14);
         cy += 16;
 
-        // En-tête colonnes
         int lx = px + 8, tw = pw - 16;
         drawRect(lx, cy, lx + tw, cy + 14, 0xFF060D1A);
         drawRect(lx, cy + 13, lx + tw, cy + 14, 0x44FFFFFF);
         fontRendererObj.drawString("Item",       lx + 28,  cy + 3, C_GRAY);
         fontRendererObj.drawString("Vendeur",    lx + 220, cy + 3, C_GRAY);
         fontRendererObj.drawString("Qte",        lx + 340, cy + 3, C_GRAY);
-        // Swap Price and Total in buy tab header to reflect the user's preference for 'Global' price focus
         fontRendererObj.drawString("Prix Total", lx + 400, cy + 3, C_GRAY);
         fontRendererObj.drawString("Unitaire",   lx + 490, cy + 3, C_GRAY);
         cy += 14;
@@ -333,16 +335,14 @@ public class GuiHDV extends GuiScreen {
             for (int i = end - scroll; i < hbRows.length; i++) hbRows[i][2] = 0;
         }
 
-        // Flèches scroll
         if (!fl.isEmpty() && fl.size() > maxRows) {
             int ax = px + pw - 24;
             boolean canUp = scroll > 0, canDn = scroll < fl.size() - maxRows;
-            drawRect(ax, listY0,           ax + 16, listY0 + 14,       canUp ? 0xFF1A2A50 : 0xFF080C14);
-            fontRendererObj.drawString("^", ax + 5, listY0 + 3,         canUp ? 0xFFAADDFF : 0xFF333355);
+            drawRect(ax, listY0, ax + 16, listY0 + 14, canUp ? 0xFF1A2A50 : 0xFF080C14);
+            fontRendererObj.drawString("^", ax + 5, listY0 + 3, canUp ? 0xFFAADDFF : 0xFF333355);
             drawRect(ax, listY0 + listH - 14, ax + 16, listY0 + listH, canDn ? 0xFF1A2A50 : 0xFF080C14);
             fontRendererObj.drawString("v", ax + 5, listY0 + listH - 11, canDn ? 0xFFAADDFF : 0xFF333355);
         }
-
         fontRendererObj.drawString(fl.size() + " annonce(s)", px + 10, py + ph - 14, C_GRAY);
     }
 
@@ -361,90 +361,134 @@ public class GuiHDV extends GuiScreen {
             GlStateManager.disableDepth();
             String name = item.getDisplayName();
             if (fontRendererObj.getStringWidth(name) > 148) name = name.substring(0, 14) + "...";
-            // Centrage vertical du nom par rapport à l'icône : (ROW_H - 8) / 2, comme dans l'onglet "Mes annonces"
-            fontRendererObj.drawStringWithShadow(name, x + 26, y + (float) (ROW_H - 8) / 2, C_WHITE);
+            fontRendererObj.drawStringWithShadow(name, x + 26, y + (float)(ROW_H - 8) / 2, C_WHITE);
         } else {
             fontRendererObj.drawString("Item invalide", x + 6, y + (ROW_H - 8) / 2, C_RED);
         }
 
         fontRendererObj.drawString(l.getSellerName(), x + 222, y + (ROW_H - 8) / 2, 0xFFAADDFF);
         fontRendererObj.drawString("" + l.getQuantity(), x + 342, y + (ROW_H - 8) / 2, C_WHITE);
-
-        // Affichage inversé : Prix Total en premier (mis en valeur)
-        // Note: l.getTotalPrice() retourne maintenant le champ brut reçu du serveur qui EST le prix total.
-        fontRendererObj.drawStringWithShadow(fmtGold(l.getTotalPrice()), x + 400, y + (float) (ROW_H - 8) / 2, C_GOLD);
+        fontRendererObj.drawStringWithShadow(fmtGold(l.getTotalPrice()), x + 400, y + (float)(ROW_H - 8) / 2, C_GOLD);
         fontRendererObj.drawString(fmtGold(l.getPricePerUnit()), x + 490, y + (ROW_H - 8) / 2, C_GRAY);
 
-        boolean canAfford = playerBalance >= l.getTotalPrice(); // Check affordability based on total price logic if purchasing whole lot
-        // NOTE: Server logic likely checks unitPrice * qty or totalPrice. Assuming standard behavior is buy whole lot.
-
+        boolean canAfford = playerBalance >= l.getTotalPrice();
         int bx = x + w - 68, by = y + (ROW_H - 14) / 2;
-        boolean bh = in(mx, my, bx, by, 62, 14);
-        drawRect(bx, by, bx + 62, by + 14, bh && canAfford ? 0xFF1A6030 : (canAfford ? 0xFF0D3515 : 0xFF2A1010));
-        drawRect(bx, by, bx + 62, by + 1, bh && canAfford ? C_GREEN : (canAfford ? 0xFF1A6030 : C_RED));
-        drawCentered(canAfford ? "Acheter" : "Insuf.", bx + 31, by + 3, canAfford ? (bh ? C_WHITE : 0xFF88EE99) : 0xFFCC5555);
+        boolean bhovr = in(mx, my, bx, by, 62, 14);
+        drawRect(bx, by, bx + 62, by + 14, bhovr && canAfford ? 0xFF1A6030 : (canAfford ? 0xFF0D3515 : 0xFF2A1010));
+        drawRect(bx, by, bx + 62, by + 1, bhovr && canAfford ? C_GREEN : (canAfford ? 0xFF1A6030 : C_RED));
+        drawCentered(canAfford ? "Acheter" : "Insuf.", bx + 31, by + 3, canAfford ? (bhovr ? C_WHITE : 0xFF88EE99) : 0xFFCC5555);
         if (idx < hbRows.length) hb(hbRows[idx], x, y, w, ROW_H);
     }
 
     // ════════════════════════════════════════════════════════════════════════
-    //  ONGLET MES ANNONCES
+    //  ONGLET MES ANNONCES — actives + vendues
     // ════════════════════════════════════════════════════════════════════════
 
     private void drawMineTab(int mx, int my) {
-        String myName = mc.thePlayer != null ? mc.thePlayer.getName() : "";
-        List<HdvListing> mine = new ArrayList<>();
-        for (HdvListing l : listings) if (myName.equals(l.getSellerName())) mine.add(l);
-
         int y = py + 50, lx = px + 8, tw = pw - 16;
+
+        // En-tête
         drawRect(lx, y, lx + tw, y + 14, 0xFF060D1A);
         drawRect(lx, y + 13, lx + tw, y + 14, 0x44FFFFFF);
-        fontRendererObj.drawString("Item",          lx + 28, y + 3, C_GRAY);
-        fontRendererObj.drawString("Qte restante",  lx + 250, y + 3, C_GRAY);
-        fontRendererObj.drawString("Prix/u",         lx + 370, y + 3, C_GRAY);
-        fontRendererObj.drawString("Expire",         lx + 470, y + 3, C_GRAY);
+        fontRendererObj.drawString("Item",     lx + 28,  y + 3, C_GRAY);
+        fontRendererObj.drawString("Qte",      lx + 250, y + 3, C_GRAY);
+        fontRendererObj.drawString("Prix/u",   lx + 370, y + 3, C_GRAY);
+        fontRendererObj.drawString("Statut",   lx + 470, y + 3, C_GRAY);
         y += 14;
 
-        if (mine.isEmpty()) {
-            drawCentered("Vous n'avez aucune annonce active.", px + pw / 2, py + ph / 2 - 10, C_GRAY);
+        int listAreaH = ph - (y - py) - 50; // espace réservé pour bouton collecter
+
+        if (loadingMine) {
+            int dots = (int)((System.currentTimeMillis() / 500) % 4);
+            StringBuilder sb = new StringBuilder("Chargement");
+            for (int d = 0; d < dots; d++) sb.append('.');
+            drawCentered(sb.toString(), px + pw / 2, y + listAreaH / 2 - 4, C_GRAY);
+        } else if (myListings.isEmpty()) {
+            drawCentered("Vous n'avez aucune annonce.", px + pw / 2, y + listAreaH / 2 - 4, C_GRAY);
         } else {
-            for (int i = 0; i < mine.size() && i < hbCancelRow.length; i++) {
-                HdvListing l = mine.get(i);
-                boolean hov = in(mx, my, lx, y, tw, ROW_H);
-                drawRect(lx, y, lx + tw, y + ROW_H, hov ? C_HOV : 0);
+            int cancelIdx = 0;
+            for (int i = 0; i < myListings.size(); i++) {
+                HdvListing l = myListings.get(i);
+                boolean sold = l.isSold();
+                boolean hov  = in(mx, my, lx, y, tw, ROW_H);
+
+                // Fond de ligne
+                int rowBg = sold ? C_SOLD_BG : (hov ? C_HOV : 0);
+                drawRect(lx, y, lx + tw, y + ROW_H, rowBg);
                 drawRect(lx, y + ROW_H - 1, lx + tw, y + ROW_H, 0x22FFFFFF);
 
+                // Icône + nom item
                 if (l.getItem() != null) {
                     GlStateManager.enableDepth();
                     RenderHelper.enableGUIStandardItemLighting();
                     itemRender.renderItemAndEffectIntoGUI(l.getItem(), lx + 6, y + (ROW_H - 16) / 2);
                     RenderHelper.disableStandardItemLighting();
                     GlStateManager.disableDepth();
-                    fontRendererObj.drawStringWithShadow(l.getItem().getDisplayName(),
-                            lx + 26, y + (ROW_H - 8) / 2, C_WHITE);
+                    String name = l.getItem().getDisplayName();
+                    if (fontRendererObj.getStringWidth(name) > 180) name = name.substring(0, 16) + "...";
+                    fontRendererObj.drawStringWithShadow(name, lx + 26, y + (float)(ROW_H - 8) / 2,
+                            sold ? 0xFFAAFFAA : C_WHITE);
+                } else {
+                    fontRendererObj.drawString("Item ?", lx + 26, y + (ROW_H - 8) / 2, C_GRAY);
                 }
-                fontRendererObj.drawString("" + l.getQuantity(), lx + 258, y + (ROW_H - 8) / 2, C_WHITE);
-                fontRendererObj.drawStringWithShadow(fmtGold(l.getPricePerUnit()), lx + 370, y + (ROW_H - 8) / 2, C_GOLD);
 
-                long rem = l.getExpiresAt() - System.currentTimeMillis() / 1000L;
-                fontRendererObj.drawString(rem > 0 ? fmtTime(rem) : "Expiree", lx + 470, y + (ROW_H - 8) / 2, rem > 0 ? C_WHITE : C_RED);
+                // Qté
+                fontRendererObj.drawString("" + l.getQuantity(), lx + 258, y + (ROW_H - 8) / 2,
+                        sold ? 0xFFBBFFBB : C_WHITE);
 
-                int bx = lx + tw - 68, by = y + (ROW_H - 14) / 2;
-                boolean bh = in(mx, my, bx, by, 62, 14);
-                drawRect(bx, by, bx + 62, by + 14, bh ? 0xCC441111 : 0x88220A0A);
-                drawRect(bx, by, bx + 62, by + 1, bh ? C_RED : 0xFF661111);
-                drawCentered("Retirer", bx + 31, by + 3, bh ? C_WHITE : 0xFFCC5555);
-                hb(hbCancelRow[i], bx, by, 62, 14);
+                // Prix/u
+                fontRendererObj.drawStringWithShadow(fmtGold(l.getPricePerUnit()),
+                        lx + 370, y + (float)(ROW_H - 8) / 2, C_GOLD);
+
+                if (sold) {
+                    // Badge VENDU + bouton Collecter (si gains en attente)
+                    fontRendererObj.drawStringWithShadow("§a✔ VENDU", lx + 470, y + (ROW_H - 8) / 2, C_GREEN);
+
+                    // Bouton "Collecter" (visible uniquement si des gains sont en attente)
+                    if (pendingEarnings > 0 && cancelIdx < hbCancelRow.length) {
+                        int bx = lx + tw - 72, by = y + (ROW_H - 14) / 2;
+                        boolean bhovr = in(mx, my, bx, by, 66, 14);
+                        drawRect(bx, by, bx + 66, by + 14, bhovr ? 0xFF1A6030 : 0xFF0D3518);
+                        drawRect(bx, by, bx + 66, by + 1, bhovr ? C_GREEN : 0xFF1A6030);
+                        drawCentered("Collecter", bx + 33, by + 3, bhovr ? C_WHITE : C_GREEN);
+                        hb(hbCancelRow[cancelIdx], bx, by, 66, 14);
+                        cancelIdx++;
+                    }
+                } else {
+                    // Annonce active : expiration + bouton Retirer
+                    long rem = l.getExpiresAt() - System.currentTimeMillis() / 1000L;
+                    fontRendererObj.drawString(rem > 0 ? fmtTime(rem) : "§cExpiree",
+                            lx + 470, y + (ROW_H - 8) / 2, rem > 0 ? C_WHITE : C_RED);
+
+                    if (cancelIdx < hbCancelRow.length) {
+                        int bx = lx + tw - 72, by = y + (ROW_H - 14) / 2;
+                        boolean bhovr = in(mx, my, bx, by, 66, 14);
+                        drawRect(bx, by, bx + 66, by + 14, bhovr ? 0xCC441111 : 0x88220A0A);
+                        drawRect(bx, by, bx + 66, by + 1, bhovr ? C_RED : 0xFF661111);
+                        drawCentered("Retirer", bx + 33, by + 3, bhovr ? C_WHITE : 0xFFCC5555);
+                        hb(hbCancelRow[cancelIdx], bx, by, 66, 14);
+                        cancelIdx++;
+                    }
+                }
+
                 y += ROW_H;
+                if (y + ROW_H > py + ph - 50) break; // ne pas déborder sur le bouton collecter
             }
+            // Invalider les hitboxes inutilisées
+            for (int i = cancelIdx; i < hbCancelRow.length; i++) hbCancelRow[i][2] = 0;
         }
 
-        // Bouton collecter
-        int gx = px + pw / 2 - 90, gy = py + ph - 38;
-        boolean gh = in(mx, my, gx, gy, 180, 22);
-        drawRect(gx, gy, gx + 180, gy + 22, gh ? 0xFF1A4A25 : 0xFF0D2A15);
-        drawBorder(gx, gy, 180, 22, gh ? C_GREEN : 0xFF1A6030);
-        drawCentered("Collecter mes gains", gx + 90, gy + 7, gh ? C_WHITE : C_GREEN);
-        hb(hbCollect, gx, gy, 180, 22);
+        // ── Bouton global "Collecter mes gains" en bas ──────────────────────
+        int gx = px + pw / 2 - 110, gy = py + ph - 42;
+        boolean hasPending = pendingEarnings > 0;
+        boolean gh = in(mx, my, gx, gy, 220, 24);
+        drawRect(gx, gy, gx + 220, gy + 24, gh && hasPending ? 0xFF1A5028 : (hasPending ? 0xFF0D2A15 : 0xFF1A1A20));
+        drawBorder(gx, gy, 220, 24, gh && hasPending ? C_GREEN : (hasPending ? 0xFF1A6030 : 0xFF333344));
+        String collectLabel = hasPending
+                ? "Collecter : §6+" + fmtGold(pendingEarnings) + " G"
+                : "Aucun gain en attente";
+        drawCentered(collectLabel, gx + 110, gy + 8, hasPending ? (gh ? C_WHITE : C_GREEN) : C_GRAY);
+        hb(hbCollect, gx, gy, 220, 24);
     }
 
     // ════════════════════════════════════════════════════════════════════════
@@ -454,9 +498,8 @@ public class GuiHDV extends GuiScreen {
     private void drawSellTab(int mx, int my) {
         int margin = 8, halfW = (pw - margin * 3) / 2;
         int leftX  = px + margin, rightX = leftX + halfW + margin;
-        int topY   = py + 50,    botH   = ph - 58;
+        int topY   = py + 50, botH = ph - 58;
 
-        // ── Panneau gauche : inventaire ──────────────────────────────────────
         drawRect(leftX, topY, leftX + halfW, topY + botH, 0xCC080E1A);
         drawBorder(leftX, topY, halfW, botH, C_ACCENT);
         drawRect(leftX, topY, leftX + halfW, topY + 16, C_HEADER);
@@ -465,17 +508,14 @@ public class GuiHDV extends GuiScreen {
 
         InventoryPlayer inv = mc.thePlayer.inventory;
         int sz = 18, gx = leftX + (halfW - 9 * sz) / 2, gy = topY + 20;
-
         for (int row = 0; row < 3; row++)
             for (int col = 0; col < 9; col++)
                 drawInvSlot(mx, my, gx + col * sz, gy + row * sz, sz, 9 + row * 9 + col, inv);
-
         int sepY = gy + 3 * sz + 3;
         drawRect(gx, sepY, gx + 9 * sz, sepY + 1, 0x44FFFFFF);
         for (int col = 0; col < 9; col++)
             drawInvSlot(mx, my, gx + col * sz, sepY + 4, sz, col, inv);
 
-        // ── Panneau droit : configuration ────────────────────────────────────
         drawRect(rightX, topY, rightX + halfW, topY + botH, 0xCC080E12);
         drawBorder(rightX, topY, halfW, botH, 0xFF1A6030);
         drawRect(rightX, topY, rightX + halfW, topY + 16, C_HEADER);
@@ -483,8 +523,6 @@ public class GuiHDV extends GuiScreen {
         fontRendererObj.drawStringWithShadow("Configuration vente", rightX + 6, topY + 4, C_GREEN);
 
         int ry = topY + 20;
-
-        // Aperçu item sélectionné
         if (sellItem != null) {
             int pvX = rightX + halfW / 2 - 8;
             GlStateManager.enableDepth();
@@ -499,17 +537,12 @@ public class GuiHDV extends GuiScreen {
         }
         ry += 42;
 
-        // ── Quantité ─────────────────────────────────────────────────────────
         fontRendererObj.drawString("Quantite :", rightX + 6, ry, C_GRAY);
         ry += 12;
-        int bw = 22, bh = 13, qTot = bw * 4 + 3 * 3 + 28 + 20; // +20 pour le champ
-
-        // Modifier l'affichage pour inclure le champ quantité au lieu du texte statique
+        int bw = 22, bh = 13, qTot = bw * 4 + 3 * 3 + 28 + 20;
         int qx = rightX + (halfW - qTot) / 2;
-        miniBtn(mx, my, qx,           ry, bw, bh, "-10", 0xFF2A0808, 0xFF991111, C_RED,   hbQtyM10);
-        miniBtn(mx, my, qx + bw + 3,  ry, bw, bh, "-1",  0xFF2A0808, 0xFF991111, C_RED,   hbQtyM1);
-
-        // Champ quantité
+        miniBtn(mx, my, qx,          ry, bw, bh, "-10", 0xFF2A0808, 0xFF991111, C_RED,   hbQtyM10);
+        miniBtn(mx, my, qx + bw + 3, ry, bw, bh, "-1",  0xFF2A0808, 0xFF991111, C_RED,   hbQtyM1);
         if (qtyField != null) {
             qtyField.xPosition = qx + (bw + 3) * 2;
             qtyField.yPosition = ry;
@@ -519,14 +552,12 @@ public class GuiHDV extends GuiScreen {
             drawBorder(qtyField.xPosition - 1, qtyField.yPosition - 1, qtyField.width + 2, 14, qtyField.isFocused() ? C_ACCENT : C_BORDER);
             qtyField.drawTextBox();
         }
-
-        int startPlusBtns = qx + (bw + 3) * 2 + 40 + 3; // après le champ (+ marge)
-        miniBtn(mx, my, startPlusBtns, ry, bw, bh, "+1",  0xFF081808, 0xFF119911, C_GREEN, hbQtyP1);
-        miniBtn(mx, my, startPlusBtns + bw + 3, ry, bw, bh, "+10", 0xFF081808, 0xFF119911, C_GREEN, hbQtyP10);
+        int startPlus = qx + (bw + 3) * 2 + 40 + 3;
+        miniBtn(mx, my, startPlus,          ry, bw, bh, "+1",  0xFF081808, 0xFF119911, C_GREEN, hbQtyP1);
+        miniBtn(mx, my, startPlus + bw + 3, ry, bw, bh, "+10", 0xFF081808, 0xFF119911, C_GREEN, hbQtyP10);
         ry += bh + 12;
 
-        // ── Prix ─────────────────────────────────────────────────────────────
-        fontRendererObj.drawString("Prix du lot :", rightX + 6, ry, C_GRAY); // Renommé
+        fontRendererObj.drawString("Prix du lot :", rightX + 6, ry, C_GRAY);
         ry += 12;
         int pfW = halfW - 14;
         if (priceField != null) {
@@ -544,19 +575,17 @@ public class GuiHDV extends GuiScreen {
 
         int pb = 28, pbH = 12, prTot = pb * 6 + 5 * 2;
         int prx = rightX + (halfW - prTot) / 2;
-        miniBtn(mx, my, prx,              ry, pb, pbH, "-1K", 0xFF2A0808, 0xFF991111, C_RED,   hbPrM1000); // 1000 -> 1K pour place
-        miniBtn(mx, my, prx + (pb+2),     ry, pb, pbH, "-100",  0xFF2A0808, 0xFF991111, C_RED,   hbPrM100);
-        miniBtn(mx, my, prx + (pb+2)*2,   ry, pb, pbH, "-10",   0xFF2A0808, 0xFF991111, C_RED,   hbPrM10);
-        miniBtn(mx, my, prx + (pb+2)*3,   ry, pb, pbH, "+10",   0xFF081808, 0xFF119911, C_GREEN, hbPrP10);
-        miniBtn(mx, my, prx + (pb+2)*4,   ry, pb, pbH, "+100",  0xFF081808, 0xFF119911, C_GREEN, hbPrP100);
-        miniBtn(mx, my, prx + (pb+2)*5,   ry, pb, pbH, "+1K", 0xFF081808, 0xFF119911, C_GREEN, hbPrP1000);
+        miniBtn(mx, my, prx,            ry, pb, pbH, "-1K",  0xFF2A0808, 0xFF991111, C_RED,   hbPrM1000);
+        miniBtn(mx, my, prx + (pb+2),   ry, pb, pbH, "-100", 0xFF2A0808, 0xFF991111, C_RED,   hbPrM100);
+        miniBtn(mx, my, prx + (pb+2)*2, ry, pb, pbH, "-10",  0xFF2A0808, 0xFF991111, C_RED,   hbPrM10);
+        miniBtn(mx, my, prx + (pb+2)*3, ry, pb, pbH, "+10",  0xFF081808, 0xFF119911, C_GREEN, hbPrP10);
+        miniBtn(mx, my, prx + (pb+2)*4, ry, pb, pbH, "+100", 0xFF081808, 0xFF119911, C_GREEN, hbPrP100);
+        miniBtn(mx, my, prx + (pb+2)*5, ry, pb, pbH, "+1K",  0xFF081808, 0xFF119911, C_GREEN, hbPrP1000);
         ry += pbH + 10;
 
-        // Afficher Prix Unitaire calculé
         long unitPrice = sellQty > 0 ? (sellPrice / sellQty) : 0;
-        drawCentered("Unitaire : " + fmtGold(unitPrice) + " $", rightX + halfW / 2, ry, C_GRAY); // Affichage unitaire informatif
+        drawCentered("Unitaire : " + fmtGold(unitPrice) + " $", rightX + halfW / 2, ry, C_GRAY);
 
-        // ── Bouton mettre en vente ────────────────────────────────────────────
         boolean canSell = sellItem != null && sellPrice > 0 && sellQty > 0;
         int sbX = rightX + 8, sbY = topY + botH - 28, sbW = halfW - 16;
         boolean sbH = in(mx, my, sbX, sbY, sbW, 20);
@@ -588,8 +617,6 @@ public class GuiHDV extends GuiScreen {
         if (idx >= 0 && idx < 36) hb(hbInvSlots[idx], sx, sy, sz - 1, sz - 1);
     }
 
-    // ── Overlay confirmation achat ────────────────────────────────────────────
-
     private void drawConfirmOverlay(int mx, int my) {
         drawRect(0, 0, width, height, 0xBB000000);
         int cw = 320, ch = 160, cx = width / 2 - cw / 2, cy = height / 2 - ch / 2;
@@ -602,27 +629,25 @@ public class GuiHDV extends GuiScreen {
         ItemStack item = confirmListing.getItem();
         fontRendererObj.drawString("Item : " + (item != null ? item.getDisplayName() : "?"), cx + 10, cy + 28, C_WHITE);
         fontRendererObj.drawString("Vendeur : " + confirmListing.getSellerName(), cx + 10, cy + 40, 0xFFAADDFF);
-
-        // Show Total Price prominently in confirmation
         fontRendererObj.drawStringWithShadow("Prix Total : " + fmtGold(confirmListing.getTotalPrice()) + " $", cx + 10, cy + 52, C_GOLD);
         fontRendererObj.drawString("Unitaire : " + fmtGold(confirmListing.getPricePerUnit()) + " $", cx + 200, cy + 52, C_GRAY);
 
         boolean canAfford = playerBalance >= confirmListing.getTotalPrice();
         fontRendererObj.drawString("Solde : " + fmtGold(playerBalance) + " $", cx + 10, cy + 64, canAfford ? C_GREEN : C_RED);
 
-        int bw = 120, by = cy + ch - 32;
-        boolean c1 = in(mx, my, cx + 10, by, bw, 20);
-        drawRect(cx + 10, by, cx + 10 + bw, by + 20, c1 ? 0xCC441111 : 0x88220A0A);
-        drawBorder(cx + 10, by, bw, 20, c1 ? C_RED : 0xFF661111);
-        drawCentered("Annuler", cx + 10 + bw / 2, by + 6, c1 ? C_WHITE : 0xFFCC5555);
-        hb(hbCancelBuy, cx + 10, by, bw, 20);
+        int btnW = 120, by = cy + ch - 32;
+        boolean c1 = in(mx, my, cx + 10, by, btnW, 20);
+        drawRect(cx + 10, by, cx + 10 + btnW, by + 20, c1 ? 0xCC441111 : 0x88220A0A);
+        drawBorder(cx + 10, by, btnW, 20, c1 ? C_RED : 0xFF661111);
+        drawCentered("Annuler", cx + 10 + btnW / 2, by + 6, c1 ? C_WHITE : 0xFFCC5555);
+        hb(hbCancelBuy, cx + 10, by, btnW, 20);
 
-        int bx2 = cx + cw - 10 - bw;
-        boolean c2 = in(mx, my, bx2, by, bw, 20);
-        drawRect(bx2, by, bx2 + bw, by + 20, c2 && canAfford ? 0xFF1A6030 : (canAfford ? 0xFF0D3518 : 0xFF2A1010));
-        drawBorder(bx2, by, bw, 20, c2 && canAfford ? C_GREEN : (canAfford ? 0xFF1A6030 : C_RED));
-        drawCentered(canAfford ? "Acheter" : "Fonds insuf.", bx2 + bw / 2, by + 6, canAfford ? (c2 ? C_WHITE : C_GREEN) : C_RED);
-        hb(hbOkBuy, bx2, by, bw, 20);
+        int bx2 = cx + cw - 10 - btnW;
+        boolean c2 = in(mx, my, bx2, by, btnW, 20);
+        drawRect(bx2, by, bx2 + btnW, by + 20, c2 && canAfford ? 0xFF1A6030 : (canAfford ? 0xFF0D3518 : 0xFF2A1010));
+        drawBorder(bx2, by, btnW, 20, c2 && canAfford ? C_GREEN : (canAfford ? 0xFF1A6030 : C_RED));
+        drawCentered(canAfford ? "Acheter" : "Fonds insuf.", bx2 + btnW / 2, by + 6, canAfford ? (c2 ? C_WHITE : C_GREEN) : C_RED);
+        hb(hbOkBuy, bx2, by, btnW, 20);
     }
 
     // ════════════════════════════════════════════════════════════════════════
@@ -631,24 +656,30 @@ public class GuiHDV extends GuiScreen {
 
     @Override
     protected void mouseClicked(int mx, int my, int btn) throws IOException {
-        // Overlay achat
         if (confirmListing != null) {
             if (ok(hbCancelBuy) && in(mx, my, hbCancelBuy)) { confirmListing = null; return; }
-            if (ok(hbOkBuy)     && in(mx, my, hbOkBuy) && playerBalance >= confirmListing.getTotalPrice()) {
+            if (ok(hbOkBuy) && in(mx, my, hbOkBuy) && playerBalance >= confirmListing.getTotalPrice()) {
                 HdvPacketHandler.buyItem(confirmListing.getId());
                 confirmListing = null;
             }
             return;
         }
 
-        if (ok(hbClose) && in(mx, my, hbClose))     { mc.displayGuiScreen(null); return; }
-        if (!in(mx, my, px, py, pw, ph))              { mc.displayGuiScreen(null); return; }
+        if (ok(hbClose) && in(mx, my, hbClose))  { mc.displayGuiScreen(null); return; }
+        if (!in(mx, my, px, py, pw, ph))          { mc.displayGuiScreen(null); return; }
 
         if (ok(hbTabBuy)  && in(mx, my, hbTabBuy)  && activeTab != TAB_BUY)  { activeTab = TAB_BUY;  requestList(); return; }
-        if (ok(hbTabMine) && in(mx, my, hbTabMine) && activeTab != TAB_MINE) { activeTab = TAB_MINE; requestList(); return; }
+        if (ok(hbTabMine) && in(mx, my, hbTabMine) && activeTab != TAB_MINE) {
+            activeTab = TAB_MINE;
+            requestList();
+            loadingMine = true;
+            HdvPacketHandler.requestMyListings();
+            return;
+        }
         if (ok(hbTabSell) && in(mx, my, hbTabSell) && activeTab != TAB_SELL) {
             activeTab = TAB_SELL; sellItem = null; sellSlot = -1; sellQty = 1; sellPrice = 100;
-            if (priceField != null) { priceField.setText("100"); priceField.setFocused(false); } return;
+            if (priceField != null) { priceField.setText("100"); priceField.setFocused(false); }
+            return;
         }
 
         switch (activeTab) {
@@ -666,12 +697,29 @@ public class GuiHDV extends GuiScreen {
                 break;
 
             case TAB_MINE:
-                if (ok(hbCollect) && in(mx, my, hbCollect)) { HdvPacketHandler.collectEarnings(); return; }
-                String myName = mc.thePlayer != null ? mc.thePlayer.getName() : "";
-                List<HdvListing> mine = new ArrayList<>();
-                for (HdvListing l : listings) if (myName.equals(l.getSellerName())) mine.add(l);
-                for (int i = 0; i < mine.size() && i < hbCancelRow.length; i++) {
-                    if (ok(hbCancelRow[i]) && in(mx, my, hbCancelRow[i])) { HdvPacketHandler.cancelOffer(mine.get(i).getId()); return; }
+                // Bouton global collecter
+                if (ok(hbCollect) && in(mx, my, hbCollect) && pendingEarnings > 0) {
+                    HdvPacketHandler.collectEarnings();
+                    return;
+                }
+                // Boutons par ligne (Retirer pour actives, Collecter pour vendues)
+                int cancelIdx = 0;
+                for (int i = 0; i < myListings.size(); i++) {
+                    HdvListing l = myListings.get(i);
+                    if (cancelIdx >= hbCancelRow.length) break;
+                    if (!l.isSold() || pendingEarnings > 0) {
+                        if (ok(hbCancelRow[cancelIdx]) && in(mx, my, hbCancelRow[cancelIdx])) {
+                            if (l.isSold()) {
+                                // Collecter les gains
+                                HdvPacketHandler.collectEarnings();
+                            } else {
+                                // Retirer l'annonce
+                                HdvPacketHandler.cancelOffer(l.getId());
+                            }
+                            return;
+                        }
+                        cancelIdx++;
+                    }
                 }
                 break;
 
@@ -696,16 +744,12 @@ public class GuiHDV extends GuiScreen {
                 if (ok(hbPrP10)   && in(mx, my, hbPrP10))   { sellPrice = Math.min(999_999_999L, sellPrice + 10);   syncPr(); return; }
                 if (ok(hbPrP100)  && in(mx, my, hbPrP100))  { sellPrice = Math.min(999_999_999L, sellPrice + 100);  syncPr(); return; }
                 if (ok(hbPrP1000) && in(mx, my, hbPrP1000)) { sellPrice = Math.min(999_999_999L, sellPrice + 1000); syncPr(); return; }
-                if (ok(hbPrFld)   && in(mx, my, hbPrFld) && priceField != null) { priceField.setFocused(true); priceField.mouseClicked(mx, my, btn); return; }
-
-                // Gestion clic champ quantité
+                if (ok(hbPrFld) && in(mx, my, hbPrFld) && priceField != null) { priceField.setFocused(true); priceField.mouseClicked(mx, my, btn); return; }
                 if (qtyField != null) {
-                   // Hitbox du champ quantité : (x, y, w, h) -> (qtyField.xPosition, qtyField.yPosition, qtyField.width, 12)
-                   boolean inQty = in(mx, my, qtyField.xPosition, qtyField.yPosition, qtyField.width, 12);
-                   if (inQty) { qtyField.setFocused(true); qtyField.mouseClicked(mx, my, btn); return; }
-                   else { qtyField.setFocused(false); }
+                    boolean inQty = in(mx, my, qtyField.xPosition, qtyField.yPosition, qtyField.width, 12);
+                    if (inQty) { qtyField.setFocused(true); qtyField.mouseClicked(mx, my, btn); return; }
+                    else qtyField.setFocused(false);
                 }
-
                 if (ok(hbSellBtn) && in(mx, my, hbSellBtn)) { doSell(); return; }
                 break;
         }
@@ -719,13 +763,9 @@ public class GuiHDV extends GuiScreen {
         if (qtyField != null && qtyField.isFocused()) {
             int v = (int)parseLong(qtyField.getText()); if (v > 0) sellQty = v; qtyField.setFocused(false);
         }
-
         if (sellPrice <= 0) { status(false, "Le prix lot doit etre > 0."); return; }
         int avail = countInInv(sellItem, mc.thePlayer.inventory);
         if (sellQty <= 0 || sellQty > avail) { status(false, "Quantite invalide (dispo : " + avail + ")"); return; }
-
-        // Logique GLOBAL : on envoie maintenant le PRIX TOTAL DIRECTEMENT.
-        // HdvPacketHandler.postOffer attend (item, totalPrice, qty).
         HdvPacketHandler.postOffer(sellItem, sellPrice, sellQty);
         status(true, "Annonce envoyee !");
         sellItem = null; sellSlot = -1; sellQty = 1; sellPrice = 100; syncPr();
@@ -756,19 +796,15 @@ public class GuiHDV extends GuiScreen {
             if (key == 28) requestList();
         }
         if (activeTab == TAB_SELL) {
-             if (priceField != null && priceField.isFocused()) {
+            if (priceField != null && priceField.isFocused()) {
                 priceField.textboxKeyTyped(c, key);
                 long v = parseLong(priceField.getText()); if (v > 0) sellPrice = v;
             }
             if (qtyField != null && qtyField.isFocused()) {
                 qtyField.textboxKeyTyped(c, key);
                 long parsed = parseLong(qtyField.getText());
-                // Clamp entre 0 et max
                 int max = sellItem != null ? countInInv(sellItem, mc.thePlayer.inventory) : 64;
-                if (parsed > max) {
-                    parsed = max;
-                    qtyField.setText(String.valueOf(parsed)); // Update text field immediately
-                }
+                if (parsed > max) { parsed = max; qtyField.setText(String.valueOf(parsed)); }
                 int v = (int) parsed;
                 if (v > 0) sellQty = v;
             }
@@ -781,8 +817,11 @@ public class GuiHDV extends GuiScreen {
         if (priceField  != null) priceField.updateCursorCounter();
         if (qtyField    != null) qtyField.updateCursorCounter();
         if (activeTab == TAB_SELL && sellSlot >= 0 && mc.thePlayer != null) {
-            ItemStack cur = (sellSlot < mc.thePlayer.inventory.mainInventory.length) ? mc.thePlayer.inventory.mainInventory[sellSlot] : null;
-            if (cur == null || (sellItem != null && cur.getItem() != sellItem.getItem())) { sellSlot = -1; sellItem = null; sellQty = 1; }
+            ItemStack cur = (sellSlot < mc.thePlayer.inventory.mainInventory.length)
+                    ? mc.thePlayer.inventory.mainInventory[sellSlot] : null;
+            if (cur == null || (sellItem != null && cur.getItem() != sellItem.getItem())) {
+                sellSlot = -1; sellItem = null; sellQty = 1;
+            }
         }
         PlayerData pd = PlayerDataHandler.getCachedData();
         if (pd != null) playerBalance = pd.getBalance();

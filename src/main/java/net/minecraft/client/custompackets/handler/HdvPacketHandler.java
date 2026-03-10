@@ -19,12 +19,16 @@ import java.util.List;
 public final class HdvPacketHandler {
 
     private static final List<HdvListing> cachedListings = new ArrayList<>();
+    private static final List<HdvListing> cachedMyListings = new ArrayList<>();
+    private static long cachedPendingEarnings = 0L;
 
-    private static ListListener   listListener;
-    private static ActionListener actionListener;
+    private static ListListener      listListener;
+    private static ActionListener    actionListener;
+    private static MyListingsListener myListingsListener;
 
-    public interface ListListener   { void onListReceived(List<HdvListing> listings); }
-    public interface ActionListener { void onActionResult(boolean success, String message); }
+    public interface ListListener       { void onListReceived(List<HdvListing> listings); }
+    public interface ActionListener     { void onActionResult(boolean success, String message); }
+    public interface MyListingsListener { void onMyListingsReceived(List<HdvListing> listings, long pendingEarnings); }
 
     // ── Enregistrement des handlers S2C ─────────────────────────────────────
 
@@ -35,26 +39,20 @@ public final class HdvPacketHandler {
                 List<HdvListing> listings = new ArrayList<>(count);
                 for (int i = 0; i < count; i++) {
                     HdvListing l = HdvListing.readFrom(buf);
-                    if (l != null) {
-                        listings.add(l);
-                    }
+                    if (l != null) listings.add(l);
                 }
                 cachedListings.clear();
                 cachedListings.addAll(listings);
                 final List<HdvListing> snapshot = Collections.unmodifiableList(new ArrayList<>(cachedListings));
                 net.minecraft.client.Minecraft.getMinecraft().addScheduledTask(() -> {
-                    // Notifier le listener (GuiHDV)
-                    if (listListener != null) {
-                        listListener.onListReceived(snapshot);
-                    }
-                    // Fallback : si le GUI courant est GuiHDV, forcer la mise à jour directement
+                    if (listListener != null) listListener.onListReceived(snapshot);
                     net.minecraft.client.gui.GuiScreen currentScreen = net.minecraft.client.Minecraft.getMinecraft().currentScreen;
                     if (currentScreen instanceof net.minecraft.client.gui.GuiHDV) {
                         ((net.minecraft.client.gui.GuiHDV) currentScreen).onListingsReceived(snapshot);
                     }
                 });
             } catch (Exception e) {
-                // LOGGER supprimé
+                // ignored
             }
         });
 
@@ -69,10 +67,38 @@ public final class HdvPacketHandler {
                     );
                 }
             } catch (Exception e) {
-                // LOGGER supprimé
+                // ignored
+            }
+        });
+
+        // Packet 0x24 : mes annonces (actives + vendues)
+        PacketDispatcher.register(PacketChannel.HDV_S2C, PacketId.HDV_MY_LISTINGS_RESPONSE, buf -> {
+            try {
+                int count = buf.readVarIntFromBuffer();
+                long earnings = buf.readLong();
+                List<HdvListing> listings = new ArrayList<>(count);
+                for (int i = 0; i < count; i++) {
+                    HdvListing l = HdvListing.readMyListing(buf);
+                    if (l != null) listings.add(l);
+                }
+                if (earnings >= 0) cachedPendingEarnings = earnings;
+                cachedMyListings.clear();
+                cachedMyListings.addAll(listings);
+                final List<HdvListing> snapshot = Collections.unmodifiableList(new ArrayList<>(cachedMyListings));
+                final long earn = cachedPendingEarnings;
+                net.minecraft.client.Minecraft.getMinecraft().addScheduledTask(() -> {
+                    if (myListingsListener != null) myListingsListener.onMyListingsReceived(snapshot, earn);
+                    net.minecraft.client.gui.GuiScreen currentScreen = net.minecraft.client.Minecraft.getMinecraft().currentScreen;
+                    if (currentScreen instanceof net.minecraft.client.gui.GuiHDV) {
+                        ((net.minecraft.client.gui.GuiHDV) currentScreen).onMyListingsReceived(snapshot, earn);
+                    }
+                });
+            } catch (Exception e) {
+                // ignored
             }
         });
     }
+
     // ── API sortante C2S ─────────────────────────────────────────────────────
 
     /** Demande la liste des annonces (page 0-indexée, filtre texte optionnel). */
@@ -102,12 +128,12 @@ public final class HdvPacketHandler {
         try {
             PacketBuffer buf = PacketSender.newBuffer();
             buf.writeVarIntToBuffer(PacketId.HDV_POST_OFFER);
-            buf.writeItemStackToBuffer(item);   // format standard 1.8.9
-            buf.writeLong(totalPrice);          // Envoi du prix TOTAL
+            buf.writeItemStackToBuffer(item);
+            buf.writeLong(totalPrice);
             buf.writeVarIntToBuffer(quantity);
             PacketSender.send(PacketChannel.HDV_C2S, buf);
         } catch (Exception e) {
-            // LOGGER supprimé
+            // ignored
         }
     }
 
@@ -124,12 +150,18 @@ public final class HdvPacketHandler {
         PacketSender.sendSimple(PacketChannel.HDV_C2S, PacketId.HDV_COLLECT);
     }
 
+    /** Demande ses propres annonces (actives + vendues) au serveur */
+    public static void requestMyListings() {
+        PacketSender.sendSimple(PacketChannel.HDV_C2S, PacketId.HDV_MY_LISTINGS_REQUEST);
+    }
+
     // ── Listeners ────────────────────────────────────────────────────────────
 
-    public static void setListListener(ListListener l)     { listListener = l; }
-    public static void setActionListener(ActionListener l) { actionListener = l; }
+    public static void setListListener(ListListener l)               { listListener = l; }
+    public static void setActionListener(ActionListener l)           { actionListener = l; }
+    public static void setMyListingsListener(MyListingsListener l)   { myListingsListener = l; }
 
-    public static List<HdvListing> getCachedListings() {
-        return Collections.unmodifiableList(cachedListings);
-    }
+    public static List<HdvListing> getCachedListings()   { return Collections.unmodifiableList(cachedListings); }
+    public static List<HdvListing> getCachedMyListings() { return Collections.unmodifiableList(cachedMyListings); }
+    public static long getCachedPendingEarnings()        { return cachedPendingEarnings; }
 }

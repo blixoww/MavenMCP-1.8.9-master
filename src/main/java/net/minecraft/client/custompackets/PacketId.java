@@ -37,6 +37,8 @@ public final class PacketId {
     public static final int HDV_BUY_ITEM      = 0x14;
     /** Récupérer les gains en attente */
     public static final int HDV_COLLECT       = 0x15;
+    /** Demander ses propres annonces (actives + vendues) */
+    public static final int HDV_MY_LISTINGS_REQUEST = 0x16;
 
     // ════════════════════════════════════════════════════════════════════════
     //  HDV – Serveur → Client
@@ -50,6 +52,8 @@ public final class PacketId {
     public static final int HDV_ACTION_RESULT  = 0x22;
     /** Mise à jour en temps réel d'un listing (prix, stock) */
     public static final int HDV_LISTING_UPDATE = 0x23;
+    /** Réponse mes annonces (actives + vendues) */
+    public static final int HDV_MY_LISTINGS_RESPONSE = 0x24;
 
     // ════════════════════════════════════════════════════════════════════════
     //  Shop – Client → Serveur
