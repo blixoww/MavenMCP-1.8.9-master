@@ -14,11 +14,10 @@ import java.util.List;
 
 /**
  * Gère tous les packets entrants/sortants liés à l'HDV.
- * Format item : writeItemStackToBuffer / readItemStackFromBuffer (vanilla 1.8.9 standard).
  */
 public final class HdvPacketHandler {
 
-    private static final List<HdvListing> cachedListings = new ArrayList<>();
+    private static final List<HdvListing> cachedListings   = new ArrayList<>();
     private static final List<HdvListing> cachedMyListings = new ArrayList<>();
     private static long cachedPendingEarnings = 0L;
 
@@ -28,11 +27,12 @@ public final class HdvPacketHandler {
 
     public interface ListListener       { void onListReceived(List<HdvListing> listings); }
     public interface ActionListener     { void onActionResult(boolean success, String message); }
-    public interface MyListingsListener { void onMyListingsReceived(List<HdvListing> listings, long pendingEarnings); }
+    public interface MyListingsListener { void onMyListingsReceived(List<HdvListing> mine, long pendingEarnings); }
 
     // ── Enregistrement des handlers S2C ─────────────────────────────────────
 
     public static void registerHandlers() {
+        // Liste globale des annonces
         PacketDispatcher.register(PacketChannel.HDV_S2C, PacketId.HDV_LIST_RESPONSE, buf -> {
             try {
                 int count = buf.readVarIntFromBuffer();
@@ -46,56 +46,48 @@ public final class HdvPacketHandler {
                 final List<HdvListing> snapshot = Collections.unmodifiableList(new ArrayList<>(cachedListings));
                 net.minecraft.client.Minecraft.getMinecraft().addScheduledTask(() -> {
                     if (listListener != null) listListener.onListReceived(snapshot);
-                    net.minecraft.client.gui.GuiScreen currentScreen = net.minecraft.client.Minecraft.getMinecraft().currentScreen;
-                    if (currentScreen instanceof net.minecraft.client.gui.GuiHDV) {
-                        ((net.minecraft.client.gui.GuiHDV) currentScreen).onListingsReceived(snapshot);
-                    }
+                    net.minecraft.client.gui.GuiScreen cur = net.minecraft.client.Minecraft.getMinecraft().currentScreen;
+                    if (cur instanceof net.minecraft.client.gui.GuiHDV)
+                        ((net.minecraft.client.gui.GuiHDV) cur).onListingsReceived(snapshot);
                 });
-            } catch (Exception e) {
-                // ignored
-            }
+            } catch (Exception ignored) {}
         });
 
+        // Résultat d'une action (achat, vente, annulation, collecte…)
         PacketDispatcher.register(PacketChannel.HDV_S2C, PacketId.HDV_ACTION_RESULT, buf -> {
             try {
                 boolean success = buf.readBoolean();
                 String  message = buf.readStringFromBuffer(256);
-                if (actionListener != null) {
-                    final boolean s = success; final String m = message;
-                    net.minecraft.client.Minecraft.getMinecraft().addScheduledTask(
-                            () -> actionListener.onActionResult(s, m)
-                    );
-                }
-            } catch (Exception e) {
-                // ignored
-            }
+                final boolean s = success; final String m = message;
+                net.minecraft.client.Minecraft.getMinecraft().addScheduledTask(() -> {
+                    if (actionListener != null) actionListener.onActionResult(s, m);
+                });
+            } catch (Exception ignored) {}
         });
 
-        // Packet 0x24 : mes annonces (actives + vendues)
+        // Mes annonces (actives + vendues) + gains en attente
         PacketDispatcher.register(PacketChannel.HDV_S2C, PacketId.HDV_MY_LISTINGS_RESPONSE, buf -> {
             try {
-                int count = buf.readVarIntFromBuffer();
-                long earnings = buf.readLong();
-                List<HdvListing> listings = new ArrayList<>(count);
+                int count           = buf.readVarIntFromBuffer();
+                long pendingEarnings = buf.readLong();
+                List<HdvListing> mine = new ArrayList<>(count);
                 for (int i = 0; i < count; i++) {
                     HdvListing l = HdvListing.readMyListing(buf);
-                    if (l != null) listings.add(l);
+                    if (l != null) mine.add(l);
                 }
-                if (earnings >= 0) cachedPendingEarnings = earnings;
+                // Mise à jour du cache
                 cachedMyListings.clear();
-                cachedMyListings.addAll(listings);
+                cachedMyListings.addAll(mine);
+                if (pendingEarnings >= 0) cachedPendingEarnings = pendingEarnings;
                 final List<HdvListing> snapshot = Collections.unmodifiableList(new ArrayList<>(cachedMyListings));
-                final long earn = cachedPendingEarnings;
+                final long ep = cachedPendingEarnings;
                 net.minecraft.client.Minecraft.getMinecraft().addScheduledTask(() -> {
-                    if (myListingsListener != null) myListingsListener.onMyListingsReceived(snapshot, earn);
-                    net.minecraft.client.gui.GuiScreen currentScreen = net.minecraft.client.Minecraft.getMinecraft().currentScreen;
-                    if (currentScreen instanceof net.minecraft.client.gui.GuiHDV) {
-                        ((net.minecraft.client.gui.GuiHDV) currentScreen).onMyListingsReceived(snapshot, earn);
-                    }
+                    if (myListingsListener != null) myListingsListener.onMyListingsReceived(snapshot, ep);
+                    net.minecraft.client.gui.GuiScreen cur = net.minecraft.client.Minecraft.getMinecraft().currentScreen;
+                    if (cur instanceof net.minecraft.client.gui.GuiHDV)
+                        ((net.minecraft.client.gui.GuiHDV) cur).onMyListingsReceived(snapshot, ep);
                 });
-            } catch (Exception e) {
-                // ignored
-            }
+            } catch (Exception ignored) {}
         });
     }
 
@@ -110,7 +102,14 @@ public final class HdvPacketHandler {
         PacketSender.send(PacketChannel.HDV_C2S, buf);
     }
 
-    /** Achète 1 unité d'un listing. */
+    /** Demande la liste des propres annonces du joueur. */
+    public static void requestMyListings() {
+        PacketBuffer buf = PacketSender.newBuffer();
+        buf.writeVarIntToBuffer(PacketId.HDV_MY_LISTINGS_REQUEST);
+        PacketSender.send(PacketChannel.HDV_C2S, buf);
+    }
+
+    /** Achète un listing. */
     public static void buyItem(int listingId) {
         PacketBuffer buf = PacketSender.newBuffer();
         buf.writeVarIntToBuffer(PacketId.HDV_BUY_ITEM);
@@ -118,11 +117,7 @@ public final class HdvPacketHandler {
         PacketSender.send(PacketChannel.HDV_C2S, buf);
     }
 
-    /**
-     * Poste une annonce de vente.
-     * L'item est sérialisé avec writeItemStackToBuffer (format vanilla Minecraft 1.8.9).
-     * Le serveur le lit avec readMinecraftItemStack() → CraftItemStack.asBukkitCopy().
-     */
+    /** Poste une annonce de vente. */
     public static void postOffer(ItemStack item, long totalPrice, int quantity) {
         if (item == null) return;
         try {
@@ -132,9 +127,7 @@ public final class HdvPacketHandler {
             buf.writeLong(totalPrice);
             buf.writeVarIntToBuffer(quantity);
             PacketSender.send(PacketChannel.HDV_C2S, buf);
-        } catch (Exception e) {
-            // ignored
-        }
+        } catch (Exception ignored) {}
     }
 
     /** Annule une annonce propre. */
@@ -150,18 +143,13 @@ public final class HdvPacketHandler {
         PacketSender.sendSimple(PacketChannel.HDV_C2S, PacketId.HDV_COLLECT);
     }
 
-    /** Demande ses propres annonces (actives + vendues) au serveur */
-    public static void requestMyListings() {
-        PacketSender.sendSimple(PacketChannel.HDV_C2S, PacketId.HDV_MY_LISTINGS_REQUEST);
-    }
-
     // ── Listeners ────────────────────────────────────────────────────────────
 
-    public static void setListListener(ListListener l)               { listListener = l; }
-    public static void setActionListener(ActionListener l)           { actionListener = l; }
-    public static void setMyListingsListener(MyListingsListener l)   { myListingsListener = l; }
+    public static void setListListener(ListListener l)           { listListener = l; }
+    public static void setActionListener(ActionListener l)       { actionListener = l; }
+    public static void setMyListingsListener(MyListingsListener l) { myListingsListener = l; }
 
     public static List<HdvListing> getCachedListings()   { return Collections.unmodifiableList(cachedListings); }
     public static List<HdvListing> getCachedMyListings() { return Collections.unmodifiableList(cachedMyListings); }
-    public static long getCachedPendingEarnings()        { return cachedPendingEarnings; }
+    public static long getCachedPendingEarnings()         { return cachedPendingEarnings; }
 }

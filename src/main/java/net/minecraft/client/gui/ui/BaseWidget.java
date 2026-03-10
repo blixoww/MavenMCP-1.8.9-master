@@ -85,7 +85,6 @@ public abstract class BaseWidget implements UIElement {
             int sw = sr.getScaledWidth();
             int sh = sr.getScaledHeight();
             if (sw > 0 && sh > 0) {
-                // Utiliser la taille actuelle du widget, ou celle mémorisée si le recalc n'est pas encore fait
                 int w = this.getWidth();
                 int h = this.getHeight();
                 if (refWidgetW > 0) w = refWidgetW;
@@ -121,31 +120,6 @@ public abstract class BaseWidget implements UIElement {
     public Object getPropOrDefault(String key, Object def) { return props.getOrDefault(key, def); }
     public void setProp(String key, Object value) { props.put(key, value); }
     public Map<String, Object> getProps() { return props; }
-
-    public void setAlignment(String ax, String ay) {
-        this.alignX = ax;
-        this.alignY = ay;
-    }
-
-    // Met à jour relX/relY depuis la position absolue courante
-    public void updateRelativePosition() {
-        Minecraft mc = Minecraft.getMinecraft();
-        if (mc != null) {
-            try {
-                ScaledResolution sr = new ScaledResolution(mc);
-                int sw = sr.getScaledWidth();
-                int sh = sr.getScaledHeight();
-                if (sw > 0 && sh > 0) {
-                    int maxX = Math.max(1, sw - this.getWidth());
-                    int maxY = Math.max(1, sh - this.getHeight());
-                    this.relX = (double) this.x / (double) maxX;
-                    this.relY = (double) this.y / (double) maxY;
-                    this.refW = sw;
-                    this.refH = sh;
-                }
-            } catch (Throwable ignored) {}
-        }
-    }
 
     // Recalcule la position absolue depuis relX/relY pour la résolution actuelle
     public void updateAbsolutePosition() {
@@ -210,8 +184,6 @@ public abstract class BaseWidget implements UIElement {
         }
 
         try { draw(); } catch (Exception e) { e.printStackTrace(); }
-        // Toujours restaurer la couleur OpenGL à blanc opaque après le dessin du widget
-        // pour éviter que les couleurs RGB/custom contaminent d'autres rendus (HUD vanilla, textures, etc.)
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
     }
 

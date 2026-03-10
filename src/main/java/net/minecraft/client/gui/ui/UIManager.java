@@ -154,37 +154,38 @@ public class UIManager {
             }
             UIElement pingEl = widgets.get("ping");
             if (pingEl instanceof SimpleTextWidget) {
+                // Récupération du ping à CHAQUE frame, sans cache
                 String pingStr = "--";
                 try {
                     if (mc != null && mc.getNetHandler() != null && mc.thePlayer != null) {
+                        Object info = null;
                         try {
+                            info = mc.getNetHandler().getPlayerInfo(mc.thePlayer.getUniqueID());
+                        } catch (Throwable t) {
+                            info = null;
+                        }
+                        if (info == null) {
+                            // Fallback: prendre le premier joueur de la liste
                             java.util.Collection<?> col = mc.getNetHandler().getPlayerInfoMap();
-                            Object info = null;
+                            if (col != null && !col.isEmpty()) info = col.iterator().next();
+                        }
+                        if (info != null) {
+                            // Essayer d'abord la méthode getResponseTime()
                             try {
-                                info = mc.getNetHandler().getPlayerInfo(mc.thePlayer.getUniqueID());
-                            } catch (Throwable t) {
-                                info = null;
-                            }
-                            if (info == null && col != null && !col.isEmpty()) info = col.iterator().next();
-                            if (info != null) {
+                                java.lang.reflect.Method mresp = info.getClass().getMethod("getResponseTime");
+                                Object v = mresp.invoke(info);
+                                pingStr = String.valueOf(v);
+                            } catch (NoSuchMethodException ns) {
+                                // fallback: essayer le champ 'responseTime'
                                 try {
-                                    java.lang.reflect.Method mresp = info.getClass().getMethod("getResponseTime");
-                                    Object v = mresp.invoke(info);
+                                    java.lang.reflect.Field f = info.getClass().getDeclaredField("responseTime");
+                                    f.setAccessible(true);
+                                    Object v = f.get(info);
                                     pingStr = String.valueOf(v);
-                                } catch (NoSuchMethodException ns) {
-                                    // fallback: try field 'responseTime'
-                                    try {
-                                        java.lang.reflect.Field f = info.getClass().getDeclaredField("responseTime");
-                                        f.setAccessible(true);
-                                        Object v = f.get(info);
-                                        pingStr = String.valueOf(v);
-                                    } catch (Throwable ex) {
-                                        pingStr = "--";
-                                    }
+                                } catch (Throwable ex) {
+                                    pingStr = "--";
                                 }
                             }
-                        } catch (Throwable t) {
-                            pingStr = "--";
                         }
                     }
                 } catch (Throwable t) {
