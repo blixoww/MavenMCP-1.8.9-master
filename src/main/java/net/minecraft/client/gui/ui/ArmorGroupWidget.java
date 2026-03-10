@@ -72,8 +72,7 @@ public class ArmorGroupWidget extends BaseWidget {
                 displayArmor[2] = new ItemStack(chest);
                 displayArmor[1] = new ItemStack(legs);
                 displayArmor[0] = new ItemStack(boots);
-            } catch (Throwable t) {
-                // ignore, leave nulls
+            } catch (Throwable ignored) {
             }
         }
 
@@ -134,7 +133,7 @@ public class ArmorGroupWidget extends BaseWidget {
         } catch (Throwable ignored) {}
 
         try {
-            if (!UIManager.getInstance().isEditorActive()) updateRelativePosition();
+            if (!UIManager.getInstance().isEditorActive()) updateAbsolutePosition();
         } catch (Throwable ignored) {}
     }
 }

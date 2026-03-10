@@ -58,7 +58,7 @@ public class HeldItemDurabilityWidget extends BaseWidget {
         if ((col & 0x00FFFFFF) == 0) col = 0x00FFFFFF;
         fr.drawStringWithShadow(text, x + 18, y + 4, col & 0x00FFFFFF);
         try {
-            if (!UIManager.getInstance().isEditorActive()) updateRelativePosition();
+            if (!UIManager.getInstance().isEditorActive()) updateAbsolutePosition();
         } catch (Throwable ignored) {
         }
     }
