@@ -73,6 +73,11 @@ public class GuiHDV extends GuiScreen {
     private int listY0, listH;
     private int listMineY0, listMineH;
 
+    // ── Flag action en cours (évite les double-refresh) ───────────────────────
+    // NONE=achat/vente standard, CANCEL=retrait vendeur, COLLECT=collecte gains
+    private enum PendingAction { NONE, CANCEL, COLLECT }
+    private PendingAction pendingAction = PendingAction.NONE;
+
     // ── Tooltip ───────────────────────────────────────────────────────────────
     private ItemStack tooltipItem = null;
     private int tooltipX, tooltipY;
@@ -138,11 +143,24 @@ public class GuiHDV extends GuiScreen {
 
         HdvPacketHandler.setActionListener((ok, msg) -> Minecraft.getMinecraft().addScheduledTask(() -> {
             statusMsg = msg; statusTimer = 160; statusOk = ok;
+            PendingAction action = pendingAction;
+            pendingAction = PendingAction.NONE;
             if (ok) {
-                listings.clear(); loading = true;
-                myListings.clear(); loadingMine = true;
-                HdvPacketHandler.requestList(0, "");
-                HdvPacketHandler.requestMyListings();
+                if (action == PendingAction.CANCEL || action == PendingAction.COLLECT) {
+                    // Retrait ou collecte : myListings déjà purgé localement + requestMyListings déjà envoyé
+                    // On rafraîchit juste la liste globale si nécessaire (retrait retire l'item des listings)
+                    if (action == PendingAction.CANCEL) {
+                        listings.clear(); loading = true;
+                        HdvPacketHandler.requestList(0, "");
+                    }
+                    // loadingMine=true déjà positionné, la réponse myListings mettra à jour
+                } else {
+                    // Achat ou mise en vente : rafraîchir tout
+                    listings.clear(); loading = true;
+                    myListings.clear(); loadingMine = true;
+                    HdvPacketHandler.requestList(0, "");
+                    HdvPacketHandler.requestMyListings();
+                }
             }
         }));
 
@@ -878,11 +896,14 @@ public class GuiHDV extends GuiScreen {
                 }
                 // Bouton global collecter
                 if (ok(hbCollect) && in(mx, my, hbCollect) && pendingEarnings > 0) {
-                    HdvPacketHandler.collectEarnings();
-                    // Purge immédiate des items vendus — le serveur enverra la liste à jour
+                    // Purge immédiate côté client
                     myListings.removeIf(HdvListing::isSold);
                     pendingEarnings = 0L;
                     loadingMine = true;
+                    if (scrollMine >= myListings.size()) scrollMine = Math.max(0, myListings.size() - 1);
+                    // Envoyer au serveur (la réponse myListings arrivera et confirmera)
+                    pendingAction = PendingAction.COLLECT;
+                    HdvPacketHandler.collectEarnings();
                     HdvPacketHandler.requestMyListings();
                     return;
                 }
@@ -897,17 +918,23 @@ public class GuiHDV extends GuiScreen {
                     if (hasBtnRow) {
                         if (ok(hbCancelRow[cancelIdx]) && in(mx, my, hbCancelRow[cancelIdx])) {
                             if (l.isSold()) {
-                                HdvPacketHandler.collectEarnings();
+                                // Collecte via bouton par ligne
                                 myListings.removeIf(HdvListing::isSold);
                                 pendingEarnings = 0L;
                                 loadingMine = true;
+                                if (scrollMine >= myListings.size()) scrollMine = Math.max(0, myListings.size() - 1);
+                                pendingAction = PendingAction.COLLECT;
+                                HdvPacketHandler.collectEarnings();
                                 HdvPacketHandler.requestMyListings();
                             } else {
-                                // Retrait immédiat de l'annonce sans la réafficher
+                                // Retrait immédiat de l'annonce
                                 int lid = l.getId();
-                                HdvPacketHandler.cancelOffer(lid);
                                 myListings.removeIf(listing -> listing.getId() == lid);
                                 if (scrollMine > 0 && scrollMine >= myListings.size()) scrollMine--;
+                                loadingMine = true;
+                                pendingAction = PendingAction.CANCEL;
+                                HdvPacketHandler.cancelOffer(lid);
+                                HdvPacketHandler.requestMyListings();
                                 status(true, "Annonce retiree — item restitue.");
                             }
                             return;
