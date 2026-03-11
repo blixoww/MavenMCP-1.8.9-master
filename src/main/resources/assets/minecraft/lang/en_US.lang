@@ -2756,3 +2756,20 @@ tile.obsidian_door.name=Obsidian Door
 # ── Random Ore ────────────────────────────────────────────────────────────────
 tile.random_ore.name=Random Ore
 
+# ── Obsidian Trapdoor ─────────────────────────────────────────────────────────
+tile.obsidianTrapdoor.name=Obsidian Trapdoor
+
+# ── Steel Ladder ──────────────────────────────────────────────────────────────
+tile.steelLadder.name=Steel Ladder
+
+# ── Heal Stick ────────────────────────────────────────────────────────────────
+item.healStick.name=Heal Stick
+
+# ── Pumpkie Pie ───────────────────────────────────────────────────────────────
+item.pumpkiePie.name=Pumpkie Pie
+
+# ── Potions custom ────────────────────────────────────────────────────────────
+potion.fallProtection=Fall Protection
+potion.prefix.fallProtection=Potion of
+effect.fallProtection=Fall Protection
+

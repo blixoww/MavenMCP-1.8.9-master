@@ -1047,6 +1047,11 @@ public class RenderItem implements IResourceManagerReloadListener {
         this.registerItem(Items.obsidian_door, "obsidian_door");
         this.registerBlock(Blocks.obsidian_door, "obsidian_door");
         this.registerBlock(Blocks.random_ore, "random_ore");
+        // obsidian_trapdoor : ItemBlock enregistré via registerItemBlock → registerBlock OK
+        this.registerBlock(Blocks.obsidian_trapdoor, "obsidian_trapdoor");
+        this.registerBlock(Blocks.steel_ladder, "steel_ladder");
+        this.registerItem(Items.heal_stick, "heal_stick");
+        this.registerItem(Items.pumpkie_pie, "pumpkie_pie");
     }
 
     public void onResourceManagerReload(IResourceManager resourceManager) {

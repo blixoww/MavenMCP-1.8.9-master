@@ -8,8 +8,10 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.*;
+import net.minecraft.potion.Potion;
 import org.lwjgl.input.Mouse;
 
 import java.io.IOException;
@@ -18,51 +20,51 @@ import java.util.*;
 /**
  * GuiCraftGuide — Lunar Client-inspired professional redesign
  * PvP Faction | MCP 1.8.9
- *
+ * <p>
  * Visual style:
- *  · Ultra-dark panels with multi-layer shadow & gradient headers
- *  · Electric-blue accent system (#3D8EFF) with mode-tinted variants
- *  · 3-D inset slots with smooth hover pulse
- *  · Smooth scrolling with momentum
- *  · Search bar with icon & focus animation
- *  · Animated chevron arrows in recipe views
- *  · Fully screen-adaptive sizing (works at any resolution)
+ * · Ultra-dark panels with multi-layer shadow & gradient headers
+ * · Electric-blue accent system (#3D8EFF) with mode-tinted variants
+ * · 3-D inset slots with smooth hover pulse
+ * · Smooth scrolling with momentum
+ * · Search bar with icon & focus animation
+ * · Animated chevron arrows in recipe views
+ * · Fully screen-adaptive sizing (works at any resolution)
  */
 public class GuiCraftGuide extends GuiScreen {
 
     // ── Palette ────────────────────────────────────────────────────────────────
-    private static final int C_OVERLAY        = 0xCC030511;
-    private static final int C_PANEL          = 0xFF0B0C17;
-    private static final int C_PANEL_HDR      = 0xFF080A14;
-    private static final int C_PANEL_INNER    = 0xFF0E0F1C;
-    private static final int C_RECIPE_BG      = 0xFF09090F;
-    private static final int C_ACCENT         = 0xFF3D8EFF;
-    private static final int C_ACCENT_DIM     = 0xFF0C1A38;
-    private static final int C_BREW           = 0xFF00BBEE;
-    private static final int C_FURNACE        = 0xFFFF7822;
-    private static final int C_GOLD           = 0xFFE8A030;
-    private static final int C_BORDER_MID     = 0xFF182040;
-    private static final int C_BORDER_DIM     = 0xFF080C18;
-    private static final int C_SLOT           = 0xFF0B0C18;
-    private static final int C_SLOT_LT        = 0xFF1C1E30;
-    private static final int C_SLOT_DK        = 0xFF040408;
-    private static final int C_SCR_TRACK      = 0xFF060710;
-    private static final int C_SCR_THUMB      = 0xFF1A2C50;
-    private static final int C_SCR_ACTIVE     = 0xFF3D8EFF;
-    private static final int C_BTN            = 0xFF0B1022;
-    private static final int C_BTN_HOV        = 0xFF162038;
-    private static final int C_BTN_BDR        = 0xFF162040;
-    private static final int C_TXT_TITLE      = 0xFFFFFFFF;
-    private static final int C_TXT_DIM        = 0xFF445870;
-    private static final int C_TXT_HINT       = 0xFF2A3648;
-    private static final int C_TXT_GOLD       = 0xFFE8A030;
-    private static final int C_TXT_BREW       = 0xFF44CCFF;
+    private static final int C_OVERLAY = 0xCC030511;
+    private static final int C_PANEL = 0xFF0B0C17;
+    private static final int C_PANEL_HDR = 0xFF080A14;
+    private static final int C_PANEL_INNER = 0xFF0E0F1C;
+    private static final int C_RECIPE_BG = 0xFF09090F;
+    private static final int C_ACCENT = 0xFF3D8EFF;
+    private static final int C_ACCENT_DIM = 0xFF0C1A38;
+    private static final int C_BREW = 0xFF00BBEE;
+    private static final int C_FURNACE = 0xFFFF7822;
+    private static final int C_GOLD = 0xFFE8A030;
+    private static final int C_BORDER_MID = 0xFF182040;
+    private static final int C_BORDER_DIM = 0xFF080C18;
+    private static final int C_SLOT = 0xFF0B0C18;
+    private static final int C_SLOT_LT = 0xFF1C1E30;
+    private static final int C_SLOT_DK = 0xFF040408;
+    private static final int C_SCR_TRACK = 0xFF060710;
+    private static final int C_SCR_THUMB = 0xFF1A2C50;
+    private static final int C_SCR_ACTIVE = 0xFF3D8EFF;
+    private static final int C_BTN = 0xFF0B1022;
+    private static final int C_BTN_HOV = 0xFF162038;
+    private static final int C_BTN_BDR = 0xFF162040;
+    private static final int C_TXT_TITLE = 0xFFFFFFFF;
+    private static final int C_TXT_DIM = 0xFF445870;
+    private static final int C_TXT_HINT = 0xFF2A3648;
+    private static final int C_TXT_GOLD = 0xFFE8A030;
+    private static final int C_TXT_BREW = 0xFF44CCFF;
 
     // ── Grid constants (base values, scaled in initGui) ────────────────────────
     private int COLS = 9;
-    private int SZ   = 18;
-    private static final int SBW  = 6;
-    private static final int SBP  = 4;
+    private int SZ = 18;
+    private static final int SBW = 6;
+    private static final int SBP = 4;
 
     // ── Dynamic layout ─────────────────────────────────────────────────────────
     private int pad, panelW, panelH, panelX, panelY;
@@ -83,118 +85,174 @@ public class GuiCraftGuide extends GuiScreen {
         int inputMeta, outputMeta;
         ItemStack ingredient;
         String name;
+
         PotionRecipe(int in, int out, ItemStack ingr, String n) {
-            inputMeta = in; outputMeta = out; ingredient = ingr; name = n;
+            inputMeta = in;
+            outputMeta = out;
+            ingredient = ingr;
+            name = n;
         }
     }
 
     private static final Map<Integer, List<PotionRecipe>> POTION_RECIPES = new HashMap<>();
+    // Clés fictives pour les potions custom (non encodables en meta vanilla)
+    static final int META_HASTE1 = 9001;
+    static final int META_HASTE2 = 9002;
+    static final int META_HASTE1_SPLASH = 9003;
+    static final int META_HASTE2_SPLASH = 9004;
+    static final int META_FALL1 = 9005;
+    static final int META_FALL2 = 9006;
+    static final int META_FALL1_SPLASH = 9007;
+    static final int META_FALL2_SPLASH = 9008;
+    // ItemStacks NBT réels associés aux meta fictifs
+    static final Map<Integer, ItemStack> CUSTOM_POTION_STACKS = new HashMap<>();
 
     static {
         ItemStack glowstone = new ItemStack(Items.glowstone_dust);
-        ItemStack redstone  = new ItemStack(Items.redstone);
+        ItemStack redstone = new ItemStack(Items.redstone);
         ItemStack gunpowder = new ItemStack(Items.gunpowder);
         ItemStack fermented = new ItemStack(Items.fermented_spider_eye);
-        POTION_RECIPES.computeIfAbsent(16, k->new ArrayList<>()).add(new PotionRecipe(0,16,new ItemStack(Items.nether_wart),"Awkward"));
-        int base=8193;
-        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(16,base,new ItemStack(Items.ghast_tear),"Régénération"));
-        POTION_RECIPES.computeIfAbsent(base+32,k->new ArrayList<>()).add(new PotionRecipe(base,base+32,glowstone,"Régénération II"));
-        POTION_RECIPES.computeIfAbsent(base+64,k->new ArrayList<>()).add(new PotionRecipe(base,base+64,redstone,"Régénération Étendue"));
-        POTION_RECIPES.computeIfAbsent(base+8192,k->new ArrayList<>()).add(new PotionRecipe(base,base+8192,gunpowder,"Régénération Splash"));
-        POTION_RECIPES.computeIfAbsent((base+32)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+32,(base+32)+8192,gunpowder,"Régénération II Splash"));
-        POTION_RECIPES.computeIfAbsent((base+64)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+64,(base+64)+8192,gunpowder,"Régénération Étendue Splash"));
-        base=8194;
-        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(16,base,new ItemStack(Items.sugar),"Rapidité"));
-        POTION_RECIPES.computeIfAbsent(base+32,k->new ArrayList<>()).add(new PotionRecipe(base,base+32,glowstone,"Rapidité II"));
-        POTION_RECIPES.computeIfAbsent(base+64,k->new ArrayList<>()).add(new PotionRecipe(base,base+64,redstone,"Rapidité Étendue"));
-        POTION_RECIPES.computeIfAbsent(base+8192,k->new ArrayList<>()).add(new PotionRecipe(base,base+8192,gunpowder,"Rapidité Splash"));
-        POTION_RECIPES.computeIfAbsent((base+32)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+32,(base+32)+8192,gunpowder,"Rapidité II Splash"));
-        POTION_RECIPES.computeIfAbsent((base+64)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+64,(base+64)+8192,gunpowder,"Rapidité Étendue Splash"));
-        base=8195;
-        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(16,base,new ItemStack(Items.magma_cream),"Résistance au Feu"));
-        POTION_RECIPES.computeIfAbsent(base+64,k->new ArrayList<>()).add(new PotionRecipe(base,base+64,redstone,"Résistance au Feu Étendue"));
-        POTION_RECIPES.computeIfAbsent(base+8192,k->new ArrayList<>()).add(new PotionRecipe(base,base+8192,gunpowder,"Résistance au Feu Splash"));
-        POTION_RECIPES.computeIfAbsent((base+64)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+64,(base+64)+8192,gunpowder,"Résistance au Feu Étendue Splash"));
-        base=8196;
-        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(16,base,new ItemStack(Items.spider_eye),"Poison"));
-        POTION_RECIPES.computeIfAbsent(base+32,k->new ArrayList<>()).add(new PotionRecipe(base,base+32,glowstone,"Poison II"));
-        POTION_RECIPES.computeIfAbsent(base+64,k->new ArrayList<>()).add(new PotionRecipe(base,base+64,redstone,"Poison Étendu"));
-        POTION_RECIPES.computeIfAbsent(base+8192,k->new ArrayList<>()).add(new PotionRecipe(base,base+8192,gunpowder,"Poison Splash"));
-        POTION_RECIPES.computeIfAbsent((base+32)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+32,(base+32)+8192,gunpowder,"Poison II Splash"));
-        POTION_RECIPES.computeIfAbsent((base+64)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+64,(base+64)+8192,gunpowder,"Poison Étendu Splash"));
-        base=8197;
-        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(16,base,new ItemStack(Items.speckled_melon),"Soin"));
-        POTION_RECIPES.computeIfAbsent(base+32,k->new ArrayList<>()).add(new PotionRecipe(base,base+32,glowstone,"Soin II"));
-        POTION_RECIPES.computeIfAbsent(base+8192,k->new ArrayList<>()).add(new PotionRecipe(base,base+8192,gunpowder,"Soin Splash"));
-        POTION_RECIPES.computeIfAbsent((base+32)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+32,(base+32)+8192,gunpowder,"Soin II Splash"));
-        base=8198;
-        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(16,base,new ItemStack(Items.golden_carrot),"Vision Nocturne"));
-        POTION_RECIPES.computeIfAbsent(base+64,k->new ArrayList<>()).add(new PotionRecipe(base,base+64,redstone,"Vision Nocturne Étendue"));
-        POTION_RECIPES.computeIfAbsent(base+8192,k->new ArrayList<>()).add(new PotionRecipe(base,base+8192,gunpowder,"Vision Nocturne Splash"));
-        POTION_RECIPES.computeIfAbsent((base+64)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+64,(base+64)+8192,gunpowder,"Vision Nocturne Étendue Splash"));
-        base=8201;
-        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(16,base,new ItemStack(Items.blaze_powder),"Force"));
-        POTION_RECIPES.computeIfAbsent(base+32,k->new ArrayList<>()).add(new PotionRecipe(base,base+32,glowstone,"Force II"));
-        POTION_RECIPES.computeIfAbsent(base+64,k->new ArrayList<>()).add(new PotionRecipe(base,base+64,redstone,"Force Étendue"));
-        POTION_RECIPES.computeIfAbsent(base+8192,k->new ArrayList<>()).add(new PotionRecipe(base,base+8192,gunpowder,"Force Splash"));
-        POTION_RECIPES.computeIfAbsent((base+32)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+32,(base+32)+8192,gunpowder,"Force II Splash"));
-        POTION_RECIPES.computeIfAbsent((base+64)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+64,(base+64)+8192,gunpowder,"Force Étendue Splash"));
-        base=8203;
-        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(16,base,new ItemStack(Items.rabbit_foot),"Saut"));
-        POTION_RECIPES.computeIfAbsent(base+32,k->new ArrayList<>()).add(new PotionRecipe(base,base+32,glowstone,"Saut II"));
-        POTION_RECIPES.computeIfAbsent(base+64,k->new ArrayList<>()).add(new PotionRecipe(base,base+64,redstone,"Saut Étendu"));
-        POTION_RECIPES.computeIfAbsent(base+8192,k->new ArrayList<>()).add(new PotionRecipe(base,base+8192,gunpowder,"Saut Splash"));
-        POTION_RECIPES.computeIfAbsent((base+32)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+32,(base+32)+8192,gunpowder,"Saut II Splash"));
-        POTION_RECIPES.computeIfAbsent((base+64)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+64,(base+64)+8192,gunpowder,"Saut Étendu Splash"));
-        base=8205;
-        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(16,base,new ItemStack(Items.fish,1,3),"Respiration Aquatique"));
-        POTION_RECIPES.computeIfAbsent(base+64,k->new ArrayList<>()).add(new PotionRecipe(base,base+64,redstone,"Respiration Aquatique Étendue"));
-        POTION_RECIPES.computeIfAbsent(base+8192,k->new ArrayList<>()).add(new PotionRecipe(base,base+8192,gunpowder,"Respiration Aquatique Splash"));
-        POTION_RECIPES.computeIfAbsent((base+64)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+64,(base+64)+8192,gunpowder,"Respiration Aquatique Étendue Splash"));
-        base=8200;
-        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(0,base,fermented,"Faiblesse"));
-        POTION_RECIPES.computeIfAbsent(base+64,k->new ArrayList<>()).add(new PotionRecipe(base,base+64,redstone,"Faiblesse Étendue"));
-        POTION_RECIPES.computeIfAbsent(base+8192,k->new ArrayList<>()).add(new PotionRecipe(base,base+8192,gunpowder,"Faiblesse Splash"));
-        POTION_RECIPES.computeIfAbsent((base+64)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+64,(base+64)+8192,gunpowder,"Faiblesse Étendue Splash"));
-        base=8202;
-        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(8194,base,fermented,"Lenteur"));
-        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(8203,base,fermented,"Lenteur"));
-        POTION_RECIPES.computeIfAbsent(base+64,k->new ArrayList<>()).add(new PotionRecipe(8258,base+64,fermented,"Lenteur Étendue"));
-        POTION_RECIPES.computeIfAbsent(base+64,k->new ArrayList<>()).add(new PotionRecipe(8267,base+64,fermented,"Lenteur Étendue"));
-        POTION_RECIPES.computeIfAbsent(base+8192,k->new ArrayList<>()).add(new PotionRecipe(base,base+8192,gunpowder,"Lenteur Splash"));
-        POTION_RECIPES.computeIfAbsent((base+64)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+64,(base+64)+8192,gunpowder,"Lenteur Étendue Splash"));
-        base=8204;
-        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(8197,base,fermented,"Dommages"));
-        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(8196,base,fermented,"Dommages"));
-        POTION_RECIPES.computeIfAbsent(base+32,k->new ArrayList<>()).add(new PotionRecipe(8229,base+32,fermented,"Dommages II"));
-        POTION_RECIPES.computeIfAbsent(base+32,k->new ArrayList<>()).add(new PotionRecipe(8228,base+32,fermented,"Dommages II"));
-        POTION_RECIPES.computeIfAbsent(base+8192,k->new ArrayList<>()).add(new PotionRecipe(base,base+8192,gunpowder,"Dommages Splash"));
-        POTION_RECIPES.computeIfAbsent((base+32)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+32,(base+32)+8192,gunpowder,"Dommages II Splash"));
-        base=8206;
-        POTION_RECIPES.computeIfAbsent(base,k->new ArrayList<>()).add(new PotionRecipe(8198,base,fermented,"Invisibilité"));
-        POTION_RECIPES.computeIfAbsent(base+64,k->new ArrayList<>()).add(new PotionRecipe(8262,base+64,fermented,"Invisibilité Étendue"));
-        POTION_RECIPES.computeIfAbsent(base+8192,k->new ArrayList<>()).add(new PotionRecipe(base,base+8192,gunpowder,"Invisibilité Splash"));
-        POTION_RECIPES.computeIfAbsent((base+64)+8192,k->new ArrayList<>()).add(new PotionRecipe(base+64,(base+64)+8192,gunpowder,"Invisibilité Étendue Splash"));
+        ItemStack feather = new ItemStack(Items.feather);
+        ItemStack diamBlock = new ItemStack(net.minecraft.init.Blocks.diamond_block);
+        POTION_RECIPES.computeIfAbsent(16, k -> new ArrayList<>()).add(new PotionRecipe(0, 16, new ItemStack(Items.nether_wart), "Awkward"));
+        int base = 8193;
+        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(16, base, new ItemStack(Items.ghast_tear), "Régénération"));
+        POTION_RECIPES.computeIfAbsent(base + 32, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 32, glowstone, "Régénération II"));
+        POTION_RECIPES.computeIfAbsent(base + 64, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 64, redstone, "Régénération Étendue"));
+        POTION_RECIPES.computeIfAbsent(base + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 8192, gunpowder, "Régénération Splash"));
+        POTION_RECIPES.computeIfAbsent((base + 32) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 32, (base + 32) + 8192, gunpowder, "Régénération II Splash"));
+        POTION_RECIPES.computeIfAbsent((base + 64) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 64, (base + 64) + 8192, gunpowder, "Régénération Étendue Splash"));
+        base = 8194;
+        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(16, base, new ItemStack(Items.sugar), "Rapidité"));
+        POTION_RECIPES.computeIfAbsent(base + 32, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 32, glowstone, "Rapidité II"));
+        POTION_RECIPES.computeIfAbsent(base + 64, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 64, redstone, "Rapidité Étendue"));
+        POTION_RECIPES.computeIfAbsent(base + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 8192, gunpowder, "Rapidité Splash"));
+        POTION_RECIPES.computeIfAbsent((base + 32) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 32, (base + 32) + 8192, gunpowder, "Rapidité II Splash"));
+        POTION_RECIPES.computeIfAbsent((base + 64) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 64, (base + 64) + 8192, gunpowder, "Rapidité Étendue Splash"));
+        base = 8195;
+        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(16, base, new ItemStack(Items.magma_cream), "Résistance au Feu"));
+        POTION_RECIPES.computeIfAbsent(base + 64, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 64, redstone, "Résistance au Feu Étendue"));
+        POTION_RECIPES.computeIfAbsent(base + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 8192, gunpowder, "Résistance au Feu Splash"));
+        POTION_RECIPES.computeIfAbsent((base + 64) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 64, (base + 64) + 8192, gunpowder, "Résistance au Feu Étendue Splash"));
+        base = 8196;
+        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(16, base, new ItemStack(Items.spider_eye), "Poison"));
+        POTION_RECIPES.computeIfAbsent(base + 32, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 32, glowstone, "Poison II"));
+        POTION_RECIPES.computeIfAbsent(base + 64, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 64, redstone, "Poison Étendu"));
+        POTION_RECIPES.computeIfAbsent(base + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 8192, gunpowder, "Poison Splash"));
+        POTION_RECIPES.computeIfAbsent((base + 32) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 32, (base + 32) + 8192, gunpowder, "Poison II Splash"));
+        POTION_RECIPES.computeIfAbsent((base + 64) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 64, (base + 64) + 8192, gunpowder, "Poison Étendu Splash"));
+        base = 8197;
+        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(16, base, new ItemStack(Items.speckled_melon), "Soin"));
+        POTION_RECIPES.computeIfAbsent(base + 32, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 32, glowstone, "Soin II"));
+        POTION_RECIPES.computeIfAbsent(base + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 8192, gunpowder, "Soin Splash"));
+        POTION_RECIPES.computeIfAbsent((base + 32) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 32, (base + 32) + 8192, gunpowder, "Soin II Splash"));
+        base = 8198;
+        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(16, base, new ItemStack(Items.golden_carrot), "Vision Nocturne"));
+        POTION_RECIPES.computeIfAbsent(base + 64, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 64, redstone, "Vision Nocturne Étendue"));
+        POTION_RECIPES.computeIfAbsent(base + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 8192, gunpowder, "Vision Nocturne Splash"));
+        POTION_RECIPES.computeIfAbsent((base + 64) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 64, (base + 64) + 8192, gunpowder, "Vision Nocturne Étendue Splash"));
+        base = 8201;
+        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(16, base, new ItemStack(Items.blaze_powder), "Force"));
+        POTION_RECIPES.computeIfAbsent(base + 32, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 32, glowstone, "Force II"));
+        POTION_RECIPES.computeIfAbsent(base + 64, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 64, redstone, "Force Étendue"));
+        POTION_RECIPES.computeIfAbsent(base + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 8192, gunpowder, "Force Splash"));
+        POTION_RECIPES.computeIfAbsent((base + 32) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 32, (base + 32) + 8192, gunpowder, "Force II Splash"));
+        POTION_RECIPES.computeIfAbsent((base + 64) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 64, (base + 64) + 8192, gunpowder, "Force Étendue Splash"));
+        base = 8203;
+        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(16, base, new ItemStack(Items.rabbit_foot), "Saut"));
+        POTION_RECIPES.computeIfAbsent(base + 32, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 32, glowstone, "Saut II"));
+        POTION_RECIPES.computeIfAbsent(base + 64, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 64, redstone, "Saut Étendu"));
+        POTION_RECIPES.computeIfAbsent(base + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 8192, gunpowder, "Saut Splash"));
+        POTION_RECIPES.computeIfAbsent((base + 32) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 32, (base + 32) + 8192, gunpowder, "Saut II Splash"));
+        POTION_RECIPES.computeIfAbsent((base + 64) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 64, (base + 64) + 8192, gunpowder, "Saut Étendu Splash"));
+        base = 8205;
+        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(16, base, new ItemStack(Items.fish, 1, 3), "Respiration Aquatique"));
+        POTION_RECIPES.computeIfAbsent(base + 64, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 64, redstone, "Respiration Aquatique Étendue"));
+        POTION_RECIPES.computeIfAbsent(base + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 8192, gunpowder, "Respiration Aquatique Splash"));
+        POTION_RECIPES.computeIfAbsent((base + 64) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 64, (base + 64) + 8192, gunpowder, "Respiration Aquatique Étendue Splash"));
+        base = 8200;
+        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(0, base, fermented, "Faiblesse"));
+        POTION_RECIPES.computeIfAbsent(base + 64, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 64, redstone, "Faiblesse Étendue"));
+        POTION_RECIPES.computeIfAbsent(base + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 8192, gunpowder, "Faiblesse Splash"));
+        POTION_RECIPES.computeIfAbsent((base + 64) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 64, (base + 64) + 8192, gunpowder, "Faiblesse Étendue Splash"));
+        base = 8202;
+        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(8194, base, fermented, "Lenteur"));
+        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(8203, base, fermented, "Lenteur"));
+        POTION_RECIPES.computeIfAbsent(base + 64, k -> new ArrayList<>()).add(new PotionRecipe(8258, base + 64, fermented, "Lenteur Étendue"));
+        POTION_RECIPES.computeIfAbsent(base + 64, k -> new ArrayList<>()).add(new PotionRecipe(8267, base + 64, fermented, "Lenteur Étendue"));
+        POTION_RECIPES.computeIfAbsent(base + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 8192, gunpowder, "Lenteur Splash"));
+        POTION_RECIPES.computeIfAbsent((base + 64) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 64, (base + 64) + 8192, gunpowder, "Lenteur Étendue Splash"));
+        base = 8204;
+        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(8197, base, fermented, "Dommages"));
+        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(8196, base, fermented, "Dommages"));
+        POTION_RECIPES.computeIfAbsent(base + 32, k -> new ArrayList<>()).add(new PotionRecipe(8229, base + 32, fermented, "Dommages II"));
+        POTION_RECIPES.computeIfAbsent(base + 32, k -> new ArrayList<>()).add(new PotionRecipe(8228, base + 32, fermented, "Dommages II"));
+        POTION_RECIPES.computeIfAbsent(base + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 8192, gunpowder, "Dommages Splash"));
+        POTION_RECIPES.computeIfAbsent((base + 32) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 32, (base + 32) + 8192, gunpowder, "Dommages II Splash"));
+        base = 8206;
+        POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(8198, base, fermented, "Invisibilité"));
+        POTION_RECIPES.computeIfAbsent(base + 64, k -> new ArrayList<>()).add(new PotionRecipe(8262, base + 64, fermented, "Invisibilité Étendue"));
+        POTION_RECIPES.computeIfAbsent(base + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 8192, gunpowder, "Invisibilité Splash"));
+        POTION_RECIPES.computeIfAbsent((base + 64) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 64, (base + 64) + 8192, gunpowder, "Invisibilité Étendue Splash"));
+
+        // ── Potions custom : Haste ─────────────────────────────────────────────
+        // Haste I  : Potion bancale + Bloc de diamant
+        POTION_RECIPES.computeIfAbsent(META_HASTE1, k -> new ArrayList<>())
+                .add(new PotionRecipe(16, META_HASTE1, diamBlock, "Haste"));
+        // Haste II : Haste I + Glowstone
+        POTION_RECIPES.computeIfAbsent(META_HASTE2, k -> new ArrayList<>())
+                .add(new PotionRecipe(META_HASTE1, META_HASTE2, glowstone, "Haste II"));
+        // Haste I Splash : Haste I + Gunpowder
+        POTION_RECIPES.computeIfAbsent(META_HASTE1_SPLASH, k -> new ArrayList<>())
+                .add(new PotionRecipe(META_HASTE1, META_HASTE1_SPLASH, gunpowder, "Haste Splash"));
+        // Haste II Splash : Haste II + Gunpowder
+        POTION_RECIPES.computeIfAbsent(META_HASTE2_SPLASH, k -> new ArrayList<>())
+                .add(new PotionRecipe(META_HASTE2, META_HASTE2_SPLASH, gunpowder, "Haste II Splash"));
+
+        // ── Potions custom : Fall Protection ──────────────────────────────────
+        // Fall I  : Potion bancale + Plume
+        POTION_RECIPES.computeIfAbsent(META_FALL1, k -> new ArrayList<>())
+                .add(new PotionRecipe(16, META_FALL1, feather, "Protection contre la Chute"));
+        // Fall II : Fall I + Glowstone
+        POTION_RECIPES.computeIfAbsent(META_FALL2, k -> new ArrayList<>())
+                .add(new PotionRecipe(META_FALL1, META_FALL2, glowstone, "Protection contre la Chute II"));
+        // Fall I Splash : Fall I + Gunpowder
+        POTION_RECIPES.computeIfAbsent(META_FALL1_SPLASH, k -> new ArrayList<>())
+                .add(new PotionRecipe(META_FALL1, META_FALL1_SPLASH, gunpowder, "Protection contre la Chute Splash"));
+        // Fall II Splash : Fall II + Gunpowder
+        POTION_RECIPES.computeIfAbsent(META_FALL2_SPLASH, k -> new ArrayList<>())
+                .add(new PotionRecipe(META_FALL2, META_FALL2_SPLASH, gunpowder, "Protection contre la Chute II Splash"));
+
+        // ── ItemStacks NBT réels pour les potions custom ───────────────────────
+        CUSTOM_POTION_STACKS.put(META_HASTE1, ItemPotion.createCustomPotion(Items.potionitem, Potion.digSpeed.id, 0, 3600, "Potion of Haste"));
+        CUSTOM_POTION_STACKS.put(META_HASTE2, ItemPotion.createCustomPotion(Items.potionitem, Potion.digSpeed.id, 1, 1800, "Potion of Haste II"));
+        CUSTOM_POTION_STACKS.put(META_HASTE1_SPLASH, ItemPotion.createCustomPotion(Items.potionitem, Potion.digSpeed.id, 0, 3600, "Splash Potion of Haste", true));
+        CUSTOM_POTION_STACKS.put(META_HASTE2_SPLASH, ItemPotion.createCustomPotion(Items.potionitem, Potion.digSpeed.id, 1, 1800, "Splash Potion of Haste II", true));
+        CUSTOM_POTION_STACKS.put(META_FALL1, ItemPotion.createCustomPotion(Items.potionitem, Potion.fallProtection.id, 0, 3600, "Potion of Fall Protection"));
+        CUSTOM_POTION_STACKS.put(META_FALL2, ItemPotion.createCustomPotion(Items.potionitem, Potion.fallProtection.id, 1, 1800, "Potion of Fall Protection II"));
+        CUSTOM_POTION_STACKS.put(META_FALL1_SPLASH, ItemPotion.createCustomPotion(Items.potionitem, Potion.fallProtection.id, 0, 3600, "Splash Potion of Fall Protection", true));
+        CUSTOM_POTION_STACKS.put(META_FALL2_SPLASH, ItemPotion.createCustomPotion(Items.potionitem, Potion.fallProtection.id, 1, 1800, "Splash Potion of Fall Protection II", true));
     }
 
     private static final Set<String> BLOCKED = new HashSet<>(Arrays.asList(
-            "tile.litFurnace","tile.farmland","tile.doorWood","tile.doorIron",
-            "tile.litRedstoneOre","tile.redstoneLamp.on","tile.pistonHead",
-            "tile.pistonMoving","tile.cake","tile.skull","tile.carrots",
-            "tile.potatoes","tile.wheat","tile.netherWart","tile.cocoa",
-            "tile.pumpkinStem","tile.melonStem","tile.tripWire",
-            "tile.beetroots","tile.portal","tile.endPortal","tile.endGateway",
-            "tile.fire","tile.water","tile.lava","tile.air"
+            "tile.litFurnace", "tile.farmland", "tile.doorWood", "tile.doorIron",
+            "tile.litRedstoneOre", "tile.redstoneLamp.on", "tile.pistonHead",
+            "tile.pistonMoving", "tile.cake", "tile.skull", "tile.carrots",
+            "tile.potatoes", "tile.wheat", "tile.netherWart", "tile.cocoa",
+            "tile.pumpkinStem", "tile.melonStem", "tile.tripWire",
+            "tile.beetroots", "tile.portal", "tile.endPortal", "tile.endGateway",
+            "tile.fire", "tile.water", "tile.lava", "tile.air"
     ));
 
     // ── State ──────────────────────────────────────────────────────────────────
     private GuiTextField searchBox;
-    private final List<ItemStack> allItems    = new ArrayList<>();
-    private final List<ItemStack> filtered    = new ArrayList<>();
+    private final List<ItemStack> allItems = new ArrayList<>();
+    private final List<ItemStack> filtered = new ArrayList<>();
     private final List<ItemStack> historyStack = new ArrayList<>();
     private boolean draggingSB = false;
 
-    private enum Mode { LIST, CRAFT, BREWING, FURNACE }
+    private enum Mode {LIST, CRAFT, BREWING, FURNACE}
+
     private Mode mode = Mode.LIST;
     private ItemStack selected;
     private IRecipe craftRecipe;
@@ -204,7 +262,8 @@ public class GuiCraftGuide extends GuiScreen {
     private PotionRecipe currentBrewRecipe = null;
     private GuiButton btnBack, btnMenu;
 
-    public GuiCraftGuide(GuiScreen parent) {}
+    public GuiCraftGuide(GuiScreen parent) {
+    }
 
     // ── Init ──────────────────────────────────────────────────────────────────
 
@@ -212,9 +271,13 @@ public class GuiCraftGuide extends GuiScreen {
     public void initGui() {
         buttonList.clear();
         historyStack.clear();
-        mode = Mode.LIST; selected = null; craftRecipe = null;
-        furnaceInput = null; currentBrewRecipe = null;
-        brewRecipesForItem = new ArrayList<>(); brewRecipeIndex = 0;
+        mode = Mode.LIST;
+        selected = null;
+        craftRecipe = null;
+        furnaceInput = null;
+        currentBrewRecipe = null;
+        brewRecipesForItem = new ArrayList<>();
+        brewRecipeIndex = 0;
 
         // Adaptive scaling based on screen resolution
         SZ = GuiRenderUtils.clamp(height / 18, 16, 24);
@@ -231,13 +294,13 @@ public class GuiCraftGuide extends GuiScreen {
 
         panelW = GuiRenderUtils.clamp(pad + GRID_W + SBP + SBW + pad, 200, width - 20);
         panelH = GuiRenderUtils.clamp(gridOff + visibleRows * SZ + 12 + btnH + 30, 180, height - 20);
-        panelX = (width  - panelW) / 2;
+        panelX = (width - panelW) / 2;
         panelY = (height - panelH) / 2;
-        gridX  = panelX + pad;
-        gridY  = panelY + gridOff;
-        sbX    = gridX + GRID_W + SBP;
-        sbY    = gridY;
-        sbH    = visibleRows * SZ;
+        gridX = panelX + pad;
+        gridY = panelY + gridOff;
+        sbX = gridX + GRID_W + SBP;
+        sbY = gridY;
+        sbH = visibleRows * SZ;
         footerY = gridY + sbH + 4;
 
         btnBack = new GuiButton(1, panelX + pad + 2, panelY + panelH - btnH - 6, btnW, btnH, "Retour");
@@ -257,9 +320,17 @@ public class GuiCraftGuide extends GuiScreen {
                 for (ItemStack s : sub) if (s != null && !isBlocked(s)) allItems.add(s);
             }
             Set<Integer> added = new HashSet<>();
-            for (Map.Entry<Integer,List<PotionRecipe>> e : POTION_RECIPES.entrySet())
-                if (added.add(e.getKey()))
-                    allItems.add(new ItemStack(Items.potionitem, 1, e.getKey()));
+            for (Map.Entry<Integer, List<PotionRecipe>> e : POTION_RECIPES.entrySet()) {
+                int meta = e.getKey();
+                if (added.add(meta)) {
+                    // Utiliser le vrai ItemStack NBT pour les potions custom, sinon le meta brut
+                    if (CUSTOM_POTION_STACKS.containsKey(meta)) {
+                        allItems.add(CUSTOM_POTION_STACKS.get(meta));
+                    } else {
+                        allItems.add(new ItemStack(Items.potionitem, 1, meta));
+                    }
+                }
+            }
         }
         filter("");
     }
@@ -288,9 +359,9 @@ public class GuiCraftGuide extends GuiScreen {
     private void drawSlotHover(int x, int y) {
         long t = System.currentTimeMillis() % 1200;
         float p = t < 600 ? t / 600f : (1200f - t) / 600f;
-        int a = (int)(0x30 + 0x30 * p);
+        int a = (int) (0x30 + 0x30 * p);
         drawRect(x, y, x + SZ, y + SZ, (a << 24) | 0x3D8EFF);
-        drawRect(x, y, x + SZ, y + 1, ((int)(0x80 + 0x40 * p) << 24) | 0x3D8EFF);
+        drawRect(x, y, x + SZ, y + 1, ((int) (0x80 + 0x40 * p) << 24) | 0x3D8EFF);
     }
 
     private void drawNavButton(int x, int y, int w, int h, String text, boolean hover, int accentCol) {
@@ -368,7 +439,7 @@ public class GuiCraftGuide extends GuiScreen {
         int focusColor = GuiRenderUtils.colorLerp(C_BORDER_MID, C_ACCENT, searchFocusAnim);
         drawRect(sx, sy + searchH - 1, sx + sw, sy + searchH, focusColor);
         if (searchFocusAnim > 0.1f) {
-            int glowAlpha = (int)(0x18 * searchFocusAnim);
+            int glowAlpha = (int) (0x18 * searchFocusAnim);
             drawRect(sx, sy + searchH - 2, sx + sw, sy + searchH - 1, (glowAlpha << 24) | (C_ACCENT & 0x00FFFFFF));
         }
 
@@ -393,7 +464,7 @@ public class GuiCraftGuide extends GuiScreen {
         if (ms > 0) {
             int th = thumbH();
             float scrollFrac = smoothScroll / ms;
-            int ty = sbY + (int)(scrollFrac * (sbH - th));
+            int ty = sbY + (int) (scrollFrac * (sbH - th));
             boolean h = inside(mx, my, sbX, sbY, SBW, sbH) || draggingSB;
             int thumbColor = h ? C_SCR_ACTIVE : C_SCR_THUMB;
             drawRect(sbX + 1, ty, sbX + SBW - 1, ty + th, thumbColor);
@@ -409,7 +480,7 @@ public class GuiCraftGuide extends GuiScreen {
 
         int scrollRow = (int) smoothScroll;
         float scrollFract = smoothScroll - scrollRow;
-        int pixelOffset = (int)(scrollFract * SZ);
+        int pixelOffset = (int) (scrollFract * SZ);
         int base = scrollRow * COLS;
         ItemStack hov = null;
 
@@ -661,14 +732,16 @@ public class GuiCraftGuide extends GuiScreen {
 
         // Animated drip
         long t = System.currentTimeMillis() % 1000;
-        int dropY = ingY + SZ + (int)(8 * (t / 1000f));
-        int dropAlpha = (int)(0xCC * (1f - t / 1000f));
+        int dropY = ingY + SZ + (int) (8 * (t / 1000f));
+        int dropAlpha = (int) (0xCC * (1f - t / 1000f));
         drawRect(ingX + SZ / 2 - 1, dropY, ingX + SZ / 2 + 1, dropY + 3, (dropAlpha << 24) | 0x00BBEE);
 
         // Input potion (bottom left)
         int inX = bx + 8, inY = top + BREW_H - SZ - 6;
         drawSlot3D(inX, inY);
-        ItemStack inputPotion = new ItemStack(Items.potionitem, 1, currentBrewRecipe.inputMeta);
+        ItemStack inputPotion = CUSTOM_POTION_STACKS.containsKey(currentBrewRecipe.inputMeta)
+                ? CUSTOM_POTION_STACKS.get(currentBrewRecipe.inputMeta)
+                : new ItemStack(Items.potionitem, 1, currentBrewRecipe.inputMeta);
         itemRender.renderItemAndEffectIntoGUI(inputPotion, inX + 1, inY + 1);
         if (inside(mx, my, inX, inY, SZ, SZ)) {
             drawSlotHover(inX, inY);
@@ -681,7 +754,9 @@ public class GuiCraftGuide extends GuiScreen {
         // Output potion (bottom right)
         int outX = bx + BREW_W - SZ - 8, outY = inY;
         drawSlotOutput(outX, outY, C_BREW);
-        ItemStack outputPotion = new ItemStack(Items.potionitem, 1, currentBrewRecipe.outputMeta);
+        ItemStack outputPotion = CUSTOM_POTION_STACKS.containsKey(currentBrewRecipe.outputMeta)
+                ? CUSTOM_POTION_STACKS.get(currentBrewRecipe.outputMeta)
+                : new ItemStack(Items.potionitem, 1, currentBrewRecipe.outputMeta);
         itemRender.renderItemAndEffectIntoGUI(outputPotion, outX + 1, outY + 1);
         if (inside(mx, my, outX, outY, SZ, SZ)) hov = outputPotion;
 
@@ -724,7 +799,9 @@ public class GuiCraftGuide extends GuiScreen {
         smoothScroll = 0;
     }
 
-    private int maxScroll() { return Math.max(0, (filtered.size() + COLS - 1) / COLS - visibleRows); }
+    private int maxScroll() {
+        return Math.max(0, (filtered.size() + COLS - 1) / COLS - visibleRows);
+    }
 
     private int thumbH() {
         int total = (filtered.size() + COLS - 1) / COLS;
@@ -735,13 +812,18 @@ public class GuiCraftGuide extends GuiScreen {
     private void applyScrollFromMouse(int my) {
         int th = thumbH(), ms = maxScroll();
         if (ms == 0) return;
-        targetScroll = Math.round((float)(my - sbY - th / 2) * ms / (sbH - th));
+        targetScroll = Math.round((float) (my - sbY - th / 2) * ms / (sbH - th));
         targetScroll = Math.max(0, Math.min(targetScroll, ms));
     }
 
     private boolean isSameStack(ItemStack a, ItemStack b) {
         if (a == null || b == null) return false;
-        return a.getItem() == b.getItem() && a.getItemDamage() == b.getItemDamage();
+        if (a.getItem() != b.getItem()) return false;
+        // Pour les potions custom NBT, comparer par nom d'affichage
+        if (a.getItem() == Items.potionitem && (a.hasTagCompound() || b.hasTagCompound())) {
+            return a.getDisplayName().equals(b.getDisplayName());
+        }
+        return a.getItemDamage() == b.getItemDamage();
     }
 
     private void openRecipe(ItemStack stack) {
@@ -761,16 +843,42 @@ public class GuiCraftGuide extends GuiScreen {
 
     private void goBack() {
         if (!historyStack.isEmpty()) loadRecipe(historyStack.remove(historyStack.size() - 1));
-        else { mode = Mode.LIST; selected = null; }
+        else {
+            mode = Mode.LIST;
+            selected = null;
+        }
     }
 
-    private void goMenu() { mode = Mode.LIST; selected = null; historyStack.clear(); }
+    private void goMenu() {
+        mode = Mode.LIST;
+        selected = null;
+        historyStack.clear();
+    }
+
+    /**
+     * Retourne le meta fictif correspondant à un ItemStack de potion custom (NBT), ou -1 si non trouvé.
+     */
+    private int resolveCustomPotionMeta(ItemStack stack) {
+        for (Map.Entry<Integer, ItemStack> e : CUSTOM_POTION_STACKS.entrySet()) {
+            ItemStack candidate = e.getValue();
+            if (candidate.getDisplayName().equals(stack.getDisplayName())) {
+                return e.getKey();
+            }
+        }
+        return -1;
+    }
 
     private void loadRecipe(ItemStack stack) {
-        selected = stack; craftRecipe = null; currentBrewRecipe = null;
-        brewRecipesForItem.clear(); brewRecipeIndex = 0; furnaceInput = null;
+        selected = stack;
+        craftRecipe = null;
+        currentBrewRecipe = null;
+        brewRecipesForItem.clear();
+        brewRecipeIndex = 0;
+        furnaceInput = null;
         if (stack.getItem() == Items.potionitem) {
-            int meta = stack.getItemDamage();
+            // Détection des potions custom par leur nom NBT
+            int customMeta = resolveCustomPotionMeta(stack);
+            int meta = (customMeta != -1) ? customMeta : stack.getItemDamage();
             if (POTION_RECIPES.containsKey(meta)) {
                 brewRecipesForItem = new ArrayList<>(POTION_RECIPES.get(meta));
                 brewRecipesForItem.sort(Comparator.comparingInt(a -> a.inputMeta));
@@ -838,8 +946,14 @@ public class GuiCraftGuide extends GuiScreen {
         super.mouseClicked(mx, my, btn);
         searchBox.mouseClicked(mx, my, btn);
         if (mode != Mode.LIST) {
-            if (inside(mx, my, btnBack.xPosition, btnBack.yPosition, btnW, btnH)) { goBack(); return; }
-            if (inside(mx, my, btnMenu.xPosition, btnMenu.yPosition, btnW, btnH)) { goMenu(); return; }
+            if (inside(mx, my, btnBack.xPosition, btnBack.yPosition, btnW, btnH)) {
+                goBack();
+                return;
+            }
+            if (inside(mx, my, btnMenu.xPosition, btnMenu.yPosition, btnW, btnH)) {
+                goMenu();
+                return;
+            }
             // Calculate contentY to match drawRecipeMode exactly
             int breadcrumbH = historyStack.isEmpty() ? 0 : 14;
             int recipeAreaH;
@@ -863,25 +977,36 @@ public class GuiCraftGuide extends GuiScreen {
                 if (mode == Mode.CRAFT && craftRecipe != null) {
                     ItemStack[] grid = getGrid(craftRecipe);
                     int sx0 = cx - (3 * SZ + 30 + SZ) / 2;
-                    for (int row = 0; row < 3; row++) for (int col = 0; col < 3; col++) {
-                        int idx = row * 3 + col;
-                        if (idx >= grid.length || grid[idx] == null) continue;
-                        if (inside(mx, my, sx0 + col * SZ, contentY + row * SZ, SZ, SZ)) {
-                            openRecipe(grid[idx]); return;
+                    for (int row = 0; row < 3; row++)
+                        for (int col = 0; col < 3; col++) {
+                            int idx = row * 3 + col;
+                            if (idx >= grid.length || grid[idx] == null) continue;
+                            if (inside(mx, my, sx0 + col * SZ, contentY + row * SZ, SZ, SZ)) {
+                                openRecipe(grid[idx]);
+                                return;
+                            }
                         }
-                    }
                 }
                 if (mode == Mode.FURNACE && furnaceInput != null) {
                     int lx = cx - (SZ + 32 + SZ) / 2;
-                    if (inside(mx, my, lx, contentY, SZ, SZ)) { openRecipe(furnaceInput); return; }
+                    if (inside(mx, my, lx, contentY, SZ, SZ)) {
+                        openRecipe(furnaceInput);
+                        return;
+                    }
                 }
                 if (mode == Mode.BREWING && currentBrewRecipe != null) {
                     int bx = cx - BREW_W / 2;
                     int ingX = bx + BREW_W / 2 - SZ / 2, ingY = contentY + 4;
                     int inX = bx + 8, inY = contentY + BREW_H - SZ - 6;
-                    if (inside(mx, my, ingX, ingY, SZ, SZ)) { openRecipe(currentBrewRecipe.ingredient); return; }
+                    if (inside(mx, my, ingX, ingY, SZ, SZ)) {
+                        openRecipe(currentBrewRecipe.ingredient);
+                        return;
+                    }
                     if (inside(mx, my, inX, inY, SZ, SZ)) {
-                        openRecipe(new ItemStack(Items.potionitem, 1, currentBrewRecipe.inputMeta));
+                        ItemStack inputStack = CUSTOM_POTION_STACKS.containsKey(currentBrewRecipe.inputMeta)
+                                ? CUSTOM_POTION_STACKS.get(currentBrewRecipe.inputMeta)
+                                : new ItemStack(Items.potionitem, 1, currentBrewRecipe.inputMeta);
+                        openRecipe(inputStack);
                         return;
                     }
                 }
@@ -899,7 +1024,7 @@ public class GuiCraftGuide extends GuiScreen {
             }
             int scrollRow = (int) smoothScroll;
             float scrollFract = smoothScroll - scrollRow;
-            int pixelOffset = (int)(scrollFract * SZ);
+            int pixelOffset = (int) (scrollFract * SZ);
             int base = scrollRow * COLS;
             for (int row = 0; row <= visibleRows; row++) {
                 for (int col = 0; col < COLS; col++) {
@@ -940,7 +1065,10 @@ public class GuiCraftGuide extends GuiScreen {
 
     @Override
     protected void keyTyped(char ch, int key) throws IOException {
-        if (mode != Mode.LIST && key == 1) { goMenu(); return; }
+        if (mode != Mode.LIST && key == 1) {
+            goMenu();
+            return;
+        }
         if (searchBox.textboxKeyTyped(ch, key)) filter(searchBox.getText());
         else super.keyTyped(ch, key);
     }

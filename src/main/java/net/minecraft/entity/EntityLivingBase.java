@@ -1137,7 +1137,7 @@ public abstract class EntityLivingBase extends Entity
         int j = MathHelper.floor_double(this.getEntityBoundingBox().minY);
         int k = MathHelper.floor_double(this.posZ);
         Block block = this.worldObj.getBlockState(new BlockPos(i, j, k)).getBlock();
-        return (block == Blocks.ladder || block == Blocks.vine) && (!(this instanceof EntityPlayer) || !((EntityPlayer)this).isSpectator());
+        return (block == Blocks.ladder || block == Blocks.vine || block == Blocks.steel_ladder) && (!(this instanceof EntityPlayer) || !((EntityPlayer)this).isSpectator());
     }
 
     /**
@@ -1154,6 +1154,26 @@ public abstract class EntityLivingBase extends Entity
         PotionEffect potioneffect = this.getActivePotionEffect(Potion.jump);
         float f = potioneffect != null ? (float)(potioneffect.getAmplifier() + 1) : 0.0F;
         int i = MathHelper.ceiling_float_int((distance - 3.0F - f) * damageMultiplier);
+
+        // ── Fall Protection : réduit/annule les dégâts de chute ───────────────
+        if (i > 0)
+        {
+            PotionEffect fallProt = this.getActivePotionEffect(Potion.fallProtection);
+            if (fallProt != null)
+            {
+                int amp = fallProt.getAmplifier();
+                if (amp >= 1)
+                {
+                    // Fall Protection II+ : immunité totale
+                    i = 0;
+                }
+                else
+                {
+                    // Fall Protection I : réduit de 50%
+                    i = Math.max(0, i / 2);
+                }
+            }
+        }
 
         if (i > 0)
         {
@@ -1641,9 +1661,16 @@ public abstract class EntityLivingBase extends Entity
                         this.motionZ = MathHelper.clamp_double(this.motionZ, (double)(-f6), (double)f6);
                         this.fallDistance = 0.0F;
 
-                        if (this.motionY < -0.15D)
+                        // Steel ladder : descente max -0.3 au lieu de -0.15
+                        int lx2 = MathHelper.floor_double(this.posX);
+                        int ly2 = MathHelper.floor_double(this.getEntityBoundingBox().minY);
+                        int lz2 = MathHelper.floor_double(this.posZ);
+                        Block currentLadder = this.worldObj.getBlockState(new BlockPos(lx2, ly2, lz2)).getBlock();
+                        double maxDown = (currentLadder == Blocks.steel_ladder) ? -0.3D : -0.15D;
+
+                        if (this.motionY < maxDown)
                         {
-                            this.motionY = -0.15D;
+                            this.motionY = maxDown;
                         }
 
                         boolean flag = this.isSneaking() && this instanceof EntityPlayer;
@@ -1658,7 +1685,19 @@ public abstract class EntityLivingBase extends Entity
 
                     if (this.isCollidedHorizontally && this.isOnLadder())
                     {
-                        this.motionY = 0.2D;
+                        // Steel ladder : vitesse de grimpe x2
+                        int lx = MathHelper.floor_double(this.posX);
+                        int ly = MathHelper.floor_double(this.getEntityBoundingBox().minY);
+                        int lz = MathHelper.floor_double(this.posZ);
+                        Block ladderBlock = this.worldObj.getBlockState(new BlockPos(lx, ly, lz)).getBlock();
+                        if (ladderBlock == Blocks.steel_ladder)
+                        {
+                            this.motionY = 0.4D;
+                        }
+                        else
+                        {
+                            this.motionY = 0.2D;
+                        }
                     }
 
                     if (this.worldObj.isRemote && (!this.worldObj.isBlockLoaded(new BlockPos((int)this.posX, 0, (int)this.posZ)) || !this.worldObj.getChunkFromBlockCoords(new BlockPos((int)this.posX, 0, (int)this.posZ)).isLoaded()))

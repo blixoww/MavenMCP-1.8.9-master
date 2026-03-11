@@ -101,6 +101,13 @@ public class Potion {
      * The saturation Potion object.
      */
     public static final Potion saturation = (new PotionHealth(23, new ResourceLocation("saturation"), false, 16262179)).setPotionName("potion.saturation");
+
+    /**
+     * Custom : Fall Protection — réduit/annule les dégâts de chute.
+     * Niveau 0 (I) = réduit de 50%, Niveau 1 (II) = immunité totale.
+     */
+    public static final Potion fallProtection = (new Potion(24, new ResourceLocation("fall_protection"), false, 8368696)).setPotionName("potion.fallProtection").setIconIndex(3, 2);
+
     public static final Potion field_180153_z = null;
     public static final Potion field_180147_A = null;
     public static final Potion field_180148_B = null;

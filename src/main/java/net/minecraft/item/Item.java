@@ -892,6 +892,8 @@ public class Item {
         registerItemBlock(Blocks.ruby_block);
         registerItemBlock(Blocks.cobalt_block);
         registerItemBlock(Blocks.random_ore);
+        registerItemBlock(Blocks.steel_ladder);
+
 
         // ── Items matériaux custom ───────────────────────────────────────────────
         registerItem(452, "steel_ingot", (new Item()).setUnlocalizedName("steel_ingot").setCreativeTab(CreativeTabs.tabMaterials));
@@ -925,6 +927,10 @@ public class Item {
         // ── Nouveaux items custom ──────────────────────────────────────────────────
         registerItem(471, "multi_tool", (new ItemMultiTool()).setUnlocalizedName("multi_tool").setCreativeTab(CreativeTabs.tabTools));
         registerItem(472, "obsidian_door", (new ItemDoor(Blocks.obsidian_door)).setUnlocalizedName("doorObsidian"));
+        registerItem(473, "heal_stick", (new ItemHealStick()));
+        registerItem(474, "pumpkie_pie", (new ItemPumpkiePie()));
+        // obsidian_trapdoor : enregistré comme ItemBlock (même approche qu'iron_trapdoor)
+        registerItemBlock(Blocks.obsidian_trapdoor);
 
         registerItem(2256, "record_13", (new ItemRecord("13")).setUnlocalizedName("record"));
         registerItem(2257, "record_cat", (new ItemRecord("cat")).setUnlocalizedName("record"));

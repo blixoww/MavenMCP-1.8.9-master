@@ -2,7 +2,9 @@ package net.minecraft.inventory;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.AchievementList;
 
@@ -159,7 +161,14 @@ public class ContainerBrewingStand extends Container
 
         public boolean isItemValid(ItemStack stack)
         {
-            return stack != null ? stack.getItem().isPotionIngredient(stack) : false;
+            if (stack == null) return false;
+            Item item = stack.getItem();
+            // Ingrédients custom : plume (Fall Protection) et bloc de diamant (Haste)
+            if (item == Items.feather || item == Item.getItemFromBlock(Blocks.diamond_block))
+            {
+                return true;
+            }
+            return item.isPotionIngredient(stack);
         }
 
         public int getSlotStackLimit()

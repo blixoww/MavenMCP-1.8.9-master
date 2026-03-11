@@ -212,6 +212,39 @@ public class CraftingManager
                 '#', Blocks.obsidian
         });
 
+        // Trappe en obsidienne : pattern trappe (2x2 obsidienne)
+        this.addRecipe(new ItemStack(Blocks.obsidian_trapdoor, 2), new Object[] {
+                "##",
+                "##",
+                '#', Blocks.obsidian
+        });
+
+        // Échelle en acier : pattern échelle classique mais avec des lingots d'acier
+        this.addRecipe(new ItemStack(Blocks.steel_ladder, 3), new Object[] {
+                "S S",
+                "SSS",
+                "S S",
+                'S', Items.steel_ingot
+        });
+
+        // Heal Stick : bâton entouré d'émeraudes et pomme dorée
+        this.addRecipe(new ItemStack(Items.heal_stick, 1), new Object[] {
+                " E ",
+                " S ",
+                " E ",
+                'E', Items.emerald,
+                'S', Items.stick
+        });
+
+        // Pumpkie Pie : tarte à la citrouille entourée de 4 émeraudes
+        this.addRecipe(new ItemStack(Items.pumpkie_pie, 1), new Object[] {
+                "E E",
+                " P ",
+                "E E",
+                'E', Items.emerald,
+                'P', Items.pumpkin_pie
+        });
+
         Collections.sort(this.recipes, new Comparator<IRecipe>()
         {
             public int compare(IRecipe p_compare_1_, IRecipe p_compare_2_)

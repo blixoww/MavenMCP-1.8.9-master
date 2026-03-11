@@ -6,6 +6,7 @@ import net.minecraft.block.BlockBrewingStand;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ContainerBrewingStand;
@@ -15,6 +16,7 @@ import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.potion.PotionHelper;
 import net.minecraft.util.EnumFacing;
@@ -133,6 +135,30 @@ public class TileEntityBrewingStand extends TileEntityLockable implements ITicka
         {
             ItemStack itemstack = this.brewingItemStacks[3];
 
+            // ── Custom brewing check first ──────────────────────────────────────
+            if (isCustomIngredient(itemstack))
+            {
+                boolean customFound = false;
+                for (int i = 0; i < 3; ++i)
+                {
+                    if (this.brewingItemStacks[i] != null && this.brewingItemStacks[i].getItem() == Items.potionitem)
+                    {
+                        if (canCustomBrew(this.brewingItemStacks[i], itemstack))
+                        {
+                            customFound = true;
+                            break;
+                        }
+                    }
+                }
+                if (customFound) return true;
+                // For glowstone/gunpowder, fall through to vanilla if no custom brew matched
+                Item ing = itemstack.getItem();
+                if (ing != Items.glowstone_dust && ing != Items.gunpowder)
+                {
+                    return false;
+                }
+            }
+
             if (!itemstack.getItem().isPotionIngredient(itemstack))
             {
                 return false;
@@ -174,11 +200,76 @@ public class TileEntityBrewingStand extends TileEntityLockable implements ITicka
         }
     }
 
+    /**
+     * Checks if this ingredient is a custom brewing ingredient (feather, diamond_block, glowstone, gunpowder).
+     */
+    private boolean isCustomIngredient(ItemStack stack)
+    {
+        if (stack == null) return false;
+        Item item = stack.getItem();
+        return item == Items.feather
+            || item == Item.getItemFromBlock(Blocks.diamond_block)
+            || item == Items.glowstone_dust
+            || item == Items.gunpowder;
+    }
+
+    /**
+     * Returns true if the custom ingredient can be applied to the potion in the slot.
+     */
+    private boolean canCustomBrew(ItemStack potionStack, ItemStack ingredient)
+    {
+        if (potionStack == null || potionStack.getItem() != Items.potionitem) return false;
+        Item ing = ingredient.getItem();
+        int meta = potionStack.getMetadata();
+        NBTTagCompound tag = potionStack.getTagCompound();
+        boolean hasCustomEffects = tag != null && tag.hasKey("CustomPotionEffects", 9);
+
+        // Plume : awkward potion (meta 16) → Fall Protection I
+        if (ing == Items.feather && meta == 16 && !hasCustomEffects) return true;
+
+        // Bloc de diamant : awkward potion (meta 16) → Haste I
+        if (ing == Item.getItemFromBlock(Blocks.diamond_block) && meta == 16 && !hasCustomEffects) return true;
+
+        // Glowstone : custom potion → amplify (only if amplifier == 0)
+        if (ing == Items.glowstone_dust && hasCustomEffects && !ItemPotion.isSplash(meta))
+        {
+            NBTTagList effects = tag.getTagList("CustomPotionEffects", 10);
+            if (effects.tagCount() > 0 && effects.getCompoundTagAt(0).getByte("Amplifier") == 0) return true;
+        }
+
+        // Gunpowder : custom potion → splash (only if not already splash)
+        if (ing == Items.gunpowder && hasCustomEffects && !ItemPotion.isSplash(meta)) return true;
+
+        return false;
+    }
+
     private void brewPotions()
     {
         if (this.canBrew())
         {
             ItemStack itemstack = this.brewingItemStacks[3];
+
+            // ── Custom brewing ──────────────────────────────────────────────────
+            if (isCustomIngredient(itemstack))
+            {
+                boolean didCustomBrew = false;
+                for (int i = 0; i < 3; ++i)
+                {
+                    if (this.brewingItemStacks[i] != null
+                        && this.brewingItemStacks[i].getItem() == Items.potionitem
+                        && canCustomBrew(this.brewingItemStacks[i], itemstack))
+                    {
+                        doCustomBrew(this.brewingItemStacks[i], itemstack);
+                        didCustomBrew = true;
+                    }
+                }
+                if (didCustomBrew)
+                {
+                    consumeIngredient();
+                    return;
+                }
+                // Fall through to vanilla for glowstone/gunpowder
+            }
 
             for (int i = 0; i < 3; ++i)
             {
@@ -203,18 +294,117 @@ public class TileEntityBrewingStand extends TileEntityLockable implements ITicka
                 }
             }
 
-            if (itemstack.getItem().hasContainerItem())
-            {
-                this.brewingItemStacks[3] = new ItemStack(itemstack.getItem().getContainerItem());
-            }
-            else
-            {
-                --this.brewingItemStacks[3].stackSize;
+            consumeIngredient();
+        }
+    }
 
-                if (this.brewingItemStacks[3].stackSize <= 0)
+    /**
+     * Applies a custom brew to the potion in the given slot.
+     */
+    private void doCustomBrew(ItemStack potionStack, ItemStack ingredient)
+    {
+        Item ing = ingredient.getItem();
+        int meta = potionStack.getMetadata();
+        NBTTagCompound tag = potionStack.getTagCompound();
+        boolean hasCustomEffects = tag != null && tag.hasKey("CustomPotionEffects", 9);
+
+        if (ing == Items.feather && meta == 16 && !hasCustomEffects)
+        {
+            // Awkward + Feather → Potion of Fall Protection I (3 min)
+            setCustomPotionEffects(potionStack, Potion.fallProtection.id, 0, 3600, "\u00a7b", "Potion of Fall Protection");
+        }
+        else if (ing == Item.getItemFromBlock(Blocks.diamond_block) && meta == 16 && !hasCustomEffects)
+        {
+            // Awkward + Diamond Block → Potion of Haste I (3 min)
+            setCustomPotionEffects(potionStack, Potion.digSpeed.id, 0, 3600, "\u00a7e", "Potion of Haste");
+        }
+        else if (ing == Items.glowstone_dust && hasCustomEffects)
+        {
+            // Glowstone → amplify to level II, halve duration
+            NBTTagList effects = tag.getTagList("CustomPotionEffects", 10);
+            for (int e = 0; e < effects.tagCount(); e++)
+            {
+                NBTTagCompound eff = effects.getCompoundTagAt(e);
+                eff.setByte("Amplifier", (byte)1);
+                eff.setInteger("Duration", eff.getInteger("Duration") / 2);
+            }
+            // Update display name
+            if (tag.hasKey("display", 10))
+            {
+                NBTTagCompound display = tag.getCompoundTag("display");
+                String name = display.getString("Name");
+                if (!name.contains("II"))
                 {
-                    this.brewingItemStacks[3] = null;
+                    display.setString("Name", name.replace(" I", "").trim() + " II");
                 }
+            }
+        }
+        else if (ing == Items.gunpowder && hasCustomEffects && !ItemPotion.isSplash(meta))
+        {
+            // Gunpowder → make splash
+            potionStack.setItemDamage(meta | 16384); // splash bit
+            if (tag.hasKey("display", 10))
+            {
+                NBTTagCompound display = tag.getCompoundTag("display");
+                String name = display.getString("Name");
+                if (!name.startsWith("Splash") && !name.startsWith("\u00a7fSplash"))
+                {
+                    // Conserver la couleur blanche, ajouter le préfixe Splash
+                    String cleanName = name.startsWith("\u00a7f") ? name.substring(2) : name;
+                    display.setString("Name", "\u00a7fSplash " + cleanName);
+                }
+            }
+        }
+    }
+
+    /**
+     * Sets custom potion effects on the given potion item stack via NBT.
+     * On ne stocke PAS de lore custom — ItemPotion.addInformation gère l'affichage
+     * automatiquement via CustomPotionEffects.
+     */
+    private void setCustomPotionEffects(ItemStack potionStack, int effectId, int amplifier, int duration, String colorCode, String name)
+    {
+        // meta 8206 = potion non-splash avec effets custom (base mundane visible)
+        potionStack.setItemDamage(8206);
+
+        NBTTagCompound tag = potionStack.getTagCompound();
+        if (tag == null)
+        {
+            tag = new NBTTagCompound();
+            potionStack.setTagCompound(tag);
+        }
+
+        // Effets
+        NBTTagList effectsList = new NBTTagList();
+        NBTTagCompound effect = new NBTTagCompound();
+        effect.setByte("Id", (byte)effectId);
+        effect.setByte("Amplifier", (byte)amplifier);
+        effect.setInteger("Duration", duration);
+        effect.setByte("ShowParticles", (byte)1);
+        effectsList.appendTag(effect);
+        tag.setTag("CustomPotionEffects", effectsList);
+
+        // Nom affiché en blanc (pas de couleur custom — évite le cyan parasite)
+        NBTTagCompound display = new NBTTagCompound();
+        String suffix = amplifier > 0 ? " II" : "";
+        display.setString("Name", "\u00a7f" + name + suffix);
+        tag.setTag("display", display);
+    }
+
+    private void consumeIngredient()
+    {
+        ItemStack itemstack = this.brewingItemStacks[3];
+        if (itemstack.getItem().hasContainerItem())
+        {
+            this.brewingItemStacks[3] = new ItemStack(itemstack.getItem().getContainerItem());
+        }
+        else
+        {
+            --this.brewingItemStacks[3].stackSize;
+
+            if (this.brewingItemStacks[3].stackSize <= 0)
+            {
+                this.brewingItemStacks[3] = null;
             }
         }
     }
@@ -359,7 +549,7 @@ public class TileEntityBrewingStand extends TileEntityLockable implements ITicka
      */
     public boolean isItemValidForSlot(int index, ItemStack stack)
     {
-        return index == 3 ? stack.getItem().isPotionIngredient(stack) : stack.getItem() == Items.potionitem || stack.getItem() == Items.glass_bottle;
+        return index == 3 ? (stack.getItem().isPotionIngredient(stack) || isCustomIngredient(stack)) : stack.getItem() == Items.potionitem || stack.getItem() == Items.glass_bottle;
     }
 
     public boolean[] func_174902_m()

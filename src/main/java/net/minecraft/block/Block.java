@@ -1308,6 +1308,8 @@ public class Block {
         // ── Nouveaux blocs custom ─────────────────────────────────────────────────
         registerBlock(204, "obsidian_door", (new BlockObsidianDoor()).disableStats());
         registerBlock(205, "random_ore", (new BlockRandomOre()).setCreativeTab(CreativeTabs.tabBlock));
+        registerBlock(206, "obsidian_trapdoor", (new BlockObsidianTrapdoor()).disableStats());
+        registerBlock(207, "steel_ladder", (new BlockSteelLadder()));
 
         blockRegistry.validateKey();
 

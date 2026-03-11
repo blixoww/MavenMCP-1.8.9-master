@@ -245,6 +245,8 @@ public class Blocks {
     // ── Nouveaux blocs custom ──────────────────────────────────────────────────
     public static final Block obsidian_door;
     public static final Block random_ore;
+    public static final Block obsidian_trapdoor;
+    public static final Block steel_ladder;
 
     /**
      * Returns the Block in the blockRegistry with the specified name.
@@ -467,6 +469,8 @@ public class Blocks {
 
             obsidian_door = getRegisteredBlock("obsidian_door");
             random_ore = getRegisteredBlock("random_ore");
+            obsidian_trapdoor = getRegisteredBlock("obsidian_trapdoor");
+            steel_ladder = getRegisteredBlock("steel_ladder");
         }
     }
 }

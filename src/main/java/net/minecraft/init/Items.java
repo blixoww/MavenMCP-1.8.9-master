@@ -252,6 +252,9 @@ public class Items
     // Nouveaux items custom
     public static final Item multi_tool;
     public static final Item obsidian_door;
+    public static final Item heal_stick;
+    public static final Item pumpkie_pie;
+    public static final Item obsidian_trapdoor;
 
     private static Item getRegisteredItem(String name)
     {
@@ -499,6 +502,9 @@ public class Items
 
             multi_tool = getRegisteredItem("multi_tool");
             obsidian_door = getRegisteredItem("obsidian_door");
+            heal_stick = getRegisteredItem("heal_stick");
+            pumpkie_pie = getRegisteredItem("pumpkie_pie");
+            obsidian_trapdoor = Item.getItemFromBlock(Blocks.obsidian_trapdoor);
         }
     }
 }
