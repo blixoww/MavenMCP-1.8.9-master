@@ -139,7 +139,8 @@ public class GuiHDV extends GuiScreen {
         HdvPacketHandler.setActionListener((ok, msg) -> Minecraft.getMinecraft().addScheduledTask(() -> {
             statusMsg = msg; statusTimer = 160; statusOk = ok;
             if (ok) {
-                loading = true; loadingMine = true;
+                listings.clear(); loading = true;
+                myListings.clear(); loadingMine = true;
                 HdvPacketHandler.requestList(0, "");
                 HdvPacketHandler.requestMyListings();
             }
@@ -373,7 +374,7 @@ public class GuiHDV extends GuiScreen {
         fontRendererObj.drawString("\u00a77Vendeur",    lx + 230, cy + 4, C_GRAY);
         fontRendererObj.drawString("\u00a77Qte",        lx + 355, cy + 4, C_GRAY);
         fontRendererObj.drawString("\u00a77Prix total", lx + 415, cy + 4, C_GRAY);
-        fontRendererObj.drawString("\u00a77Unitaire",   lx + 515, cy + 4, C_GRAY);
+        fontRendererObj.drawString("\u00a77Prix/u",     lx + 505, cy + 4, C_GRAY);
         cy += 16;
 
         listY0 = cy;
@@ -428,20 +429,20 @@ public class GuiHDV extends GuiScreen {
 
         fontRendererObj.drawString("\u00a7b" + l.getSellerName(), x + 230, y + (ROW_H - 8) / 2, 0xFFAADDFF);
         fontRendererObj.drawString("\u00a7f" + l.getQuantity(),   x + 357, y + (ROW_H - 8) / 2, C_WHITE);
-        fontRendererObj.drawStringWithShadow("\u00a76" + fmtGold(l.getTotalPrice()) + " G", x + 415, y + (ROW_H - 8) / 2, C_GOLD);
-        fontRendererObj.drawString("\u00a77" + fmtGold(l.getPricePerUnit()) + "/u",         x + 515, y + (ROW_H - 8) / 2, C_GRAY);
+        fontRendererObj.drawStringWithShadow("\u00a76" + fmtGold(l.getTotalPrice()) + " $", x + 415, y + (ROW_H - 8) / 2, C_GOLD);
+        fontRendererObj.drawString("\u00a77" + fmtGold(l.getPricePerUnit()) + "$/u",         x + 505, y + (ROW_H - 8) / 2, C_GRAY);
 
         boolean canAfford = playerBalance >= l.getTotalPrice();
-        int bx = x + w - 68, by = y + (ROW_H - 14) / 2;
-        boolean bhovr = in(mx, my, bx, by, 62, 14);
+        int bx = x + w - 72, by = y + (ROW_H - 14) / 2;
+        boolean bhovr = in(mx, my, bx, by, 66, 14);
         if (canAfford) {
-            drawRect(bx, by, bx + 62, by + 14, bhovr ? 0xFF1A6030 : 0xFF0D3515);
-            drawRect(bx, by, bx + 62, by + 1, bhovr ? C_GREEN : 0xFF1A6030);
-            drawCentered(bhovr ? "\u00a7fAcheter" : "\u00a7aAcheter", bx + 31, by + 3, C_WHITE);
+            drawRect(bx, by, bx + 66, by + 14, bhovr ? 0xFF1A6030 : 0xFF0D3515);
+            drawRect(bx, by, bx + 66, by + 1, bhovr ? C_GREEN : 0xFF1A6030);
+            drawCentered(bhovr ? "\u00a7fAcheter" : "\u00a7aAcheter", bx + 33, by + 3, C_WHITE);
         } else {
-            drawRect(bx, by, bx + 62, by + 14, 0xFF2A1010);
-            drawRect(bx, by, bx + 62, by + 1, C_RED);
-            drawCentered("\u00a7cInsuffisant", bx + 31, by + 3, 0xFFCC5555);
+            drawRect(bx, by, bx + 66, by + 14, 0xFF2A1010);
+            drawRect(bx, by, bx + 66, by + 1, C_RED);
+            drawCentered("\u00a7cInsuffisant", bx + 33, by + 3, 0xFFCC5555);
         }
         if (idx < hbRows.length) hb(hbRows[idx], x, y, w, ROW_H);
     }
@@ -499,7 +500,7 @@ public class GuiHDV extends GuiScreen {
                 }
 
                 fontRendererObj.drawString("\u00a7f" + l.getQuantity(), lx + 268, y + (ROW_H - 8) / 2, sold ? 0xFFBBFFCC : C_WHITE);
-                fontRendererObj.drawStringWithShadow("\u00a76" + fmtGold(l.getPricePerUnit()) + " G", lx + 375, y + (ROW_H - 8) / 2, C_GOLD);
+                fontRendererObj.drawStringWithShadow("\u00a76" + fmtGold(l.getPricePerUnit()) + " $", lx + 375, y + (ROW_H - 8) / 2, C_GOLD);
 
                 int bx = lx + tw - 74, by = y + (ROW_H - 14) / 2;
                 boolean bhovr = in(mx, my, bx, by, 68, 14);
@@ -550,8 +551,8 @@ public class GuiHDV extends GuiScreen {
             drawRect(gx + 9,  gy + 9,  gx + 23, gy + 23, 0xFF0D2515);
             drawRect(gx + 11, gy + 11, gx + 21, gy + 21, 0xFFFFDD00);
             String txt = gh
-                ? "\u00a7fCollecter \u00a76" + fmtGold(pendingEarnings) + " G \u00a7a(cliquez)"
-                : "\u00a7aGains disponibles : \u00a76" + fmtGold(pendingEarnings) + " G";
+                ? "\u00a7fCollecter \u00a76" + fmtGold(pendingEarnings) + " $ \u00a7a(cliquez)"
+                : "\u00a7aGains disponibles : \u00a76" + fmtGold(pendingEarnings) + " $";
             fontRendererObj.drawStringWithShadow(txt, gx + 30, gy + 12, gh ? C_WHITE : C_GREEN);
         } else {
             drawRect(gx, gy, gx + 280, gy + 32, 0xFF0D1220);
@@ -751,8 +752,8 @@ public class GuiHDV extends GuiScreen {
             fontRendererObj.drawStringWithShadow("\u00a7f" + item.getDisplayName(), cx + 32, cy + 34, C_WHITE);
         }
         fontRendererObj.drawString("\u00a77Vendeur : \u00a7b" + confirmListing.getSellerName(), cx + 12, cy + 52, 0xFFAADDFF);
-        fontRendererObj.drawStringWithShadow("\u00a77Total : \u00a76" + fmtGold(confirmListing.getTotalPrice()) + " G", cx + 12, cy + 64, C_GOLD);
-        fontRendererObj.drawString("\u00a77Unitaire : \u00a7f" + fmtGold(confirmListing.getPricePerUnit()) + " G/u", cx + cw / 2 + 10, cy + 64, C_GRAY);
+        fontRendererObj.drawStringWithShadow("\u00a77Total : \u00a76" + fmtGold(confirmListing.getTotalPrice()) + " $", cx + 12, cy + 64, C_GOLD);
+        fontRendererObj.drawString("\u00a77Unitaire : \u00a7f" + fmtGold(confirmListing.getPricePerUnit()) + " $/u", cx + cw / 2 + 10, cy + 64, C_GRAY);
         fontRendererObj.drawString("\u00a77Quantite : \u00a7f" + confirmListing.getQuantity(), cx + 12, cy + 76, C_GRAY);
 
         boolean canAfford = playerBalance >= confirmListing.getTotalPrice();
