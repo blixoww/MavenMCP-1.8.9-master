@@ -13,9 +13,7 @@ import java.util.List;
  * Heal Stick — Soigne le joueur de 4 cœurs (8 HP) au clic droit.
  * Cooldown de 5 secondes. Durabilité limitée (50 utilisations).
  */
-public class ItemHealStick extends Item {
-
-    private static final long COOLDOWN_MS = 5000; // 5 secondes
+public class ItemHealStick extends Item {// 5 secondes
 
     public ItemHealStick() {
         this.setMaxStackSize(1);
@@ -61,8 +59,6 @@ public class ItemHealStick extends Item {
         tooltip.add("\u00a7a+4 \u2764 Soins instantan\u00e9s");
         tooltip.add("\u00a77R\u00e9g\u00e9n\u00e9ration I (2s)");
         tooltip.add("\u00a78Cooldown: \u00a7f5s");
-        int uses = stack.getMaxDamage() - stack.getItemDamage();
-        tooltip.add("\u00a78Utilisations restantes: \u00a7f" + uses + "\u00a78/\u00a7f" + stack.getMaxDamage());
     }
 
     @Override

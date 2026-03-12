@@ -60,6 +60,7 @@ public class RenderPlayer extends RendererLivingEntity<AbstractClientPlayer> {
         }
     }
 
+
     private void setModelVisibilities(AbstractClientPlayer clientPlayer) {
         ModelPlayer modelplayer = this.getMainModel();
 
@@ -119,67 +120,59 @@ public class RenderPlayer extends RendererLivingEntity<AbstractClientPlayer> {
     }
 
     protected void renderOffsetLivingLabel(AbstractClientPlayer entityIn, double x, double y, double z, String str, float p_177069_9_, double p_177069_10_) {
-        // Le score belowName (slot 2) est remplacé par la barre de vie custom — on l'ignore.
-
-        super.renderOffsetLivingLabel(entityIn, x, y, z, str, p_177069_9_, p_177069_10_);
-
-        // ── Barre de vie (distance max 32 blocs) ──────────────────────────────────
+        // ── Barre de vie JUSTE AU-DESSUS du pseudo (distance max 32 blocs) ─────────
         if (p_177069_10_ < (32.0D * 32.0D)) {
             this.renderHealthBar(entityIn, x, y, z, p_177069_9_);
         }
+
+        // Pseudo en dessous de la barre
+        super.renderOffsetLivingLabel(entityIn, x, y, z, str, p_177069_9_, p_177069_10_);
     }
 
-    /**
-     * Affiche une barre de vie stylisée sous le pseudo du joueur.
-     * Dégradé vert → orange → rouge selon la vie restante.
-     * Bordure fine, fond sombre, texte HP centré.
-     */
     private void renderHealthBar(AbstractClientPlayer entity, double x, double y, double z, float scale) {
         float maxHealth = entity.getMaxHealth();
         float currentHealth = entity.getHealth();
         if (maxHealth <= 0) return;
         float ratio = Math.max(0f, Math.min(1f, currentHealth / maxHealth));
 
-        // ── Couleur dégradée selon le ratio ──────────────────────────────────────
         float r, g, b;
         if (ratio > 0.6f) {
-            // vert vif → vert-jaune  (1.0 → 0.6)
-            float t = (ratio - 0.6f) / 0.4f;          // 1 quand plein, 0 à 60%
-            r = 1f - t * 0.6f;   // 0.4 → 1.0
-            g = 0.85f;
-            b = 0f;
+            r = 0.15f; g = 0.85f; b = 0.15f;
         } else if (ratio > 0.3f) {
-            // jaune → orange  (0.6 → 0.3)
-            float t = (ratio - 0.3f) / 0.3f;
-            r = 1f;
-            g = 0.5f * t + 0.15f; // 0.65 → 0.15
-            b = 0f;
+            r = 1.0f;  g = 0.5f;  b = 0.0f;
         } else {
-            // orange-rouge → rouge vif  (0.3 → 0.0)
-            float t = ratio / 0.3f;
-            r = 1f;
-            g = 0.15f * t;
-            b = 0f;
+            r = 0.9f;  g = 0.1f;  b = 0.1f;
         }
 
-        // ── Dimensions ───────────────────────────────────────────────────────────
-        final float BAR_W     = 50f;   // largeur totale
-        final float BAR_H     = 3.5f;  // hauteur barre principale
-        final float BORDER    = 0.8f;  // épaisseur de la bordure
-        final float CORNER    = 1.2f;  // taille coins (simulation arrondi)
-        final float half      = BAR_W / 2f;
-
-        // Décalage vertical en dessous du pseudo
-        float fontH    = (float) this.getFontRendererFromRenderManager().FONT_HEIGHT;
-        float yOffset  = fontH * 1.15f * scale + (BAR_H + BORDER * 2 + 4f) * scale;
+        final float BAR_W  = 40f;
+        final float BAR_H  = 3f;
+        final float BORDER = 1f;
+        final float half   = BAR_W / 2f;
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate((float) x, (float) y + entity.height + 0.5f, (float) z);
+
+        // ── Reproduire exactement le translate du parent (RendererLivingEntity.renderLivingLabel) ──
+        // Le pseudo est placé à (x, y + entity.height + 0.5, z) en coords monde.
+        // On se place là, puis on fait le billboard comme le parent.
+        double nameY = y + entity.height + 0.5D;
+        if (entity.isSneaking()) nameY -= 0.25D;
+
+        GlStateManager.translate((float) x, (float) nameY, (float) z);
         GL11.glNormal3f(0f, 1f, 0f);
-        GlStateManager.rotate(-this.renderManager.playerViewY,  0f, 1f, 0f);
-        GlStateManager.rotate( this.renderManager.playerViewX, 1f, 0f, 0f);
+        GlStateManager.rotate(-this.renderManager.playerViewY, 0f, 1f, 0f);
+        GlStateManager.rotate(this.renderManager.playerViewX, 1f, 0f, 0f);
         GlStateManager.scale(-scale, -scale, scale);
-        GlStateManager.translate(0f, -yOffset / scale, 0f);
+
+        // Dans l'espace billboard après scale(-scale,-scale,scale) :
+        //   Y=0       = point de référence du pseudo (centre du label)
+        //   Y positif = vers le BAS de l'écran
+        //   Y négatif = vers le HAUT de l'écran
+        //
+        // Le pseudo est centré verticalement à Y ≈ 0.
+        // On veut la barre JUSTE AU-DESSUS → Y négatif = -(BAR_H + BORDER*2 + marge).
+        float margin = 2f;
+        float barOffsetY = -(BAR_H + BORDER * 2f + margin);
+        GlStateManager.translate(0f, barOffsetY, 0f);
 
         GlStateManager.disableLighting();
         GlStateManager.depthMask(false);
@@ -191,114 +184,51 @@ public class RenderPlayer extends RendererLivingEntity<AbstractClientPlayer> {
         Tessellator tess = Tessellator.getInstance();
         WorldRenderer wr = tess.getWorldRenderer();
 
-        // ── 1. Ombre portée (décalage +1 pixel en bas) ───────────────────────────
-        float sx = BORDER + CORNER, sy = -(BAR_H + BORDER * 2);
-        float shadowAlpha = 0.35f;
+        float top    = 0f;
+        float bottom = BAR_H + BORDER * 2f;
+        float iL = -half + BORDER;
+        float iR =  half - BORDER;
+        float iT = top    + BORDER;
+        float iB = bottom - BORDER;
+
+        // 1. Contour noir
         wr.begin(7, DefaultVertexFormats.POSITION_COLOR);
-        wr.pos(-half + sx + 1,            1f, 0).color(0f,0f,0f, shadowAlpha).endVertex();
-        wr.pos(-half + sx + 1,   sy - 1f,    0).color(0f,0f,0f, shadowAlpha).endVertex();
-        wr.pos( half - sx + 1,   sy - 1f,    0).color(0f,0f,0f, shadowAlpha).endVertex();
-        wr.pos( half - sx + 1,            1f, 0).color(0f,0f,0f, shadowAlpha).endVertex();
+        wr.pos(-half, top,    0).color(0f, 0f, 0f, 0.85f).endVertex();
+        wr.pos(-half, bottom, 0).color(0f, 0f, 0f, 0.85f).endVertex();
+        wr.pos( half, bottom, 0).color(0f, 0f, 0f, 0.85f).endVertex();
+        wr.pos( half, top,    0).color(0f, 0f, 0f, 0.85f).endVertex();
         tess.draw();
 
-        // ── 2. Fond global (noir semi-transparent) ────────────────────────────────
-        float by = -(BAR_H + BORDER * 2);
+        // 2. Fond gris sombre (zone vide)
         wr.begin(7, DefaultVertexFormats.POSITION_COLOR);
-        // centre
-        wr.pos(-half + CORNER, BORDER,    0).color(0.05f,0.05f,0.05f,0.85f).endVertex();
-        wr.pos(-half + CORNER, by,        0).color(0.05f,0.05f,0.05f,0.85f).endVertex();
-        wr.pos( half - CORNER, by,        0).color(0.05f,0.05f,0.05f,0.85f).endVertex();
-        wr.pos( half - CORNER, BORDER,    0).color(0.05f,0.05f,0.05f,0.85f).endVertex();
-        tess.draw();
-        // côté gauche (sans les coins)
-        wr.begin(7, DefaultVertexFormats.POSITION_COLOR);
-        wr.pos(-half,          BORDER - CORNER, 0).color(0.05f,0.05f,0.05f,0.85f).endVertex();
-        wr.pos(-half,          by + CORNER,     0).color(0.05f,0.05f,0.05f,0.85f).endVertex();
-        wr.pos(-half + CORNER, by + CORNER,     0).color(0.05f,0.05f,0.05f,0.85f).endVertex();
-        wr.pos(-half + CORNER, BORDER - CORNER, 0).color(0.05f,0.05f,0.05f,0.85f).endVertex();
-        tess.draw();
-        // côté droit
-        wr.begin(7, DefaultVertexFormats.POSITION_COLOR);
-        wr.pos(half - CORNER, BORDER - CORNER, 0).color(0.05f,0.05f,0.05f,0.85f).endVertex();
-        wr.pos(half - CORNER, by + CORNER,     0).color(0.05f,0.05f,0.05f,0.85f).endVertex();
-        wr.pos(half,          by + CORNER,     0).color(0.05f,0.05f,0.05f,0.85f).endVertex();
-        wr.pos(half,          BORDER - CORNER, 0).color(0.05f,0.05f,0.05f,0.85f).endVertex();
+        wr.pos(iL, iT, 0).color(0.25f, 0.25f, 0.25f, 0.9f).endVertex();
+        wr.pos(iL, iB, 0).color(0.25f, 0.25f, 0.25f, 0.9f).endVertex();
+        wr.pos(iR, iB, 0).color(0.25f, 0.25f, 0.25f, 0.9f).endVertex();
+        wr.pos(iR, iT, 0).color(0.25f, 0.25f, 0.25f, 0.9f).endVertex();
         tess.draw();
 
-        // ── 3. Bordure lumineuse (blanc 20%) ──────────────────────────────────────
-        // top
-        wr.begin(7, DefaultVertexFormats.POSITION_COLOR);
-        wr.pos(-half + CORNER, BORDER, 0).color(1f,1f,1f,0.18f).endVertex();
-        wr.pos(-half + CORNER, 0f,     0).color(1f,1f,1f,0.18f).endVertex();
-        wr.pos( half - CORNER, 0f,     0).color(1f,1f,1f,0.18f).endVertex();
-        wr.pos( half - CORNER, BORDER, 0).color(1f,1f,1f,0.18f).endVertex();
-        tess.draw();
-        // bottom
-        wr.begin(7, DefaultVertexFormats.POSITION_COLOR);
-        wr.pos(-half + CORNER, by,          0).color(0f,0f,0f,0.3f).endVertex();
-        wr.pos(-half + CORNER, by - BORDER, 0).color(0f,0f,0f,0.3f).endVertex();
-        wr.pos( half - CORNER, by - BORDER, 0).color(0f,0f,0f,0.3f).endVertex();
-        wr.pos( half - CORNER, by,          0).color(0f,0f,0f,0.3f).endVertex();
-        tess.draw();
-
-        // ── 4. Barre colorée remplie (avec dégradé vertical) ─────────────────────
-        float fillRight = -half + BORDER + (BAR_W - BORDER * 2) * ratio;
-        float barBot    =  -(BAR_H + BORDER);
-        float barTop    =  -BORDER;
+        // 3. Barre colorée avec dégradé vertical
         if (ratio > 0f) {
-            // dégradé vertical : couleur claire en haut, plus sombre en bas
-            float rD = r * 0.65f, gD = g * 0.65f, bD = b * 0.65f;
+            float fillR = iL + (iR - iL) * ratio;
+            float rD = r * 0.55f, gD = g * 0.55f, bD = b * 0.55f;
             wr.begin(7, DefaultVertexFormats.POSITION_COLOR);
-            wr.pos(-half + BORDER, BORDER, 0).color(r,  g,  b,  0.95f).endVertex();
-            wr.pos(-half + BORDER, barBot, 0).color(rD, gD, bD, 0.95f).endVertex();
-            wr.pos(fillRight,      barBot, 0).color(rD, gD, bD, 0.95f).endVertex();
-            wr.pos(fillRight,      BORDER, 0).color(r,  g,  b,  0.95f).endVertex();
+            wr.pos(iL,    iT, 0).color(r,  g,  b,  1f).endVertex();
+            wr.pos(iL,    iB, 0).color(rD, gD, bD, 1f).endVertex();
+            wr.pos(fillR, iB, 0).color(rD, gD, bD, 1f).endVertex();
+            wr.pos(fillR, iT, 0).color(r,  g,  b,  1f).endVertex();
             tess.draw();
 
-            // Reflet brillant sur le tiers supérieur
-            float midY = BORDER - (BORDER - barBot) * 0.35f;
+            // Reflet brillant (tiers supérieur)
+            float midY = iT + (iB - iT) * 0.35f;
             wr.begin(7, DefaultVertexFormats.POSITION_COLOR);
-            wr.pos(-half + BORDER, BORDER, 0).color(1f, 1f, 1f, 0.12f).endVertex();
-            wr.pos(-half + BORDER, midY,   0).color(1f, 1f, 1f, 0.0f ).endVertex();
-            wr.pos(fillRight,      midY,   0).color(1f, 1f, 1f, 0.0f ).endVertex();
-            wr.pos(fillRight,      BORDER, 0).color(1f, 1f, 1f, 0.12f).endVertex();
-            tess.draw();
-        }
-
-        // ── 5. Zone vide (gris anthracite) ────────────────────────────────────────
-        if (fillRight < half - BORDER) {
-            wr.begin(7, DefaultVertexFormats.POSITION_COLOR);
-            wr.pos(fillRight,      barTop, 0).color(0.18f,0.18f,0.18f,0.80f).endVertex();
-            wr.pos(fillRight,      barBot, 0).color(0.10f,0.10f,0.10f,0.80f).endVertex();
-            wr.pos(half - BORDER,  barBot, 0).color(0.10f,0.10f,0.10f,0.80f).endVertex();
-            wr.pos(half - BORDER,  barTop, 0).color(0.18f,0.18f,0.18f,0.80f).endVertex();
+            wr.pos(iL,    iT,  0).color(1f, 1f, 1f, 0.18f).endVertex();
+            wr.pos(iL,    midY,0).color(1f, 1f, 1f, 0.0f ).endVertex();
+            wr.pos(fillR, midY,0).color(1f, 1f, 1f, 0.0f ).endVertex();
+            wr.pos(fillR, iT,  0).color(1f, 1f, 1f, 0.18f).endVertex();
             tess.draw();
         }
 
         GlStateManager.enableTexture2D();
-
-        // ── 6. Texte "HP actuels / max HP" centré sous la barre ──────────────────
-        net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getMinecraft();
-        if (mc != null && mc.fontRendererObj != null) {
-            int hp    = (int) Math.ceil(currentHealth);
-            int maxHp = (int) maxHealth;
-            String hpText = hp + " / " + maxHp;
-
-            // Couleur texte selon ratio
-            int textColor;
-            if (ratio > 0.6f)      textColor = 0x55FF55; // vert
-            else if (ratio > 0.3f) textColor = 0xFFAA00; // orange
-            else                   textColor = 0xFF4444; // rouge
-
-            float textScale = 0.6f;
-            GlStateManager.pushMatrix();
-            GlStateManager.translate(0f, barBot - 1.5f - fontH * textScale, 0f);
-            GlStateManager.scale(textScale, textScale, 1f);
-            int textW = mc.fontRendererObj.getStringWidth(hpText);
-            mc.fontRendererObj.drawStringWithShadow(hpText, -textW / 2f, 0f, textColor);
-            GlStateManager.popMatrix();
-        }
-
         GlStateManager.depthMask(true);
         GlStateManager.enableDepth();
         GlStateManager.enableLighting();
