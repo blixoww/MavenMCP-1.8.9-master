@@ -16,9 +16,6 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EnumPlayerModelParts;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
-import net.minecraft.scoreboard.Score;
-import net.minecraft.scoreboard.ScoreObjective;
-import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
@@ -122,68 +119,67 @@ public class RenderPlayer extends RendererLivingEntity<AbstractClientPlayer> {
     }
 
     protected void renderOffsetLivingLabel(AbstractClientPlayer entityIn, double x, double y, double z, String str, float p_177069_9_, double p_177069_10_) {
-        if (p_177069_10_ < 100.0D) {
-            Scoreboard scoreboard = entityIn.getWorldScoreboard();
-            ScoreObjective scoreobjective = scoreboard.getObjectiveInDisplaySlot(2);
-
-            if (scoreobjective != null) {
-                Score score = scoreboard.getValueFromObjective(entityIn.getName(), scoreobjective);
-                this.renderLivingLabel(entityIn, score.getScorePoints() + " " + scoreobjective.getDisplayName(), x, y, z, 64);
-                y += (double) ((float) this.getFontRendererFromRenderManager().FONT_HEIGHT * 1.15F * p_177069_9_);
-            }
-        }
+        // Le score belowName (slot 2) est remplacé par la barre de vie custom — on l'ignore.
 
         super.renderOffsetLivingLabel(entityIn, x, y, z, str, p_177069_9_, p_177069_10_);
 
-        // ── Barre de vie ──────────────────────────────────────────────────────────
-        if (p_177069_10_ < (64.0D * 64.0D)) {
+        // ── Barre de vie (distance max 32 blocs) ──────────────────────────────────
+        if (p_177069_10_ < (32.0D * 32.0D)) {
             this.renderHealthBar(entityIn, x, y, z, p_177069_9_);
         }
     }
 
     /**
-     * Affiche une barre de vie colorée sous le pseudo du joueur.
-     * Verte si HP haute, orange si moyenne, rouge si basse.
+     * Affiche une barre de vie stylisée sous le pseudo du joueur.
+     * Dégradé vert → orange → rouge selon la vie restante.
+     * Bordure fine, fond sombre, texte HP centré.
      */
     private void renderHealthBar(AbstractClientPlayer entity, double x, double y, double z, float scale) {
         float maxHealth = entity.getMaxHealth();
         float currentHealth = entity.getHealth();
-        float ratio = (maxHealth <= 0) ? 0 : Math.max(0, Math.min(1, currentHealth / maxHealth));
+        if (maxHealth <= 0) return;
+        float ratio = Math.max(0f, Math.min(1f, currentHealth / maxHealth));
 
-        // Couleur selon le ratio de vie
+        // ── Couleur dégradée selon le ratio ──────────────────────────────────────
         float r, g, b;
-        if (ratio > 0.5F) {
-            // vert -> orange (ratio 1.0 -> 0.5)
-            float t = (ratio - 0.5F) * 2.0F; // 1.0 quand plein, 0.0 quand moitié
-            r = 1.0F - t;        // 0 -> 1 (plus orange quand t diminue)
-            g = 0.8F;
-            b = 0.0F;
+        if (ratio > 0.6f) {
+            // vert vif → vert-jaune  (1.0 → 0.6)
+            float t = (ratio - 0.6f) / 0.4f;          // 1 quand plein, 0 à 60%
+            r = 1f - t * 0.6f;   // 0.4 → 1.0
+            g = 0.85f;
+            b = 0f;
+        } else if (ratio > 0.3f) {
+            // jaune → orange  (0.6 → 0.3)
+            float t = (ratio - 0.3f) / 0.3f;
+            r = 1f;
+            g = 0.5f * t + 0.15f; // 0.65 → 0.15
+            b = 0f;
         } else {
-            // orange -> rouge (ratio 0.5 -> 0.0)
-            float t = ratio * 2.0F; // 1.0 quand moitié, 0.0 quand vide
-            r = 1.0F;
-            g = 0.8F * t;        // orange -> rouge
-            b = 0.0F;
+            // orange-rouge → rouge vif  (0.3 → 0.0)
+            float t = ratio / 0.3f;
+            r = 1f;
+            g = 0.15f * t;
+            b = 0f;
         }
 
-        // Dimensions de la barre
-        final int BAR_WIDTH = 40; // largeur totale en pixels "label-space"
-        final int BAR_HEIGHT = 2;  // hauteur
-        final int BAR_PADDING = 1;  // espace entre fond et barre de couleur
+        // ── Dimensions ───────────────────────────────────────────────────────────
+        final float BAR_W     = 50f;   // largeur totale
+        final float BAR_H     = 3.5f;  // hauteur barre principale
+        final float BORDER    = 0.8f;  // épaisseur de la bordure
+        final float CORNER    = 1.2f;  // taille coins (simulation arrondi)
+        final float half      = BAR_W / 2f;
 
-        // Décalage vertical : en dessous du pseudo
-        // p_177069_9_ = 0.02666... -> on travaille dans le même espace que renderLivingLabel
-        float yOffset = (float) this.getFontRendererFromRenderManager().FONT_HEIGHT * 1.15F * scale;
+        // Décalage vertical en dessous du pseudo
+        float fontH    = (float) this.getFontRendererFromRenderManager().FONT_HEIGHT;
+        float yOffset  = fontH * 1.15f * scale + (BAR_H + BORDER * 2 + 4f) * scale;
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate((float) x, (float) y + entity.height + 0.5F, (float) z);
-        GL11.glNormal3f(0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(-this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
+        GlStateManager.translate((float) x, (float) y + entity.height + 0.5f, (float) z);
+        GL11.glNormal3f(0f, 1f, 0f);
+        GlStateManager.rotate(-this.renderManager.playerViewY,  0f, 1f, 0f);
+        GlStateManager.rotate( this.renderManager.playerViewX, 1f, 0f, 0f);
         GlStateManager.scale(-scale, -scale, scale);
-
-        // Décale vers le bas (sous le label du pseudo qui est déjà rendu)
-        GlStateManager.translate(0.0F, -yOffset / scale - (float) (BAR_HEIGHT + BAR_PADDING * 2 + 2), 0.0F);
+        GlStateManager.translate(0f, -yOffset / scale, 0f);
 
         GlStateManager.disableLighting();
         GlStateManager.depthMask(false);
@@ -192,46 +188,122 @@ public class RenderPlayer extends RendererLivingEntity<AbstractClientPlayer> {
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         GlStateManager.disableTexture2D();
 
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+        Tessellator tess = Tessellator.getInstance();
+        WorldRenderer wr = tess.getWorldRenderer();
 
-        int half = BAR_WIDTH / 2;
+        // ── 1. Ombre portée (décalage +1 pixel en bas) ───────────────────────────
+        float sx = BORDER + CORNER, sy = -(BAR_H + BORDER * 2);
+        float shadowAlpha = 0.35f;
+        wr.begin(7, DefaultVertexFormats.POSITION_COLOR);
+        wr.pos(-half + sx + 1,            1f, 0).color(0f,0f,0f, shadowAlpha).endVertex();
+        wr.pos(-half + sx + 1,   sy - 1f,    0).color(0f,0f,0f, shadowAlpha).endVertex();
+        wr.pos( half - sx + 1,   sy - 1f,    0).color(0f,0f,0f, shadowAlpha).endVertex();
+        wr.pos( half - sx + 1,            1f, 0).color(0f,0f,0f, shadowAlpha).endVertex();
+        tess.draw();
 
-        // Fond sombre semi-transparent
-        worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR);
-        worldrenderer.pos(-half - BAR_PADDING, BAR_PADDING, 0.0D).color(0.0F, 0.0F, 0.0F, 0.4F).endVertex();
-        worldrenderer.pos(-half - BAR_PADDING, -BAR_HEIGHT - BAR_PADDING, 0.0D).color(0.0F, 0.0F, 0.0F, 0.4F).endVertex();
-        worldrenderer.pos(half + BAR_PADDING, -BAR_HEIGHT - BAR_PADDING, 0.0D).color(0.0F, 0.0F, 0.0F, 0.4F).endVertex();
-        worldrenderer.pos(half + BAR_PADDING, BAR_PADDING, 0.0D).color(0.0F, 0.0F, 0.0F, 0.4F).endVertex();
-        tessellator.draw();
+        // ── 2. Fond global (noir semi-transparent) ────────────────────────────────
+        float by = -(BAR_H + BORDER * 2);
+        wr.begin(7, DefaultVertexFormats.POSITION_COLOR);
+        // centre
+        wr.pos(-half + CORNER, BORDER,    0).color(0.05f,0.05f,0.05f,0.85f).endVertex();
+        wr.pos(-half + CORNER, by,        0).color(0.05f,0.05f,0.05f,0.85f).endVertex();
+        wr.pos( half - CORNER, by,        0).color(0.05f,0.05f,0.05f,0.85f).endVertex();
+        wr.pos( half - CORNER, BORDER,    0).color(0.05f,0.05f,0.05f,0.85f).endVertex();
+        tess.draw();
+        // côté gauche (sans les coins)
+        wr.begin(7, DefaultVertexFormats.POSITION_COLOR);
+        wr.pos(-half,          BORDER - CORNER, 0).color(0.05f,0.05f,0.05f,0.85f).endVertex();
+        wr.pos(-half,          by + CORNER,     0).color(0.05f,0.05f,0.05f,0.85f).endVertex();
+        wr.pos(-half + CORNER, by + CORNER,     0).color(0.05f,0.05f,0.05f,0.85f).endVertex();
+        wr.pos(-half + CORNER, BORDER - CORNER, 0).color(0.05f,0.05f,0.05f,0.85f).endVertex();
+        tess.draw();
+        // côté droit
+        wr.begin(7, DefaultVertexFormats.POSITION_COLOR);
+        wr.pos(half - CORNER, BORDER - CORNER, 0).color(0.05f,0.05f,0.05f,0.85f).endVertex();
+        wr.pos(half - CORNER, by + CORNER,     0).color(0.05f,0.05f,0.05f,0.85f).endVertex();
+        wr.pos(half,          by + CORNER,     0).color(0.05f,0.05f,0.05f,0.85f).endVertex();
+        wr.pos(half,          BORDER - CORNER, 0).color(0.05f,0.05f,0.05f,0.85f).endVertex();
+        tess.draw();
 
-        // Barre de couleur (portion remplie)
-        int filledWidth = (int) (BAR_WIDTH * ratio);
-        if (filledWidth > 0) {
-            worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR);
-            worldrenderer.pos(-half, 0, 0.0D).color(r, g, b, 0.9F).endVertex();
-            worldrenderer.pos(-half, -BAR_HEIGHT, 0.0D).color(r, g, b, 0.9F).endVertex();
-            worldrenderer.pos(-half + filledWidth, -BAR_HEIGHT, 0.0D).color(r, g, b, 0.9F).endVertex();
-            worldrenderer.pos(-half + filledWidth, 0, 0.0D).color(r, g, b, 0.9F).endVertex();
-            tessellator.draw();
+        // ── 3. Bordure lumineuse (blanc 20%) ──────────────────────────────────────
+        // top
+        wr.begin(7, DefaultVertexFormats.POSITION_COLOR);
+        wr.pos(-half + CORNER, BORDER, 0).color(1f,1f,1f,0.18f).endVertex();
+        wr.pos(-half + CORNER, 0f,     0).color(1f,1f,1f,0.18f).endVertex();
+        wr.pos( half - CORNER, 0f,     0).color(1f,1f,1f,0.18f).endVertex();
+        wr.pos( half - CORNER, BORDER, 0).color(1f,1f,1f,0.18f).endVertex();
+        tess.draw();
+        // bottom
+        wr.begin(7, DefaultVertexFormats.POSITION_COLOR);
+        wr.pos(-half + CORNER, by,          0).color(0f,0f,0f,0.3f).endVertex();
+        wr.pos(-half + CORNER, by - BORDER, 0).color(0f,0f,0f,0.3f).endVertex();
+        wr.pos( half - CORNER, by - BORDER, 0).color(0f,0f,0f,0.3f).endVertex();
+        wr.pos( half - CORNER, by,          0).color(0f,0f,0f,0.3f).endVertex();
+        tess.draw();
+
+        // ── 4. Barre colorée remplie (avec dégradé vertical) ─────────────────────
+        float fillRight = -half + BORDER + (BAR_W - BORDER * 2) * ratio;
+        float barBot    =  -(BAR_H + BORDER);
+        float barTop    =  -BORDER;
+        if (ratio > 0f) {
+            // dégradé vertical : couleur claire en haut, plus sombre en bas
+            float rD = r * 0.65f, gD = g * 0.65f, bD = b * 0.65f;
+            wr.begin(7, DefaultVertexFormats.POSITION_COLOR);
+            wr.pos(-half + BORDER, BORDER, 0).color(r,  g,  b,  0.95f).endVertex();
+            wr.pos(-half + BORDER, barBot, 0).color(rD, gD, bD, 0.95f).endVertex();
+            wr.pos(fillRight,      barBot, 0).color(rD, gD, bD, 0.95f).endVertex();
+            wr.pos(fillRight,      BORDER, 0).color(r,  g,  b,  0.95f).endVertex();
+            tess.draw();
+
+            // Reflet brillant sur le tiers supérieur
+            float midY = BORDER - (BORDER - barBot) * 0.35f;
+            wr.begin(7, DefaultVertexFormats.POSITION_COLOR);
+            wr.pos(-half + BORDER, BORDER, 0).color(1f, 1f, 1f, 0.12f).endVertex();
+            wr.pos(-half + BORDER, midY,   0).color(1f, 1f, 1f, 0.0f ).endVertex();
+            wr.pos(fillRight,      midY,   0).color(1f, 1f, 1f, 0.0f ).endVertex();
+            wr.pos(fillRight,      BORDER, 0).color(1f, 1f, 1f, 0.12f).endVertex();
+            tess.draw();
         }
 
-        // Partie vide (gris très sombre)
-        if (filledWidth < BAR_WIDTH) {
-            worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR);
-            worldrenderer.pos(-half + filledWidth, 0, 0.0D).color(0.15F, 0.15F, 0.15F, 0.7F).endVertex();
-            worldrenderer.pos(-half + filledWidth, -BAR_HEIGHT, 0.0D).color(0.15F, 0.15F, 0.15F, 0.7F).endVertex();
-            worldrenderer.pos(half, -BAR_HEIGHT, 0.0D).color(0.15F, 0.15F, 0.15F, 0.7F).endVertex();
-            worldrenderer.pos(half, 0, 0.0D).color(0.15F, 0.15F, 0.15F, 0.7F).endVertex();
-            tessellator.draw();
+        // ── 5. Zone vide (gris anthracite) ────────────────────────────────────────
+        if (fillRight < half - BORDER) {
+            wr.begin(7, DefaultVertexFormats.POSITION_COLOR);
+            wr.pos(fillRight,      barTop, 0).color(0.18f,0.18f,0.18f,0.80f).endVertex();
+            wr.pos(fillRight,      barBot, 0).color(0.10f,0.10f,0.10f,0.80f).endVertex();
+            wr.pos(half - BORDER,  barBot, 0).color(0.10f,0.10f,0.10f,0.80f).endVertex();
+            wr.pos(half - BORDER,  barTop, 0).color(0.18f,0.18f,0.18f,0.80f).endVertex();
+            tess.draw();
         }
 
         GlStateManager.enableTexture2D();
+
+        // ── 6. Texte "HP actuels / max HP" centré sous la barre ──────────────────
+        net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getMinecraft();
+        if (mc != null && mc.fontRendererObj != null) {
+            int hp    = (int) Math.ceil(currentHealth);
+            int maxHp = (int) maxHealth;
+            String hpText = hp + " / " + maxHp;
+
+            // Couleur texte selon ratio
+            int textColor;
+            if (ratio > 0.6f)      textColor = 0x55FF55; // vert
+            else if (ratio > 0.3f) textColor = 0xFFAA00; // orange
+            else                   textColor = 0xFF4444; // rouge
+
+            float textScale = 0.6f;
+            GlStateManager.pushMatrix();
+            GlStateManager.translate(0f, barBot - 1.5f - fontH * textScale, 0f);
+            GlStateManager.scale(textScale, textScale, 1f);
+            int textW = mc.fontRendererObj.getStringWidth(hpText);
+            mc.fontRendererObj.drawStringWithShadow(hpText, -textW / 2f, 0f, textColor);
+            GlStateManager.popMatrix();
+        }
+
         GlStateManager.depthMask(true);
         GlStateManager.enableDepth();
         GlStateManager.enableLighting();
         GlStateManager.disableBlend();
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color(1f, 1f, 1f, 1f);
         GlStateManager.popMatrix();
     }
 
