@@ -128,6 +128,16 @@ public class PotionStatusWidget extends BaseWidget {
 
             if (name == null) name = "Potion";
 
+            // ── Afficher le niveau (I, II, III…) selon l'amplifier ────────────────
+            int amplifier = 0;
+            try { amplifier = pe.getAmplifier(); } catch (Throwable t) { amplifier = 0; }
+            if (amplifier > 0) {
+                String[] romanNumerals = {"I","II","III","IV","V","VI","VII","VIII","IX","X"};
+                String roman = (amplifier < romanNumerals.length) ? romanNumerals[amplifier] : String.valueOf(amplifier + 1);
+                name = name + " " + roman;
+            }
+            // ─────────────────────────────────────────────────────────────────────
+
             String text = name;
             if (showDuration) {
                 try {

@@ -70,6 +70,8 @@ public class GuiUIEditor extends GuiScreen {
                 }
                 if (selected instanceof net.minecraft.client.gui.ui.ArmorGroupWidget)
                     ((BaseWidget) selected).setProp("editorPreview", Boolean.TRUE);
+                if (selected instanceof net.minecraft.client.gui.ui.HeldItemDurabilityWidget)
+                    ((BaseWidget) selected).setProp("editorPreview", Boolean.TRUE);
                 bringToFront("sidebar");
             }
         }
@@ -311,6 +313,8 @@ public class GuiUIEditor extends GuiScreen {
                     ((BaseWidget) selected).setProp("previewEffect", "speed");
                 }
                 if (selected instanceof net.minecraft.client.gui.ui.ArmorGroupWidget)
+                    ((BaseWidget) selected).setProp("editorPreview", Boolean.TRUE);
+                if (selected instanceof net.minecraft.client.gui.ui.HeldItemDurabilityWidget)
                     ((BaseWidget) selected).setProp("editorPreview", Boolean.TRUE);
                 UIManager.getInstance().setEditorActive(true);
                 bringToFront("sidebar");
@@ -963,6 +967,8 @@ public class GuiUIEditor extends GuiScreen {
                         ((BaseWidget) selected).setProp("previewEffect", null);
                     }
                     if (selected instanceof net.minecraft.client.gui.ui.ArmorGroupWidget)
+                        ((BaseWidget) selected).setProp("editorPreview", Boolean.FALSE);
+                    if (selected instanceof net.minecraft.client.gui.ui.HeldItemDurabilityWidget)
                         ((BaseWidget) selected).setProp("editorPreview", Boolean.FALSE);
                     selected = null; colorEditorOpen = false; sidebarDragging = false;
                     return;
