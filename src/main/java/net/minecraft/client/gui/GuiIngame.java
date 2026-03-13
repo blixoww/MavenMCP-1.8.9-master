@@ -282,6 +282,20 @@ public class GuiIngame extends Gui {
             this.renderTooltip(scaledresolution, partialTicks);
         }
 
+        // ── Crosshair ─────────────────────────────────────────────────────────
+        if (this.mc.gameSettings.thirdPersonView == 0 && !this.mc.playerController.isSpectator()) {
+            this.mc.mcProfiler.startSection("crosshair");
+            GlStateManager.tryBlendFuncSeparate(775, 769, 1, 0);
+            this.mc.getTextureManager().bindTexture(icons);
+            GlStateManager.enableBlend();
+            GlStateManager.enableAlpha();
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            this.drawTexturedModalRect(i / 2 - 7, j / 2 - 7, 0, 0, 15, 15);
+            GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+            this.mc.mcProfiler.endSection();
+        }
+        // ─────────────────────────────────────────────────────────────────────
+
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(icons);
         GlStateManager.enableBlend();

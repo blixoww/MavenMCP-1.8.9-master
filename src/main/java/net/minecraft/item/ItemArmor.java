@@ -220,10 +220,10 @@ public class ItemArmor extends Item {
         DIAMOND("diamond", 33, new int[]{3, 8, 6, 3}, 10),
         // ── Matériaux custom ─────────────────────────────────────────────────────
         // Modifiez le 2e chiffre pour changer la durabilité (factor × {11,16,15,13})
-        STEEL("steel", 75, new int[]{3, 9, 7, 3}, 12),  // ~légèrement > diamant
-        EMERALD("emerald", 60, new int[]{4, 10, 8, 4}, 14),  // > acier
-        RUBY("ruby", 65, new int[]{4, 11, 9, 4}, 16),  // > émeraude
-        COBALT("cobalt", 70, new int[]{5, 13, 10, 5}, 18);  // meilleur set
+        STEEL("steel", 75, new int[]{4, 8, 6, 3}, 12),
+        EMERALD("emerald", 60, new int[]{4, 8, 7, 4}, 14),
+        RUBY("ruby", 65, new int[]{4, 9, 8, 4}, 16),
+        COBALT("cobalt", 70, new int[]{4, 10, 9, 4}, 18);
 
         private final String name;
         private final int maxDamageFactor;
