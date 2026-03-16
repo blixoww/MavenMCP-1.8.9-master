@@ -33,6 +33,12 @@ public class RecipesWeapons
         mgr.addRecipe(new ItemStack(Items.emerald_sword), new Object[]{"X", "X", "#", '#', Items.stick, 'X', Items.emerald});
         mgr.addRecipe(new ItemStack(Items.ruby_sword),    new Object[]{"X", "X", "#", '#', Items.stick, 'X', Items.ruby});
         mgr.addRecipe(new ItemStack(Items.cobalt_sword),  new Object[]{"X", "X", "#", '#', Items.stick, 'X', Items.cobalt_ingot});
+
+        // ── Arcs custom ──────────────────────────────────────────────────────────
+        mgr.addRecipe(new ItemStack(Items.steel_bow),   new Object[]{" #X", "# X", " #X", 'X', Items.string, '#', Items.steel_ingot});
+        mgr.addRecipe(new ItemStack(Items.emerald_bow), new Object[]{" #X", "# X", " #X", 'X', Items.string, '#', Items.emerald});
+        mgr.addRecipe(new ItemStack(Items.ruby_bow),    new Object[]{" #X", "# X", " #X", 'X', Items.string, '#', Items.ruby});
+        mgr.addRecipe(new ItemStack(Items.cobalt_bow),  new Object[]{" #X", "# X", " #X", 'X', Items.string, '#', Items.cobalt_ingot});
     }
 }
 

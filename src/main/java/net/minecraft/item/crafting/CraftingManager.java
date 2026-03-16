@@ -245,6 +245,25 @@ public class CraftingManager
                 'P', Items.pumpkin_pie
         });
 
+        // ── Cobalt Apple ─────────────────────────────────────────────────────────
+        this.addRecipe(new ItemStack(Items.cobalt_apple, 1), new Object[] {
+                "CCC",
+                "CAC",
+                "CCC",
+                'C', Blocks.cobalt_block,
+                'A', new ItemStack(Items.golden_apple, 1, 1)
+        });
+
+        // ── Transparent Block ────────────────────────────────────────────────────
+        this.addRecipe(new ItemStack(Blocks.transparent_block, 4), new Object[] {
+                "GEG",
+                "EDE",
+                "GEG",
+                'G', Blocks.glass,
+                'E', Items.emerald,
+                'D', Items.diamond
+        });
+
         Collections.sort(this.recipes, new Comparator<IRecipe>()
         {
             public int compare(IRecipe p_compare_1_, IRecipe p_compare_2_)

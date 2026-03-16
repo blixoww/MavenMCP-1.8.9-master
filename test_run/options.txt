@@ -85,6 +85,7 @@ key_key.fullscreen:87
 key_key.spectatorOutlines:0
 key_Zoom:29
 key_HDV:35
+key_Waypoints:17
 key_key.hotbar.1:2
 key_key.hotbar.2:3
 key_key.hotbar.3:4

@@ -333,6 +333,12 @@ public class ModelBakery
         this.variantNames.put(Item.getItemFromBlock(Blocks.oak_fence_gate), Lists.newArrayList(new String[] {"oak_fence_gate"}));
         this.variantNames.put(Item.getItemFromBlock(Blocks.oak_fence), Lists.newArrayList(new String[] {"oak_fence"}));
         this.variantNames.put(Items.oak_door, Lists.newArrayList(new String[] {"oak_door"}));
+
+        // ── Custom bows variant names ────────────────────────────────────────────
+        this.variantNames.put(Items.steel_bow,   Lists.newArrayList(new String[] {"steel_bow",   "steel_bow_pulling_0",   "steel_bow_pulling_1",   "steel_bow_pulling_2"}));
+        this.variantNames.put(Items.emerald_bow, Lists.newArrayList(new String[] {"emerald_bow", "emerald_bow_pulling_0", "emerald_bow_pulling_1", "emerald_bow_pulling_2"}));
+        this.variantNames.put(Items.ruby_bow,    Lists.newArrayList(new String[] {"ruby_bow",    "ruby_bow_pulling_0",    "ruby_bow_pulling_1",    "ruby_bow_pulling_2"}));
+        this.variantNames.put(Items.cobalt_bow,  Lists.newArrayList(new String[] {"cobalt_bow",  "cobalt_bow_pulling_0",  "cobalt_bow_pulling_1",  "cobalt_bow_pulling_2"}));
     }
 
     private List<String> getVariantNames(Item p_177596_1_)

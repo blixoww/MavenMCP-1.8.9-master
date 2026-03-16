@@ -256,6 +256,16 @@ public class Items
     public static final Item pumpkie_pie;
     public static final Item obsidian_trapdoor;
 
+    // Arcs custom
+    public static final Item steel_bow;
+    public static final Item emerald_bow;
+    public static final Item ruby_bow;
+    public static final Item cobalt_bow;
+
+    // Cobalt Hammer & Apple
+    public static final Item cobalt_hammer;
+    public static final Item cobalt_apple;
+
     private static Item getRegisteredItem(String name)
     {
         return (Item)Item.itemRegistry.getObject(new ResourceLocation(name));
@@ -505,6 +515,13 @@ public class Items
             heal_stick = getRegisteredItem("heal_stick");
             pumpkie_pie = getRegisteredItem("pumpkie_pie");
             obsidian_trapdoor = Item.getItemFromBlock(Blocks.obsidian_trapdoor);
+
+            steel_bow = getRegisteredItem("steel_bow");
+            emerald_bow = getRegisteredItem("emerald_bow");
+            ruby_bow = getRegisteredItem("ruby_bow");
+            cobalt_bow = getRegisteredItem("cobalt_bow");
+            cobalt_hammer = getRegisteredItem("cobalt_hammer");
+            cobalt_apple = getRegisteredItem("cobalt_apple");
         }
     }
 }

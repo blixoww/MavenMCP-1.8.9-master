@@ -2768,6 +2768,21 @@ item.healStick.name=Heal Stick
 # ── Pumpkie Pie ───────────────────────────────────────────────────────────────
 item.pumpkiePie.name=Pumpkie Pie
 
+# ── Custom Bows ───────────────────────────────────────────────────────────────
+item.steel_bow.name=Steel Bow
+item.emerald_bow.name=Emerald Bow
+item.ruby_bow.name=Ruby Bow
+item.cobalt_bow.name=Cobalt Bow
+
+# ── Cobalt Hammer ─────────────────────────────────────────────────────────────
+item.cobalt_hammer.name=Cobalt Hammer
+
+# ── Cobalt Apple ──────────────────────────────────────────────────────────────
+item.cobalt_apple.name=Cobalt Apple
+
+# ── Transparent Block ─────────────────────────────────────────────────────────
+tile.transparent_block.name=Transparent Block
+
 # ── Potions custom ────────────────────────────────────────────────────────────
 potion.fallProtection=Fall Protection
 potion.prefix.fallProtection=Potion of

@@ -1311,6 +1311,9 @@ public class Block {
         registerBlock(206, "obsidian_trapdoor", (new BlockObsidianTrapdoor()).disableStats());
         registerBlock(207, "steel_ladder", (new BlockSteelLadder()));
 
+        // ── Transparent Block (X-ray) ─────────────────────────────────────────────
+        registerBlock(208, "transparent_block", (new BlockTransparent()));
+
         blockRegistry.validateKey();
 
         for (Block block13 : blockRegistry) {

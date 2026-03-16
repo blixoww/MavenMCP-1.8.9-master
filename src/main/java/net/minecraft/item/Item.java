@@ -932,6 +932,21 @@ public class Item {
         // obsidian_trapdoor : enregistré comme ItemBlock (même approche qu'iron_trapdoor)
         registerItemBlock(Blocks.obsidian_trapdoor);
 
+        // ── Arcs custom ──────────────────────────────────────────────────────────
+        registerItem(476, "steel_bow", (new ItemCustomBow(480, 1.2F)).setUnlocalizedName("steel_bow"));
+        registerItem(477, "emerald_bow", (new ItemCustomBow(576, 1.4F)).setUnlocalizedName("emerald_bow"));
+        registerItem(478, "ruby_bow", (new ItemCustomBow(672, 1.6F)).setUnlocalizedName("ruby_bow"));
+        registerItem(479, "cobalt_bow", (new ItemCustomBow(768, 2.0F)).setUnlocalizedName("cobalt_bow"));
+
+        // ── Cobalt Hammer (3x3 mining) ───────────────────────────────────────────
+        registerItem(480, "cobalt_hammer", (new ItemCobaltHammer()));
+
+        // ── Cobalt Apple ─────────────────────────────────────────────────────────
+        registerItem(481, "cobalt_apple", (new ItemCobaltApple()));
+
+        // ── Transparent Block ────────────────────────────────────────────────────
+        registerItemBlock(Blocks.transparent_block);
+
         registerItem(2256, "record_13", (new ItemRecord("13")).setUnlocalizedName("record"));
         registerItem(2257, "record_cat", (new ItemRecord("cat")).setUnlocalizedName("record"));
         registerItem(2258, "record_blocks", (new ItemRecord("blocks")).setUnlocalizedName("record"));

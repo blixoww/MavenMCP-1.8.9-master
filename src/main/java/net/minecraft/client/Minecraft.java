@@ -475,6 +475,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
     {
         this.gameSettings = new GameSettings(this, this.mcDataDir);
         MacroManager.INSTANCE.init(this.mcDataDir);
+        net.minecraft.client.waypoint.WaypointManager.INSTANCE.init();
         this.defaultResourcePacks.add(this.mcDefaultResourcePack);
         this.startTimerHackThread();
 
@@ -2113,6 +2114,11 @@ public class Minecraft implements IThreadListener, IPlayerUsage
             while (this.gameSettings.keyBindHDV.isPressed())
             {
                 this.displayGuiScreen(new net.minecraft.client.gui.GuiHDV());
+            }
+
+            while (this.gameSettings.keyBindWaypoints.isPressed())
+            {
+                this.displayGuiScreen(new net.minecraft.client.waypoint.GuiWaypoints());
             }
 
             while (this.gameSettings.keyBindDrop.isPressed())

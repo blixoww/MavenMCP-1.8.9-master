@@ -247,6 +247,7 @@ public class Blocks {
     public static final Block random_ore;
     public static final Block obsidian_trapdoor;
     public static final Block steel_ladder;
+    public static final Block transparent_block;
 
     /**
      * Returns the Block in the blockRegistry with the specified name.
@@ -471,6 +472,7 @@ public class Blocks {
             random_ore = getRegisteredBlock("random_ore");
             obsidian_trapdoor = getRegisteredBlock("obsidian_trapdoor");
             steel_ladder = getRegisteredBlock("steel_ladder");
+            transparent_block = getRegisteredBlock("transparent_block");
         }
     }
 }

@@ -254,15 +254,23 @@ public class RenderItem implements IResourceManagerReloadListener {
 
                 if (item == Items.fishing_rod && entityplayer.fishEntity != null) {
                     modelresourcelocation = new ModelResourceLocation("fishing_rod_cast", "inventory");
-                } else if (item == Items.bow && entityplayer.getItemInUse() != null) {
+                } else if (entityplayer.getItemInUse() != null && (item == Items.bow || item instanceof net.minecraft.item.ItemCustomBow)) {
                     int i = stack.getMaxItemUseDuration() - entityplayer.getItemInUseCount();
+                    String bowName;
+                    if (item == Items.bow) {
+                        bowName = "bow";
+                    } else {
+                        net.minecraft.util.ResourceLocation bowRL = (net.minecraft.util.ResourceLocation) Item.itemRegistry.getNameForObject(item);
+                        // getResourcePath() renvoie uniquement le chemin sans namespace (ex: "steel_bow")
+                        bowName = bowRL.getResourcePath();
+                    }
 
                     if (i >= 18) {
-                        modelresourcelocation = new ModelResourceLocation("bow_pulling_2", "inventory");
+                        modelresourcelocation = new ModelResourceLocation(bowName + "_pulling_2", "inventory");
                     } else if (i > 13) {
-                        modelresourcelocation = new ModelResourceLocation("bow_pulling_1", "inventory");
+                        modelresourcelocation = new ModelResourceLocation(bowName + "_pulling_1", "inventory");
                     } else if (i > 0) {
-                        modelresourcelocation = new ModelResourceLocation("bow_pulling_0", "inventory");
+                        modelresourcelocation = new ModelResourceLocation(bowName + "_pulling_0", "inventory");
                     }
                 }
 
@@ -1052,6 +1060,34 @@ public class RenderItem implements IResourceManagerReloadListener {
         this.registerBlock(Blocks.steel_ladder, "steel_ladder");
         this.registerItem(Items.heal_stick, "heal_stick");
         this.registerItem(Items.pumpkie_pie, "pumpkie_pie");
+
+        // ── Arcs custom (avec variantes pulling) ─────────────────────────────────
+        this.registerItem(Items.steel_bow, 0, "steel_bow");
+        this.registerItem(Items.steel_bow, 1, "steel_bow_pulling_0");
+        this.registerItem(Items.steel_bow, 2, "steel_bow_pulling_1");
+        this.registerItem(Items.steel_bow, 3, "steel_bow_pulling_2");
+
+        this.registerItem(Items.emerald_bow, 0, "emerald_bow");
+        this.registerItem(Items.emerald_bow, 1, "emerald_bow_pulling_0");
+        this.registerItem(Items.emerald_bow, 2, "emerald_bow_pulling_1");
+        this.registerItem(Items.emerald_bow, 3, "emerald_bow_pulling_2");
+
+        this.registerItem(Items.ruby_bow, 0, "ruby_bow");
+        this.registerItem(Items.ruby_bow, 1, "ruby_bow_pulling_0");
+        this.registerItem(Items.ruby_bow, 2, "ruby_bow_pulling_1");
+        this.registerItem(Items.ruby_bow, 3, "ruby_bow_pulling_2");
+
+        this.registerItem(Items.cobalt_bow, 0, "cobalt_bow");
+        this.registerItem(Items.cobalt_bow, 1, "cobalt_bow_pulling_0");
+        this.registerItem(Items.cobalt_bow, 2, "cobalt_bow_pulling_1");
+        this.registerItem(Items.cobalt_bow, 3, "cobalt_bow_pulling_2");
+
+        // ── Cobalt Hammer & Apple ────────────────────────────────────────────────
+        this.registerItem(Items.cobalt_hammer, "cobalt_hammer");
+        this.registerItem(Items.cobalt_apple, "cobalt_apple");
+
+        // ── Transparent Block ────────────────────────────────────────────────────
+        this.registerBlock(Blocks.transparent_block, "transparent_block");
     }
 
     public void onResourceManagerReload(IResourceManager resourceManager) {

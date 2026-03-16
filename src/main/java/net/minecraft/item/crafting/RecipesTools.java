@@ -50,6 +50,9 @@ public class RecipesTools
         mgr.addRecipe(new ItemStack(Items.cobalt_shovel),  new Object[]{"X",   "#",   "#",   '#', Items.stick, 'X', Items.cobalt_ingot});
         mgr.addRecipe(new ItemStack(Items.cobalt_axe),     new Object[]{"XX",  "X#",  " #",  '#', Items.stick, 'X', Items.cobalt_ingot});
         mgr.addRecipe(new ItemStack(Items.cobalt_hoe),     new Object[]{"XX",  " #",  " #",  '#', Items.stick, 'X', Items.cobalt_ingot});
+
+        // ── Cobalt Hammer (3x3 mining) ───────────────────────────────────────────
+        mgr.addRecipe(new ItemStack(Items.cobalt_hammer), new Object[]{"CCC", "C#C", " # ", '#', Items.stick, 'C', Items.cobalt_ingot});
     }
 }
 

@@ -1328,6 +1328,10 @@ public class EntityRenderer implements IResourceManagerReloadListener {
 
         this.mc.mcProfiler.endStartSection("hand");
 
+        // ── Rendu des Waypoints ──────────────────────────────────────────────────
+        this.mc.mcProfiler.endStartSection("waypoints");
+        net.minecraft.client.waypoint.WaypointRenderer.render(partialTicks);
+
         if (this.renderHand) {
             GlStateManager.clear(256);
             this.renderHand(partialTicks, pass);
