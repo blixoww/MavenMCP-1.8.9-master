@@ -350,7 +350,12 @@ public final class ItemStack
                     if (entityIn instanceof EntityPlayer)
                     {
                         EntityPlayer entityplayer = (EntityPlayer)entityIn;
-                        entityplayer.triggerAchievement(StatList.objectBreakStats[Item.getIdFromItem(this.item)]);
+                        // Protection NPE : objectBreakStats[i] peut être null pour les items custom
+                        int itemId = Item.getIdFromItem(this.item);
+                        if (itemId >= 0 && itemId < StatList.objectBreakStats.length && StatList.objectBreakStats[itemId] != null)
+                        {
+                            entityplayer.triggerAchievement(StatList.objectBreakStats[itemId]);
+                        }
 
                         if (this.stackSize == 0 && this.getItem() instanceof ItemBow)
                         {
@@ -358,7 +363,7 @@ public final class ItemStack
                         }
                     }
 
-                    if (this.stackSize < 0)
+                    if (this.stackSize <= 0)
                     {
                         this.stackSize = 0;
                     }

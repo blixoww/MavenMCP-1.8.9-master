@@ -27,7 +27,7 @@ public class BlockTransparent extends Block {
         this.setStepSound(soundTypeGlass);
         this.setUnlocalizedName("transparent_block");
         this.setCreativeTab(CreativeTabs.tabBlock);
-        this.setLightOpacity(0);  // pas d'ombre
+        this.setLightOpacity(0);
     }
 
 

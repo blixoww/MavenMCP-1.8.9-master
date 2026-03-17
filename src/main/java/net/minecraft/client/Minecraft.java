@@ -679,29 +679,102 @@ public class Minecraft implements IThreadListener, IPlayerUsage
 
         if (util$enumos != Util.EnumOS.OSX)
         {
-            InputStream inputstream = null;
-            InputStream inputstream1 = null;
-
             try
             {
-                inputstream = this.mcDefaultResourcePack.getInputStreamAssets(new ResourceLocation("icons/icon_16x16.png"));
-                inputstream1 = this.mcDefaultResourcePack.getInputStreamAssets(new ResourceLocation("icons/icon_32x32.png"));
-
-                if (inputstream != null && inputstream1 != null)
-                {
-                    Display.setIcon(new ByteBuffer[] {this.readImageToBuffer(inputstream), this.readImageToBuffer(inputstream1)});
-                }
+                Display.setIcon(new ByteBuffer[] {
+                    generateQuartzBlockIcon(16),
+                    generateQuartzBlockIcon(32)
+                });
             }
-            catch (IOException ioexception)
+            catch (Exception e)
             {
-                logger.error((String)"Couldn\'t set icon", (Throwable)ioexception);
-            }
-            finally
-            {
-                IOUtils.closeQuietly(inputstream);
-                IOUtils.closeQuietly(inputstream1);
+                logger.error("Couldn't set icon", e);
             }
         }
+    }
+
+    /**
+     * Génère une icône bloc de quartz en 3D isométrique pour la fenêtre.
+     * Les 3 faces (haut, gauche, droite) sont dessinées avec les couleurs du quartz blanc.
+     */
+    private ByteBuffer generateQuartzBlockIcon(int size)
+    {
+        java.awt.image.BufferedImage img = new java.awt.image.BufferedImage(size, size, java.awt.image.BufferedImage.TYPE_INT_ARGB);
+        java.awt.Graphics2D g = img.createGraphics();
+        g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // Fond transparent
+        g.setColor(new java.awt.Color(0, 0, 0, 0));
+        g.fillRect(0, 0, size, size);
+
+        // Couleurs du bloc quartz blanc (face haut plus claire, faces latérales plus sombres)
+        java.awt.Color top   = new java.awt.Color(245, 244, 238); // haut : quasi-blanc légèrement chaud
+        java.awt.Color left  = new java.awt.Color(200, 198, 192); // gauche : gris clair
+        java.awt.Color right = new java.awt.Color(175, 173, 167); // droite : gris moyen
+
+        // Proportions isométriques
+        // Le bloc occupe ~85% de la taille, centré
+        int margin = size / 10;
+        int w = size - 2 * margin;   // largeur totale du dessin
+        int halfW = w / 2;
+        int topH  = size / 5;        // hauteur de la face du haut
+        int sideH = size / 2;        // hauteur des faces latérales
+
+        // Points du cube isométrique :
+        // Le centre haut du cube (pointe supérieure)
+        int cx = size / 2;
+        int cy = margin;
+
+        // Face du HAUT (losange)
+        int[] xTop = { cx,         cx + halfW, cx,         cx - halfW };
+        int[] yTop = { cy,         cy + topH,  cy + 2*topH,cy + topH  };
+        g.setColor(top);
+        g.fillPolygon(xTop, yTop, 4);
+
+        // Bord face haut
+        g.setColor(new java.awt.Color(160, 158, 152));
+        g.drawPolygon(xTop, yTop, 4);
+
+        // Face GAUCHE (parallélogramme)
+        int[] xLeft = { cx - halfW, cx,         cx,         cx - halfW };
+        int[] yLeft = { cy + topH,  cy + 2*topH, cy + 2*topH + sideH, cy + topH + sideH };
+        g.setColor(left);
+        g.fillPolygon(xLeft, yLeft, 4);
+        g.setColor(new java.awt.Color(140, 138, 133));
+        g.drawPolygon(xLeft, yLeft, 4);
+
+        // Face DROITE (parallélogramme)
+        int[] xRight = { cx,         cx + halfW, cx + halfW,         cx         };
+        int[] yRight = { cy + 2*topH, cy + topH,  cy + topH + sideH, cy + 2*topH + sideH };
+        g.setColor(right);
+        g.fillPolygon(xRight, yRight, 4);
+        g.setColor(new java.awt.Color(120, 118, 113));
+        g.drawPolygon(xRight, yRight, 4);
+
+        // Lignes de détail quartz sur la face haut (veines subtiles)
+        if (size >= 32)
+        {
+            g.setColor(new java.awt.Color(220, 218, 212, 120));
+            // Petite veine diagonale sur le dessus
+            g.drawLine(cx - halfW/3, cy + topH, cx, cy + 2*topH - topH/3);
+            g.drawLine(cx + halfW/4, cy + topH + topH/2, cx + halfW/2, cy + topH);
+        }
+
+        g.dispose();
+
+        // Conversion en ByteBuffer RGBA pour LWJGL
+        int[] pixels = new int[size * size];
+        img.getRGB(0, 0, size, size, pixels, 0, size);
+        ByteBuffer buffer = ByteBuffer.allocateDirect(size * size * 4);
+        for (int pixel : pixels)
+        {
+            buffer.put((byte)((pixel >> 16) & 0xFF)); // R
+            buffer.put((byte)((pixel >> 8) & 0xFF));  // G
+            buffer.put((byte)(pixel & 0xFF));          // B
+            buffer.put((byte)((pixel >> 24) & 0xFF)); // A
+        }
+        buffer.flip();
+        return buffer;
     }
 
     private static boolean isJvm64bit()
