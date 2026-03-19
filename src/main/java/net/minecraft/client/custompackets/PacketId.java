@@ -55,6 +55,7 @@ public final class PacketId {
     /** Réponse mes annonces (actives + vendues) */
     public static final int HDV_MY_LISTINGS_RESPONSE = 0x24;
 
+
     // ════════════════════════════════════════════════════════════════════════
     //  Shop – Client → Serveur
     // ════════════════════════════════════════════════════════════════════════
@@ -63,6 +64,9 @@ public final class PacketId {
     public static final int SHOP_ITEMS_REQUEST      = 0x31;
     public static final int SHOP_BUY                = 0x32;
     public static final int SHOP_SELL               = 0x33;
+    /** Vendre tout (qty = -1 dans SHOP_SELL, alias lisible) */
+    public static final int SHOP_SELL_ALL           = 0x33;
+    public static final int SHOP_ITEM_DETAIL_REQUEST = 0x34;
 
     // ════════════════════════════════════════════════════════════════════════
     //  Shop – Serveur → Client
@@ -71,6 +75,9 @@ public final class PacketId {
     public static final int SHOP_CATEGORIES_RESPONSE = 0x40;
     public static final int SHOP_ITEMS_RESPONSE      = 0x41;
     public static final int SHOP_TRANSACTION_RESULT  = 0x42;
+    public static final int SHOP_MARKET_STATS        = 0x43;
+    /** Serveur demande au client d'ouvrir le GUI shop */
+    public static final int SHOP_OPEN                = 0x44;
 
     // ════════════════════════════════════════════════════════════════════════
     //  Données joueur – Serveur → Client

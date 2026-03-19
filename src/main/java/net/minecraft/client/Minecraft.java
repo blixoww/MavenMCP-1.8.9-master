@@ -2189,6 +2189,11 @@ public class Minecraft implements IThreadListener, IPlayerUsage
                 this.displayGuiScreen(new net.minecraft.client.gui.GuiHDV());
             }
 
+            while (this.gameSettings.keyBindShop.isPressed())
+            {
+                this.displayGuiScreen(new net.minecraft.client.gui.GuiShop());
+            }
+
             while (this.gameSettings.keyBindWaypoints.isPressed())
             {
                 this.displayGuiScreen(new net.minecraft.client.waypoint.GuiWaypoints());
