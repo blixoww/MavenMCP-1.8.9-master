@@ -8,6 +8,9 @@ import net.minecraft.client.custompackets.data.HdvListing;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,6 +19,8 @@ import java.util.List;
  * Gère tous les packets entrants/sortants liés à l'HDV.
  */
 public final class HdvPacketHandler {
+
+    private static final Logger LOGGER = LogManager.getLogger("Hdv");
 
     private static final List<HdvListing> cachedListings   = new ArrayList<>();
     private static final List<HdvListing> cachedMyListings = new ArrayList<>();
@@ -32,6 +37,7 @@ public final class HdvPacketHandler {
     // ── Enregistrement des handlers S2C ─────────────────────────────────────
 
     public static void registerHandlers() {
+        LOGGER.debug("[Hdv] Registering handlers");
         // Liste globale des annonces
         PacketDispatcher.register(PacketChannel.HDV_S2C, PacketId.HDV_LIST_RESPONSE, buf -> {
             try {
@@ -63,6 +69,14 @@ public final class HdvPacketHandler {
                     if (actionListener != null) actionListener.onActionResult(s, m);
                 });
             } catch (Exception ignored) {}
+        });
+
+        // Demande au client d'ouvrir l'interface HDV
+        PacketDispatcher.register(PacketChannel.HDV_S2C, PacketId.HDV_OPEN, buf -> {
+            LOGGER.info("[Hdv] HDV_OPEN packet reçu côté client, ouverture du GUI");
+            net.minecraft.client.Minecraft.getMinecraft().addScheduledTask(() ->
+                    net.minecraft.client.Minecraft.getMinecraft().displayGuiScreen(
+                            new net.minecraft.client.gui.GuiHDV()));
         });
 
         // Mes annonces (actives + vendues) + gains en attente

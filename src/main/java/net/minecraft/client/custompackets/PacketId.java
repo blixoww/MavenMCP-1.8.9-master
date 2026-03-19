@@ -54,6 +54,8 @@ public final class PacketId {
     public static final int HDV_LISTING_UPDATE = 0x23;
     /** Réponse mes annonces (actives + vendues) */
     public static final int HDV_MY_LISTINGS_RESPONSE = 0x24;
+    /** Demande au client d'ouvrir l'interface HDV */
+    public static final int HDV_OPEN = 0x25;
 
 
     // ════════════════════════════════════════════════════════════════════════
