@@ -1059,7 +1059,7 @@ public class RenderItem implements IResourceManagerReloadListener {
         this.registerBlock(Blocks.obsidian_trapdoor, "obsidian_trapdoor");
         this.registerBlock(Blocks.steel_ladder, "steel_ladder");
         this.registerItem(Items.heal_stick, "heal_stick");
-        this.registerItem(Items.pumpkie_pie, "pumpkie_pie");
+        this.registerItem(Items.green_pumpkin_pie, "green_pumpkin_pie");
 
         // ── Arcs custom (avec variantes pulling) ─────────────────────────────────
         this.registerItem(Items.steel_bow, 0, "steel_bow");

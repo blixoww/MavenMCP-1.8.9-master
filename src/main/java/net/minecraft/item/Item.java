@@ -928,9 +928,9 @@ public class Item {
         registerItem(471, "multi_tool", (new ItemMultiTool()).setUnlocalizedName("multi_tool").setCreativeTab(CreativeTabs.tabTools));
         registerItem(472, "obsidian_door", (new ItemDoor(Blocks.obsidian_door)).setUnlocalizedName("doorObsidian"));
         registerItem(473, "heal_stick", (new ItemHealStick()));
-        registerItem(474, "pumpkie_pie", (new ItemPumpkiePie()));
-        // obsidian_trapdoor : enregistré comme ItemBlock (même approche qu'iron_trapdoor)
-        registerItemBlock(Blocks.obsidian_trapdoor);
+        registerItem(474, "green_pumpkin_pie", (new ItemGreenPumpkinPie()));
+         // obsidian_trapdoor : enregistré comme ItemBlock (même approche qu'iron_trapdoor)
+         registerItemBlock(Blocks.obsidian_trapdoor);
 
         // ── Arcs custom ──────────────────────────────────────────────────────────
         registerItem(476, "steel_bow", (new ItemCustomBow(480, 1.2F)).setUnlocalizedName("steel_bow"));

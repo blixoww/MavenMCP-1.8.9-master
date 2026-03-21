@@ -253,7 +253,7 @@ public class Items
     public static final Item multi_tool;
     public static final Item obsidian_door;
     public static final Item heal_stick;
-    public static final Item pumpkie_pie;
+    public static final Item green_pumpkin_pie;
     public static final Item obsidian_trapdoor;
 
     // Arcs custom
@@ -513,7 +513,7 @@ public class Items
             multi_tool = getRegisteredItem("multi_tool");
             obsidian_door = getRegisteredItem("obsidian_door");
             heal_stick = getRegisteredItem("heal_stick");
-            pumpkie_pie = getRegisteredItem("pumpkie_pie");
+            green_pumpkin_pie = getRegisteredItem("green_pumpkin_pie");
             obsidian_trapdoor = Item.getItemFromBlock(Blocks.obsidian_trapdoor);
 
             steel_bow = getRegisteredItem("steel_bow");

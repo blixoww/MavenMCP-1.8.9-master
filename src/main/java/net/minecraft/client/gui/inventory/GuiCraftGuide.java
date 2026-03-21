@@ -12,6 +12,7 @@ import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.*;
 import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import org.lwjgl.input.Mouse;
 
 import java.io.IOException;
@@ -137,10 +138,10 @@ public class GuiCraftGuide extends GuiScreen {
         base = 8196;
         POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(16, base, new ItemStack(Items.spider_eye), "Poison"));
         POTION_RECIPES.computeIfAbsent(base + 32, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 32, glowstone, "Poison II"));
-        POTION_RECIPES.computeIfAbsent(base + 64, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 64, redstone, "Poison Étendu"));
+        POTION_RECIPES.computeIfAbsent(base + 64, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 64, redstone, "Poison Étendue"));
         POTION_RECIPES.computeIfAbsent(base + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 8192, gunpowder, "Poison Splash"));
         POTION_RECIPES.computeIfAbsent((base + 32) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 32, (base + 32) + 8192, gunpowder, "Poison II Splash"));
-        POTION_RECIPES.computeIfAbsent((base + 64) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 64, (base + 64) + 8192, gunpowder, "Poison Étendu Splash"));
+        POTION_RECIPES.computeIfAbsent((base + 64) + 8192, k -> new ArrayList<>()).add(new PotionRecipe(base + 64, (base + 64) + 8192, gunpowder, "Poison Étendue Splash"));
         base = 8197;
         POTION_RECIPES.computeIfAbsent(base, k -> new ArrayList<>()).add(new PotionRecipe(16, base, new ItemStack(Items.speckled_melon), "Soin"));
         POTION_RECIPES.computeIfAbsent(base + 32, k -> new ArrayList<>()).add(new PotionRecipe(base, base + 32, glowstone, "Soin II"));
@@ -255,6 +256,8 @@ public class GuiCraftGuide extends GuiScreen {
 
     private Mode mode = Mode.LIST;
     private ItemStack selected;
+    // Si non-null, sera utilisé dans initGui() pour pré-sélectionner une recette
+    private ItemStack initialStack = null;
     private IRecipe craftRecipe;
     private ItemStack furnaceInput;
     private List<PotionRecipe> brewRecipesForItem = new ArrayList<>();
@@ -263,6 +266,15 @@ public class GuiCraftGuide extends GuiScreen {
     private GuiButton btnBack, btnMenu;
 
     public GuiCraftGuide(GuiScreen parent) {
+    }
+
+    // Constructeur pratique : ouvre directement le guide sur un ItemStack donné
+    public GuiCraftGuide(GuiScreen parent, ItemStack initial) {
+        this(parent);
+        if (initial != null) {
+            // Conserver l'item initial et l'appliquer dans initGui()
+            this.initialStack = initial;
+        }
     }
 
     // ── Init ──────────────────────────────────────────────────────────────────
@@ -278,6 +290,14 @@ public class GuiCraftGuide extends GuiScreen {
         currentBrewRecipe = null;
         brewRecipesForItem = new ArrayList<>();
         brewRecipeIndex = 0;
+
+        // Si un item initial a été fourni via le constructeur, l'ouvrir maintenant
+        if (initialStack != null) {
+            loadRecipe(initialStack);
+            // clear initialStack pour éviter réouverture si initGui est rappelé
+            initialStack = null;
+            // leave init flow so layout will reflect selected recipe
+        }
 
         // Adaptive scaling based on screen resolution
         SZ = GuiRenderUtils.clamp(height / 18, 16, 24);
@@ -521,7 +541,7 @@ public class GuiCraftGuide extends GuiScreen {
     private void drawFooter() {
         GuiRenderUtils.drawGradientRect(panelX + 1, footerY, panelX + panelW - 1, footerY + 14, 0x00000000, 0x22000000);
         drawRect(panelX + 1, footerY + 14, panelX + panelW - 1, footerY + 15, 0x11FFFFFF);
-        String hint = "\u00a77Clic\u00a78: recette  \u00a77\u00b7  Molette\u00a78: d\u00e9filer  \u00a77\u00b7  \n ESC\u00a78: fermer";
+        String hint = "\u00a77Clic\u00a78: recette  \u00a77\u00b7  Molette\u00a78: d\u00e9filer";
         drawCenteredString(fontRendererObj, hint, panelX + panelW / 2, footerY + 3, C_TXT_DIM);
     }
 
@@ -594,8 +614,10 @@ public class GuiCraftGuide extends GuiScreen {
 
         // Recipe title
         String recipeTitle = mode == Mode.CRAFT ? "Crafting" : mode == Mode.BREWING ? "Alchimie" : "Fourneau";
+        // Pour le mode CRAFT on augmente légèrement l'espacement vertical afin que le titre soit
+        // clairement au-dessus de la zone de craft (évite le chevauchement avec la bordure de la boîte).
         drawCenteredString(fontRendererObj, "\u00a77" + recipeTitle, cx, curY, C_TXT_DIM);
-        curY += 14;
+        curY += (mode == Mode.CRAFT ? 20 : 14);
 
         RenderHelper.enableGUIStandardItemLighting();
         GlStateManager.enableDepth();
@@ -859,13 +881,49 @@ public class GuiCraftGuide extends GuiScreen {
      * Retourne le meta fictif correspondant à un ItemStack de potion custom (NBT), ou -1 si non trouvé.
      */
     private int resolveCustomPotionMeta(ItemStack stack) {
+        if (stack == null) return -1;
+        String targetName = stripFormatting(stack.getDisplayName());
         for (Map.Entry<Integer, ItemStack> e : CUSTOM_POTION_STACKS.entrySet()) {
             ItemStack candidate = e.getValue();
-            if (candidate.getDisplayName().equals(stack.getDisplayName())) {
-                return e.getKey();
+            if (candidate == null) continue;
+            // Compare NBT if present (meilleur indicateur)
+            if (candidate.hasTagCompound() && stack.hasTagCompound()) {
+                if (candidate.getTagCompound().equals(stack.getTagCompound())) return e.getKey();
             }
+            // Compare potion effects lists when available (robuste pour potions avec mêmes effets)
+            try {
+                ItemPotion ip = (ItemPotion) Items.potionitem;
+                List<PotionEffect> ce = ip.getEffects(candidate);
+                List<PotionEffect> te = ip.getEffects(stack);
+                if (ce != null && te != null && comparePotionEffects(ce, te)) return e.getKey();
+            } catch (Exception ex) {
+                // ignore if method not available or casting fails
+            }
+            // Compare display names sans codes de formatage (localisation / couleurs)
+            String candName = stripFormatting(candidate.getDisplayName());
+            if (!candName.isEmpty() && candName.equalsIgnoreCase(targetName)) return e.getKey();
+            // Lastly, compare raw meta (fallback)
+            if (candidate.getItemDamage() == stack.getItemDamage()) return e.getKey();
         }
         return -1;
+    }
+
+    private boolean comparePotionEffects(List<PotionEffect> a, List<PotionEffect> b) {
+        if (a.size() != b.size()) return false;
+        for (int i = 0; i < a.size(); i++) {
+            PotionEffect pa = a.get(i);
+            PotionEffect pb = b.get(i);
+            if (pa.getPotionID() != pb.getPotionID()) return false;
+            if (pa.getAmplifier() != pb.getAmplifier()) return false;
+            // durée peut varier ; ignorer ou comparer approximativement — ici on compare l'amplifier et l'id
+        }
+        return true;
+    }
+
+    // Enlève les codes de formatage Minecraft (§x) pour faciliter la comparaison de noms
+    private String stripFormatting(String s) {
+        if (s == null) return "";
+        return s.replaceAll("\u00A7.", "");
     }
 
     private void loadRecipe(ItemStack stack) {
@@ -888,20 +946,70 @@ public class GuiCraftGuide extends GuiScreen {
                     return;
                 }
             }
+            // Passe de secours : essayer de trouver une clé POTION_RECIPES dont le ItemStack candidat correspond
+            if (brewRecipesForItem.isEmpty()) {
+                for (Map.Entry<Integer, List<PotionRecipe>> e : POTION_RECIPES.entrySet()) {
+                    int key = e.getKey();
+                    ItemStack candidate = CUSTOM_POTION_STACKS.containsKey(key)
+                            ? CUSTOM_POTION_STACKS.get(key)
+                            : new ItemStack(Items.potionitem, 1, key);
+                    if (isSameStack(candidate, stack)) {
+                        brewRecipesForItem = new ArrayList<>(e.getValue());
+                        brewRecipesForItem.sort(Comparator.comparingInt(a -> a.inputMeta));
+                        if (!brewRecipesForItem.isEmpty()) {
+                            currentBrewRecipe = brewRecipesForItem.get(0);
+                            mode = Mode.BREWING;
+                            return;
+                        }
+                    }
+                }
+            }
         }
+        int targetMeta = stack.getItemDamage();
+        if (targetMeta == 32767) targetMeta = 0;
+        boolean isDamageable = stack.getItem().isDamageable();
+        // Première passe : recherche stricte (wildcard ou meta exact)
         for (IRecipe r : CraftingManager.getInstance().getRecipeList()) {
             ItemStack out = r.getRecipeOutput();
-            if (out != null && out.getItem() == stack.getItem() && out.getItemDamage() == stack.getItemDamage()) {
+            if (out == null) continue;
+            if (out.getItem() != stack.getItem()) continue;
+            int outMeta = out.getItemDamage();
+            if (outMeta == 32767 || outMeta == targetMeta) {
                 craftRecipe = r;
                 break;
             }
         }
+        // Seconde passe : si aucun résultat et item damageable, accepter premier recipe du même item
+        if (craftRecipe == null && isDamageable) {
+            for (IRecipe r : CraftingManager.getInstance().getRecipeList()) {
+                ItemStack out = r.getRecipeOutput();
+                if (out == null) continue;
+                if (out.getItem() == stack.getItem()) {
+                    craftRecipe = r;
+                    break;
+                }
+            }
+        }
         if (craftRecipe == null) {
+            // Furnace: même logique en deux passes
             for (Map.Entry<ItemStack, ItemStack> e : FurnaceRecipes.instance().getSmeltingList().entrySet()) {
                 ItemStack out = e.getValue();
-                if (out != null && out.getItem() == stack.getItem() && out.getItemDamage() == stack.getItemDamage()) {
+                if (out == null) continue;
+                if (out.getItem() != stack.getItem()) continue;
+                int outMeta = out.getItemDamage();
+                if (outMeta == 32767 || outMeta == targetMeta) {
                     furnaceInput = e.getKey();
                     break;
+                }
+            }
+            if (furnaceInput == null && isDamageable) {
+                for (Map.Entry<ItemStack, ItemStack> e : FurnaceRecipes.instance().getSmeltingList().entrySet()) {
+                    ItemStack out = e.getValue();
+                    if (out == null) continue;
+                    if (out.getItem() == stack.getItem()) {
+                        furnaceInput = e.getKey();
+                        break;
+                    }
                 }
             }
         }
@@ -970,7 +1078,8 @@ public class GuiCraftGuide extends GuiScreen {
             int recPanelY = (height - recPanelH) / 2;
             int curY = recPanelY + titleH + 6 + breadcrumbH;
             curY += 10; // after separator
-            curY += 14; // after recipe title
+            // after recipe title — garder la même marge conditionnelle que dans drawRecipeMode
+            curY += (mode == Mode.CRAFT ? 20 : 14);
             int contentY = curY;
             int cx = panelX + panelW / 2;
             if (btn == 0) {
@@ -1057,7 +1166,6 @@ public class GuiCraftGuide extends GuiScreen {
     @Override
     public void handleMouseInput() throws IOException {
         super.handleMouseInput();
-        if (mode != Mode.LIST) return;
         int w = Mouse.getEventDWheel(), ms = maxScroll();
         if (w < 0 && targetScroll < ms) targetScroll++;
         if (w > 0 && targetScroll > 0) targetScroll--;

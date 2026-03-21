@@ -44,12 +44,12 @@ public class ItemCobaltApple extends ItemFood {
     public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
         tooltip.add("");
         tooltip.add("\u00a76\u00a7lEffets en mangeant:");
-        tooltip.add("\u00a7d \u2726 Regeneration V \u00a78(30s)");
-        tooltip.add("\u00a79 \u2726 Resistance II \u00a78(5min)");
+        tooltip.add("\u00a7d \u2726 Régénération V \u00a78(30s)");
+        tooltip.add("\u00a79 \u2726 Résistance II \u00a78(5min)");
         tooltip.add("\u00a7e \u2726 Absorption IV \u00a78(2min)");
-        tooltip.add("\u00a7c \u2726 Fire Resistance I \u00a78(5min)");
-        tooltip.add("\u00a74 \u2726 Strength III \u00a78(2min)");
-        tooltip.add("\u00a7b \u2726 Speed II \u00a78(2min)");
+        tooltip.add("\u00a7c \u2726 Résistance au feu I \u00a78(5min)");
+        tooltip.add("\u00a74 \u2726 Force III \u00a78(2min)");
+        tooltip.add("\u00a7b \u2726 Vitesse II \u00a78(2min)");
     }
 }
 

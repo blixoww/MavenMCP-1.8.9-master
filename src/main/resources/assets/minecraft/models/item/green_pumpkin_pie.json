@@ -1,7 +1,7 @@
 {
   "parent": "builtin/generated",
   "textures": {
-    "layer0": "items/pumpkin_pie"
+    "layer0": "items/green_pumpkin_pie"
   },
   "display": {
     "thirdperson": {

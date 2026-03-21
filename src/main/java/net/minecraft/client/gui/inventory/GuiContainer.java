@@ -709,6 +709,24 @@ public abstract class GuiContainer extends GuiScreen
                 this.handleMouseClick(this.theSlot, this.theSlot.slotNumber, isCtrlKeyDown() ? 1 : 0, 4);
             }
         }
+
+        // Ouvrir le guide de craft sur l'item survolé si la touche configurée est pressée
+        try {
+            if (this.mc != null && this.mc.gameSettings != null && net.minecraft.client.settings.GameSettings.isKeyDown(this.mc.gameSettings.keyBindOpenCraftGuide)) {
+                ItemStack held = null;
+                try {
+                    held = this.mc.thePlayer != null ? this.mc.thePlayer.inventory.getItemStack() : null;
+                } catch (Exception ignore) {}
+                ItemStack stackToOpen = null;
+                if (held != null) stackToOpen = held;
+                else if (this.theSlot != null && this.theSlot.getHasStack()) stackToOpen = this.theSlot.getStack();
+                if (stackToOpen != null) {
+                    this.mc.displayGuiScreen(new GuiCraftGuide(this, stackToOpen));
+                }
+            }
+        } catch (Exception e) {
+        }
+
     }
 
     /**

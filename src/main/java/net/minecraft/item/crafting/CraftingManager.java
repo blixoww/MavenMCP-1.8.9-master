@@ -227,17 +227,17 @@ public class CraftingManager
                 'S', Items.steel_ingot
         });
 
-        // Heal Stick : bâton entouré d'émeraudes et pomme dorée
+        // Heal Stick : 2 blocs de ruby (vertical)
         this.addRecipe(new ItemStack(Items.heal_stick, 1), new Object[] {
                 " E ",
-                " S ",
                 " E ",
-                'E', Items.emerald,
+                " S ",
+                'E', Item.getItemFromBlock(Blocks.ruby_block),
                 'S', Items.stick
         });
 
         // Pumpkie Pie : tarte à la citrouille entourée de 4 émeraudes
-        this.addRecipe(new ItemStack(Items.pumpkie_pie, 1), new Object[] {
+        this.addRecipe(new ItemStack(Items.green_pumpkin_pie, 1), new Object[] {
                 "E E",
                 " P ",
                 "E E",

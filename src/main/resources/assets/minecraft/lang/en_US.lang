@@ -1,4 +1,3 @@
-
 language.name=English
 language.region=US
 language.code=en_US
@@ -1878,7 +1877,7 @@ commands.spreadplayers.info.players=(Average distance between players is %s bloc
 commands.spreadplayers.failure.teams=Could not spread %s teams around %s,%s (too many players for space - try using spread of at most %s)
 commands.spreadplayers.failure.players=Could not spread %s players around %s,%s (too many players for space - try using spread of at most %s)
 commands.achievement.usage=/achievement <give|take> <stat_name|*> [player]
-commands.achievement.unknownAchievement=Unknown achievement or statistic '%s'
+commands.achievement.unknown=Unknown achievement or statistic '%s'
 commands.achievement.alreadyHave=Player %s already has achievement %s
 commands.achievement.dontHave=Player %s doesn't have achievement %s
 commands.achievement.give.success.all=Successfully given all achievements to %s
@@ -2766,7 +2765,7 @@ tile.steelLadder.name=Steel Ladder
 item.healStick.name=Heal Stick
 
 # ── Pumpkie Pie ───────────────────────────────────────────────────────────────
-item.pumpkiePie.name=Pumpkie Pie
+item.greenPumpkinPie.name=Green Pumpkin Pie
 
 # ── Custom Bows ───────────────────────────────────────────────────────────────
 item.steel_bow.name=Steel Bow
