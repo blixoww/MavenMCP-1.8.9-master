@@ -1,0 +1,108 @@
+---- Minecraft Crash Report ----
+// Surprise! Haha. Well, this is awkward.
+
+Time: 22/03/26 00:29
+Description: Tesselating block model
+
+java.lang.IllegalArgumentException: Cannot get property PropertyEnum{name=half, clazz=class net.minecraft.block.BlockSlab$EnumBlockHalf, values=[top, bottom]} as it does not exist in BlockState{block=minecraft:double_obsidian_slab, properties=[seamless, variant]}
+	at net.minecraft.block.state.BlockState$StateImplementation.getValue(BlockState.java:127)
+	at net.minecraft.block.BlockSlab.shouldSideBeRendered(BlockSlab.java:139)
+	at net.minecraft.client.renderer.BlockModelRenderer.renderModelAmbientOcclusion(BlockModelRenderer.java:64)
+	at net.minecraft.client.renderer.BlockModelRenderer.renderModel(BlockModelRenderer.java:37)
+	at net.minecraft.client.renderer.BlockModelRenderer.renderModel(BlockModelRenderer.java:27)
+	at net.minecraft.client.renderer.BlockRendererDispatcher.renderBlock(BlockRendererDispatcher.java:75)
+	at net.minecraft.client.renderer.chunk.RenderChunk.rebuildChunk(RenderChunk.java:187)
+	at net.minecraft.client.renderer.chunk.ChunkRenderWorker.processTask(ChunkRenderWorker.java:96)
+	at net.minecraft.client.renderer.chunk.ChunkRenderDispatcher.updateChunkNow(ChunkRenderDispatcher.java:138)
+	at net.minecraft.client.renderer.RenderGlobal.setupTerrain(RenderGlobal.java:926)
+	at net.minecraft.client.renderer.EntityRenderer.renderWorldPass(EntityRenderer.java:1229)
+	at net.minecraft.client.renderer.EntityRenderer.renderWorld(EntityRenderer.java:1175)
+	at net.minecraft.client.renderer.EntityRenderer.updateCameraAndRender(EntityRenderer.java:1035)
+	at net.minecraft.client.Minecraft.runGameLoop(Minecraft.java:1225)
+	at net.minecraft.client.Minecraft.run(Minecraft.java:427)
+	at net.minecraft.client.main.Main.main(Main.java:113)
+	at StartDev.main(StartDev.java:22)
+
+
+A detailed walkthrough of the error, its code path and all known details is as follows:
+---------------------------------------------------------------------------------------
+
+-- Head --
+Stacktrace:
+	at net.minecraft.block.state.BlockState$StateImplementation.getValue(BlockState.java:127)
+	at net.minecraft.block.BlockSlab.shouldSideBeRendered(BlockSlab.java:139)
+	at net.minecraft.client.renderer.BlockModelRenderer.renderModelAmbientOcclusion(BlockModelRenderer.java:64)
+
+-- Block model being tesselated --
+Details:
+	Block: minecraft:obsidian_slab[half=bottom,variant=stone]
+	Block location: World: (-10,70,268), Chunk: (at 6,4,12 in -1,16; contains blocks -16,0,256 to -1,255,271), Region: (-1,0; contains chunks -32,0 to -1,31, blocks -512,0,0 to -1,255,511)
+	Using AO: true
+Stacktrace:
+	at net.minecraft.client.renderer.BlockModelRenderer.renderModel(BlockModelRenderer.java:37)
+	at net.minecraft.client.renderer.BlockModelRenderer.renderModel(BlockModelRenderer.java:27)
+
+-- Block being tesselated --
+Details:
+	Block type: ID #210 (tile.obsidianSlab // net.minecraft.block.BlockHalfObsidianSlab)
+	Block data value: 0 / 0x0 / 0b0000
+	Block location: World: (-10,70,268), Chunk: (at 6,4,12 in -1,16; contains blocks -16,0,256 to -1,255,271), Region: (-1,0; contains chunks -32,0 to -1,31, blocks -512,0,0 to -1,255,511)
+Stacktrace:
+	at net.minecraft.client.renderer.BlockRendererDispatcher.renderBlock(BlockRendererDispatcher.java:75)
+	at net.minecraft.client.renderer.chunk.RenderChunk.rebuildChunk(RenderChunk.java:187)
+	at net.minecraft.client.renderer.chunk.ChunkRenderWorker.processTask(ChunkRenderWorker.java:96)
+	at net.minecraft.client.renderer.chunk.ChunkRenderDispatcher.updateChunkNow(ChunkRenderDispatcher.java:138)
+	at net.minecraft.client.renderer.RenderGlobal.setupTerrain(RenderGlobal.java:926)
+	at net.minecraft.client.renderer.EntityRenderer.renderWorldPass(EntityRenderer.java:1229)
+	at net.minecraft.client.renderer.EntityRenderer.renderWorld(EntityRenderer.java:1175)
+
+-- Affected level --
+Details:
+	Level name: MpServer
+	All players: 1 total; [EntityPlayerSP['leziink'/220, l='MpServer', x=-7,35, y=69,00, z=267,44]]
+	Chunk stats: MultiplayerChunkCache: 320, 320
+	Level seed: 0
+	Level generator: ID 00 - default, ver 1. Features enabled: false
+	Level generator options: 
+	Level spawn location: -4,00,64,00,236,00 - World: (-4,64,236), Chunk: (at 12,4,12 in -1,14; contains blocks -16,0,224 to -1,255,239), Region: (-1,0; contains chunks -32,0 to -1,31, blocks -512,0,0 to -1,255,511)
+	Level time: 225405 game time, 225405 day time
+	Level dimension: 0
+	Level storage version: 0x00000 - Unknown?
+	Level weather: Rain time: 0 (now: false), thunder time: 0 (now: false)
+	Level game mode: Game mode: creative (ID 1). Hardcore: false. Cheats: false
+	Forced entities: 27 total; [EntityBat['Bat'/128, l='MpServer', x=33,01, y=48,06, z=340,05], EntityBat['Bat'/129, l='MpServer', x=37,44, y=46,10, z=340,75], EntityBat['Bat'/130, l='MpServer', x=52,16, y=20,32, z=205,73], EntityBat['Bat'/131, l='MpServer', x=58,39, y=15,85, z=214,36], EntityBat['Bat'/536, l='MpServer', x=-66,61, y=16,43, z=343,91], EntityBat['Bat'/537, l='MpServer', x=-64,67, y=16,04, z=342,00], EntityPig['Pig'/91, l='MpServer', x=-80,34, y=70,00, z=301,97], EntityPig['Pig'/92, l='MpServer', x=-86,72, y=72,00, z=292,78], EntityPig['Pig'/93, l='MpServer', x=-80,56, y=70,00, z=308,16], EntityBat['Bat'/99, l='MpServer', x=-66,64, y=36,09, z=229,41], EntityPig['Pig'/100, l='MpServer', x=-64,81, y=72,00, z=245,06], EntityCow['Cow'/101, l='MpServer', x=-74,56, y=69,00, z=294,44], EntityCow['Cow'/102, l='MpServer', x=-73,47, y=69,00, z=294,44], EntityCow['Cow'/103, l='MpServer', x=-72,63, y=69,00, z=291,72], EntityBat['Bat'/104, l='MpServer', x=-73,72, y=14,32, z=335,83], EntityBat['Bat'/114, l='MpServer', x=-57,56, y=30,92, z=285,22], EntityBat['Bat'/115, l='MpServer', x=-50,07, y=30,67, z=283,49], EntityPig['Pig'/116, l='MpServer', x=-63,16, y=69,00, z=321,47], EntityBat['Bat'/117, l='MpServer', x=-34,49, y=36,04, z=262,50], EntityBat['Bat'/118, l='MpServer', x=-36,79, y=36,75, z=262,44], EntityBat['Bat'/119, l='MpServer', x=-32,31, y=61,10, z=266,03], EntityBat['Bat'/120, l='MpServer', x=-43,29, y=35,04, z=273,29], EntityPig['Pig'/121, l='MpServer', x=-39,47, y=68,00, z=306,28], EntityCow['Cow'/125, l='MpServer', x=21,78, y=65,00, z=244,66], EntityCow['Cow'/126, l='MpServer', x=17,81, y=63,00, z=264,72], EntityPlayerSP['leziink'/220, l='MpServer', x=-7,35, y=69,00, z=267,44], EntityBat['Bat'/127, l='MpServer', x=34,31, y=44,48, z=338,97]]
+	Retry entities: 0 total; []
+	Server brand: vanilla
+	Server type: Integrated singleplayer server
+Stacktrace:
+	at net.minecraft.client.multiplayer.WorldClient.addWorldInfoToCrashReport(WorldClient.java:390)
+	at net.minecraft.client.Minecraft.addGraphicsAndWorldToCrashReport(Minecraft.java:2911)
+	at net.minecraft.client.Minecraft.run(Minecraft.java:448)
+	at net.minecraft.client.main.Main.main(Main.java:113)
+	at StartDev.main(StartDev.java:22)
+
+-- System Details --
+Details:
+	Minecraft Version: 1.8.9
+	Operating System: Windows 10 (amd64) version 10.0
+	Java Version: 1.8.0_181, Oracle Corporation
+	Java VM Version: Java HotSpot(TM) 64-Bit Server VM (mixed mode), Oracle Corporation
+	Memory: 189771016 bytes (180 MB) / 906493952 bytes (864 MB) up to 7432306688 bytes (7088 MB)
+	JVM Flags: 0 total; 
+	IntCache: cache: 1, tcache: 1, allocated: 12, tallocated: 94
+	Launched Version: MavenMCP
+	LWJGL: 2.9.4
+	OpenGL: AMD Radeon RX 7800 XT GL version 4.6.0 Compatibility Profile Context 26.3.1.260309, ATI Technologies Inc.
+	GL Caps: Using GL 1.3 multitexturing.
+Using GL 1.3 texture combiners.
+Using framebuffer objects because OpenGL 3.0 is supported and separate blending is supported.
+Shaders are available because OpenGL 2.1 is supported.
+VBOs are available because OpenGL 1.5 is supported.
+
+	Using VBOs: No
+	Is Modded: Very likely; Jar signature invalidated
+	Type: Client (map_client.txt)
+	Resource Packs: 
+	Current Language: English (US)
+	Profiler Position: N/A (disabled)
+	CPU: 16x AMD Ryzen 7 7700X 8-Core Processor 

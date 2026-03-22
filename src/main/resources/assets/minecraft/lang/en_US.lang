@@ -2787,3 +2787,8 @@ potion.fallProtection=Fall Protection
 potion.prefix.fallProtection=Potion of
 effect.fallProtection=Fall Protection
 
+# Obsidian slab/stairs names
+tile.obsidianSlab.name=Obsidian Slab
+item.obsidianSlab.name=Obsidian Slab
+tile.stairsObsidian.name=Obsidian Stairs
+item.stairsObsidian.name=Obsidian Stairs

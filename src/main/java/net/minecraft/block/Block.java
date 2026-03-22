@@ -16,6 +16,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -1313,6 +1314,11 @@ public class Block {
 
         // ── Transparent Block (X-ray) ─────────────────────────────────────────────
         registerBlock(208, "transparent_block", (new BlockTransparent()));
+
+        registerBlock(209, "double_obsidian_slab", (new BlockDoubleObsidianSlab()).setHardness(50.0F).setResistance(2000.0F).setStepSound(soundTypePiston).setUnlocalizedName("obsidianSlab").setCreativeTab(CreativeTabs.tabBlock));
+        registerBlock(210, "obsidian_slab", (new BlockHalfObsidianSlab()).setHardness(50.0F).setResistance(2000.0F).setStepSound(soundTypePiston).setUnlocalizedName("obsidianSlab").setCreativeTab(CreativeTabs.tabBlock));
+        registerBlock(211, "obsidian_stairs", (new BlockStairs(blockRegistry.getObject(new ResourceLocation("obsidian")).getDefaultState())).setUnlocalizedName("stairsObsidian").setCreativeTab(CreativeTabs.tabBlock));
+
 
         blockRegistry.validateKey();
 

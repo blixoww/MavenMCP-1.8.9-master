@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "inventory": { "model": "minecraft:obsidian_slab" },
+    "": { "model": "minecraft:obsidian_slab" },
+    "normal": { "model": "minecraft:obsidian_slab" },
+    "half=bottom,variant=stone": { "model": "minecraft:obsidian_slab" },
+    "half=top,variant=stone":    { "model": "minecraft:obsidian_slab_top" },
+    "type=bottom": { "model": "minecraft:obsidian_slab" },
+    "type=top":    { "model": "minecraft:obsidian_slab_top" },
+    "type=double": { "model": "minecraft:double_obsidian_slab" }
+  }
+}

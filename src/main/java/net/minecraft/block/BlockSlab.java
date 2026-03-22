@@ -136,15 +136,15 @@ public abstract class BlockSlab extends Block
             BlockPos blockpos = pos.offset(side.getOpposite());
             IBlockState iblockstate = worldIn.getBlockState(pos);
             IBlockState iblockstate1 = worldIn.getBlockState(blockpos);
-            boolean flag = isSlab(iblockstate.getBlock()) && iblockstate.getValue(HALF) == BlockSlab.EnumBlockHalf.TOP;
-            boolean flag1 = isSlab(iblockstate1.getBlock()) && iblockstate1.getValue(HALF) == BlockSlab.EnumBlockHalf.TOP;
+            boolean flag = iblockstate.getPropertyNames().contains(HALF) && iblockstate.getValue(HALF) == BlockSlab.EnumBlockHalf.TOP;
+            boolean flag1 = iblockstate1.getPropertyNames().contains(HALF) && iblockstate1.getValue(HALF) == BlockSlab.EnumBlockHalf.TOP;
             return flag1 ? (side == EnumFacing.DOWN ? true : (side == EnumFacing.UP && super.shouldSideBeRendered(worldIn, pos, side) ? true : !isSlab(iblockstate.getBlock()) || !flag)) : (side == EnumFacing.UP ? true : (side == EnumFacing.DOWN && super.shouldSideBeRendered(worldIn, pos, side) ? true : !isSlab(iblockstate.getBlock()) || flag));
         }
     }
 
     protected static boolean isSlab(Block blockIn)
     {
-        return blockIn == Blocks.stone_slab || blockIn == Blocks.wooden_slab || blockIn == Blocks.stone_slab2;
+        return blockIn == Blocks.stone_slab || blockIn == Blocks.wooden_slab || blockIn == Blocks.stone_slab2 || blockIn == Blocks.obsidian_slab;
     }
 
     /**

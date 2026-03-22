@@ -1088,6 +1088,9 @@ public class RenderItem implements IResourceManagerReloadListener {
 
         // ── Transparent Block ────────────────────────────────────────────────────
         this.registerBlock(Blocks.transparent_block, "transparent_block");
+
+        this.registerBlock(Blocks.obsidian_slab, "obsidian_slab");
+        this.registerBlock(Blocks.obsidian_stairs, "obsidian_stairs");
     }
 
     public void onResourceManagerReload(IResourceManager resourceManager) {

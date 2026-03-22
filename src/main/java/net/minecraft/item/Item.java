@@ -10,19 +10,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockDirt;
-import net.minecraft.block.BlockDoublePlant;
-import net.minecraft.block.BlockFlower;
-import net.minecraft.block.BlockPlanks;
-import net.minecraft.block.BlockPrismarine;
-import net.minecraft.block.BlockRedSandstone;
-import net.minecraft.block.BlockSand;
-import net.minecraft.block.BlockSandStone;
-import net.minecraft.block.BlockSilverfish;
-import net.minecraft.block.BlockStone;
-import net.minecraft.block.BlockStoneBrick;
-import net.minecraft.block.BlockWall;
+import net.minecraft.block.*;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -929,8 +917,8 @@ public class Item {
         registerItem(472, "obsidian_door", (new ItemDoor(Blocks.obsidian_door)).setUnlocalizedName("doorObsidian"));
         registerItem(473, "heal_stick", (new ItemHealStick()));
         registerItem(474, "green_pumpkin_pie", (new ItemGreenPumpkinPie()));
-         // obsidian_trapdoor : enregistré comme ItemBlock (même approche qu'iron_trapdoor)
-         registerItemBlock(Blocks.obsidian_trapdoor);
+        // obsidian_trapdoor : enregistré comme ItemBlock (même approche qu'iron_trapdoor)
+        registerItemBlock(Blocks.obsidian_trapdoor);
 
         // ── Arcs custom ──────────────────────────────────────────────────────────
         registerItem(476, "steel_bow", (new ItemCustomBow(480, 1.2F)).setUnlocalizedName("steel_bow"));
@@ -946,6 +934,14 @@ public class Item {
 
         // ── Transparent Block ────────────────────────────────────────────────────
         registerItemBlock(Blocks.transparent_block);
+
+        registerItemBlock(Blocks.obsidian_slab,
+                (new ItemSlab(
+                        (BlockSlab) Blocks.obsidian_slab,
+                        (BlockSlab) Blocks.obsidian_slab,
+                        (BlockSlab) Blocks.double_obsidian_slab
+                )).setUnlocalizedName("obsidianSlab"));
+        registerItemBlock(Blocks.obsidian_stairs);
 
         registerItem(2256, "record_13", (new ItemRecord("13")).setUnlocalizedName("record"));
         registerItem(2257, "record_cat", (new ItemRecord("cat")).setUnlocalizedName("record"));
