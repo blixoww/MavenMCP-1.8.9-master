@@ -1,46 +1,46 @@
-[01:25:18] [Client thread/INFO]: Setting user: leziink
-[01:25:18] [Client thread/INFO]: (Session ID is token:0:leziink)
-[01:25:18] [Client thread/INFO]: LWJGL Version: 2.9.4
-[01:25:18] [Client thread/INFO]: Reloading ResourceManager: Default
-[01:25:18] [Client thread/ERROR]: Couldn't initialize twitch stream
-[01:25:18] [Sound Library Loader/INFO]: Starting up SoundSystem...
-[01:25:19] [Client thread/WARN]: Unable to load variant: seamless=false,variant=nether_brick from minecraft:double_obsidian_slab#seamless=false,variant=nether_brick
-[01:25:19] [Client thread/WARN]: Unable to load variant: half=bottom,variant=nether_brick from minecraft:obsidian_slab#half=bottom,variant=nether_brick
-[01:25:19] [Thread-6/INFO]: Initializing LWJGL OpenAL
-[01:25:19] [Thread-6/INFO]: (The LWJGL binding of OpenAL.  For more information, see http://www.lwjgl.org)
-[01:25:19] [Client thread/WARN]: Unable to load variant: half=bottom,variant=sandstone from minecraft:obsidian_slab#half=bottom,variant=sandstone
-[01:25:19] [Client thread/WARN]: Unable to load variant: seamless=true,variant=sandstone from minecraft:double_obsidian_slab#seamless=true,variant=sandstone
-[01:25:19] [Client thread/WARN]: Unable to load variant: seamless=false,variant=cobblestone from minecraft:double_obsidian_slab#seamless=false,variant=cobblestone
-[01:25:19] [Thread-6/INFO]: OpenAL initialized.
-[01:25:19] [Client thread/WARN]: Unable to load variant: seamless=true,variant=cobblestone from minecraft:double_obsidian_slab#seamless=true,variant=cobblestone
-[01:25:19] [Client thread/WARN]: Unable to load variant: seamless=true,variant=quartz from minecraft:double_obsidian_slab#seamless=true,variant=quartz
-[01:25:19] [Client thread/WARN]: Unable to load variant: seamless=true,variant=nether_brick from minecraft:double_obsidian_slab#seamless=true,variant=nether_brick
-[01:25:19] [Client thread/WARN]: Unable to load variant: half=top,variant=stone_brick from minecraft:obsidian_slab#half=top,variant=stone_brick
-[01:25:19] [Client thread/WARN]: Unable to load variant: seamless=false,variant=quartz from minecraft:double_obsidian_slab#seamless=false,variant=quartz
-[01:25:19] [Client thread/WARN]: Unable to load variant: seamless=true,variant=brick from minecraft:double_obsidian_slab#seamless=true,variant=brick
-[01:25:19] [Client thread/WARN]: Unable to load variant: half=bottom,variant=brick from minecraft:obsidian_slab#half=bottom,variant=brick
-[01:25:19] [Client thread/WARN]: Unable to load variant: half=top,variant=cobblestone from minecraft:obsidian_slab#half=top,variant=cobblestone
-[01:25:19] [Client thread/WARN]: Unable to load variant: half=bottom,variant=cobblestone from minecraft:obsidian_slab#half=bottom,variant=cobblestone
-[01:25:19] [Client thread/WARN]: Unable to load variant: half=top,variant=brick from minecraft:obsidian_slab#half=top,variant=brick
-[01:25:19] [Client thread/WARN]: Unable to load variant: half=top,variant=wood_old from minecraft:obsidian_slab#half=top,variant=wood_old
-[01:25:19] [Client thread/WARN]: Unable to load variant: half=bottom,variant=quartz from minecraft:obsidian_slab#half=bottom,variant=quartz
-[01:25:19] [Client thread/WARN]: Unable to load variant: seamless=false,variant=brick from minecraft:double_obsidian_slab#seamless=false,variant=brick
-[01:25:19] [Client thread/WARN]: Unable to load variant: seamless=true,variant=wood_old from minecraft:double_obsidian_slab#seamless=true,variant=wood_old
-[01:25:19] [Client thread/WARN]: Unable to load variant: seamless=false,variant=stone_brick from minecraft:double_obsidian_slab#seamless=false,variant=stone_brick
-[01:25:19] [Client thread/WARN]: Unable to load variant: half=top,variant=quartz from minecraft:obsidian_slab#half=top,variant=quartz
-[01:25:19] [Client thread/WARN]: Unable to load variant: seamless=false,variant=wood_old from minecraft:double_obsidian_slab#seamless=false,variant=wood_old
-[01:25:19] [Client thread/WARN]: Unable to load variant: half=bottom,variant=stone_brick from minecraft:obsidian_slab#half=bottom,variant=stone_brick
-[01:25:19] [Client thread/WARN]: Unable to load variant: half=bottom,variant=wood_old from minecraft:obsidian_slab#half=bottom,variant=wood_old
-[01:25:19] [Client thread/WARN]: Unable to load variant: seamless=false,variant=sandstone from minecraft:double_obsidian_slab#seamless=false,variant=sandstone
-[01:25:19] [Client thread/WARN]: Unable to load variant: seamless=true,variant=stone_brick from minecraft:double_obsidian_slab#seamless=true,variant=stone_brick
-[01:25:19] [Client thread/WARN]: Unable to load variant: half=top,variant=sandstone from minecraft:obsidian_slab#half=top,variant=sandstone
-[01:25:19] [Client thread/WARN]: Unable to load variant: half=top,variant=nether_brick from minecraft:obsidian_slab#half=top,variant=nether_brick
-[01:25:19] [Sound Library Loader/INFO]: Sound engine started
-[01:25:20] [Client thread/INFO]: Created: 1024x1024 textures-atlas
-[01:25:20] [Client thread/INFO]: [CustomPackets] ✓ Initialisation du système de packets custom...
-[01:25:20] [Client thread/INFO]: [CustomPackets] ✓ HdvPacketHandler enregistré
-[01:25:20] [Client thread/INFO]: [CustomPackets] ✓ Système initialisé avec succès.
-[01:25:20] [Client thread/ERROR]: Realms module missing
+[18:37:23] [Client thread/INFO]: Setting user: leziink
+[18:37:23] [Client thread/INFO]: (Session ID is token:0:leziink)
+[18:37:24] [Client thread/INFO]: LWJGL Version: 2.9.4
+[18:37:24] [Client thread/INFO]: Reloading ResourceManager: Default
+[18:37:24] [Client thread/ERROR]: Couldn't initialize twitch stream
+[18:37:24] [Sound Library Loader/INFO]: Starting up SoundSystem...
+[18:37:24] [Thread-6/INFO]: Initializing LWJGL OpenAL
+[18:37:24] [Thread-6/INFO]: (The LWJGL binding of OpenAL.  For more information, see http://www.lwjgl.org)
+[18:37:24] [Thread-6/INFO]: OpenAL initialized.
+[18:37:25] [Client thread/WARN]: Unable to load variant: seamless=false,variant=nether_brick from minecraft:double_obsidian_slab#seamless=false,variant=nether_brick
+[18:37:25] [Client thread/WARN]: Unable to load variant: half=bottom,variant=nether_brick from minecraft:obsidian_slab#half=bottom,variant=nether_brick
+[18:37:25] [Client thread/WARN]: Unable to load variant: half=bottom,variant=sandstone from minecraft:obsidian_slab#half=bottom,variant=sandstone
+[18:37:25] [Client thread/WARN]: Unable to load variant: seamless=true,variant=sandstone from minecraft:double_obsidian_slab#seamless=true,variant=sandstone
+[18:37:25] [Client thread/WARN]: Unable to load variant: seamless=false,variant=cobblestone from minecraft:double_obsidian_slab#seamless=false,variant=cobblestone
+[18:37:25] [Client thread/WARN]: Unable to load variant: seamless=true,variant=cobblestone from minecraft:double_obsidian_slab#seamless=true,variant=cobblestone
+[18:37:25] [Client thread/WARN]: Unable to load variant: seamless=true,variant=quartz from minecraft:double_obsidian_slab#seamless=true,variant=quartz
+[18:37:25] [Client thread/WARN]: Unable to load variant: seamless=true,variant=nether_brick from minecraft:double_obsidian_slab#seamless=true,variant=nether_brick
+[18:37:25] [Client thread/WARN]: Unable to load variant: half=top,variant=stone_brick from minecraft:obsidian_slab#half=top,variant=stone_brick
+[18:37:25] [Client thread/WARN]: Unable to load variant: seamless=false,variant=quartz from minecraft:double_obsidian_slab#seamless=false,variant=quartz
+[18:37:25] [Client thread/WARN]: Unable to load variant: seamless=true,variant=brick from minecraft:double_obsidian_slab#seamless=true,variant=brick
+[18:37:25] [Client thread/WARN]: Unable to load variant: half=bottom,variant=brick from minecraft:obsidian_slab#half=bottom,variant=brick
+[18:37:25] [Client thread/WARN]: Unable to load variant: half=top,variant=cobblestone from minecraft:obsidian_slab#half=top,variant=cobblestone
+[18:37:25] [Client thread/WARN]: Unable to load variant: half=bottom,variant=cobblestone from minecraft:obsidian_slab#half=bottom,variant=cobblestone
+[18:37:25] [Client thread/WARN]: Unable to load variant: half=top,variant=brick from minecraft:obsidian_slab#half=top,variant=brick
+[18:37:25] [Client thread/WARN]: Unable to load variant: half=top,variant=wood_old from minecraft:obsidian_slab#half=top,variant=wood_old
+[18:37:25] [Client thread/WARN]: Unable to load variant: half=bottom,variant=quartz from minecraft:obsidian_slab#half=bottom,variant=quartz
+[18:37:25] [Client thread/WARN]: Unable to load variant: seamless=false,variant=brick from minecraft:double_obsidian_slab#seamless=false,variant=brick
+[18:37:25] [Client thread/WARN]: Unable to load variant: seamless=true,variant=wood_old from minecraft:double_obsidian_slab#seamless=true,variant=wood_old
+[18:37:25] [Client thread/WARN]: Unable to load variant: seamless=false,variant=stone_brick from minecraft:double_obsidian_slab#seamless=false,variant=stone_brick
+[18:37:25] [Client thread/WARN]: Unable to load variant: half=top,variant=quartz from minecraft:obsidian_slab#half=top,variant=quartz
+[18:37:25] [Client thread/WARN]: Unable to load variant: seamless=false,variant=wood_old from minecraft:double_obsidian_slab#seamless=false,variant=wood_old
+[18:37:25] [Client thread/WARN]: Unable to load variant: half=bottom,variant=stone_brick from minecraft:obsidian_slab#half=bottom,variant=stone_brick
+[18:37:25] [Client thread/WARN]: Unable to load variant: half=bottom,variant=wood_old from minecraft:obsidian_slab#half=bottom,variant=wood_old
+[18:37:25] [Client thread/WARN]: Unable to load variant: seamless=false,variant=sandstone from minecraft:double_obsidian_slab#seamless=false,variant=sandstone
+[18:37:25] [Client thread/WARN]: Unable to load variant: seamless=true,variant=stone_brick from minecraft:double_obsidian_slab#seamless=true,variant=stone_brick
+[18:37:25] [Client thread/WARN]: Unable to load variant: half=top,variant=sandstone from minecraft:obsidian_slab#half=top,variant=sandstone
+[18:37:25] [Client thread/WARN]: Unable to load variant: half=top,variant=nether_brick from minecraft:obsidian_slab#half=top,variant=nether_brick
+[18:37:25] [Sound Library Loader/INFO]: Sound engine started
+[18:37:27] [Client thread/INFO]: Created: 1024x1024 textures-atlas
+[18:37:27] [Client thread/INFO]: [CustomPackets] ✓ Initialisation du système de packets custom...
+[18:37:27] [Client thread/INFO]: [CustomPackets] ✓ HdvPacketHandler enregistré
+[18:37:27] [Client thread/INFO]: [CustomPackets] ✓ Système initialisé avec succès.
+[18:37:27] [Client thread/ERROR]: Realms module missing
 java.lang.ClassNotFoundException: com.mojang.realmsclient.gui.screens.RealmsNotificationsScreen
 	at java.net.URLClassLoader.findClass(URLClassLoader.java:381) ~[?:1.8.0_181]
 	at java.lang.ClassLoader.loadClass(ClassLoader.java:424) ~[?:1.8.0_181]
@@ -56,58 +56,3 @@ java.lang.ClassNotFoundException: com.mojang.realmsclient.gui.screens.RealmsNoti
 	at net.minecraft.client.Minecraft.run(Minecraft.java:407) [classes/:?]
 	at net.minecraft.client.main.Main.main(Main.java:113) [classes/:?]
 	at StartDev.main(StartDev.java:22) [test-classes/:?]
-[01:25:22] [Client thread/ERROR]: Realms module missing
-java.lang.ClassNotFoundException: com.mojang.realmsclient.gui.screens.RealmsNotificationsScreen
-	at java.net.URLClassLoader.findClass(URLClassLoader.java:381) ~[?:1.8.0_181]
-	at java.lang.ClassLoader.loadClass(ClassLoader.java:424) ~[?:1.8.0_181]
-	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:349) ~[?:1.8.0_181]
-	at java.lang.ClassLoader.loadClass(ClassLoader.java:357) ~[?:1.8.0_181]
-	at java.lang.Class.forName0(Native Method) ~[?:1.8.0_181]
-	at java.lang.Class.forName(Class.java:264) ~[?:1.8.0_181]
-	at net.minecraft.realms.RealmsBridge.getNotificationScreen(RealmsBridge.java:38) [classes/:?]
-	at net.minecraft.client.gui.GuiMainMenu.initGui(GuiMainMenu.java:246) [classes/:?]
-	at net.minecraft.client.gui.GuiScreen.setWorldAndResolution(GuiScreen.java:556) [classes/:?]
-	at net.minecraft.client.Minecraft.displayGuiScreen(Minecraft.java:1095) [classes/:?]
-	at net.minecraft.client.gui.GuiSelectWorld.func_146615_e(GuiSelectWorld.java:180) [classes/:?]
-	at net.minecraft.client.gui.GuiSelectWorld$List.elementClicked(GuiSelectWorld.java:284) [classes/:?]
-	at net.minecraft.client.gui.GuiSlot.handleMouseInput(GuiSlot.java:354) [classes/:?]
-	at net.minecraft.client.gui.GuiSelectWorld.handleMouseInput(GuiSelectWorld.java:83) [classes/:?]
-	at net.minecraft.client.gui.GuiScreen.handleInput(GuiScreen.java:588) [classes/:?]
-	at net.minecraft.client.Minecraft.runTick(Minecraft.java:1878) [classes/:?]
-	at net.minecraft.client.Minecraft.runGameLoop(Minecraft.java:1199) [classes/:?]
-	at net.minecraft.client.Minecraft.run(Minecraft.java:427) [classes/:?]
-	at net.minecraft.client.main.Main.main(Main.java:113) [classes/:?]
-	at StartDev.main(StartDev.java:22) [test-classes/:?]
-[01:25:22] [Server thread/INFO]: Starting integrated minecraft server version 1.8.9
-[01:25:22] [Server thread/INFO]: Generating keypair
-[01:25:22] [Server thread/INFO]: Preparing start region for level 0
-[01:25:22] [Server thread/INFO]: Changing view distance to 12, from 10
-[01:25:22] [Client thread/ERROR]: Realms module missing
-java.lang.ClassNotFoundException: com.mojang.realmsclient.gui.screens.RealmsNotificationsScreen
-	at java.net.URLClassLoader.findClass(URLClassLoader.java:381) ~[?:1.8.0_181]
-	at java.lang.ClassLoader.loadClass(ClassLoader.java:424) ~[?:1.8.0_181]
-	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:349) ~[?:1.8.0_181]
-	at java.lang.ClassLoader.loadClass(ClassLoader.java:357) ~[?:1.8.0_181]
-	at java.lang.Class.forName0(Native Method) ~[?:1.8.0_181]
-	at java.lang.Class.forName(Class.java:264) ~[?:1.8.0_181]
-	at net.minecraft.realms.RealmsBridge.getNotificationScreen(RealmsBridge.java:38) [classes/:?]
-	at net.minecraft.client.gui.GuiMainMenu.initGui(GuiMainMenu.java:246) [classes/:?]
-	at net.minecraft.client.gui.GuiScreen.setWorldAndResolution(GuiScreen.java:556) [classes/:?]
-	at net.minecraft.client.Minecraft.displayGuiScreen(Minecraft.java:1095) [classes/:?]
-	at net.minecraft.client.Minecraft.launchIntegratedServer(Minecraft.java:2472) [classes/:?]
-	at net.minecraft.client.gui.GuiSelectWorld.func_146615_e(GuiSelectWorld.java:201) [classes/:?]
-	at net.minecraft.client.gui.GuiSelectWorld$List.elementClicked(GuiSelectWorld.java:284) [classes/:?]
-	at net.minecraft.client.gui.GuiSlot.handleMouseInput(GuiSlot.java:354) [classes/:?]
-	at net.minecraft.client.gui.GuiSelectWorld.handleMouseInput(GuiSelectWorld.java:83) [classes/:?]
-	at net.minecraft.client.gui.GuiScreen.handleInput(GuiScreen.java:588) [classes/:?]
-	at net.minecraft.client.Minecraft.runTick(Minecraft.java:1878) [classes/:?]
-	at net.minecraft.client.Minecraft.runGameLoop(Minecraft.java:1199) [classes/:?]
-	at net.minecraft.client.Minecraft.run(Minecraft.java:427) [classes/:?]
-	at net.minecraft.client.main.Main.main(Main.java:113) [classes/:?]
-	at StartDev.main(StartDev.java:22) [test-classes/:?]
-[01:25:22] [Server thread/INFO]: leziink[local:E:6d3429c6] logged in with entity id 215 at (-12.171609102935607, 69.0, 263.0972700280418)
-[01:25:22] [Server thread/INFO]: leziink joined the game
-[01:25:22] [Client thread/INFO]: [CustomPackets] ✓ Packet REGISTER envoyé pour : CUSTOM:HDV_S2C CUSTOM:HDV_C2S CUSTOM:SHOP_S2C CUSTOM:SHOP_C2S CUSTOM:PDATA_S2C CUSTOM:PDATA_C2S CUSTOM:C2S CUSTOM:S2C
-[01:25:22] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'MC|Brand'
-[01:25:22] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[01:25:22] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('MC|Brand') = false

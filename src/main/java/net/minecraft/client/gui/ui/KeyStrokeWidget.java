@@ -108,6 +108,58 @@ public class KeyStrokeWidget extends BaseWidget {
             setProp("initialized", Boolean.TRUE);
         }
 
+        // --- Recalcul position relative pour le redimensionnement ---
+        // On compare la résolution actuelle avec celle stockée (refW/refH).
+        // Si ça a changé, on applique les ratios (relX/relY) pour repositionner.
+        // On met aussi à jour refWidgetW/refWidgetH.
+        try {
+            ScaledResolution sr = new ScaledResolution(mc);
+            int sw = sr.getScaledWidth();
+            int sh = sr.getScaledHeight();
+            
+            // Si la résolution a changé depuis la dernière fois
+            if (sw > 0 && sh > 0 && (sw != this.refW || sh != this.refH)) {
+                // Si on avait déjà des coordonnées relatives valides (refW > 0), on les applique
+                if (this.refW > 0 && this.refH > 0) {
+                    int maxX = Math.max(1, sw - this.width);
+                    int maxY = Math.max(1, sh - this.height);
+                    
+                    // Calcul de la nouvelle position absolue basée sur le ratio relatif stocké
+                    this.x = (int) Math.round(this.relX * maxX);
+                    this.y = (int) Math.round(this.relY * maxY);
+                    
+                    // Clamp pour rester dans l'écran
+                    this.x = Math.max(0, Math.min(maxX, this.x));
+                    this.y = Math.max(0, Math.min(maxY, this.y));
+                }
+                
+                // On met à jour les références
+                this.refW = sw;
+                this.refH = sh;
+                this.refWidgetW = this.width;
+                this.refWidgetH = this.height;
+                
+                // Recalcul des ratios (au cas où le clamp a modifié x/y)
+                int currentMaxX = Math.max(1, sw - this.width);
+                int currentMaxY = Math.max(1, sh - this.height);
+                this.relX = (double) this.x / currentMaxX;
+                this.relY = (double) this.y / currentMaxY;
+                
+                try { UIManager.getInstance().saveConfig(); } catch (Throwable ignored) {}
+            } else {
+                // Si la résolution n'a pas changé, on met juste à jour les ratios 
+                // au cas où l'utilisateur aurait bougé le widget manuellement (drag & drop)
+                int maxX = Math.max(1, sw - this.width);
+                int maxY = Math.max(1, sh - this.height);
+                this.relX = (double) this.x / maxX;
+                this.relY = (double) this.y / maxY;
+                
+                // Mise à jour continue des refs pour être prêt au prochain changement
+                this.refW = sw;
+                this.refH = sh;
+            }
+        } catch (Throwable ignored) {}
+
         FontRenderer fr = mc.fontRendererObj;
         long now = System.currentTimeMillis();
 
@@ -170,36 +222,6 @@ public class KeyStrokeWidget extends BaseWidget {
 
         this.width = rowW;
         this.height = kH + gap + kH + gap + mH + gap + spH;
-
-        // Après le calcul des dimensions réelles (width/height), on s'assure que relX/relY
-        // sont stockés avec la BONNE taille de widget.
-        // Cas 1 : refWidgetW != width → setPosition a été appelé avec une taille incorrecte
-        //         (ex: chargement config avant le premier draw), on recalcule.
-        // Cas 2 : refW < 0 → premier rendu, pas encore initialisé.
-        try {
-            ScaledResolution sr2 = new ScaledResolution(mc);
-            int sw2 = sr2.getScaledWidth();
-            int sh2 = sr2.getScaledHeight();
-            if (sw2 > 0 && sh2 > 0) {
-                boolean needsRecalc = (this.refW < 0) || (this.refWidgetW != this.width);
-                if (needsRecalc) {
-                    int maxX2 = Math.max(1, sw2 - this.width);
-                    int maxY2 = Math.max(1, sh2 - this.height);
-                    int cx = Math.max(0, Math.min(maxX2, this.x));
-                    int cy = Math.max(0, Math.min(maxY2, this.y));
-                    this.x = cx;
-                    this.y = cy;
-                    this.relX = (double) cx / maxX2;
-                    this.relY = (double) cy / maxY2;
-                    this.refW = sw2;
-                    this.refH = sh2;
-                    this.refWidgetW = this.width;
-                    this.refWidgetH = this.height;
-                    try { UIManager.getInstance().saveConfig(); } catch (Throwable ignored) {}
-                }
-            }
-        } catch (Throwable ignored) {}
-
 
         GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);

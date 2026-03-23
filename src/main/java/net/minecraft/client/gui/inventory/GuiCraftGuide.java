@@ -107,6 +107,8 @@ public class GuiCraftGuide extends GuiScreen {
     static final int META_FALL2_SPLASH = 9008;
     // ItemStacks NBT réels associés aux meta fictifs
     static final Map<Integer, ItemStack> CUSTOM_POTION_STACKS = new HashMap<>();
+    // Map signatures des potions -> meta fictif pour résolution rapide
+    static final Map<String, Integer> CUSTOM_POTION_SIGNATURES = new HashMap<>();
 
     static {
         ItemStack glowstone = new ItemStack(Items.glowstone_dust);
@@ -229,10 +231,23 @@ public class GuiCraftGuide extends GuiScreen {
         CUSTOM_POTION_STACKS.put(META_HASTE2, ItemPotion.createCustomPotion(Items.potionitem, Potion.digSpeed.id, 1, 1800, "Potion of Haste II"));
         CUSTOM_POTION_STACKS.put(META_HASTE1_SPLASH, ItemPotion.createCustomPotion(Items.potionitem, Potion.digSpeed.id, 0, 3600, "Splash Potion of Haste", true));
         CUSTOM_POTION_STACKS.put(META_HASTE2_SPLASH, ItemPotion.createCustomPotion(Items.potionitem, Potion.digSpeed.id, 1, 1800, "Splash Potion of Haste II", true));
-        CUSTOM_POTION_STACKS.put(META_FALL1, ItemPotion.createCustomPotion(Items.potionitem, Potion.fallProtection.id, 0, 3600, "Potion of Fall Protection"));
-        CUSTOM_POTION_STACKS.put(META_FALL2, ItemPotion.createCustomPotion(Items.potionitem, Potion.fallProtection.id, 1, 1800, "Potion of Fall Protection II"));
+        CUSTOM_POTION_STACKS.put(META_FALL1, ItemPotion.createCustomPotion(Items.potionitem, Potion.fallProtection.id, 0, 3600, "Potion de Fall Protection"));
+        CUSTOM_POTION_STACKS.put(META_FALL2, ItemPotion.createCustomPotion(Items.potionitem, Potion.fallProtection.id, 1, 1800, "Potion de Fall Protection II"));
         CUSTOM_POTION_STACKS.put(META_FALL1_SPLASH, ItemPotion.createCustomPotion(Items.potionitem, Potion.fallProtection.id, 0, 3600, "Splash Potion of Fall Protection", true));
         CUSTOM_POTION_STACKS.put(META_FALL2_SPLASH, ItemPotion.createCustomPotion(Items.potionitem, Potion.fallProtection.id, 1, 1800, "Splash Potion of Fall Protection II", true));
+
+        // Construire des signatures pour résolution fiable (effets triés + nom sans formatage)
+        for (Map.Entry<Integer, ItemStack> e : CUSTOM_POTION_STACKS.entrySet()) {
+            Integer key = e.getKey();
+            ItemStack stack = e.getValue();
+            if (stack == null) continue;
+            try {
+                String sig = buildPotionSignature(stack);
+                if (sig != null && !sig.isEmpty()) CUSTOM_POTION_SIGNATURES.put(sig, key);
+            } catch (Exception ex) {
+                // ignore
+            }
+        }
     }
 
     private static final Set<String> BLOCKED = new HashSet<>(Arrays.asList(
@@ -689,7 +704,10 @@ public class GuiCraftGuide extends GuiScreen {
         ItemStack out = craftRecipe.getRecipeOutput();
         itemRender.renderItemAndEffectIntoGUI(out, rx + 1, ry + 1);
         itemRender.renderItemOverlayIntoGUI(fontRendererObj, out, rx + 1, ry + 1, null);
-        if (inside(mx, my, rx, ry, SZ, SZ)) hov = out;
+        if (inside(mx, my, rx, ry, SZ, SZ)) {
+            drawSlotHover(rx, ry);
+            hov = out;
+        }
         if (out.stackSize > 1)
             fontRendererObj.drawStringWithShadow("\u00a76x" + out.stackSize, rx, ry + SZ + 4, C_TXT_GOLD);
         return hov;
@@ -721,14 +739,20 @@ public class GuiCraftGuide extends GuiScreen {
         int rx = lx + SZ + 32;
         drawSlotOutput(rx, top, C_FURNACE);
         itemRender.renderItemAndEffectIntoGUI(selected, rx + 1, top + 1);
-        if (inside(mx, my, rx, top, SZ, SZ)) hov = selected;
+        if (inside(mx, my, rx, top, SZ, SZ)) {
+            drawSlotHover(rx, top);
+            hov = selected;
+        }
         return hov;
     }
 
     private static final int BREW_W = 96, BREW_H = 70;
 
     private ItemStack drawBrewingRecipe(int mx, int my, int cx, int top) {
-        if (currentBrewRecipe == null) return null;
+        if (currentBrewRecipe == null) {
+            return null; // Return early if no brewing recipe is available
+        }
+
         int bx = cx - BREW_W / 2;
         ItemStack hov = null;
 
@@ -770,9 +794,6 @@ public class GuiCraftGuide extends GuiScreen {
             hov = inputPotion;
         }
 
-        // Arrow
-        GuiRenderUtils.drawChevronArrow(inX + SZ + 4, inY + SZ / 2, 5, 0x00BBEE, (t % 800) / 800f);
-
         // Output potion (bottom right)
         int outX = bx + BREW_W - SZ - 8, outY = inY;
         drawSlotOutput(outX, outY, C_BREW);
@@ -780,7 +801,10 @@ public class GuiCraftGuide extends GuiScreen {
                 ? CUSTOM_POTION_STACKS.get(currentBrewRecipe.outputMeta)
                 : new ItemStack(Items.potionitem, 1, currentBrewRecipe.outputMeta);
         itemRender.renderItemAndEffectIntoGUI(outputPotion, outX + 1, outY + 1);
-        if (inside(mx, my, outX, outY, SZ, SZ)) hov = outputPotion;
+        if (inside(mx, my, outX, outY, SZ, SZ)) {
+            drawSlotHover(outX, outY);
+            hov = outputPotion;
+        }
 
         // Multiple recipe indicator + Recipe name — stacked without overlap
         int textY = top + BREW_H + 8;
@@ -838,13 +862,102 @@ public class GuiCraftGuide extends GuiScreen {
         targetScroll = Math.max(0, Math.min(targetScroll, ms));
     }
 
+    /**
+     * Résout le meta fictif d'une potion custom en se basant prioritairement sur NBT/effets, puis nom.
+     * Retourne -1 si aucune correspondance trouvée.
+     */
+    private int resolveCustomPotionMeta(ItemStack stack) {
+        if (stack == null) return -1;
+        try {
+            // Première tentative : signature basée sur effets triés + nom (construction déterministe)
+            String sig = buildPotionSignature(stack);
+            if (sig != null && !sig.isEmpty() && CUSTOM_POTION_SIGNATURES.containsKey(sig)) {
+                return CUSTOM_POTION_SIGNATURES.get(sig);
+            }
+            // Ensuite, comparaison NBT exacte
+            for (Map.Entry<Integer, ItemStack> e : CUSTOM_POTION_STACKS.entrySet()) {
+                int key = e.getKey();
+                ItemStack candidate = e.getValue();
+                if (candidate == null) continue;
+                if (candidate.hasTagCompound() && stack.hasTagCompound()) {
+                    if (candidate.getTagCompound().equals(stack.getTagCompound())) return key;
+                }
+            }
+            // Enfin, heuristiques : comparaison par effets puis par nom
+            for (Map.Entry<Integer, ItemStack> e : CUSTOM_POTION_STACKS.entrySet()) {
+                int key = e.getKey();
+                ItemStack candidate = e.getValue();
+                if (candidate == null) continue;
+                try {
+                    ItemPotion ip = (ItemPotion) Items.potionitem;
+                    List<PotionEffect> ce = ip.getEffects(candidate);
+                    List<PotionEffect> te = ip.getEffects(stack);
+                    if (ce != null && te != null && comparePotionEffects(ce, te)) return key;
+                } catch (Exception ex) {
+                    // ignore
+                }
+                String candName = stripFormatting(candidate.getDisplayName()).toLowerCase(Locale.ROOT);
+                String targetName = stripFormatting(stack.getDisplayName()).toLowerCase(Locale.ROOT);
+                if (!candName.isEmpty() && candName.equals(targetName)) return key;
+            }
+        } catch (Exception ex) {
+            // fallback silencieux
+        }
+        return -1;
+    }
+
+    // Construit une signature stable pour une potion : ensemble trié d'effets (id:amp) + nom nettoyée
+    private static String buildPotionSignature(ItemStack stack) {
+        if (stack == null) return "";
+        try {
+            ItemPotion ip = (ItemPotion) Items.potionitem;
+            List<PotionEffect> eff = ip.getEffects(stack);
+            List<String> parts = new ArrayList<>();
+            if (eff != null) {
+                for (PotionEffect p : eff) parts.add(p.getPotionID() + ":" + p.getAmplifier());
+                Collections.sort(parts);
+            }
+            String name = stripFormattingStatic(stack.getDisplayName()).toLowerCase(Locale.ROOT);
+            String joined = String.join(",", parts);
+            return joined + "|" + name;
+        } catch (Exception ex) {
+            return stripFormattingStatic(stack.getDisplayName()).toLowerCase(Locale.ROOT);
+        }
+    }
+
+    // static helper pour stripFormatting dans un contexte static
+    private static String stripFormattingStatic(String s) {
+        if (s == null) return "";
+        return s.replaceAll("\u00A7.", "");
+    }
+
     private boolean isSameStack(ItemStack a, ItemStack b) {
         if (a == null || b == null) return false;
         if (a.getItem() != b.getItem()) return false;
-        // Pour les potions custom NBT, comparer par nom d'affichage
-        if (a.getItem() == Items.potionitem && (a.hasTagCompound() || b.hasTagCompound())) {
-            return a.getDisplayName().equals(b.getDisplayName());
+        // Cas spécial : potions (vanilla ou custom)
+        if (a.getItem() == Items.potionitem) {
+            // Tenter résolution via signature/NBT/effets
+            int ma = resolveCustomPotionMeta(a);
+            int mb = resolveCustomPotionMeta(b);
+            if (ma != -1 && mb != -1) return ma == mb;
+            if (ma != -1 || mb != -1) return false;
+            // Sinon comparer les effets (robuste) puis le nom sans formatage, puis meta brut
+            try {
+                ItemPotion ip = (ItemPotion) Items.potionitem;
+                List<PotionEffect> ea = ip.getEffects(a);
+                List<PotionEffect> eb = ip.getEffects(b);
+                if (ea != null && eb != null) {
+                    if (comparePotionEffects(ea, eb)) return true;
+                }
+            } catch (Exception ex) {
+                // ignore
+            }
+            String na = stripFormatting(a.getDisplayName()).toLowerCase(Locale.ROOT);
+            String nb = stripFormatting(b.getDisplayName()).toLowerCase(Locale.ROOT);
+            if (!na.isEmpty() && !nb.isEmpty() && na.equals(nb)) return true;
+            return a.getItemDamage() == b.getItemDamage();
         }
+        // Cas général : comparer le metadata
         return a.getItemDamage() == b.getItemDamage();
     }
 
@@ -852,10 +965,7 @@ public class GuiCraftGuide extends GuiScreen {
         if (stack == null) return;
         if (selected != null && isSameStack(selected, stack)) return;
         ItemStack prev = selected;
-        loadRecipe(stack);
-        if ((mode == Mode.CRAFT && craftRecipe != null)
-                || (mode == Mode.BREWING && !brewRecipesForItem.isEmpty())
-                || (mode == Mode.FURNACE && furnaceInput != null)) {
+        if (loadRecipe(stack)) {
             if (prev != null) {
                 boolean top = !historyStack.isEmpty() && isSameStack(historyStack.get(historyStack.size() - 1), prev);
                 if (!top) historyStack.add(prev);
@@ -877,47 +987,21 @@ public class GuiCraftGuide extends GuiScreen {
         historyStack.clear();
     }
 
-    /**
-     * Retourne le meta fictif correspondant à un ItemStack de potion custom (NBT), ou -1 si non trouvé.
-     */
-    private int resolveCustomPotionMeta(ItemStack stack) {
-        if (stack == null) return -1;
-        String targetName = stripFormatting(stack.getDisplayName());
-        for (Map.Entry<Integer, ItemStack> e : CUSTOM_POTION_STACKS.entrySet()) {
-            ItemStack candidate = e.getValue();
-            if (candidate == null) continue;
-            // Compare NBT if present (meilleur indicateur)
-            if (candidate.hasTagCompound() && stack.hasTagCompound()) {
-                if (candidate.getTagCompound().equals(stack.getTagCompound())) return e.getKey();
-            }
-            // Compare potion effects lists when available (robuste pour potions avec mêmes effets)
-            try {
-                ItemPotion ip = (ItemPotion) Items.potionitem;
-                List<PotionEffect> ce = ip.getEffects(candidate);
-                List<PotionEffect> te = ip.getEffects(stack);
-                if (ce != null && te != null && comparePotionEffects(ce, te)) return e.getKey();
-            } catch (Exception ex) {
-                // ignore if method not available or casting fails
-            }
-            // Compare display names sans codes de formatage (localisation / couleurs)
-            String candName = stripFormatting(candidate.getDisplayName());
-            if (!candName.isEmpty() && candName.equalsIgnoreCase(targetName)) return e.getKey();
-            // Lastly, compare raw meta (fallback)
-            if (candidate.getItemDamage() == stack.getItemDamage()) return e.getKey();
-        }
-        return -1;
-    }
-
     private boolean comparePotionEffects(List<PotionEffect> a, List<PotionEffect> b) {
+        if (a == null || b == null) return false;
         if (a.size() != b.size()) return false;
-        for (int i = 0; i < a.size(); i++) {
-            PotionEffect pa = a.get(i);
-            PotionEffect pb = b.get(i);
-            if (pa.getPotionID() != pb.getPotionID()) return false;
-            if (pa.getAmplifier() != pb.getAmplifier()) return false;
-            // durée peut varier ; ignorer ou comparer approximativement — ici on compare l'amplifier et l'id
+        // Compare as multisets of (potionId, amplifier) so ordering doesn't matter
+        Map<String, Integer> cntA = new HashMap<>();
+        Map<String, Integer> cntB = new HashMap<>();
+        for (PotionEffect p : a) {
+            String k = p.getPotionID() + ":" + p.getAmplifier();
+            cntA.put(k, cntA.getOrDefault(k, 0) + 1);
         }
-        return true;
+        for (PotionEffect p : b) {
+            String k = p.getPotionID() + ":" + p.getAmplifier();
+            cntB.put(k, cntB.getOrDefault(k, 0) + 1);
+        }
+        return cntA.equals(cntB);
     }
 
     // Enlève les codes de formatage Minecraft (§x) pour faciliter la comparaison de noms
@@ -926,13 +1010,26 @@ public class GuiCraftGuide extends GuiScreen {
         return s.replaceAll("\u00A7.", "");
     }
 
-    private void loadRecipe(ItemStack stack) {
+    private boolean loadRecipe(ItemStack stack) {
+        // Sauvegarde de l'état actuel pour restauration si aucune recette n'est trouvée
+        Mode oldMode = mode;
+        ItemStack oldSel = selected;
+        IRecipe oldCraft = craftRecipe;
+        ItemStack oldFurnace = furnaceInput;
+        List<PotionRecipe> oldBrew = brewRecipesForItem;
+        PotionRecipe oldCurBrew = currentBrewRecipe;
+        int oldBrewIdx = brewRecipeIndex;
+
         selected = stack;
         craftRecipe = null;
         currentBrewRecipe = null;
-        brewRecipesForItem.clear();
+        brewRecipesForItem = new ArrayList<>();
         brewRecipeIndex = 0;
         furnaceInput = null;
+        
+        // Initialiser temporairement à LIST ; si rien n'est trouvé, cela restera ainsi
+        mode = Mode.LIST;
+
         if (stack.getItem() == Items.potionitem) {
             // Détection des potions custom par leur nom NBT
             int customMeta = resolveCustomPotionMeta(stack);
@@ -943,7 +1040,6 @@ public class GuiCraftGuide extends GuiScreen {
                 if (!brewRecipesForItem.isEmpty()) {
                     currentBrewRecipe = brewRecipesForItem.get(0);
                     mode = Mode.BREWING;
-                    return;
                 }
             }
             // Passe de secours : essayer de trouver une clé POTION_RECIPES dont le ItemStack candidat correspond
@@ -959,7 +1055,6 @@ public class GuiCraftGuide extends GuiScreen {
                         if (!brewRecipesForItem.isEmpty()) {
                             currentBrewRecipe = brewRecipesForItem.get(0);
                             mode = Mode.BREWING;
-                            return;
                         }
                     }
                 }
@@ -1013,10 +1108,28 @@ public class GuiCraftGuide extends GuiScreen {
                 }
             }
         }
+
+        // Finaliser le mode
         if (craftRecipe != null) mode = Mode.CRAFT;
         else if (furnaceInput != null) mode = Mode.FURNACE;
         else if (!brewRecipesForItem.isEmpty()) mode = Mode.BREWING;
-        else mode = Mode.LIST;
+        
+        // Si un mode a été trouvé, c'est un succès
+        if (mode != Mode.LIST) {
+            return true;
+        }
+
+        // Sinon, on restaure l'état précédent et on retourne false
+        // (Sauf si on était déjà en mode LIST, auquel cas on reste en LIST mais sans recette)
+        // Mais ici on veut éviter de quitter une recette pour aller vers LIST si on clique un ingrédient sans recette.
+        mode = oldMode;
+        selected = oldSel;
+        craftRecipe = oldCraft;
+        furnaceInput = oldFurnace;
+        brewRecipesForItem = oldBrew;
+        currentBrewRecipe = oldCurBrew;
+        brewRecipeIndex = oldBrewIdx;
+        return false;
     }
 
     private ItemStack fixWildcard(ItemStack s) {
@@ -1078,44 +1191,71 @@ public class GuiCraftGuide extends GuiScreen {
             int recPanelY = (height - recPanelH) / 2;
             int curY = recPanelY + titleH + 6 + breadcrumbH;
             curY += 10; // after separator
-            // after recipe title — garder la même marge conditionnelle que dans drawRecipeMode
             curY += (mode == Mode.CRAFT ? 20 : 14);
             int contentY = curY;
             int cx = panelX + panelW / 2;
+
             if (btn == 0) {
-                if (mode == Mode.CRAFT && craftRecipe != null) {
-                    ItemStack[] grid = getGrid(craftRecipe);
-                    int sx0 = cx - (3 * SZ + 30 + SZ) / 2;
-                    for (int row = 0; row < 3; row++)
-                        for (int col = 0; col < 3; col++) {
-                            int idx = row * 3 + col;
-                            if (idx >= grid.length || grid[idx] == null) continue;
-                            if (inside(mx, my, sx0 + col * SZ, contentY + row * SZ, SZ, SZ)) {
-                                openRecipe(grid[idx]);
-                                return;
-                            }
-                        }
-                }
-                if (mode == Mode.FURNACE && furnaceInput != null) {
-                    int lx = cx - (SZ + 32 + SZ) / 2;
-                    if (inside(mx, my, lx, contentY, SZ, SZ)) {
-                        openRecipe(furnaceInput);
-                        return;
-                    }
-                }
                 if (mode == Mode.BREWING && currentBrewRecipe != null) {
                     int bx = cx - BREW_W / 2;
+                    // Ingredient
                     int ingX = bx + BREW_W / 2 - SZ / 2, ingY = contentY + 4;
-                    int inX = bx + 8, inY = contentY + BREW_H - SZ - 6;
                     if (inside(mx, my, ingX, ingY, SZ, SZ)) {
                         openRecipe(currentBrewRecipe.ingredient);
                         return;
                     }
+                    // Input Potion
+                    int inX = bx + 8, inY = contentY + BREW_H - SZ - 6;
                     if (inside(mx, my, inX, inY, SZ, SZ)) {
                         ItemStack inputStack = CUSTOM_POTION_STACKS.containsKey(currentBrewRecipe.inputMeta)
                                 ? CUSTOM_POTION_STACKS.get(currentBrewRecipe.inputMeta)
                                 : new ItemStack(Items.potionitem, 1, currentBrewRecipe.inputMeta);
                         openRecipe(inputStack);
+                        return;
+                    }
+                    // Output Potion
+                    int outX = bx + BREW_W - SZ - 8, outY = inY;
+                    if (inside(mx, my, outX, outY, SZ, SZ)) {
+                        ItemStack outputStack = CUSTOM_POTION_STACKS.containsKey(currentBrewRecipe.outputMeta)
+                                ? CUSTOM_POTION_STACKS.get(currentBrewRecipe.outputMeta)
+                                : new ItemStack(Items.potionitem, 1, currentBrewRecipe.outputMeta);
+                        openRecipe(outputStack);
+                        return;
+                    }
+                } else if (mode == Mode.CRAFT && craftRecipe != null) {
+                    ItemStack[] grid = getGrid(craftRecipe);
+                    int gw = 3 * SZ;
+                    int totalW = gw + 30 + SZ;
+                    int sx0 = cx - totalW / 2;
+                    // Grid inputs
+                    for (int row = 0; row < 3; row++) {
+                        for (int col = 0; col < 3; col++) {
+                            int idx = row * 3 + col;
+                            if (grid[idx] == null) continue;
+                            int sx = sx0 + col * SZ, sy = contentY + row * SZ;
+                            if (inside(mx, my, sx, sy, SZ, SZ)) {
+                                openRecipe(grid[idx]);
+                                return;
+                            }
+                        }
+                    }
+                    // Output
+                    int rx = sx0 + gw + 26, ry = contentY + SZ;
+                    if (inside(mx, my, rx, ry, SZ, SZ)) {
+                        openRecipe(craftRecipe.getRecipeOutput());
+                        return;
+                    }
+                } else if (mode == Mode.FURNACE && furnaceInput != null) {
+                    int lx = cx - (SZ + 32 + SZ) / 2;
+                    // Input
+                    if (inside(mx, my, lx, contentY, SZ, SZ)) {
+                        openRecipe(furnaceInput);
+                        return;
+                    }
+                    // Output
+                    int rx = lx + SZ + 32;
+                    if (inside(mx, my, rx, contentY, SZ, SZ)) {
+                        openRecipe(selected);
                         return;
                     }
                 }
@@ -1187,4 +1327,3 @@ public class GuiCraftGuide extends GuiScreen {
         else if (btn.id == 2) goMenu();
     }
 }
-

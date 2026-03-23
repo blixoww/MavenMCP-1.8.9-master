@@ -214,9 +214,19 @@ public final class ShopPacketHandler {
         });
 
         PacketDispatcher.register(PacketChannel.SHOP_S2C, PacketId.SHOP_ITEMS_RESPONSE, buf -> {
+            // New format: [ActionVarInt] [Count] [Items...]
+            // ActionVarInt: 0 = Clear & Add, 1 = Add (Append)
+            int action = buf.readVarIntFromBuffer();
             int count = buf.readVarIntFromBuffer();
-            cachedItems.clear();
-            for (int i = 0; i < count; i++) cachedItems.add(ShopItem.readFrom(buf));
+            
+            if (action == 0) {
+                cachedItems.clear();
+            }
+            
+            for (int i = 0; i < count; i++) {
+                cachedItems.add(ShopItem.readFrom(buf));
+            }
+            
             if (itemsListener != null)
                 itemsListener.onItemsReceived(Collections.unmodifiableList(cachedItems));
         });
