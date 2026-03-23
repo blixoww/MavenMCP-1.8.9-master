@@ -13,6 +13,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
@@ -72,6 +73,9 @@ public class GuiShop extends GuiScreen {
     private boolean loadingCats = true;
     private boolean loadingItems = false;
     private long playerBalance = 0L;
+    
+    // Config
+    private boolean useEnglish = true;
 
     // ─── Ticker Persistant ───────────────────────────────────────────────────
     private static float tickerOffset = 0; 
@@ -124,6 +128,7 @@ public class GuiShop extends GuiScreen {
     private final int[][] hbRows = new int[MAX_ROWS][4];
     private final int[] hbBack = new int[4];
     private final int[] hbClose = new int[4];
+    private final int[] hbLang = new int[4];
     private final int[] hbTabBuy = new int[4];
     private final int[] hbTabSell = new int[4];
     private final int[] hbAction = new int[4];
@@ -272,7 +277,7 @@ public class GuiShop extends GuiScreen {
     private void clearHb() {
         for (int[] h : hbCats) h[2] = 0;
         for (int[] h : hbRows) h[2] = 0;
-        hbBack[2] = hbClose[2] = hbTabBuy[2] = hbTabSell[2] = 0;
+        hbBack[2] = hbClose[2] = hbLang[2] = hbTabBuy[2] = hbTabSell[2] = 0;
         hbAction[2] = hbSellAll[2] = 0;
         hbQM10[2] = hbQM1[2] = hbQP1[2] = hbQP10[2] = hbQMax[2] = 0;
         hbSearchBox[2] = hbScrollUp[2] = hbScrollDn[2] = 0;
@@ -286,10 +291,15 @@ public class GuiShop extends GuiScreen {
         if (q.isEmpty()) {
             filtered.addAll(src);
         } else {
-            for (ShopPacketHandler.ShopItem it : src)
-                if (fixString(it.getDisplayName()).toLowerCase().contains(q)
-                        || fixString(it.getCategory()).toLowerCase().contains(q))
+            for (ShopPacketHandler.ShopItem it : src) {
+                String name = fixString(getItemName(it)).toLowerCase();
+                String raw = fixString(it.getMinecraftItem()).toLowerCase().replace("_", " ");
+                String cat = fixString(it.getCategory()).toLowerCase();
+                
+                if (name.contains(q) || raw.contains(q) || cat.contains(q)) {
                     filtered.add(it);
+                }
+            }
         }
         
         // Si on est dans Décoration sans recherche spécifique, on affiche tout pour s'assurer d'avoir les vitres
@@ -402,7 +412,7 @@ public class GuiShop extends GuiScreen {
         for (ShopPacketHandler.ShopItem it : activeItems) {
             if (limit++ > 30) break;
             
-            String name = fixString(it.getDisplayName());
+            String name = fixString(getItemName(it));
             String priceStr = fmtC(it.getBuyPrice());
             String arrow = "§7-";
 
@@ -477,7 +487,7 @@ public class GuiShop extends GuiScreen {
 
         String title = "§b§lMARKET§f§lPLACE";
         if (screen == Screen.DETAIL && selectedItem != null) {
-            title += " §8/ §7" + fixString(selectedItem.getDisplayName());
+            title += " §8/ §7" + fixString(getItemName(selectedItem));
         } else {
             if (screen == Screen.ITEMS && !searchMode) title += " §8/ §7" + selectedCatName;
             if (searchMode && !searchQuery.isEmpty()) title += " §8/ §7Recherche : §f\"" + fixString(searchQuery) + "\"";
@@ -491,6 +501,16 @@ public class GuiShop extends GuiScreen {
         drawRect(bx2 - 6, py + 5, bx2 + bw + 10, py + 23, 0xFF15202B);
         drawRect(bx2 - 6, py + 5, bx2 + bw + 10, py + 6, 0xFF2A4055);
         fontRendererObj.drawStringWithShadow(bal, bx2, py + 9, C_WHITE);
+        
+        // Bouton Langue
+        int langX = bx2 - 26;
+        int langY = py + 6;
+        boolean lh = inR(mx, my, langX, langY, 20, 16);
+        drawRect(langX, langY, langX + 20, langY + 16, lh ? 0xFF2A4055 : 0xFF15202B);
+        drawRect(langX, langY, langX + 20, langY + 1, lh ? C_WHITE : 0xFF445566);
+        String langTxt = useEnglish ? "EN" : "FR";
+        drawCtrAt(langTxt, langX + 10, langY + 4, useEnglish ? C_ACCENT2 : C_LGRAY);
+        hb(hbLang, langX, langY, 20, 16);
 
         int cx = px + pw - 22, cy = py + 6;
         boolean ch = inR(mx, my, cx, cy, 16, 16);
@@ -629,7 +649,7 @@ public class GuiShop extends GuiScreen {
         drawRect(x, y, x + w, y + h, 0xFF09111A);
         renderIconSafe(resolveIcon(e.getMinecraftItem()), x + 2, y + 3);
         
-        fontRendererObj.drawString(fixString(e.getDisplayName()), x + 22, y + 3, C_WHITE);
+        fontRendererObj.drawString(fixString(useEnglish ? formatEnglish(e.getMinecraftItem()) : e.getDisplayName()), x + 22, y + 3, C_WHITE);
         String price = (isBuy ? "§6" : "§a") + fmtC(isBuy ? e.getBuyPrice() : e.getSellPrice()) + "$";
         fontRendererObj.drawString(price, x + 22, y + 12, C_GRAY);
         
@@ -704,7 +724,7 @@ public class GuiShop extends GuiScreen {
                 drawRect(tx + 6, ry + 6, tx + 22, ry + 22, fc);
             }
 
-            String nm = fixString(it.getDisplayName());
+            String nm = fixString(getItemName(it));
             fontRendererObj.drawStringWithShadow("§f" + nm, tx + 36, ry + 9, C_WHITE);
             
             fontRendererObj.drawString("§6" + fmtC(it.getBuyPrice()) + "$", tx + tw - 260, ry + 9, C_GOLD);
@@ -771,7 +791,7 @@ public class GuiShop extends GuiScreen {
         ItemStack bigIcon = resolveIcon(selectedItem.getMinecraftItem());
         renderIconSafe(bigIcon, infoX + infoW / 2 - 8, infoY + 8);
         
-        String nm = fixString(selectedItem.getDisplayName());
+        String nm = fixString(getItemName(selectedItem));
         drawCtrAt("§f§l" + nm, infoX + infoW / 2, infoY + 28);
         drawCtrAt("§8" + normalizeCatName(selCat), infoX + infoW / 2, infoY + 38);
 
@@ -1028,7 +1048,7 @@ public class GuiShop extends GuiScreen {
             drawRect(gx + 2, y, gx + gw - 2, y + rowH, 0xFF0E1620);
             
             renderIconSafe(resolveIcon(e.getMinecraftItem()), gx + 4, y + 3);
-            fontRendererObj.drawString(fixString(e.getDisplayName()), gx + 22, y + 3, C_WHITE);
+            fontRendererObj.drawString(fixString(useEnglish ? formatEnglish(e.getMinecraftItem()) : e.getDisplayName()), gx + 22, y + 3, C_WHITE);
             fontRendererObj.drawString("§7x" + e.getVolume(), gx + 22, y + 12, C_GRAY);
             
             String p = fmtC(showBought ? e.getBuyPrice() : e.getSellPrice()) + "$";
@@ -1067,6 +1087,25 @@ public class GuiShop extends GuiScreen {
          for (int i=0; i<len; i++) { if (s.charAt(i) == 'Ã') { broken = true; break; } }
          if (!broken) return s;
          try { return new String(s.getBytes("ISO-8859-1"), StandardCharsets.UTF_8); } catch (Exception e) { return s; }
+     }
+     
+     private String getItemName(ShopPacketHandler.ShopItem it) {
+         if (useEnglish) return formatEnglish(it.getMinecraftItem());
+         return it.getDisplayName();
+     }
+     
+     private String formatEnglish(String s) {
+         if (s == null) return "";
+         if (s.contains(":")) s = s.split(":")[0];
+         s = s.replace("_", " ");
+         StringBuilder sb = new StringBuilder();
+         boolean up = true;
+         for (char c : s.toCharArray()) {
+             if (up) { sb.append(Character.toUpperCase(c)); up = false; }
+             else sb.append(c);
+             if (c == ' ') up = true;
+         }
+         return sb.toString();
      }
 
      private String normalizeCatName(String cat) {
@@ -1232,6 +1271,7 @@ public class GuiShop extends GuiScreen {
          super.mouseClicked(mx, my, btn);
          if (btn != 0) return;
          if (inH(mx, my, hbClose)) { mc.displayGuiScreen(null); return; }
+         if (inH(mx, my, hbLang)) { useEnglish = !useEnglish; applyFilter(); return; }
          if (inH(mx, my, hbBack)) {
              if (searchMode) { searchMode = false; searchQuery = ""; applyFilter(); }
              else if (screen == Screen.DETAIL) { screen = Screen.ITEMS; selectedItem = null; loadingItems = true; ShopPacketHandler.requestItems(selectedCatId); }
@@ -1272,7 +1312,19 @@ public class GuiShop extends GuiScreen {
      protected void keyTyped(char ch, int key) throws IOException {
          super.keyTyped(ch, key);
          if (qtyInputFocused) { if (key==1) { qtyInputFocused=false; qtyInputStr=""; } else if (key==28||key==156) { applyQtyInput(); qtyInputFocused=false; } else if (key==14 && !qtyInputStr.isEmpty()) qtyInputStr = qtyInputStr.substring(0, qtyInputStr.length()-1); else if (ch>='0' && ch<='9' && qtyInputStr.length()<5) qtyInputStr+=ch; return; }
-         if (searchFocused) { if (key==1) { searchFocused=false; } else if (key==14 && !searchQuery.isEmpty()) searchQuery = searchQuery.substring(0, searchQuery.length()-1); else if (ch>=32 && searchQuery.length()<32) searchQuery+=ch; searchMode = !searchQuery.isEmpty(); applyFilter(); } else if (key==1) mc.displayGuiScreen(null);
+         if (searchFocused) {
+             if (isCtrlKeyDown() && key == Keyboard.KEY_A) {
+                 searchQuery = "";
+                 searchMode = false;
+                 applyFilter();
+                 return;
+             }
+             if (key==1) { searchFocused=false; }
+             else if (key==14 && !searchQuery.isEmpty()) searchQuery = searchQuery.substring(0, searchQuery.length()-1);
+             else if (ch>=32 && searchQuery.length()<32) searchQuery+=ch;
+             searchMode = !searchQuery.isEmpty();
+             applyFilter();
+         } else if (key==1) mc.displayGuiScreen(null);
      }
 
      @Override
