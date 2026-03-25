@@ -26,7 +26,7 @@ public class KeyStrokeWidget extends BaseWidget {
     // Couleurs des cases (noir transparent)
     private static final int BOX_NORMAL = 0xB0000000; // noir semi-transparent
     private static final int BOX_PRESSED = 0xC8202020; // légèrement plus clair quand pressé
-    private static final int BOX_BORDER = 0xB0000000; // bordure blanche subtile
+    private static final int BOX_BORDER = 0xB0000000; // bordure noire subtile
     private static final int BOX_BORDER_PRESSED = 0xAAFFFFFF; // bordure plus vive si pressé
 
     private final KeyBinding[] keys;
@@ -49,6 +49,7 @@ public class KeyStrokeWidget extends BaseWidget {
         this.height = 96;
         if (getPropOrDefault("showBackground", null) == null) setProp("showBackground", Boolean.FALSE);
         if (getPropOrDefault("initialized", null) == null) setProp("initialized", Boolean.FALSE);
+        if (getPropOrDefault("showSpaceRainbow", null) == null) setProp("showSpaceRainbow", Boolean.FALSE);
         try {
             this.setRGBMode(true);
         } catch (Throwable ignored) {
@@ -108,118 +109,62 @@ public class KeyStrokeWidget extends BaseWidget {
             setProp("initialized", Boolean.TRUE);
         }
 
-        // --- Recalcul position relative pour le redimensionnement ---
-        // On compare la résolution actuelle avec celle stockée (refW/refH).
-        // Si ça a changé, on applique les ratios (relX/relY) pour repositionner.
-        // On met aussi à jour refWidgetW/refWidgetH.
         try {
             ScaledResolution sr = new ScaledResolution(mc);
             int sw = sr.getScaledWidth();
             int sh = sr.getScaledHeight();
             
-            // Si la résolution a changé depuis la dernière fois
             if (sw > 0 && sh > 0 && (sw != this.refW || sh != this.refH)) {
-                // Si on avait déjà des coordonnées relatives valides (refW > 0), on les applique
                 if (this.refW > 0 && this.refH > 0) {
                     int maxX = Math.max(1, sw - this.width);
                     int maxY = Math.max(1, sh - this.height);
-                    
-                    // Calcul de la nouvelle position absolue basée sur le ratio relatif stocké
                     this.x = (int) Math.round(this.relX * maxX);
                     this.y = (int) Math.round(this.relY * maxY);
-                    
-                    // Clamp pour rester dans l'écran
                     this.x = Math.max(0, Math.min(maxX, this.x));
                     this.y = Math.max(0, Math.min(maxY, this.y));
                 }
-                
-                // On met à jour les références
-                this.refW = sw;
-                this.refH = sh;
-                this.refWidgetW = this.width;
-                this.refWidgetH = this.height;
-                
-                // Recalcul des ratios (au cas où le clamp a modifié x/y)
+                this.refW = sw; this.refH = sh;
+                this.refWidgetW = this.width; this.refWidgetH = this.height;
                 int currentMaxX = Math.max(1, sw - this.width);
                 int currentMaxY = Math.max(1, sh - this.height);
                 this.relX = (double) this.x / currentMaxX;
                 this.relY = (double) this.y / currentMaxY;
-                
-                try { UIManager.getInstance().saveConfig(); } catch (Throwable ignored) {}
             } else {
-                // Si la résolution n'a pas changé, on met juste à jour les ratios 
-                // au cas où l'utilisateur aurait bougé le widget manuellement (drag & drop)
                 int maxX = Math.max(1, sw - this.width);
                 int maxY = Math.max(1, sh - this.height);
                 this.relX = (double) this.x / maxX;
                 this.relY = (double) this.y / maxY;
-                
-                // Mise à jour continue des refs pour être prêt au prochain changement
-                this.refW = sw;
-                this.refH = sh;
+                this.refW = sw; this.refH = sh;
             }
         } catch (Throwable ignored) {}
 
         FontRenderer fr = mc.fontRendererObj;
         long now = System.currentTimeMillis();
 
-        // ── États clavier ─────────────────────────────────────────────────────
         boolean lmbDown = false, rmbDown = false, spaceDown = false;
-        if (IDX_LMB < keys.length) try {
-            lmbDown = keys[IDX_LMB].isKeyDown();
-        } catch (Throwable t) {
-        }
-        if (IDX_RMB < keys.length) try {
-            rmbDown = keys[IDX_RMB].isKeyDown();
-        } catch (Throwable t) {
-        }
-        if (IDX_SPACE < keys.length) try {
-            spaceDown = keys[IDX_SPACE].isKeyDown();
-        } catch (Throwable t) {
-        }
+        if (IDX_LMB < keys.length) try { lmbDown = keys[IDX_LMB].isKeyDown(); } catch (Throwable t) {}
+        if (IDX_RMB < keys.length) try { rmbDown = keys[IDX_RMB].isKeyDown(); } catch (Throwable t) {}
+        if (IDX_SPACE < keys.length) try { spaceDown = keys[IDX_SPACE].isKeyDown(); } catch (Throwable t) {}
 
-        if (lmbDown && !prevLmbDown) {
-            leftClickTimes.add(now);
-            lastLmbPress = now;
-        }
-        if (rmbDown && !prevRmbDown) {
-            rightClickTimes.add(now);
-            lastRmbPress = now;
-        }
+        if (lmbDown && !prevLmbDown) { leftClickTimes.add(now); lastLmbPress = now; }
+        if (rmbDown && !prevRmbDown) { rightClickTimes.add(now); lastRmbPress = now; }
         if (spaceDown && prevDown.length > IDX_SPACE && !prevDown[IDX_SPACE]) lastSpacePress = now;
 
-        prevLmbDown = lmbDown;
-        prevRmbDown = rmbDown;
+        prevLmbDown = lmbDown; prevRmbDown = rmbDown;
         leftClickTimes.removeIf(t -> t < now - 1000L);
         rightClickTimes.removeIf(t -> t < now - 1000L);
 
         for (int i = 0; i < Math.min(4, keys.length); i++) {
             boolean pressed = false;
-            try {
-                pressed = keys[i].isKeyDown();
-            } catch (Throwable t) {
-            }
+            try { pressed = keys[i].isKeyDown(); } catch (Throwable t) {}
             if (pressed && !prevDown[i]) lastKeyPressTime[i] = now;
             prevDown[i] = pressed;
         }
         if (IDX_SPACE < keys.length) prevDown[IDX_SPACE] = spaceDown;
 
-        // ── Géométrie — cases carrées bien alignées ───────────────────────────
-        int kW = 26; // largeur d'une case carrée
-        int kH = 26; // hauteur d'une case carrée
-        int gap = 3;  // écart entre cases
+        int kW = 26, kH = 26, gap = 3;
         int rowW = kW * 3 + gap * 2;
-
-        // LMB/RMB : 2 cases égales sur toute la largeur
-        // Correction : on force le RMB à être aligné avec la touche D
-        int mW = kW; // largeur identique à une touche clavier
-        int mH = 26;
-        int mGap = rowW - (2 * mW); // espace restant à répartir entre les deux cases
-        int mGapL = mGap / 2;
-        int mGapR = mGap - mGapL;
-
-        int spH = 10;
-
+        int mH = 26, spH = 10;
         this.width = rowW;
         this.height = kH + gap + kH + gap + mH + gap + spH;
 
@@ -229,134 +174,79 @@ public class KeyStrokeWidget extends BaseWidget {
         int txtColor = isRGBMode() ? getRainbowColor() : getColor();
         int sX = this.x, sY = this.y;
 
-        // ── Ligne 1 : Z centré ────────────────────────────────────────────────
-        int zX = sX + kW + gap;
-        if (isEditorKeyVisible(0) && 0 < keys.length)
-            drawKey(fr, zX, sY, kW, kH, 0, txtColor, now);
-
-        // ── Ligne 2 : Q  S  D ─────────────────────────────────────────────────
+        // Ligne 1
+        if (isEditorKeyVisible(0) && 0 < keys.length) drawKey(fr, sX + kW + gap, sY, kW, kH, 0, txtColor, now);
+        // Ligne 2
         int l2y = sY + kH + gap;
-        if (isEditorKeyVisible(1) && 1 < keys.length)
-            drawKey(fr, sX, l2y, kW, kH, 1, txtColor, now);
-        if (isEditorKeyVisible(2) && 2 < keys.length)
-            drawKey(fr, sX + kW + gap, l2y, kW, kH, 2, txtColor, now);
-        if (isEditorKeyVisible(3) && 3 < keys.length)
-            drawKey(fr, sX + 2 * (kW + gap), l2y, kW, kH, 3, txtColor, now);
-
-        // ── Ligne 3 : LMB | RMB ───────────────────────────────────────────────
+        if (isEditorKeyVisible(1) && 1 < keys.length) drawKey(fr, sX, l2y, kW, kH, 1, txtColor, now);
+        if (isEditorKeyVisible(2) && 2 < keys.length) drawKey(fr, sX + kW + gap, l2y, kW, kH, 2, txtColor, now);
+        if (isEditorKeyVisible(3) && 3 < keys.length) drawKey(fr, sX + 2 * (kW + gap), l2y, kW, kH, 3, txtColor, now);
+        // Ligne 3
         int l3y = l2y + kH + gap;
-        // LMB et RMB élargis : chacun occupe la moitié de la ligne, avec un léger gap central
-        int mouseGap = 4;
-        int mouseW = (rowW - mouseGap) / 2;
-        if (isEditorKeyVisible(4) && IDX_LMB < keys.length)
-            drawMouse(fr, sX, l3y, mouseW, mH, IDX_LMB, txtColor, now, "LMB", leftClickTimes.size(), lastLmbPress);
-        if (isEditorKeyVisible(5) && IDX_RMB < keys.length)
-            drawMouse(fr, sX + mouseW + mouseGap, l3y, mouseW, mH, IDX_RMB, txtColor, now, "RMB", rightClickTimes.size(), lastRmbPress);
-
-        // ── Ligne 4 : Barre espace RGB ────────────────────────────────────────
+        int mouseGap = 4, mouseW = (rowW - mouseGap) / 2;
+        if (isEditorKeyVisible(4) && IDX_LMB < keys.length) drawMouse(fr, sX, l3y, mouseW, mH, IDX_LMB, txtColor, now, "LMB", leftClickTimes.size(), lastLmbPress);
+        if (isEditorKeyVisible(5) && IDX_RMB < keys.length) drawMouse(fr, sX + mouseW + mouseGap, l3y, mouseW, mH, IDX_RMB, txtColor, now, "RMB", rightClickTimes.size(), lastRmbPress);
+        // Ligne 4
         int l4y = l3y + mH + gap;
-        if (isEditorKeyVisible(6))
-            drawSpaceBarImproved(sX, l4y, rowW, spH, now);
+        if (isEditorKeyVisible(6)) drawSpaceBarImproved(sX, l4y, rowW, spH, now, txtColor);
 
         GlStateManager.disableBlend();
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
-
-    /**
-     * Dessine une case clavier standard
-     */
     private void drawKey(FontRenderer fr, int x, int y, int w, int h, int physIdx, int txt, long now) {
-        boolean pressed = false;
-        try {
-            pressed = keys[physIdx].isKeyDown();
-        } catch (Throwable t) {
-        }
-        prevDown[physIdx] = pressed;
-
-        int bg = pressed ? BOX_PRESSED : BOX_NORMAL;
-        int brd = pressed ? BOX_BORDER_PRESSED : BOX_BORDER;
-        Gui.drawRect(x, y, x + w, y + h, bg);
-        drawBorder1px(x, y, w, h, brd);
-
-        // Flash
+        boolean pressed = prevDown[physIdx];
+        Gui.drawRect(x, y, x + w, y + h, pressed ? BOX_PRESSED : BOX_NORMAL);
+        drawBorder1px(x, y, w, h, pressed ? BOX_BORDER_PRESSED : BOX_BORDER);
         long elapsed = now - lastKeyPressTime[physIdx];
         if (elapsed < FLASH_DURATION) {
             float t = elapsed / (float) FLASH_DURATION;
             int fa = (int) (FLASH_MAX * (1f - t * t) * 255f);
             if (fa > 0) Gui.drawRect(x, y, x + w, y + h, (fa << 24) | 0xFFFFFF);
         }
-
         String label = GameSettings.getKeyDisplayString(keys[physIdx].getKeyCode());
         if (label == null || label.isEmpty()) label = keys[physIdx].getKeyDescription();
-        fr.drawStringWithShadow(label,
-                x + (w - fr.getStringWidth(label)) / 2.0f,
-                y + (h - 8) / 2.0f, txt);
+        fr.drawStringWithShadow(label, x + (w - fr.getStringWidth(label)) / 2.0f, y + (h - 8) / 2.0f, txt);
     }
 
-    /**
-     * Dessine un bouton souris LMB/RMB
-     */
-    private void drawMouse(FontRenderer fr, int x, int y, int w, int h,
-                           int physIdx, int txt, long now,
-                           String label, int cps, long lastPress) {
-        boolean pressed = false;
-        try {
-            pressed = keys[physIdx].isKeyDown();
-        } catch (Throwable t) {
-        }
-        prevDown[physIdx] = pressed;
-
-        int bg = pressed ? BOX_PRESSED : BOX_NORMAL;
-        int brd = pressed ? BOX_BORDER_PRESSED : BOX_BORDER;
-        Gui.drawRect(x, y, x + w, y + h, bg);
-        drawBorder1px(x, y, w, h, brd);
-
+    private void drawMouse(FontRenderer fr, int x, int y, int w, int h, int physIdx, int txt, long now, String label, int cps, long lastPress) {
+        boolean pressed = prevDown[physIdx];
+        Gui.drawRect(x, y, x + w, y + h, pressed ? BOX_PRESSED : BOX_NORMAL);
+        drawBorder1px(x, y, w, h, pressed ? BOX_BORDER_PRESSED : BOX_BORDER);
         long elapsed = now - lastPress;
         if (elapsed < FLASH_DURATION) {
             float t = elapsed / (float) FLASH_DURATION;
             int fa = (int) (FLASH_MAX * (1f - t * t) * 255f);
             if (fa > 0) Gui.drawRect(x, y, x + w, y + h, (fa << 24) | 0xFFFFFF);
         }
-
-        // Label en haut, CPS en bas
-        int labelY = y + (h - 16) / 2;  // centre vertical global pour les 2 lignes
-        fr.drawStringWithShadow(label,
-                x + (w - fr.getStringWidth(label)) / 2.0f, labelY, txt);
+        int labelY = y + (h - 16) / 2;
+        fr.drawStringWithShadow(label, x + (w - fr.getStringWidth(label)) / 2.0f, labelY, txt);
         String cpsStr = cps + " CPS";
-        fr.drawStringWithShadow(cpsStr,
-                x + (w - fr.getStringWidth(cpsStr)) / 2.0f, labelY + 9, txt & 0x77FFFFFF);
+        fr.drawStringWithShadow(cpsStr, x + (w - fr.getStringWidth(cpsStr)) / 2.0f, labelY + 9, txt & 0x77FFFFFF);
     }
 
-    /**
-     * Nouvelle version de la barre espace : fond noir transparent, bande RGB plus fine et centrée
-     */
-    private void drawSpaceBarImproved(int x, int y, int w, int h, long now) {
+    private void drawSpaceBarImproved(int x, int y, int w, int h, long now, int txtColor) {
         boolean pressed = false;
-        if (IDX_SPACE < keys.length) try {
-            pressed = keys[IDX_SPACE].isKeyDown();
-        } catch (Throwable t) {
-        }
-
-        // Fond noir transparent
+        if (IDX_SPACE < keys.length) try { pressed = keys[IDX_SPACE].isKeyDown(); } catch (Throwable t) {}
         Gui.drawRect(x, y, x + w, y + h, pressed ? BOX_PRESSED : BOX_NORMAL);
         drawBorder1px(x, y, w, h, pressed ? BOX_BORDER_PRESSED : BOX_BORDER);
 
-        // Bande RGB plus fine et centrée
-        int rgbH = Math.max(4, h - 4); // hauteur de la bande RGB (plus fine)
-        int rgbY = y + (h - rgbH) / 2;
-        int rgbX = x + 2;
-        int rgbW = w - 4;
-        if (rgbW > 0 && rgbH > 0) {
-            float timeOffset = (now % 3000L) / 3000.0f;
+        boolean showRainbow = Boolean.TRUE.equals(getPropOrDefault("showSpaceRainbow", false));
+        if (showRainbow) {
+            int rgbH = 2, rgbW = w - 6;
+            int rgbX = x + 3, rgbY = y + (h - rgbH) / 2;
+            float timeOffset = (now % 4000L) / 4000.0f;
             for (int i = 0; i < rgbW; i++) {
                 float hue = (timeOffset + i / (float) rgbW) % 1.0f;
-                int rgb = java.awt.Color.HSBtoRGB(hue, 1.0f, 0.95f) & 0x00FFFFFF;
-                Gui.drawRect(rgbX + i, rgbY, rgbX + i + 1, rgbY + rgbH, 0xFF000000 | rgb);
+                int rgb = java.awt.Color.HSBtoRGB(hue, 0.7f, 1.0f) & 0x00FFFFFF;
+                Gui.drawRect(rgbX + i, rgbY, rgbX + i + 1, rgbY + rgbH, 0xCC000000 | rgb);
             }
+        } else {
+            // Version sobre : petite ligne colorée simple ou juste vide
+            int lineW = w / 3, lineH = 1;
+            int lx = x + (w - lineW) / 2, ly = y + (h - lineH) / 2;
+            Gui.drawRect(lx, ly, lx + lineW, ly + lineH, txtColor & 0x99FFFFFF);
         }
 
-        // Flash discret par-dessus
         long elapsed = now - lastSpacePress;
         if (elapsed < FLASH_DURATION) {
             float t = elapsed / (float) FLASH_DURATION;
@@ -365,9 +255,6 @@ public class KeyStrokeWidget extends BaseWidget {
         }
     }
 
-    /**
-     * Bordure 1px exacte
-     */
     private void drawBorder1px(int x, int y, int w, int h, int color) {
         Gui.drawRect(x, y, x + w, y + 1, color);
         Gui.drawRect(x, y + h - 1, x + w, y + h, color);
@@ -375,9 +262,6 @@ public class KeyStrokeWidget extends BaseWidget {
         Gui.drawRect(x + w - 1, y, x + w, y + h, color);
     }
 
-    /**
-     * Arc-en-ciel lent et pastel pour le texte
-     */
     private int getRainbowColor() {
         float hue = (System.currentTimeMillis() % 8000L) / 8000.0f;
         int c = java.awt.Color.HSBtoRGB(hue, 0.6f, 1.0f);

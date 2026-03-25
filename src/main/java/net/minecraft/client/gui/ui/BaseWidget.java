@@ -4,6 +4,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.gui.GuiRenderUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,15 +19,10 @@ public abstract class BaseWidget implements UIElement {
 
     protected final Map<String, Object> props = new HashMap<>();
 
-    // Position relative : stockée en fraction de l'écran lors d'un setPosition() explicite
-    // -1 = non initialisée (utiliser x/y absolus tels quels)
     protected double relX = -1.0d, relY = -1.0d;
-    // Résolution de référence au moment du dernier setPosition()
     protected int refW = -1, refH = -1;
-    // Taille du widget au moment du positionnement (pour un recalcul exact)
     protected int refWidgetW = -1, refWidgetH = -1;
 
-    // Alignement (non utilisé pour le calcul mais conservé pour compatibilité sauvegarde)
     protected String alignX = "LEFT";
     protected String alignY = "TOP";
 
@@ -47,7 +43,6 @@ public abstract class BaseWidget implements UIElement {
     public void setPosition(int x, int y) {
         this.x = x;
         this.y = y;
-        // Mémoriser la fraction uniquement si on a accès à la résolution
         Minecraft mc = Minecraft.getMinecraft();
         if (mc != null) {
             try {
@@ -85,13 +80,8 @@ public abstract class BaseWidget implements UIElement {
             int sw = sr.getScaledWidth();
             int sh = sr.getScaledHeight();
             if (sw > 0 && sh > 0) {
-                int w = this.getWidth();
-                int h = this.getHeight();
-                if (refWidgetW > 0) w = refWidgetW;
-                if (refWidgetH > 0) h = refWidgetH;
-
-                int maxX = Math.max(1, sw - w);
-                int maxY = Math.max(1, sh - h);
+                int maxX = Math.max(1, sw - this.getWidth());
+                int maxY = Math.max(1, sh - this.getHeight());
                 this.x = (int) Math.round(relX * maxX);
                 this.y = (int) Math.round(relY * maxY);
             }
@@ -121,7 +111,6 @@ public abstract class BaseWidget implements UIElement {
     public void setProp(String key, Object value) { props.put(key, value); }
     public Map<String, Object> getProps() { return props; }
 
-    // Recalcule la position absolue depuis relX/relY pour la résolution actuelle
     public void updateAbsolutePosition() {
         if (relX < 0.0d || relY < 0.0d) return;
         Minecraft mc = Minecraft.getMinecraft();
@@ -135,14 +124,8 @@ public abstract class BaseWidget implements UIElement {
                     int newMaxY = Math.max(1, sh - this.getHeight());
                     int nx = (int) Math.round(this.relX * newMaxX);
                     int ny = (int) Math.round(this.relY * newMaxY);
-                    nx = Math.max(0, Math.min(sw - this.getWidth(), nx));
-                    ny = Math.max(0, Math.min(sh - this.getHeight(), ny));
-                    this.x = nx;
-                    this.y = ny;
-                    this.refW = sw;
-                    this.refH = sh;
-                    this.refWidgetW = this.getWidth();
-                    this.refWidgetH = this.getHeight();
+                    this.x = Math.max(0, Math.min(sw - this.getWidth(), nx));
+                    this.y = Math.max(0, Math.min(sh - this.getHeight(), ny));
                 }
             } catch (Throwable ignored) {}
         }
@@ -154,33 +137,19 @@ public abstract class BaseWidget implements UIElement {
         this.lastMouseY = mouseY;
         if (!enabled) return;
 
-        boolean editorActive = false;
-        try { editorActive = UIManager.getInstance().isEditorActive(); } catch (Throwable ignored) {}
-
-        // Adapter la position si la résolution a changé (seulement hors éditeur)
+        boolean editorActive = UIManager.getInstance().isEditorActive();
         if (!editorActive) {
             updateAbsolutePosition();
         }
 
-        // Rainbow mode
-        if (rgbMode) {
-            long t = System.currentTimeMillis();
-            float hue = (t % 10000L) / 10000.0f;
-            int c = java.awt.Color.HSBtoRGB(hue, 0.8f, 0.9f);
-            // ne pas modifier this.color, juste afficher
-        }
-
         boolean showBg = Boolean.TRUE.equals(getPropOrDefault("showBackground", Boolean.FALSE));
         if (showBg) {
-            int drawColor = getColor();
+            int bgCol = 0x88000000; // Default dark semi-transparent
+            int outlineCol = getColor();
+            
             GlStateManager.enableBlend();
-            GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-            Gui.drawRect(this.x - 2, this.y - 2, this.x + getWidth() + 2, this.y + getHeight() + 2, drawColor);
-            Gui.drawRect(this.x - 2, this.y - 2, this.x - 1, this.y + getHeight() + 2, 0xFF000000);
-            Gui.drawRect(this.x + getWidth() + 1, this.y - 2, this.x + getWidth() + 2, this.y + getHeight() + 2, 0xFF000000);
-            Gui.drawRect(this.x - 2, this.y - 2, this.x + getWidth() + 2, this.y - 1, 0xFF000000);
-            Gui.drawRect(this.x - 2, this.y + getHeight() + 1, this.x + getWidth() + 2, this.y + getHeight() + 2, 0xFF000000);
-            GlStateManager.disableBlend();
+            Gui.drawRect(this.x - 2, this.y - 2, this.x + getWidth() + 2, this.y + getHeight() + 2, bgCol);
+            GuiRenderUtils.drawRectOutline(this.x - 2, this.y - 2, getWidth() + 4, getHeight() + 4, (0xAA << 24) | (outlineCol & 0xFFFFFF));
         }
 
         try { draw(); } catch (Exception e) { e.printStackTrace(); }

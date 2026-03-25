@@ -2,46 +2,52 @@ package net.minecraft.client.gui;
 
 import net.minecraft.client.macro.MacroManager;
 import net.minecraft.client.macro.MacroManager.Macro;
-import net.minecraft.client.resources.I18n;
+import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import java.io.IOException;
 import java.util.List;
 
-/**
- * Interface de gestion des macros.
- * <p>
- * Layout :
- * - Titre en haut
- * - Liste des macros existantes (clé + commande + bouton Supprimer)
- * - Formulaire en bas : champ commande, champ touche, bouton Ajouter
- * - Bouton Terminer
- */
 public class GuiMacros extends GuiScreen {
-    private static final int COLOR_TITLE = 0xFFFFFF;
-    private static final int COLOR_HEADER = 0xAAAAAA;
-    private static final int COLOR_ROW_ODD = 0x20FFFFFF;
-    private static final int COLOR_ROW_EVN = 0x10FFFFFF;
-    private static final int COLOR_WARN = 0xFF5555;
-    private static final int COLOR_OK = 0x55FF55;
+    
+    // ── Palette de couleurs "Origins" ────────────────────────────────────────
+    private static final int C_BG       = 0xF2040912;
+    private static final int C_BORDER   = 0xFF1A3A6A;
+    private static final int C_ACCENT   = 0xFF2277EE;
+    private static final int C_ACCENT2  = 0xFF55AAFF;
+    private static final int C_HEADER   = 0xFF030B16;
+    private static final int C_GOLD     = 0xFFFFD700;
+    private static final int C_GREEN    = 0xFF33CC77;
+    private static final int C_RED      = 0xFFEE3333;
+    private static final int C_GRAY     = 0xFF778899;
+    private static final int C_WHITE    = 0xFFFFFFFF;
+    private static final int C_PANEL    = 0x44000000;
 
     private final GuiScreen parent;
     private final MacroManager mgr = MacroManager.INSTANCE;
 
-    // Champs de saisie du formulaire "Ajouter"
+    // Dimensions
+    private int px, py, pw, ph;
+    
+    // Formulaire
     private GuiTextField fieldCommand;
-    private int pendingKeyCode = 0;          // touche en attente d'assignation
-    private boolean listeningKey = false;    // est-on en mode "appuie une touche" ?
-
-    // Editing (null = pas en cours)
+    private int pendingKeyCode = 0;
+    private boolean listeningKey = false;
     private Integer editingIndex = null;
 
-    // Scroll pour la liste
+    // Scroll
     private int scrollOffset = 0;
-    private static final int ROW_HEIGHT = 24;
-    private static final int LIST_Y_START = 50;
-    private int listDisplayHeight;
+    private static final int ROW_H = 30;
+    private int listY, listH;
+
+    // Hitboxes pour les clics sans GuiButton
+    private final int[] hbClose   = new int[4];
+    private final int[] hbAdd     = new int[4];
+    private final int[] hbAssign  = new int[4];
+    private final int[] hbCancel  = new int[4];
+    private final int[][] hbEdit  = new int[20][4];
+    private final int[][] hbDel   = new int[20][4];
 
     public GuiMacros(GuiScreen parent) {
         this.parent = parent;
@@ -50,29 +56,30 @@ public class GuiMacros extends GuiScreen {
     @Override
     public void initGui() {
         Keyboard.enableRepeatEvents(true);
-        listDisplayHeight = this.height - LIST_Y_START - 90;
+        
+        // Taille fixe plus "pro"
+        pw = 400;
+        ph = 300;
+        px = (width - pw) / 2;
+        py = (height - ph) / 2;
 
-        // Champ commande (formulaire du bas)
-        this.fieldCommand = new GuiTextField(0, this.fontRendererObj,
-                this.width / 2 - 155, this.height - 76, 250, 20);
-        this.fieldCommand.setMaxStringLength(256);
+        listY = py + 40;
+        listH = ph - 110;
+
+        // On utilise la hauteur standard (20) pour le GuiTextField car le champ est privé
+        this.fieldCommand = new GuiTextField(0, fontRendererObj, px + 20, py + ph - 62, pw - 130, 20);
+        this.fieldCommand.setMaxStringLength(128);
         this.fieldCommand.setFocused(true);
-
-        // Bouton "Assigner touche"
-        this.buttonList.add(new GuiButton(100, this.width / 2 + 100, this.height - 76, 110, 20,
-                getKeyButtonLabel()));
-
-        // Bouton "Ajouter / Sauver"
-        this.buttonList.add(new GuiButton(101, this.width / 2 - 155, this.height - 52, 130, 20,
-                editingIndex == null ? "Ajouter" : "Sauvegarder"));
-
-        // Bouton "Annuler édition"
-        this.buttonList.add(new GuiButton(102, this.width / 2 - 20, this.height - 52, 80, 20,
-                "Annuler"));
-
-        // Bouton Terminer
-        this.buttonList.add(new GuiButton(200, this.width / 2 - 75, this.height - 26, 150, 20,
-                I18n.format("gui.done")));
+        
+        if (editingIndex != null) {
+            Macro m = mgr.getMacros().get(editingIndex);
+            fieldCommand.setText(m.getCommand());
+        }
+        
+        // Réinitialisation des hitboxes pour éviter les résidus
+        for(int i=0; i<20; i++) {
+            hbEdit[i][2] = 0; hbDel[i][2] = 0;
+        }
     }
 
     @Override
@@ -80,126 +87,178 @@ public class GuiMacros extends GuiScreen {
         Keyboard.enableRepeatEvents(false);
     }
 
-    private String getKeyButtonLabel() {
-        if (listeningKey) return "> Appuie une touche <";
-        if (pendingKeyCode == 0) return "Touche : ---";
-        Macro tmp = new Macro(pendingKeyCode, "");
-        return "Touche : " + tmp.getKeyDisplayString();
-    }
-
     @Override
-    protected void actionPerformed(GuiButton button) throws IOException {
+    public void drawScreen(int mx, int my, float pt) {
+        drawDefaultBackground();
+        GlStateManager.enableBlend();
+
+        // ── Fenêtre Principale ────────────────────────────────────────────────
+        drawRect(px + 4, py + 4, px + pw + 4, py + ph + 4, 0x55000000); // Ombre
+        drawRect(px, py, px + pw, py + ph, C_BG);
+        drawBorder(px, py, pw, ph, C_BORDER);
+        
+        // Header
+        drawRect(px, py, px + pw, py + 26, C_HEADER);
+        drawRect(px, py + 25, px + pw, py + 26, C_ACCENT);
+        fontRendererObj.drawStringWithShadow("§lGESTION DES MACROS", px + 15, py + 9, C_WHITE);
+        
+        // Bouton Fermer (X)
+        int cx = px + pw - 20, cy = py + 6;
+        boolean chov = in(mx, my, cx, cy, 14, 14);
+        drawRect(cx, cy, cx + 14, cy + 14, chov ? 0xFFBB3333 : 0x44AA3333);
+        fontRendererObj.drawString("x", cx + 4, cy + 2, chov ? C_WHITE : 0xFFCC7777);
+        hb(hbClose, cx, cy, 14, 14);
+
+        // ── Liste des Macros ──────────────────────────────────────────────────
         List<Macro> macros = mgr.getMacros();
-
-        if (button.id == 200) {
-            // Terminer
-            mc.displayGuiScreen(parent);
-        } else if (button.id == 100) {
-            // Assigner touche
-            listeningKey = !listeningKey;
-            updateKeyButton();
-        } else if (button.id == 101) {
-            // Ajouter ou Sauvegarder
-            String cmd = fieldCommand.getText().trim();
-            if (cmd.isEmpty() || pendingKeyCode == 0) return;
-
-            Macro m = new Macro(pendingKeyCode, cmd);
-            if (editingIndex != null) {
-                mgr.setMacro(editingIndex, m);
-                editingIndex = null;
-            } else {
-                if (mgr.canAddMacro())
-                    mgr.addMacro(m);
-            }
-            resetForm();
-        } else if (button.id == 102) {
-            // Annuler édition
-            editingIndex = null;
-            resetForm();
-        } else if (button.id >= 300 && button.id < 400) {
-            // Supprimer macro
-            int idx = button.id - 300;
-            mgr.removeMacro(idx);
-            if (scrollOffset > 0 && scrollOffset >= mgr.getCount()) scrollOffset--;
-        } else if (button.id >= 400 && button.id < 500) {
-            // Éditer macro
-            int idx = button.id - 400;
-            if (idx >= 0 && idx < macros.size()) {
+        int visible = listH / ROW_H;
+        
+        if (macros.isEmpty()) {
+            drawCentered("§8Aucune macro configurée.", px + pw / 2, listY + listH / 2 - 4, 0);
+        } else {
+            for (int i = 0; i < visible && (i + scrollOffset) < macros.size(); i++) {
+                int idx = i + scrollOffset;
                 Macro m = macros.get(idx);
-                editingIndex = idx;
-                fieldCommand.setText(m.getCommand());
-                pendingKeyCode = m.getKeyCode();
-                listeningKey = false;
-                updateKeyButton();
-                updateAddButton();
+                int rowY = listY + i * ROW_H;
+                boolean hov = in(mx, my, px + 10, rowY, pw - 20, ROW_H - 4);
+                boolean isEditing = editingIndex != null && editingIndex == idx;
+
+                // Fond de ligne
+                drawRect(px + 10, rowY, px + pw - 10, rowY + ROW_H - 4, isEditing ? 0x442277EE : (hov ? 0x22FFFFFF : 0x11FFFFFF));
+                if (isEditing) drawRect(px + 10, rowY, px + 12, rowY + ROW_H - 4, C_ACCENT);
+
+                // Touche (Badge)
+                String keyStr = m.getKeyDisplayString();
+                int kw = fontRendererObj.getStringWidth(keyStr) + 10;
+                drawRect(px + 18, rowY + 6, px + 18 + kw, rowY + 18, 0xFF152545);
+                drawBorder(px + 18, rowY + 6, kw, 12, C_ACCENT);
+                fontRendererObj.drawString(keyStr, px + 18 + 5, rowY + 8, C_GOLD);
+
+                // Commande
+                String cmd = m.getCommand();
+                int maxW = pw - kw - 120;
+                if (fontRendererObj.getStringWidth(cmd) > maxW)
+                    cmd = fontRendererObj.trimStringToWidth(cmd, maxW) + "...";
+                fontRendererObj.drawString(cmd, px + 25 + kw, rowY + 8, C_WHITE);
+
+                // Boutons d'action (mini)
+                int bx = px + pw - 85;
+                miniBtn(mx, my, bx, rowY + 4, 30, 14, "§aEdt", 0xFF154515, C_GREEN, hbEdit[i]);
+                miniBtn(mx, my, bx + 35, rowY + 4, 30, 14, "§cSup", 0xFF451515, C_RED, hbDel[i]);
             }
         }
-    }
 
-    private void resetForm() {
-        fieldCommand.setText("");
-        pendingKeyCode = 0;
-        listeningKey = false;
-        updateKeyButton();
-        updateAddButton();
-    }
-
-    private void updateKeyButton() {
-        for (Object o : buttonList) {
-            if (o instanceof GuiButton && ((GuiButton) o).id == 100) {
-                ((GuiButton) o).displayString = getKeyButtonLabel();
-            }
+        // Scrollbar stylisée
+        if (macros.size() > visible) {
+            int sbX = px + pw - 8, sbH = listH;
+            drawRect(sbX, listY, sbX + 3, listY + sbH, 0x22FFFFFF);
+            int thumbH = Math.max(10, sbH * visible / macros.size());
+            int thumbY = listY + (sbH - thumbH) * scrollOffset / (macros.size() - visible);
+            drawRect(sbX, thumbY, sbX + 3, thumbY + thumbH, C_ACCENT);
         }
-    }
 
-    private void updateAddButton() {
-        for (Object o : buttonList) {
-            if (o instanceof GuiButton && ((GuiButton) o).id == 101) {
-                ((GuiButton) o).displayString = editingIndex == null ? "Ajouter" : "Sauvegarder";
-            }
-        }
+        // ── Zone d'Ajout / Edition ───────────────────────────────────────────
+        int formY = py + ph - 68;
+        drawRect(px + 10, formY, px + pw - 10, py + ph - 10, C_PANEL);
+        drawRect(px + 10, formY, px + pw - 10, formY + 1, 0x44FFFFFF);
+
+        fontRendererObj.drawString(editingIndex == null ? "§7AJOUTER UNE MACRO" : "§bEDITION MACRO #" + (editingIndex + 1), px + 20, formY + 8, 0);
+
+        // Champ Commande - On évite l'accès au champ privé height
+        drawRect(fieldCommand.xPosition - 2, fieldCommand.yPosition - 2, fieldCommand.xPosition + fieldCommand.width + 2, fieldCommand.yPosition + 22, 0xFF05101A);
+        drawBorder(fieldCommand.xPosition - 2, fieldCommand.yPosition - 2, fieldCommand.width + 4, 24, fieldCommand.isFocused() ? C_ACCENT : 0xFF1A2A45);
+        fieldCommand.drawTextBox();
+        if (fieldCommand.getText().isEmpty() && !fieldCommand.isFocused())
+            fontRendererObj.drawString("§8/commande ou texte...", fieldCommand.xPosition + 4, fieldCommand.yPosition + 6, 0);
+
+        // Bouton Touche
+        int tx = px + pw - 100, ty = py + ph - 62;
+        boolean thov = in(mx, my, tx, ty, 80, 20);
+        drawRect(tx, ty, tx + 80, ty + 20, listeningKey ? 0xFF225588 : (thov ? 0xFF152545 : 0xFF0A1020));
+        drawBorder(tx, ty, 80, 20, listeningKey ? C_WHITE : (thov ? C_ACCENT2 : C_BORDER));
+        String keyLabel = listeningKey ? "§b???" : (pendingKeyCode == 0 ? "§7Touche" : "§e" + new Macro(pendingKeyCode, "").getKeyDisplayString());
+        drawCentered(keyLabel, tx + 40, ty + 6, 0);
+        hb(hbAssign, tx, ty, 80, 20);
+
+        // Boutons Action Formulaire
+        boolean canSave = !fieldCommand.getText().trim().isEmpty() && pendingKeyCode != 0;
+        int btnW = (pw - 40) / 2 - 5;
+        
+        // Bouton Valider
+        int vbx = px + 20, vby = py + ph - 35;
+        boolean vhov = canSave && in(mx, my, vbx, vby, btnW, 18);
+        drawRect(vbx, vby, vbx + btnW, vby + 18, canSave ? (vhov ? 0xFF228844 : 0xFF154525) : 0xFF333333);
+        drawBorder(vbx, vby, btnW, 18, canSave ? (vhov ? C_GREEN : 0xFF226644) : 0xFF444444);
+        drawCentered(editingIndex == null ? "§lAJOUTER" : "§lSAUVEGARDER", vbx + btnW / 2, vby + 5, canSave ? C_WHITE : C_GRAY);
+        hb(hbAdd, vbx, vby, btnW, 18);
+
+        // Bouton Annuler / Clear
+        int abx = px + pw - 20 - btnW, aby = py + ph - 35;
+        boolean ahov = in(mx, my, abx, aby, btnW, 18);
+        drawRect(abx, aby, abx + btnW, aby + 18, ahov ? 0xFF882222 : 0xFF451515);
+        drawBorder(abx, aby, btnW, 18, ahov ? C_RED : 0xFF662222);
+        drawCentered(editingIndex == null ? "§lEFFACER" : "§lANNULER", abx + btnW / 2, aby + 5, C_WHITE);
+        hb(hbCancel, abx, aby, btnW, 18);
+
+        super.drawScreen(mx, my, pt);
     }
 
     @Override
-    protected void keyTyped(char typedChar, int keyCode) throws IOException {
+    protected void mouseClicked(int mx, int my, int btn) throws IOException {
         if (listeningKey) {
-            if (keyCode == 1) // ESC = annuler assignation
-            {
-                listeningKey = false;
-                updateKeyButton();
+            pendingKeyCode = -(btn + 1);
+            listeningKey = false;
+            return;
+        }
+
+        if (ok(hbClose) && in(mx, my, hbClose)) { mc.displayGuiScreen(parent); return; }
+        if (ok(hbAssign) && in(mx, my, hbAssign)) { listeningKey = !listeningKey; return; }
+        
+        if (ok(hbAdd) && in(mx, my, hbAdd)) {
+            String cmd = fieldCommand.getText().trim();
+            if (!cmd.isEmpty() && pendingKeyCode != 0) {
+                if (editingIndex != null) mgr.setMacro(editingIndex, new Macro(pendingKeyCode, cmd));
+                else if (mgr.canAddMacro()) mgr.addMacro(new Macro(pendingKeyCode, cmd));
+                resetForm();
+            }
+            return;
+        }
+
+        if (ok(hbCancel) && in(mx, my, hbCancel)) { resetForm(); return; }
+
+        // Clics sur la liste
+        for (int i = 0; i < hbEdit.length; i++) {
+            if (ok(hbEdit[i]) && in(mx, my, hbEdit[i])) {
+                int idx = i + scrollOffset;
+                if (idx < mgr.getMacros().size()) {
+                    Macro m = mgr.getMacros().get(idx);
+                    editingIndex = idx;
+                    fieldCommand.setText(m.getCommand());
+                    pendingKeyCode = m.getKeyCode();
+                }
                 return;
             }
-            if (keyCode != 0) {
-                pendingKeyCode = keyCode;
-            } else if (typedChar > 0) {
-                pendingKeyCode = typedChar + 256;
+            if (ok(hbDel[i]) && in(mx, my, hbDel[i])) {
+                int idx = i + scrollOffset;
+                if (idx < mgr.getMacros().size()) mgr.removeMacro(idx);
+                return;
             }
-            listeningKey = false;
-            updateKeyButton();
-            return;
         }
 
-        if (keyCode == 1) // ESC
-        {
-            mc.displayGuiScreen(parent);
-            return;
-        }
-        fieldCommand.textboxKeyTyped(typedChar, keyCode);
+        fieldCommand.mouseClicked(mx, my, btn);
+        super.mouseClicked(mx, my, btn);
     }
 
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+    protected void keyTyped(char c, int k) throws IOException {
         if (listeningKey) {
-            // Bouton souris : stocker comme keyCode négatif : -(btn+1)
-            pendingKeyCode = -(mouseButton + 1);
+            if (k == 1) { listeningKey = false; return; }
+            if (k != 0) pendingKeyCode = k;
             listeningKey = false;
-            updateKeyButton();
             return;
         }
-
-        // Gestion scroll sur la liste (molette)
-        super.mouseClicked(mouseX, mouseY, mouseButton);
-        fieldCommand.mouseClicked(mouseX, mouseY, mouseButton);
+        if (k == 1) { mc.displayGuiScreen(parent); return; }
+        fieldCommand.textboxKeyTyped(c, k);
     }
 
     @Override
@@ -207,8 +266,9 @@ public class GuiMacros extends GuiScreen {
         super.handleMouseInput();
         int wheel = Mouse.getDWheel();
         if (wheel != 0) {
-            int maxScroll = Math.max(0, mgr.getCount() - listDisplayHeight / ROW_HEIGHT);
-            if (wheel < 0) scrollOffset = Math.min(scrollOffset + 1, maxScroll);
+            int visible = listH / ROW_H;
+            int max = Math.max(0, mgr.getCount() - visible);
+            if (wheel < 0) scrollOffset = Math.min(scrollOffset + 1, max);
             else scrollOffset = Math.max(scrollOffset - 1, 0);
         }
     }
@@ -218,100 +278,30 @@ public class GuiMacros extends GuiScreen {
         fieldCommand.updateCursorCounter();
     }
 
-    @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        this.drawDefaultBackground();
-        List<Macro> macros = mgr.getMacros();
-
-        // ── Titre ──────────────────────────────────────────────────────────────
-        this.drawCenteredString(fontRendererObj, "§lGestion des Macros", width / 2, 14, COLOR_TITLE);
-        String sub = macros.size() + " / " + MacroManager.MAX_MACROS + " macros";
-        this.drawCenteredString(fontRendererObj, sub, width / 2, 26, COLOR_HEADER);
-
-        // ── En-têtes colonnes ─────────────────────────────────────────────────
-        int col1 = this.width / 2 - 200;
-        int col2 = col1 + 80;
-        int col3 = col2 + 290;
-        this.drawString(fontRendererObj, "§7Touche", col1, LIST_Y_START - 12, COLOR_HEADER);
-        this.drawString(fontRendererObj, "§7Commande", col2, LIST_Y_START - 12, COLOR_HEADER);
-
-        // ── Liste des macros ─────────────────────────────────────────────────
-        // Reconstruit les boutons de lignes à chaque frame (dynamique)
-        // On les retire puis on les rajoute
-        buttonList.removeIf(b -> b.id >= 300 && b.id < 500);
-
-        int visibleRows = listDisplayHeight / ROW_HEIGHT;
-        for (int i = 0; i < visibleRows && (i + scrollOffset) < macros.size(); i++) {
-            int idx = i + scrollOffset;
-            Macro m = macros.get(idx);
-            int rowY = LIST_Y_START + i * ROW_HEIGHT;
-
-            // Fond alterné
-            int bg = (idx % 2 == 0) ? COLOR_ROW_EVN : COLOR_ROW_ODD;
-            drawRect(col1 - 4, rowY - 2, col3 + 4, rowY + ROW_HEIGHT - 4, bg);
-
-            // Touche
-            String keyStr = m.getKeyDisplayString();
-            this.drawString(fontRendererObj, "§e" + keyStr, col1, rowY + 4, 0xFFFFFF);
-
-            // Commande (tronquée si trop longue)
-            String cmd = m.getCommand();
-            int maxW = col3 - col2 - 70;
-            if (fontRendererObj.getStringWidth(cmd) > maxW)
-                cmd = fontRendererObj.trimStringToWidth(cmd, maxW) + "...";
-            this.drawString(fontRendererObj, cmd, col2, rowY + 4, 0xDDDDDD);
-
-            // Bouton Éditer
-            GuiButton btnEdit = new GuiButton(400 + idx, col3 - 64, rowY, 30, 16, "§aEdt");
-            this.buttonList.add(btnEdit);
-            // Bouton Supprimer
-            GuiButton btnDel = new GuiButton(300 + idx, col3 - 30, rowY, 34, 16, "§cSup");
-            this.buttonList.add(btnDel);
-        }
-
-        // Scrollbar
-        if (macros.size() > visibleRows) {
-            int sbX = col3 + 8;
-            int sbH = listDisplayHeight;
-            drawRect(sbX, LIST_Y_START, sbX + 4, LIST_Y_START + sbH, 0x44FFFFFF);
-            int thumbH = Math.max(10, sbH * visibleRows / macros.size());
-            int maxScroll = macros.size() - visibleRows;
-            int thumbY = LIST_Y_START + (sbH - thumbH) * scrollOffset / Math.max(1, maxScroll);
-            drawRect(sbX, thumbY, sbX + 4, thumbY + thumbH, 0xCCFFFFFF);
-        }
-
-        // ── Séparateur ───────────────────────────────────────────────────────
-        int sepY = this.height - 85;
-        drawRect(col1 - 4, sepY, col3 + 4, sepY + 1, 0x88AAAAAA);
-
-        // ── Formulaire ajout ─────────────────────────────────────────────────
-        int formY = this.height - 80;
-        String formTitle = editingIndex == null ? "§7Nouvelle macro :" : "§7Modifier macro #" + (editingIndex + 1) + " :";
-        this.drawString(fontRendererObj, formTitle, this.width / 2 - 155, formY, COLOR_HEADER);
-
-        // Avertissement si limite atteinte
-        if (!mgr.canAddMacro() && editingIndex == null) {
-            this.drawString(fontRendererObj, "§cLimite de " + MacroManager.MAX_MACROS + " macros atteinte.",
-                    this.width / 2 - 155, formY + 10, COLOR_WARN);
-        }
-
-        // Validation visuelle du formulaire
-        boolean formValid = !fieldCommand.getText().trim().isEmpty() && pendingKeyCode != 0;
-        for (Object o : buttonList) {
-            if (o instanceof GuiButton && ((GuiButton) o).id == 101)
-                ((GuiButton) o).enabled = formValid && (mgr.canAddMacro() || editingIndex != null);
-        }
-
-        // Champ commande
-        fieldCommand.drawTextBox();
-
-        super.drawScreen(mouseX, mouseY, partialTicks);
-
-        // Tooltip info
-        this.drawString(fontRendererObj,
-                "§8Astuce : la commande peut commencer par / pour une commande, ou être du texte normal.",
-                this.width / 2 - 155, this.height - 10, 0x555555);
+    private void resetForm() {
+        fieldCommand.setText("");
+        pendingKeyCode = 0;
+        editingIndex = null;
+        listeningKey = false;
     }
+
+    // ── Utilitaires de Rendu ────────────────────────────────────────────────
+    private void drawBorder(int x, int y, int w, int h, int c) {
+        drawRect(x, y, x+w, y+1, c); drawRect(x, y+h-1, x+w, y+h, c);
+        drawRect(x, y, x+1, y+h, c); drawRect(x+w-1, y, x+w, y+h, c);
+    }
+    private void drawCentered(String s, int cx, int y, int col) {
+        fontRendererObj.drawStringWithShadow(s, cx - fontRendererObj.getStringWidth(s) / 2f, y, col);
+    }
+    private void miniBtn(int mx, int my, int x, int y, int w, int h, String l, int bg, int tc, int[] hbT) {
+        boolean hov = in(mx, my, x, y, w, h);
+        drawRect(x, y, x+w, y+h, hov ? bg : 0x44000000);
+        drawBorder(x, y, w, h, hov ? tc : 0x44FFFFFF);
+        fontRendererObj.drawString(l, x + (w - fontRendererObj.getStringWidth(l)) / 2, y + 3, 0xFFFFFFFF);
+        hb(hbT, x, y, w, h);
+    }
+    private void hb(int[] h, int x, int y, int w, int wh) { h[0]=x; h[1]=y; h[2]=w; h[3]=wh; }
+    private boolean ok(int[] h) { return h[2] > 0; }
+    private boolean in(int mx, int my, int x, int y, int w, int h) { return mx>=x && my>=y && mx<=x+w && my<=y+h; }
+    private boolean in(int mx, int my, int[] h) { return mx>=h[0] && my>=h[1] && mx<=h[0]+h[2] && my<=h[1]+h[3]; }
 }
-
-
