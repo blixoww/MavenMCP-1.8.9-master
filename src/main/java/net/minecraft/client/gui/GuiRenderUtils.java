@@ -1,9 +1,12 @@
 package net.minecraft.client.gui;
 
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+
+import java.util.List;
 
 /**
  * GuiRenderUtils — Shared rendering helpers for Lunar Client-style GUIs.
@@ -105,6 +108,41 @@ public class GuiRenderUtils {
         GlStateManager.enableTexture2D();
     }
 
+    public static void drawTooltip(int x, int y, List<String> textLines) {
+        if (textLines.isEmpty()) return;
+        
+        GlStateManager.disableRescaleNormal();
+        RenderHelper.disableStandardItemLighting();
+        GlStateManager.disableLighting();
+        GlStateManager.disableDepth();
+        
+        FontRenderer font = net.minecraft.client.Minecraft.getMinecraft().fontRendererObj;
+        int maxW = 0;
+        for (String s : textLines) {
+            int w = font.getStringWidth(s);
+            if (w > maxW) maxW = w;
+        }
+
+        int tx = x + 12;
+        int ty = y - 12;
+        int th = 8;
+        if (textLines.size() > 1) th += 2 + (textLines.size() - 1) * 10;
+
+        int bg = 0xF0100010;
+        Gui.drawRect(tx - 3, ty - 4, tx + maxW + 3, ty + th + 4, bg);
+        drawRectOutline(tx - 3, ty - 4, maxW + 6, th + 8, 0x505000FF);
+        
+        for (int i = 0; i < textLines.size(); i++) {
+            font.drawStringWithShadow(textLines.get(i), tx, ty, -1);
+            ty += 10;
+        }
+        
+        GlStateManager.enableLighting();
+        GlStateManager.enableDepth();
+        RenderHelper.enableStandardItemLighting();
+        GlStateManager.enableRescaleNormal();
+    }
+
     public static void drawSelectionHalo(int x, int y, int w, int h, int color) {
         long time = System.currentTimeMillis();
         float wave = (float) (Math.sin(time / 250.0D) * 0.5D + 0.5D);
@@ -193,8 +231,8 @@ public class GuiRenderUtils {
     public static void drawChevronArrow(int cx, int cy, int size, int color, float animProgress) {
         int alpha = (int)(0x80 + 0x7F * animProgress);
         int c = ((alpha & 0xFF) << 24) | (color & 0x00FFFFFF);
-        int half \u003d size / 2;
-        for (int i \u003d 0; i \u003c half; i++) {
+        int half = size / 2;
+        for (int i = 0; i < half; i++) {
             Gui.drawRect(cx + i, cy - half + i, cx + i + 2, cy - half + i + 1, c);
             Gui.drawRect(cx + i, cy + half - i, cx + i + 2, cy + half - i + 1, c);
         }

@@ -1,46 +1,46 @@
-[18:55:38] [Client thread/INFO]: Setting user: leziink
-[18:55:38] [Client thread/INFO]: (Session ID is token:0:leziink)
-[18:55:39] [Client thread/INFO]: LWJGL Version: 2.9.4
-[18:55:39] [Client thread/INFO]: Reloading ResourceManager: Default
-[18:55:39] [Client thread/ERROR]: Couldn't initialize twitch stream
-[18:55:39] [Sound Library Loader/INFO]: Starting up SoundSystem...
-[18:55:39] [Thread-6/INFO]: Initializing LWJGL OpenAL
-[18:55:39] [Thread-6/INFO]: (The LWJGL binding of OpenAL.  For more information, see http://www.lwjgl.org)
-[18:55:39] [Thread-6/INFO]: OpenAL initialized.
-[18:55:39] [Client thread/WARN]: Unable to load variant: seamless=false,variant=nether_brick from minecraft:double_obsidian_slab#seamless=false,variant=nether_brick
-[18:55:39] [Client thread/WARN]: Unable to load variant: half=bottom,variant=nether_brick from minecraft:obsidian_slab#half=bottom,variant=nether_brick
-[18:55:39] [Client thread/WARN]: Unable to load variant: half=bottom,variant=sandstone from minecraft:obsidian_slab#half=bottom,variant=sandstone
-[18:55:39] [Client thread/WARN]: Unable to load variant: seamless=true,variant=sandstone from minecraft:double_obsidian_slab#seamless=true,variant=sandstone
-[18:55:39] [Client thread/WARN]: Unable to load variant: seamless=false,variant=cobblestone from minecraft:double_obsidian_slab#seamless=false,variant=cobblestone
-[18:55:39] [Client thread/WARN]: Unable to load variant: seamless=true,variant=cobblestone from minecraft:double_obsidian_slab#seamless=true,variant=cobblestone
-[18:55:39] [Client thread/WARN]: Unable to load variant: seamless=true,variant=quartz from minecraft:double_obsidian_slab#seamless=true,variant=quartz
-[18:55:39] [Client thread/WARN]: Unable to load variant: seamless=true,variant=nether_brick from minecraft:double_obsidian_slab#seamless=true,variant=nether_brick
-[18:55:39] [Client thread/WARN]: Unable to load variant: half=top,variant=stone_brick from minecraft:obsidian_slab#half=top,variant=stone_brick
-[18:55:39] [Client thread/WARN]: Unable to load variant: seamless=false,variant=quartz from minecraft:double_obsidian_slab#seamless=false,variant=quartz
-[18:55:39] [Client thread/WARN]: Unable to load variant: seamless=true,variant=brick from minecraft:double_obsidian_slab#seamless=true,variant=brick
-[18:55:39] [Client thread/WARN]: Unable to load variant: half=bottom,variant=brick from minecraft:obsidian_slab#half=bottom,variant=brick
-[18:55:39] [Client thread/WARN]: Unable to load variant: half=top,variant=cobblestone from minecraft:obsidian_slab#half=top,variant=cobblestone
-[18:55:39] [Client thread/WARN]: Unable to load variant: half=bottom,variant=cobblestone from minecraft:obsidian_slab#half=bottom,variant=cobblestone
-[18:55:39] [Client thread/WARN]: Unable to load variant: half=top,variant=brick from minecraft:obsidian_slab#half=top,variant=brick
-[18:55:39] [Client thread/WARN]: Unable to load variant: half=top,variant=wood_old from minecraft:obsidian_slab#half=top,variant=wood_old
-[18:55:39] [Client thread/WARN]: Unable to load variant: half=bottom,variant=quartz from minecraft:obsidian_slab#half=bottom,variant=quartz
-[18:55:39] [Client thread/WARN]: Unable to load variant: seamless=false,variant=brick from minecraft:double_obsidian_slab#seamless=false,variant=brick
-[18:55:39] [Client thread/WARN]: Unable to load variant: seamless=true,variant=wood_old from minecraft:double_obsidian_slab#seamless=true,variant=wood_old
-[18:55:39] [Client thread/WARN]: Unable to load variant: seamless=false,variant=stone_brick from minecraft:double_obsidian_slab#seamless=false,variant=stone_brick
-[18:55:39] [Client thread/WARN]: Unable to load variant: half=top,variant=quartz from minecraft:obsidian_slab#half=top,variant=quartz
-[18:55:39] [Client thread/WARN]: Unable to load variant: seamless=false,variant=wood_old from minecraft:double_obsidian_slab#seamless=false,variant=wood_old
-[18:55:39] [Client thread/WARN]: Unable to load variant: half=bottom,variant=stone_brick from minecraft:obsidian_slab#half=bottom,variant=stone_brick
-[18:55:39] [Client thread/WARN]: Unable to load variant: half=bottom,variant=wood_old from minecraft:obsidian_slab#half=bottom,variant=wood_old
-[18:55:39] [Client thread/WARN]: Unable to load variant: seamless=false,variant=sandstone from minecraft:double_obsidian_slab#seamless=false,variant=sandstone
-[18:55:39] [Client thread/WARN]: Unable to load variant: seamless=true,variant=stone_brick from minecraft:double_obsidian_slab#seamless=true,variant=stone_brick
-[18:55:39] [Client thread/WARN]: Unable to load variant: half=top,variant=sandstone from minecraft:obsidian_slab#half=top,variant=sandstone
-[18:55:39] [Client thread/WARN]: Unable to load variant: half=top,variant=nether_brick from minecraft:obsidian_slab#half=top,variant=nether_brick
-[18:55:39] [Sound Library Loader/INFO]: Sound engine started
-[18:55:41] [Client thread/INFO]: Created: 1024x1024 textures-atlas
-[18:55:41] [Client thread/INFO]: [CustomPackets] ✓ Initialisation du système de packets custom...
-[18:55:41] [Client thread/INFO]: [CustomPackets] ✓ HdvPacketHandler enregistré
-[18:55:41] [Client thread/INFO]: [CustomPackets] ✓ Système initialisé avec succès.
-[18:55:41] [Client thread/ERROR]: Realms module missing
+[21:53:32] [Client thread/INFO]: Setting user: leziink
+[21:53:32] [Client thread/INFO]: (Session ID is token:0:leziink)
+[21:53:32] [Client thread/INFO]: LWJGL Version: 2.9.4
+[21:53:33] [Client thread/INFO]: Reloading ResourceManager: Default
+[21:53:33] [Client thread/ERROR]: Couldn't initialize twitch stream
+[21:53:33] [Sound Library Loader/INFO]: Starting up SoundSystem...
+[21:53:33] [Thread-6/INFO]: Initializing LWJGL OpenAL
+[21:53:33] [Thread-6/INFO]: (The LWJGL binding of OpenAL.  For more information, see http://www.lwjgl.org)
+[21:53:33] [Thread-6/INFO]: OpenAL initialized.
+[21:53:33] [Client thread/WARN]: Unable to load variant: seamless=false,variant=nether_brick from minecraft:double_obsidian_slab#seamless=false,variant=nether_brick
+[21:53:33] [Client thread/WARN]: Unable to load variant: half=bottom,variant=nether_brick from minecraft:obsidian_slab#half=bottom,variant=nether_brick
+[21:53:33] [Client thread/WARN]: Unable to load variant: half=bottom,variant=sandstone from minecraft:obsidian_slab#half=bottom,variant=sandstone
+[21:53:33] [Client thread/WARN]: Unable to load variant: seamless=true,variant=sandstone from minecraft:double_obsidian_slab#seamless=true,variant=sandstone
+[21:53:33] [Client thread/WARN]: Unable to load variant: seamless=false,variant=cobblestone from minecraft:double_obsidian_slab#seamless=false,variant=cobblestone
+[21:53:33] [Client thread/WARN]: Unable to load variant: seamless=true,variant=cobblestone from minecraft:double_obsidian_slab#seamless=true,variant=cobblestone
+[21:53:33] [Client thread/WARN]: Unable to load variant: seamless=true,variant=quartz from minecraft:double_obsidian_slab#seamless=true,variant=quartz
+[21:53:33] [Client thread/WARN]: Unable to load variant: seamless=true,variant=nether_brick from minecraft:double_obsidian_slab#seamless=true,variant=nether_brick
+[21:53:33] [Client thread/WARN]: Unable to load variant: half=top,variant=stone_brick from minecraft:obsidian_slab#half=top,variant=stone_brick
+[21:53:33] [Client thread/WARN]: Unable to load variant: seamless=false,variant=quartz from minecraft:double_obsidian_slab#seamless=false,variant=quartz
+[21:53:33] [Client thread/WARN]: Unable to load variant: seamless=true,variant=brick from minecraft:double_obsidian_slab#seamless=true,variant=brick
+[21:53:33] [Client thread/WARN]: Unable to load variant: half=bottom,variant=brick from minecraft:obsidian_slab#half=bottom,variant=brick
+[21:53:33] [Client thread/WARN]: Unable to load variant: half=top,variant=cobblestone from minecraft:obsidian_slab#half=top,variant=cobblestone
+[21:53:33] [Client thread/WARN]: Unable to load variant: half=bottom,variant=cobblestone from minecraft:obsidian_slab#half=bottom,variant=cobblestone
+[21:53:33] [Client thread/WARN]: Unable to load variant: half=top,variant=brick from minecraft:obsidian_slab#half=top,variant=brick
+[21:53:33] [Client thread/WARN]: Unable to load variant: half=top,variant=wood_old from minecraft:obsidian_slab#half=top,variant=wood_old
+[21:53:33] [Client thread/WARN]: Unable to load variant: half=bottom,variant=quartz from minecraft:obsidian_slab#half=bottom,variant=quartz
+[21:53:33] [Client thread/WARN]: Unable to load variant: seamless=false,variant=brick from minecraft:double_obsidian_slab#seamless=false,variant=brick
+[21:53:33] [Client thread/WARN]: Unable to load variant: seamless=true,variant=wood_old from minecraft:double_obsidian_slab#seamless=true,variant=wood_old
+[21:53:33] [Client thread/WARN]: Unable to load variant: seamless=false,variant=stone_brick from minecraft:double_obsidian_slab#seamless=false,variant=stone_brick
+[21:53:33] [Client thread/WARN]: Unable to load variant: half=top,variant=quartz from minecraft:obsidian_slab#half=top,variant=quartz
+[21:53:33] [Client thread/WARN]: Unable to load variant: seamless=false,variant=wood_old from minecraft:double_obsidian_slab#seamless=false,variant=wood_old
+[21:53:33] [Client thread/WARN]: Unable to load variant: half=bottom,variant=stone_brick from minecraft:obsidian_slab#half=bottom,variant=stone_brick
+[21:53:33] [Client thread/WARN]: Unable to load variant: half=bottom,variant=wood_old from minecraft:obsidian_slab#half=bottom,variant=wood_old
+[21:53:33] [Client thread/WARN]: Unable to load variant: seamless=false,variant=sandstone from minecraft:double_obsidian_slab#seamless=false,variant=sandstone
+[21:53:33] [Client thread/WARN]: Unable to load variant: seamless=true,variant=stone_brick from minecraft:double_obsidian_slab#seamless=true,variant=stone_brick
+[21:53:33] [Client thread/WARN]: Unable to load variant: half=top,variant=sandstone from minecraft:obsidian_slab#half=top,variant=sandstone
+[21:53:33] [Client thread/WARN]: Unable to load variant: half=top,variant=nether_brick from minecraft:obsidian_slab#half=top,variant=nether_brick
+[21:53:33] [Sound Library Loader/INFO]: Sound engine started
+[21:53:35] [Client thread/INFO]: Created: 1024x1024 textures-atlas
+[21:53:35] [Client thread/INFO]: [CustomPackets] ✓ Initialisation du système de packets custom...
+[21:53:35] [Client thread/INFO]: [CustomPackets] ✓ HdvPacketHandler enregistré
+[21:53:35] [Client thread/INFO]: [CustomPackets] ✓ Système initialisé avec succès.
+[21:53:35] [Client thread/ERROR]: Realms module missing
 java.lang.ClassNotFoundException: com.mojang.realmsclient.gui.screens.RealmsNotificationsScreen
 	at java.net.URLClassLoader.findClass(URLClassLoader.java:381) ~[?:1.8.0_181]
 	at java.lang.ClassLoader.loadClass(ClassLoader.java:424) ~[?:1.8.0_181]
@@ -56,7 +56,7 @@ java.lang.ClassNotFoundException: com.mojang.realmsclient.gui.screens.RealmsNoti
 	at net.minecraft.client.Minecraft.run(Minecraft.java:407) [classes/:?]
 	at net.minecraft.client.main.Main.main(Main.java:113) [classes/:?]
 	at StartDev.main(StartDev.java:22) [test-classes/:?]
-[18:55:44] [Client thread/ERROR]: Realms module missing
+[21:53:36] [Client thread/ERROR]: Realms module missing
 java.lang.ClassNotFoundException: com.mojang.realmsclient.gui.screens.RealmsNotificationsScreen
 	at java.net.URLClassLoader.findClass(URLClassLoader.java:381) ~[?:1.8.0_181]
 	at java.lang.ClassLoader.loadClass(ClassLoader.java:424) ~[?:1.8.0_181]
@@ -78,10 +78,10 @@ java.lang.ClassNotFoundException: com.mojang.realmsclient.gui.screens.RealmsNoti
 	at net.minecraft.client.Minecraft.run(Minecraft.java:427) [classes/:?]
 	at net.minecraft.client.main.Main.main(Main.java:113) [classes/:?]
 	at StartDev.main(StartDev.java:22) [test-classes/:?]
-[18:55:44] [Server thread/INFO]: Starting integrated minecraft server version 1.8.9
-[18:55:44] [Server thread/INFO]: Generating keypair
-[18:55:45] [Server thread/INFO]: Preparing start region for level 0
-[18:55:45] [Client thread/ERROR]: Realms module missing
+[21:53:37] [Server thread/INFO]: Starting integrated minecraft server version 1.8.9
+[21:53:37] [Server thread/INFO]: Generating keypair
+[21:53:37] [Server thread/INFO]: Preparing start region for level 0
+[21:53:37] [Client thread/ERROR]: Realms module missing
 java.lang.ClassNotFoundException: com.mojang.realmsclient.gui.screens.RealmsNotificationsScreen
 	at java.net.URLClassLoader.findClass(URLClassLoader.java:381) ~[?:1.8.0_181]
 	at java.lang.ClassLoader.loadClass(ClassLoader.java:424) ~[?:1.8.0_181]
@@ -104,110 +104,46 @@ java.lang.ClassNotFoundException: com.mojang.realmsclient.gui.screens.RealmsNoti
 	at net.minecraft.client.Minecraft.run(Minecraft.java:427) [classes/:?]
 	at net.minecraft.client.main.Main.main(Main.java:113) [classes/:?]
 	at StartDev.main(StartDev.java:22) [test-classes/:?]
-[18:55:45] [Server thread/INFO]: Changing view distance to 12, from 10
-[18:55:45] [Server thread/INFO]: leziink[local:E:f141c360] logged in with entity id 215 at (-10.407369054328187, 69.0, 263.3427790052434)
-[18:55:45] [Server thread/INFO]: leziink joined the game
-[18:55:45] [Client thread/INFO]: [CustomPackets] ✓ Packet REGISTER envoyé pour : CUSTOM:HDV_S2C CUSTOM:HDV_C2S CUSTOM:SHOP_S2C CUSTOM:SHOP_C2S CUSTOM:PDATA_S2C CUSTOM:PDATA_C2S CUSTOM:C2S CUSTOM:S2C
-[18:55:45] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'MC|Brand'
-[18:55:45] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[18:55:45] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('MC|Brand') = false
-[18:55:49] [Server thread/INFO]: Saving and pausing game...
-[18:55:49] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[18:55:49] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[18:55:49] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[18:56:29] [Client thread/WARN]: Unable to play unknown soundEvent: minecraft:step.anvil
-[18:57:22] [Server thread/INFO]: Saving and pausing game...
-[18:57:22] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[18:57:22] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[18:57:22] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[18:57:26] [Server thread/INFO]: Saving and pausing game...
-[18:57:26] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[18:57:26] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[18:57:26] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[18:57:28] [Server thread/INFO]: Saving and pausing game...
-[18:57:28] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[18:57:28] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[18:57:28] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[18:57:31] [Server thread/INFO]: Saving and pausing game...
-[18:57:31] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[18:57:31] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[18:57:31] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[19:01:26] [Server thread/INFO]: Saving and pausing game...
-[19:01:26] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[19:01:26] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[19:01:26] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[19:11:36] [Server thread/INFO]: Saving and pausing game...
-[19:11:36] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[19:11:36] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[19:11:36] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[20:06:29] [Client thread/WARN]: Unable to play unknown soundEvent: minecraft:step.anvil
-[20:06:29] [Client thread/WARN]: Unable to play unknown soundEvent: minecraft:step.anvil
-[20:06:45] [Client thread/WARN]: Unable to play unknown soundEvent: minecraft:step.anvil
-[20:09:46] [Client thread/WARN]: Unable to play unknown soundEvent: minecraft:step.anvil
-[20:10:37] [Server thread/INFO]: Saving and pausing game...
-[20:10:37] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[20:10:37] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[20:10:37] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[20:16:16] [Server thread/INFO]: Saving and pausing game...
-[20:16:16] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[20:16:16] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[20:16:16] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[20:16:38] [Server thread/INFO]: Saving and pausing game...
-[20:16:38] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[20:16:38] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[20:16:38] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[20:16:53] [Client thread/WARN]: Unable to play unknown soundEvent: minecraft:step.anvil
-[20:18:26] [Client thread/WARN]: Unable to play unknown soundEvent: minecraft:step.anvil
-[20:19:54] [Server thread/INFO]: Saving and pausing game...
-[20:19:54] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[20:19:54] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[20:19:54] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[20:20:28] [Server thread/INFO]: Saving and pausing game...
-[20:20:28] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[20:20:28] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[20:20:28] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[20:20:33] [Server thread/INFO]: Saving and pausing game...
-[20:20:33] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[20:20:33] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[20:20:33] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[20:21:01] [Client thread/WARN]: Unable to play unknown soundEvent: minecraft:step.anvil
-[20:21:12] [Server thread/INFO]: Saving and pausing game...
-[20:21:12] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[20:21:12] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[20:21:12] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[20:22:22] [Server thread/INFO]: Saving and pausing game...
-[20:22:22] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[20:22:22] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[20:22:22] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[20:22:29] [Server thread/INFO]: Saving and pausing game...
-[20:22:29] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[20:22:29] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[20:22:29] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[20:22:30] [Server thread/INFO]: Saving and pausing game...
-[20:22:30] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[20:22:30] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[20:22:30] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[20:22:48] [Server thread/INFO]: Saving and pausing game...
-[20:22:48] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[20:22:48] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[20:22:48] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[20:22:59] [Server thread/INFO]: Saving and pausing game...
-[20:22:59] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[20:22:59] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[20:22:59] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[20:23:14] [Server thread/INFO]: Saving and pausing game...
-[20:23:14] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[20:23:14] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[20:23:14] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[20:23:17] [Server thread/INFO]: Saving and pausing game...
-[20:23:17] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[20:23:17] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[20:23:17] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[20:23:18] [Server thread/INFO]: Stopping server
-[20:23:18] [Server thread/INFO]: Saving players
-[20:23:18] [Server thread/INFO]: Saving worlds
-[20:23:18] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[20:23:18] [Client thread/ERROR]: Realms module missing
+[21:53:37] [Server thread/INFO]: Changing view distance to 12, from 10
+[21:53:37] [Server thread/INFO]: leziink[local:E:56a9f464] logged in with entity id 208 at (-2.910344195900568, 73.0, 260.37845927093565)
+[21:53:37] [Server thread/INFO]: leziink joined the game
+[21:53:37] [Client thread/INFO]: [CustomPackets] ✓ Packet REGISTER envoyé pour : CUSTOM:HDV_S2C CUSTOM:HDV_C2S CUSTOM:SHOP_S2C CUSTOM:SHOP_C2S CUSTOM:PDATA_S2C CUSTOM:PDATA_C2S CUSTOM:C2S CUSTOM:S2C
+[21:53:37] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'MC|Brand'
+[21:53:37] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
+[21:53:37] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('MC|Brand') = false
+[21:53:41] [Server thread/INFO]: Saving and pausing game...
+[21:53:41] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
+[21:53:41] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
+[21:53:41] [Server thread/INFO]: Saving chunks for level 'New World'/The End
+[21:53:57] [Server thread/INFO]: Saving and pausing game...
+[21:53:57] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
+[21:53:57] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
+[21:53:57] [Server thread/INFO]: Saving chunks for level 'New World'/The End
+[21:54:03] [Server thread/INFO]: Saving and pausing game...
+[21:54:03] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
+[21:54:03] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
+[21:54:03] [Server thread/INFO]: Saving chunks for level 'New World'/The End
+[21:54:13] [Server thread/INFO]: Saving and pausing game...
+[21:54:13] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
+[21:54:13] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
+[21:54:13] [Server thread/INFO]: Saving chunks for level 'New World'/The End
+[21:54:14] [Server thread/INFO]: Saving and pausing game...
+[21:54:14] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
+[21:54:14] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
+[21:54:14] [Server thread/INFO]: Saving chunks for level 'New World'/The End
+[21:55:36] [Server thread/INFO]: Saving and pausing game...
+[21:55:36] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
+[21:55:36] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
+[21:55:36] [Server thread/INFO]: Saving chunks for level 'New World'/The End
+[22:46:34] [Server thread/INFO]: Saving and pausing game...
+[22:46:34] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
+[22:46:34] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
+[22:46:34] [Server thread/INFO]: Saving chunks for level 'New World'/The End
+[22:46:35] [Server thread/INFO]: Stopping server
+[22:46:35] [Server thread/INFO]: Saving players
+[22:46:35] [Server thread/INFO]: Saving worlds
+[22:46:35] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
+[22:46:35] [Client thread/ERROR]: Realms module missing
 java.lang.ClassNotFoundException: com.mojang.realmsclient.gui.screens.RealmsNotificationsScreen
 	at java.net.URLClassLoader.findClass(URLClassLoader.java:381) ~[?:1.8.0_181]
 	at java.lang.ClassLoader.loadClass(ClassLoader.java:424) ~[?:1.8.0_181]
@@ -228,161 +164,8 @@ java.lang.ClassNotFoundException: com.mojang.realmsclient.gui.screens.RealmsNoti
 	at net.minecraft.client.Minecraft.run(Minecraft.java:427) [classes/:?]
 	at net.minecraft.client.main.Main.main(Main.java:113) [classes/:?]
 	at StartDev.main(StartDev.java:22) [test-classes/:?]
-[20:23:18] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[20:23:18] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[20:23:20] [Client thread/INFO]: Connecting to 127.0.0.1, 7777
-[20:23:20] [Client thread/INFO]: [CustomPackets] ✓ Packet REGISTER envoyé pour : CUSTOM:HDV_S2C CUSTOM:HDV_C2S CUSTOM:SHOP_S2C CUSTOM:SHOP_C2S CUSTOM:PDATA_S2C CUSTOM:PDATA_C2S CUSTOM:C2S CUSTOM:S2C
-[20:23:20] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'REGISTER'
-[20:23:20] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[20:23:20] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('REGISTER') = false
-[20:23:20] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'MC|Brand'
-[20:23:20] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[20:23:20] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('MC|Brand') = false
-[20:23:20] [Client thread/INFO]: [CHAT] [+] leziink a rejoint RedConflict.
-[20:23:20] [Client thread/INFO]: [CHAT] --------------------------------
-[20:23:20] [Client thread/INFO]: [CHAT]   Bienvenue sur RedConflict !
-[20:23:20] [Client thread/INFO]: [CHAT]   Serveur 1.8.9 | PvP / Survie
-[20:23:20] [Client thread/INFO]: [CHAT]   Discord : discord.gg/UMJUnfQq
-[20:23:20] [Client thread/INFO]: [CHAT]   Tapez /commands pour voir les commandes.
-[20:23:20] [Client thread/INFO]: [CHAT]   Boutique : /shop | HDV : /hdv
-[20:23:20] [Client thread/INFO]: [CHAT] --------------------------------
-[20:23:21] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'CUSTOM:HDV_S2C'
-[20:23:21] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[20:23:21] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('CUSTOM:HDV_S2C') = true
-[20:23:21] [Client thread/INFO]: [NetHandler] ✓ Dispatching vers PacketDispatcher...
-[20:23:21] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'CUSTOM:PDATA_S2C'
-[20:23:21] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[20:23:21] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('CUSTOM:PDATA_S2C') = true
-[20:23:21] [Client thread/INFO]: [NetHandler] ✓ Dispatching vers PacketDispatcher...
-[20:23:21] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'CUSTOM:HDV_S2C'
-[20:23:21] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[20:23:21] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('CUSTOM:HDV_S2C') = true
-[20:23:21] [Client thread/INFO]: [NetHandler] ✓ Dispatching vers PacketDispatcher...
-[20:23:21] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'CUSTOM:PDATA_S2C'
-[20:23:21] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[20:23:21] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('CUSTOM:PDATA_S2C') = true
-[20:23:21] [Client thread/INFO]: [NetHandler] ✓ Dispatching vers PacketDispatcher...
-[20:23:22] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'CUSTOM:PDATA_S2C'
-[20:23:22] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[20:23:22] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('CUSTOM:PDATA_S2C') = true
-[20:23:22] [Client thread/INFO]: [NetHandler] ✓ Dispatching vers PacketDispatcher...
-[20:23:22] [Chunk Batcher 1/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[20:23:22] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'CUSTOM:HDV_S2C'
-[20:23:22] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[20:23:22] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('CUSTOM:HDV_S2C') = true
-[20:23:22] [Client thread/INFO]: [NetHandler] ✓ Dispatching vers PacketDispatcher...
-[20:23:22] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'CUSTOM:PDATA_S2C'
-[20:23:22] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[20:23:22] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('CUSTOM:PDATA_S2C') = true
-[20:23:22] [Client thread/INFO]: [NetHandler] ✓ Dispatching vers PacketDispatcher...
-[20:23:22] [Chunk Batcher 0/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[20:23:29] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'CUSTOM:HDV_S2C'
-[20:23:29] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[20:23:29] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('CUSTOM:HDV_S2C') = true
-[20:23:29] [Client thread/INFO]: [NetHandler] ✓ Dispatching vers PacketDispatcher...
-[20:23:29] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'CUSTOM:PDATA_S2C'
-[20:23:29] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[20:23:29] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('CUSTOM:PDATA_S2C') = true
-[20:23:29] [Client thread/INFO]: [NetHandler] ✓ Dispatching vers PacketDispatcher...
-[20:23:29] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'CUSTOM:HDV_S2C'
-[20:23:29] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[20:23:29] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('CUSTOM:HDV_S2C') = true
-[20:23:29] [Client thread/INFO]: [NetHandler] ✓ Dispatching vers PacketDispatcher...
-[20:23:29] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'CUSTOM:PDATA_S2C'
-[20:23:29] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[20:23:29] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('CUSTOM:PDATA_S2C') = true
-[20:23:29] [Client thread/INFO]: [NetHandler] ✓ Dispatching vers PacketDispatcher...
-[20:26:13] [Chunk Batcher 1/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[20:26:18] [Chunk Batcher 0/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[20:26:55] [Chunk Batcher 0/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[20:29:27] [Client thread/WARN]: Unable to play unknown soundEvent: minecraft:step.anvil
-[20:33:49] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'CUSTOM:HDV_S2C'
-[20:33:49] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[20:33:49] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('CUSTOM:HDV_S2C') = true
-[20:33:49] [Client thread/INFO]: [NetHandler] ✓ Dispatching vers PacketDispatcher...
-[20:33:49] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'CUSTOM:PDATA_S2C'
-[20:33:49] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[20:33:49] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('CUSTOM:PDATA_S2C') = true
-[20:33:49] [Client thread/INFO]: [NetHandler] ✓ Dispatching vers PacketDispatcher...
-[20:33:49] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'CUSTOM:HDV_S2C'
-[20:33:49] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[20:33:49] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('CUSTOM:HDV_S2C') = true
-[20:33:49] [Client thread/INFO]: [NetHandler] ✓ Dispatching vers PacketDispatcher...
-[20:33:49] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'CUSTOM:PDATA_S2C'
-[20:33:49] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[20:33:49] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('CUSTOM:PDATA_S2C') = true
-[20:33:49] [Client thread/INFO]: [NetHandler] ✓ Dispatching vers PacketDispatcher...
-[20:33:50] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'CUSTOM:SHOP_S2C'
-[20:33:50] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[20:33:50] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('CUSTOM:SHOP_S2C') = true
-[20:33:50] [Client thread/INFO]: [NetHandler] ✓ Dispatching vers PacketDispatcher...
-[20:33:50] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'CUSTOM:SHOP_S2C'
-[20:33:50] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[20:33:50] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('CUSTOM:SHOP_S2C') = true
-[20:33:50] [Client thread/INFO]: [NetHandler] ✓ Dispatching vers PacketDispatcher...
-[20:33:50] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'CUSTOM:SHOP_S2C'
-[20:33:50] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[20:33:50] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('CUSTOM:SHOP_S2C') = true
-[20:33:50] [Client thread/INFO]: [NetHandler] ✓ Dispatching vers PacketDispatcher...
-[20:33:50] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'CUSTOM:SHOP_S2C'
-[20:33:50] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[20:33:50] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('CUSTOM:SHOP_S2C') = true
-[20:33:50] [Client thread/INFO]: [NetHandler] ✓ Dispatching vers PacketDispatcher...
-[20:33:50] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'CUSTOM:SHOP_S2C'
-[20:33:50] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[20:33:50] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('CUSTOM:SHOP_S2C') = true
-[20:33:50] [Client thread/INFO]: [NetHandler] ✓ Dispatching vers PacketDispatcher...
-[20:33:50] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'CUSTOM:SHOP_S2C'
-[20:33:50] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[20:33:50] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('CUSTOM:SHOP_S2C') = true
-[20:33:50] [Client thread/INFO]: [NetHandler] ✓ Dispatching vers PacketDispatcher...
-[20:33:50] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'CUSTOM:SHOP_S2C'
-[20:33:50] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[20:33:50] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('CUSTOM:SHOP_S2C') = true
-[20:33:50] [Client thread/INFO]: [NetHandler] ✓ Dispatching vers PacketDispatcher...
-[20:33:50] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'CUSTOM:SHOP_S2C'
-[20:33:50] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[20:33:50] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('CUSTOM:SHOP_S2C') = true
-[20:33:50] [Client thread/INFO]: [NetHandler] ✓ Dispatching vers PacketDispatcher...
-[20:33:50] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'CUSTOM:SHOP_S2C'
-[20:33:50] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
-[20:33:50] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('CUSTOM:SHOP_S2C') = true
-[20:33:50] [Client thread/INFO]: [NetHandler] ✓ Dispatching vers PacketDispatcher...
-[20:33:53] [Client thread/INFO]: [CHAT] [ClearLagg] Nettoyage dans 60 seconde(s).
-[20:34:30] [Client thread/INFO]: [CHAT] [ClearLagg] Nettoyage dans 30 seconde(s).
-[20:34:38] [Client thread/WARN]: Unable to play unknown soundEvent: minecraft:step.anvil
-[20:34:55] [Client thread/INFO]: [CHAT] [ClearLagg] Nettoyage dans 10 seconde(s).
-[20:35:07] [Client thread/INFO]: [CHAT] [ClearLagg] Nettoyage terminé : 0 items 0 mobs
-[20:35:26] [Client thread/INFO]: [CHAT] --------------------------------
-[20:35:26] [Client thread/INFO]: [CHAT]   leziink | Classement #1
-[20:35:26] [Client thread/INFO]: [CHAT] --------------------------------
-[20:35:26] [Client thread/INFO]: [CHAT]   Kills         | 0
-[20:35:26] [Client thread/INFO]: [CHAT]   Morts         | 0
-[20:35:26] [Client thread/INFO]: [CHAT]   Ratio K/D     | 0.00
-[20:35:26] [Client thread/INFO]: [CHAT]   Temps de jeu  | 4h 29min
-[20:35:26] [Client thread/INFO]: [CHAT] --------------------------------
-[20:35:26] [Client thread/INFO]: [CHAT]   Tapez /ks top pour le classement global.
-[20:35:28] [Client thread/INFO]: [CHAT] --------------------------------
-[20:35:28] [Client thread/INFO]: [CHAT]   Classement KS | Top 2
-[20:35:28] [Client thread/INFO]: [CHAT] --------------------------------
-[20:35:28] [Client thread/INFO]: [CHAT]   #1 leziink | K 0 | M 0 | KD 0.00
-[20:35:28] [Client thread/INFO]: [CHAT]   #2 Red_One | K 0 | M 0 | KD 0.00
-[20:35:28] [Client thread/INFO]: [CHAT] --------------------------------
-[20:35:28] [Client thread/INFO]: [CHAT]   Votre position : #1
-[20:35:30] [Client thread/WARN]: Unable to play unknown soundEvent: minecraft:step.anvil
-[20:35:55] [Client thread/INFO]: [CHAT] Unknown command. Type "/help" for help.
-[20:35:56] [Client thread/INFO]: [CHAT] --------------------------------
-[20:35:56] [Client thread/INFO]: [CHAT] Amis — Aide
-[20:35:56] [Client thread/INFO]: [CHAT]   /friend add <joueur>    — Envoyer une demande d'ami
-[20:35:56] [Client thread/INFO]: [CHAT]   /friend accept <joueur> — Accepter une demande
-[20:35:56] [Client thread/INFO]: [CHAT]   /friend deny <joueur>   — Refuser une demande
-[20:35:56] [Client thread/INFO]: [CHAT]   /friend remove <joueur> — Supprimer un ami
-[20:35:56] [Client thread/INFO]: [CHAT]   /friend list              — Voir votre liste d'amis
-[20:35:56] [Client thread/INFO]: [CHAT] --------------------------------
-[20:36:10] [Client thread/INFO]: [CHAT] [RedConflict] Usage : /friend add <joueur>
-[20:36:14] [Client thread/INFO]: [CHAT] --------------------------------
-[20:36:14] [Client thread/INFO]: [CHAT] Amis [0/5]
-[20:36:14] [Client thread/INFO]: [CHAT]   Vous n'avez aucun ami pour l'instant.
-[20:36:14] [Client thread/INFO]: [CHAT]   Utilisez /friend add <joueur> pour en ajouter.
-[20:36:14] [Client thread/INFO]: [CHAT] --------------------------------
-[20:37:04] [Client thread/INFO]: [CHAT] [RedConflict] Usage : /trade <joueur> | /trade accept | /trade deny
+[22:46:35] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
+[22:46:35] [Server thread/INFO]: Saving chunks for level 'New World'/The End
+[22:46:35] [Client thread/INFO]: Stopping!
+[22:46:35] [Client thread/INFO]: SoundSystem shutting down...
+[22:46:35] [Client thread/WARN]: Author: Paul Lamb, www.paulscode.com
