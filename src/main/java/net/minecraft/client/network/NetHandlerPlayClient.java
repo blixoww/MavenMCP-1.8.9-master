@@ -2,7 +2,6 @@ package net.minecraft.client.network;
 
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
 import com.mojang.authlib.GameProfile;
 import io.netty.buffer.Unpooled;
 import java.io.File;
@@ -17,7 +16,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.ClientBrandRetriever;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.GuardianSound;
-import net.minecraft.client.custompackets.CustomPacketSystem;
+import net.minecraft.client.custompackets.PacketDispatcher;
 import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiChat;
@@ -212,6 +211,7 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.storage.MapData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import com.google.common.util.concurrent.Futures;
 
 public class NetHandlerPlayClient implements INetHandlerPlayClient
 {
@@ -1822,25 +1822,16 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
      * player instance and finally "MC|RPack" which the server uses to communicate the identifier of the default server
      * resourcepack for the client to load.
      */
-    private static final Logger LOGGER = LogManager.getLogger("CustomPackets");
-
     public void handleCustomPayload(S3FPacketCustomPayload packetIn)
     {
         PacketThreadUtil.checkThreadAndEnqueue(packetIn, this, this.gameController);
 
-        LOGGER.info("[NetHandler] Custom payload reçu: canal = '{}'", packetIn.getChannelName());
-
         // ── Initialiser le système de packets custom ────────────────────────
         net.minecraft.client.custompackets.CustomPacketSystem.init();
-        LOGGER.info("[NetHandler] CustomPacketSystem initialisé");
 
         // ── Dispatch vers le système de packets custom ──────────────────────
-        boolean handles = net.minecraft.client.custompackets.PacketDispatcher.handles(packetIn.getChannelName());
-        LOGGER.info("[NetHandler] PacketDispatcher.handles('{}') = {}", packetIn.getChannelName(), handles);
-
-        if (handles)
+        if (PacketDispatcher.handles(packetIn.getChannelName()))
         {
-            LOGGER.info("[NetHandler] ✓ Dispatching vers PacketDispatcher...");
             net.minecraft.client.custompackets.PacketDispatcher.dispatch(
                     packetIn.getChannelName(), packetIn.getBufferData());
             return;
