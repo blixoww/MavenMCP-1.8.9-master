@@ -21,7 +21,7 @@ import java.util.*;
 
 /**
  * GuiCraftGuide — Ultimate Alchemist & Crafter Edition
- * 
+ *
  * Optimized for MCP 1.8.9 with:
  * · Robust Potion Recipe Navigation (Fixes Splash -> Normal transition)
  * · Enhanced Visuals (Glow, Alchemic Flows, Smooth Scroll)
@@ -107,9 +107,9 @@ public class GuiCraftGuide extends GuiScreen {
         ItemStack fermented = new ItemStack(Items.fermented_spider_eye);
         ItemStack feather = new ItemStack(Items.feather);
         ItemStack diamBlock = new ItemStack(net.minecraft.init.Blocks.diamond_block);
-        
+
         POTION_RECIPES.computeIfAbsent(16, k -> new ArrayList<>()).add(new PotionRecipe(0, 16, new ItemStack(Items.nether_wart), "Potion Étrange"));
-        
+
         addPotionSet(8193, new ItemStack(Items.ghast_tear), "Régénération", glowstone, redstone, gunpowder);
         addPotionSet(8194, new ItemStack(Items.sugar), "Rapidité", glowstone, redstone, gunpowder);
         addPotionSet(8195, new ItemStack(Items.magma_cream), "Résistance au Feu", null, redstone, gunpowder);
@@ -119,12 +119,12 @@ public class GuiCraftGuide extends GuiScreen {
         addPotionSet(8201, new ItemStack(Items.blaze_powder), "Force", glowstone, redstone, gunpowder);
         addPotionSet(8203, new ItemStack(Items.rabbit_foot), "Saut", glowstone, redstone, gunpowder);
         addPotionSet(8205, new ItemStack(Items.fish, 1, 3), "Respiration Aquatique", null, redstone, gunpowder);
-        
+
         POTION_RECIPES.computeIfAbsent(8200, k -> new ArrayList<>()).add(new PotionRecipe(0, 8200, fermented, "Faiblesse"));
         POTION_RECIPES.computeIfAbsent(8264, k -> new ArrayList<>()).add(new PotionRecipe(8200, 8264, redstone, "Faiblesse Étendue"));
         POTION_RECIPES.computeIfAbsent(16392, k -> new ArrayList<>()).add(new PotionRecipe(8200, 16392, gunpowder, "Faiblesse Jetable"));
         POTION_RECIPES.computeIfAbsent(16456, k -> new ArrayList<>()).add(new PotionRecipe(8264, 16456, gunpowder, "Faiblesse Étendue Jetable"));
-        
+
         POTION_RECIPES.computeIfAbsent(8202, k -> new ArrayList<>()).add(new PotionRecipe(8194, 8202, fermented, "Lenteur"));
         POTION_RECIPES.computeIfAbsent(8202, k -> new ArrayList<>()).add(new PotionRecipe(8203, 8202, fermented, "Lenteur"));
         POTION_RECIPES.computeIfAbsent(8204, k -> new ArrayList<>()).add(new PotionRecipe(8197, 8204, fermented, "Dégâts Instantanés"));
@@ -199,7 +199,7 @@ public class GuiCraftGuide extends GuiScreen {
         buttonList.clear();
         mode = Mode.LIST;
         selected = null;
-        
+
         SZ = GuiRenderUtils.clamp(height / 18, 16, 22);
         COLS = GuiRenderUtils.clamp((width - 60) / SZ, 7, 10);
         visibleRows = GuiRenderUtils.clamp((height - 150) / SZ, 4, 7);
@@ -340,9 +340,9 @@ public class GuiCraftGuide extends GuiScreen {
                 drawSlot3D(x, y);
                 itemRender.renderItemAndEffectIntoGUI(filtered.get(i), x + 1, y + 1);
                 // Correction : Highlight pour les slots partiellement visibles
-                if (inside(mx, my, x, y, SZ, SZ) && y + SZ > gridY && y < gridY + sbH) { 
-                    drawSlotHover(x, y); 
-                    hov = filtered.get(i); 
+                if (inside(mx, my, x, y, SZ, SZ) && y + SZ > gridY && y < gridY + sbH) {
+                    drawSlotHover(x, y);
+                    hov = filtered.get(i);
                 }
             }
         }
@@ -393,7 +393,7 @@ public class GuiCraftGuide extends GuiScreen {
         btnClose.yPosition = btnY; btnClose.xPosition = panelX + panelW - pad - btnW;
         drawNavButton(btnBack.xPosition, btnBack.yPosition, btnW, btnH, "\u25C4 Retour", inside(mx, my, btnBack.xPosition, btnBack.yPosition, btnW, btnH), accent);
         drawNavButton(btnClose.xPosition, btnClose.yPosition, btnW, btnH, "Fermer", inside(mx, my, btnClose.xPosition, btnClose.yPosition, btnW, btnH), C_ACCENT);
-        
+
         if (!historyStack.isEmpty()) {
             drawCenteredString(fontRendererObj, "\u00a78" + historyStack.size() + " en historique", cx, btnY + 5, C_TXT_DIM);
         }
@@ -411,7 +411,7 @@ public class GuiCraftGuide extends GuiScreen {
             drawRect(sx, sy, sx + 1, sy + SZ, C_SLOT_LT);
             drawRect(sx + SZ - 1, sy, sx + SZ, sy + SZ, C_SLOT_DK);
             drawRect(sx, sy + SZ - 1, sx + SZ, sy + SZ, C_SLOT_DK);
-            
+
             if (grid[i] != null) {
                 itemRender.renderItemAndEffectIntoGUI(grid[i], sx + 1, sy + 1);
                 if (inside(mx, my, sx, sy, SZ, SZ)) { drawSlotHover(sx, sy); hov = grid[i]; }
@@ -447,29 +447,29 @@ public class GuiCraftGuide extends GuiScreen {
         if (currentBrewRecipe == null) return null;
         int bx = cx - BREW_W / 2; ItemStack hov = null;
         drawRect(bx - 4, top - 4, bx + BREW_W + 4, top + BREW_H + 4, C_RECIPE_BG);
-        
+
         // Visual connecting lines
         int ingX = bx + BREW_W / 2 - SZ / 2, ingY = top + 6;
         int inX = bx + 10, inY = top + BREW_H - SZ - 6;
         int outX = bx + BREW_W - SZ - 10, outY = inY;
-        
+
         drawRect(cx, ingY + SZ, cx + 1, inY - 4, C_BREW & 0x44FFFFFF);
         drawRect(bx + 16, inY - 4, bx + BREW_W - 16, inY - 3, C_BREW & 0x44FFFFFF);
-        
+
         drawSlot3D(ingX, ingY);
         itemRender.renderItemAndEffectIntoGUI(currentBrewRecipe.ingredient, ingX + 1, ingY + 1);
         if (inside(mx, my, ingX, ingY, SZ, SZ)) { hov = currentBrewRecipe.ingredient; drawSlotHover(ingX, ingY); }
-        
+
         drawSlot3D(inX, inY);
         ItemStack inS = getPotionStack(currentBrewRecipe.inputMeta);
         itemRender.renderItemAndEffectIntoGUI(inS, inX + 1, inY + 1);
         if (inside(mx, my, inX, inY, SZ, SZ)) { hov = inS; drawSlotHover(inX, inY); }
-        
+
         drawSlotOutput(outX, outY, C_BREW);
         ItemStack outS = getPotionStack(currentBrewRecipe.outputMeta);
         itemRender.renderItemAndEffectIntoGUI(outS, outX + 1, outY + 1);
         if (inside(mx, my, outX, outY, SZ, SZ)) { hov = outS; drawSlotHover(outX, outY); }
-        
+
         String recipeInfo = currentBrewRecipe.name + (brewRecipesForItem.size() > 1 ? " (" + (brewRecipeIndex + 1) + "/" + brewRecipesForItem.size() + ")" : "");
         drawCenteredString(fontRendererObj, "\u00a7b" + recipeInfo, cx, top + BREW_H + 6, C_TXT_BREW);
         return hov;
@@ -507,11 +507,11 @@ public class GuiCraftGuide extends GuiScreen {
         if (a.getItem() == Items.potionitem) {
             int ma = resolveCustomPotionMeta(a), mb = resolveCustomPotionMeta(b);
             if (ma != -1 || mb != -1) return ma == mb;
-            
+
             // Vanilla potion comparison: meta bits represent the effect
             int da = a.getItemDamage(), db = b.getItemDamage();
             // Normaliser en ignorant les bits inutiles pour la comparaison de type
-            int mask = 15 | 32 | 64 | 16384; 
+            int mask = 15 | 32 | 64 | 16384;
             return (da & mask) == (db & mask);
         }
         return a.getItemDamage() == b.getItemDamage();
@@ -538,14 +538,14 @@ public class GuiCraftGuide extends GuiScreen {
         if (stack.getItem() == Items.potionitem) {
             int meta = resolveCustomPotionMeta(stack);
             if (meta == -1) meta = stack.getItemDamage();
-            
+
             if (POTION_RECIPES.containsKey(meta)) brewRecipesForItem.addAll(POTION_RECIPES.get(meta));
             else {
                 for (Map.Entry<Integer, List<PotionRecipe>> e : POTION_RECIPES.entrySet()) {
                     if (isSameStack(getPotionStack(e.getKey()), stack)) { brewRecipesForItem.addAll(e.getValue()); break; }
                 }
             }
-            if (!brewRecipesForItem.isEmpty()) { 
+            if (!brewRecipesForItem.isEmpty()) {
                 brewRecipesForItem.sort(Comparator.comparingInt(a -> a.inputMeta));
                 currentBrewRecipe = brewRecipesForItem.get(0); mode = Mode.BREWING;
             }
@@ -568,7 +568,7 @@ public class GuiCraftGuide extends GuiScreen {
             }
         }
         if (mode != Mode.LIST) return true;
-        
+
         mode = oldMode; selected = oldSel; craftRecipe = oldCraft; furnaceInput = oldFurnace; brewRecipesForItem = oldBrew; currentBrewRecipe = oldCurBrew; brewRecipeIndex = oldBrewIdx;
         return false;
     }
@@ -614,22 +614,22 @@ public class GuiCraftGuide extends GuiScreen {
     }
 
     private ItemStack fixWildcard(ItemStack s) { if (s == null) return null; ItemStack c = s.copy(); if (c.getItemDamage() == 32767) c.setItemDamage(0); return c; }
-    
+
     private ItemStack[] getGrid(IRecipe r) {
         ItemStack[] g = new ItemStack[9];
         if (r instanceof ShapedRecipes) {
-            ShapedRecipes sr \u003d (ShapedRecipes) r;
-            int rw \u003d sr.getRecipeWidth();
-            int rh \u003d sr.getRecipeHeight();
-            ItemStack[] items \u003d sr.getRecipeItems();
-            for (int row \u003d 0; row \u003c rh; row++) {
-                for (int col \u003d 0; col \u003c rw; col++) {
-                    g[row * 3 + col] \u003d fixWildcard(items[row * rw + col]);
+            ShapedRecipes sr = (ShapedRecipes) r;
+            int rw = sr.getRecipeWidth();
+            int rh = sr.getRecipeHeight();
+            ItemStack[] items = sr.getRecipeItems();
+            for (int row = 0; row < rh; row++) {
+                for (int col = 0; col < rw; col++) {
+                    g[row * 3 + col] = fixWildcard(items[row * rw + col]);
                 }
             }
         } else if (r instanceof ShapelessRecipes) {
-            List\u003cItemStack\u003e items \u003d ((ShapelessRecipes) r).getRecipeItems();
-            for (int i \u003d 0; i \u003c items.size() \u0026\u0026 i \u003c 9; i++) g[i] \u003d fixWildcard(items.get(i));
+            List<ItemStack> items = ((ShapelessRecipes) r).getRecipeItems();
+            for (int i = 0; i < items.size() && i < 9; i++) g[i] = fixWildcard(items.get(i));
         }
         return g;
     }
@@ -640,17 +640,17 @@ public class GuiCraftGuide extends GuiScreen {
     protected void mouseClicked(int mx, int my, int btn) throws IOException {
         super.mouseClicked(mx, my, btn);
         if (btn == 1) { goBack(); return; } // Right-click = Back
-        
+
         searchBox.mouseClicked(mx, my, btn);
         if (mode != Mode.LIST) {
             if (inside(mx, my, btnBack.xPosition, btnBack.yPosition, btnW, btnH)) { goBack(); return; }
             if (inside(mx, my, btnClose.xPosition, btnClose.yPosition, btnW, btnH)) { mc.displayGuiScreen(null); return; }
-            
+
             int recipeAreaH = (mode == Mode.BREWING) ? (BREW_H + 30) : (mode == Mode.CRAFT ? 3 * SZ + 30 : SZ + 30);
             int recPanelY = (height - Math.max(panelH, titleH + 10 + 15 + recipeAreaH + 40)) / 2;
             int contentY = recPanelY + titleH + 12 + 14;
             int cx = panelX + panelW / 2;
-            
+
             if (btn == 0) {
                 if (mode == Mode.BREWING && currentBrewRecipe != null) {
                     int bx = cx - BREW_W / 2;
@@ -686,12 +686,12 @@ public class GuiCraftGuide extends GuiScreen {
         super.handleMouseInput(); int w = Mouse.getEventDWheel(), ms = maxScroll();
         if (w < 0 && targetScroll < ms) targetScroll++; if (w > 0 && targetScroll > 0) targetScroll--;
     }
-    @Override protected void keyTyped(char ch, int key) throws IOException { 
-        if (key == Keyboard.KEY_ESCAPE || (mode != Mode.LIST && (key == Keyboard.KEY_BACK || key == Keyboard.KEY_LEFT))) { 
-            if (mode != Mode.LIST) goBack(); else mc.displayGuiScreen(null); 
+    @Override protected void keyTyped(char ch, int key) throws IOException {
+        if (key == Keyboard.KEY_ESCAPE || (mode != Mode.LIST && (key == Keyboard.KEY_BACK || key == Keyboard.KEY_LEFT))) {
+            if (mode != Mode.LIST) goBack(); else mc.displayGuiScreen(null);
         }
-        else if (searchBox.textboxKeyTyped(ch, key)) filter(searchBox.getText()); 
-        else super.keyTyped(ch, key); 
+        else if (searchBox.textboxKeyTyped(ch, key)) filter(searchBox.getText());
+        else super.keyTyped(ch, key);
     }
     @Override protected void actionPerformed(GuiButton btn) throws IOException { if (btn.id == 1) goBack(); else if (btn.id == 2) mc.displayGuiScreen(null); }
 }

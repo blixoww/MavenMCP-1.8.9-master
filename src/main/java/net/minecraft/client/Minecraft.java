@@ -681,10 +681,107 @@ public class Minecraft implements IThreadListener, IPlayerUsage
         {
             try
             {
-                Display.setIcon(new ByteBuffer[] {
-                    generateQuartzBlockIcon(16),
-                    generateQuartzBlockIcon(32)
-                });
+                // Try to load custom icons from the resourcepack: assets/minecraft/textures/logo/logo_16.png and logo_32.png
+                ByteBuffer icon16 = null;
+                ByteBuffer icon32 = null;
+
+                try
+                {
+                    InputStream in16 = this.mcDefaultResourcePack.getInputStream(new ResourceLocation("textures/logo/logo_16.png"));
+                    icon16 = readImageToBuffer(in16);
+                    IOUtils.closeQuietly(in16);
+                }
+                catch (Exception e)
+                {
+                    // ignore - will try other options
+                }
+
+                try
+                {
+                    InputStream in32 = this.mcDefaultResourcePack.getInputStream(new ResourceLocation("textures/logo/logo_32.png"));
+                    icon32 = readImageToBuffer(in32);
+                    IOUtils.closeQuietly(in32);
+                }
+                catch (Exception e)
+                {
+                    // ignore - will try other options
+                }
+
+                // If we didn't find explicit 16/32 icons, try a single logo.png and scale it
+                if (icon16 == null || icon32 == null)
+                {
+                    try
+                    {
+                        InputStream inLogo = this.mcDefaultResourcePack.getInputStream(new ResourceLocation("textures/logo/logo.png"));
+
+                        if (inLogo != null)
+                        {
+                            BufferedImage img = ImageIO.read(inLogo);
+                            IOUtils.closeQuietly(inLogo);
+
+                            if (icon16 == null)
+                            {
+                                BufferedImage scaled16 = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+                                java.awt.Graphics2D g16 = scaled16.createGraphics();
+                                g16.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                                g16.drawImage(img.getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH), 0, 0, null);
+                                g16.dispose();
+
+                                int[] pixels16 = new int[16 * 16];
+                                scaled16.getRGB(0, 0, 16, 16, pixels16, 0, 16);
+                                ByteBuffer buf16 = ByteBuffer.allocateDirect(16 * 16 * 4);
+                                for (int pixel : pixels16)
+                                {
+                                    buf16.put((byte)((pixel >> 16) & 0xFF));
+                                    buf16.put((byte)((pixel >> 8) & 0xFF));
+                                    buf16.put((byte)(pixel & 0xFF));
+                                    buf16.put((byte)((pixel >> 24) & 0xFF));
+                                }
+                                buf16.flip();
+                                icon16 = buf16;
+                            }
+
+                            if (icon32 == null)
+                            {
+                                BufferedImage scaled32 = new BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB);
+                                java.awt.Graphics2D g32 = scaled32.createGraphics();
+                                g32.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                                g32.drawImage(img.getScaledInstance(32, 32, java.awt.Image.SCALE_SMOOTH), 0, 0, null);
+                                g32.dispose();
+
+                                int[] pixels32 = new int[32 * 32];
+                                scaled32.getRGB(0, 0, 32, 32, pixels32, 0, 32);
+                                ByteBuffer buf32 = ByteBuffer.allocateDirect(32 * 32 * 4);
+                                for (int pixel : pixels32)
+                                {
+                                    buf32.put((byte)((pixel >> 16) & 0xFF));
+                                    buf32.put((byte)((pixel >> 8) & 0xFF));
+                                    buf32.put((byte)(pixel & 0xFF));
+                                    buf32.put((byte)((pixel >> 24) & 0xFF));
+                                }
+                                buf32.flip();
+                                icon32 = buf32;
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        // ignore and fallback to quartz generator below
+                    }
+                }
+
+                if (icon16 != null && icon32 != null)
+                {
+                    Display.setIcon(new ByteBuffer[] { icon16, icon32 });
+                }
+                else
+                {
+                    // Fallback to the original quartz-generated icons
+                    Display.setIcon(new ByteBuffer[] {
+                        generateQuartzBlockIcon(16),
+                        generateQuartzBlockIcon(32)
+                    });
+                }
             }
             catch (Exception e)
             {
