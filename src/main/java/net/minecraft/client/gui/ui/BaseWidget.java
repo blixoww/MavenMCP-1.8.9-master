@@ -146,7 +146,7 @@ public abstract class BaseWidget implements UIElement {
         if (showBg) {
             int bgCol = 0x88000000; // Default dark semi-transparent
             int outlineCol = getColor();
-            
+
             GlStateManager.enableBlend();
             Gui.drawRect(this.x - 2, this.y - 2, this.x + getWidth() + 2, this.y + getHeight() + 2, bgCol);
             GuiRenderUtils.drawRectOutline(this.x - 2, this.y - 2, getWidth() + 4, getHeight() + 4, (0xAA << 24) | (outlineCol & 0xFFFFFF));

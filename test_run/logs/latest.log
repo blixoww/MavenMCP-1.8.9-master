@@ -1,8 +1,46 @@
-[00:04:49] [Client thread/INFO]: [CHAT] Vous n'êtes plus AFK.
-[00:04:51] [Client thread/WARN]: Unable to play unknown soundEvent: minecraft:step.anvil
-[00:04:51] [Client thread/WARN]: Unable to play unknown soundEvent: minecraft:step.anvil
-[00:04:51] [Client thread/WARN]: Unable to play unknown soundEvent: minecraft:step.anvil
-[00:05:20] [Client thread/ERROR]: Realms module missing
+[10:26:26] [Client thread/INFO]: Setting user: leziink
+[10:26:26] [Client thread/INFO]: (Session ID is token:0:leziink)
+[10:26:27] [Client thread/INFO]: LWJGL Version: 2.9.4
+[10:26:27] [Client thread/INFO]: Reloading ResourceManager: Default
+[10:26:27] [Client thread/ERROR]: Couldn't initialize twitch stream
+[10:26:27] [Sound Library Loader/INFO]: Starting up SoundSystem...
+[10:26:27] [Thread-7/INFO]: Initializing LWJGL OpenAL
+[10:26:27] [Thread-7/INFO]: (The LWJGL binding of OpenAL.  For more information, see http://www.lwjgl.org)
+[10:26:27] [Thread-7/INFO]: OpenAL initialized.
+[10:26:27] [Client thread/WARN]: Unable to load variant: seamless=false,variant=nether_brick from minecraft:double_obsidian_slab#seamless=false,variant=nether_brick
+[10:26:27] [Client thread/WARN]: Unable to load variant: half=bottom,variant=nether_brick from minecraft:obsidian_slab#half=bottom,variant=nether_brick
+[10:26:28] [Client thread/WARN]: Unable to load variant: half=bottom,variant=sandstone from minecraft:obsidian_slab#half=bottom,variant=sandstone
+[10:26:28] [Client thread/WARN]: Unable to load variant: seamless=true,variant=sandstone from minecraft:double_obsidian_slab#seamless=true,variant=sandstone
+[10:26:28] [Client thread/WARN]: Unable to load variant: seamless=false,variant=cobblestone from minecraft:double_obsidian_slab#seamless=false,variant=cobblestone
+[10:26:28] [Client thread/WARN]: Unable to load variant: seamless=true,variant=cobblestone from minecraft:double_obsidian_slab#seamless=true,variant=cobblestone
+[10:26:28] [Client thread/WARN]: Unable to load variant: seamless=true,variant=quartz from minecraft:double_obsidian_slab#seamless=true,variant=quartz
+[10:26:28] [Client thread/WARN]: Unable to load variant: seamless=true,variant=nether_brick from minecraft:double_obsidian_slab#seamless=true,variant=nether_brick
+[10:26:28] [Client thread/WARN]: Unable to load variant: half=top,variant=stone_brick from minecraft:obsidian_slab#half=top,variant=stone_brick
+[10:26:28] [Client thread/WARN]: Unable to load variant: seamless=false,variant=quartz from minecraft:double_obsidian_slab#seamless=false,variant=quartz
+[10:26:28] [Client thread/WARN]: Unable to load variant: seamless=true,variant=brick from minecraft:double_obsidian_slab#seamless=true,variant=brick
+[10:26:28] [Client thread/WARN]: Unable to load variant: half=bottom,variant=brick from minecraft:obsidian_slab#half=bottom,variant=brick
+[10:26:28] [Client thread/WARN]: Unable to load variant: half=top,variant=cobblestone from minecraft:obsidian_slab#half=top,variant=cobblestone
+[10:26:28] [Client thread/WARN]: Unable to load variant: half=bottom,variant=cobblestone from minecraft:obsidian_slab#half=bottom,variant=cobblestone
+[10:26:28] [Client thread/WARN]: Unable to load variant: half=top,variant=brick from minecraft:obsidian_slab#half=top,variant=brick
+[10:26:28] [Client thread/WARN]: Unable to load variant: half=top,variant=wood_old from minecraft:obsidian_slab#half=top,variant=wood_old
+[10:26:28] [Client thread/WARN]: Unable to load variant: half=bottom,variant=quartz from minecraft:obsidian_slab#half=bottom,variant=quartz
+[10:26:28] [Client thread/WARN]: Unable to load variant: seamless=false,variant=brick from minecraft:double_obsidian_slab#seamless=false,variant=brick
+[10:26:28] [Client thread/WARN]: Unable to load variant: seamless=true,variant=wood_old from minecraft:double_obsidian_slab#seamless=true,variant=wood_old
+[10:26:28] [Sound Library Loader/INFO]: Sound engine started
+[10:26:28] [Client thread/WARN]: Unable to load variant: seamless=false,variant=stone_brick from minecraft:double_obsidian_slab#seamless=false,variant=stone_brick
+[10:26:28] [Client thread/WARN]: Unable to load variant: half=top,variant=quartz from minecraft:obsidian_slab#half=top,variant=quartz
+[10:26:28] [Client thread/WARN]: Unable to load variant: seamless=false,variant=wood_old from minecraft:double_obsidian_slab#seamless=false,variant=wood_old
+[10:26:28] [Client thread/WARN]: Unable to load variant: half=bottom,variant=stone_brick from minecraft:obsidian_slab#half=bottom,variant=stone_brick
+[10:26:28] [Client thread/WARN]: Unable to load variant: half=bottom,variant=wood_old from minecraft:obsidian_slab#half=bottom,variant=wood_old
+[10:26:28] [Client thread/WARN]: Unable to load variant: seamless=false,variant=sandstone from minecraft:double_obsidian_slab#seamless=false,variant=sandstone
+[10:26:28] [Client thread/WARN]: Unable to load variant: seamless=true,variant=stone_brick from minecraft:double_obsidian_slab#seamless=true,variant=stone_brick
+[10:26:28] [Client thread/WARN]: Unable to load variant: half=top,variant=sandstone from minecraft:obsidian_slab#half=top,variant=sandstone
+[10:26:28] [Client thread/WARN]: Unable to load variant: half=top,variant=nether_brick from minecraft:obsidian_slab#half=top,variant=nether_brick
+[10:26:29] [Client thread/INFO]: Created: 1024x1024 textures-atlas
+[10:26:30] [Client thread/INFO]: [CustomPackets] ✓ Initialisation du système de packets custom...
+[10:26:30] [Client thread/INFO]: [CustomPackets] ✓ HdvPacketHandler enregistré
+[10:26:30] [Client thread/INFO]: [CustomPackets] ✓ Système initialisé avec succès.
+[10:26:30] [Client thread/ERROR]: Realms module missing
 java.lang.ClassNotFoundException: com.mojang.realmsclient.gui.screens.RealmsNotificationsScreen
 	at java.net.URLClassLoader.findClass(URLClassLoader.java:381) ~[?:1.8.0_181]
 	at java.lang.ClassLoader.loadClass(ClassLoader.java:424) ~[?:1.8.0_181]
@@ -14,17 +52,102 @@ java.lang.ClassNotFoundException: com.mojang.realmsclient.gui.screens.RealmsNoti
 	at net.minecraft.client.gui.GuiMainMenu.initGui(GuiMainMenu.java:246) [classes/:?]
 	at net.minecraft.client.gui.GuiScreen.setWorldAndResolution(GuiScreen.java:556) [classes/:?]
 	at net.minecraft.client.Minecraft.displayGuiScreen(Minecraft.java:1192) [classes/:?]
-	at net.minecraft.client.gui.GuiMultiplayer.actionPerformed(GuiMultiplayer.java:185) [classes/:?]
-	at net.minecraft.client.gui.GuiScreen.mouseClicked(GuiScreen.java:511) [classes/:?]
-	at net.minecraft.client.gui.GuiMultiplayer.mouseClicked(GuiMultiplayer.java:437) [classes/:?]
-	at net.minecraft.client.gui.GuiScreen.handleMouseInput(GuiScreen.java:619) [classes/:?]
-	at net.minecraft.client.gui.GuiMultiplayer.handleMouseInput(GuiMultiplayer.java:88) [classes/:?]
+	at net.minecraft.client.Minecraft.startGame(Minecraft.java:583) [classes/:?]
+	at net.minecraft.client.Minecraft.run(Minecraft.java:407) [classes/:?]
+	at net.minecraft.client.main.Main.main(Main.java:113) [classes/:?]
+	at StartDev.main(StartDev.java:22) [test-classes/:?]
+[10:27:00] [Client thread/ERROR]: Realms module missing
+java.lang.ClassNotFoundException: com.mojang.realmsclient.gui.screens.RealmsNotificationsScreen
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:381) ~[?:1.8.0_181]
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:424) ~[?:1.8.0_181]
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:349) ~[?:1.8.0_181]
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357) ~[?:1.8.0_181]
+	at java.lang.Class.forName0(Native Method) ~[?:1.8.0_181]
+	at java.lang.Class.forName(Class.java:264) ~[?:1.8.0_181]
+	at net.minecraft.realms.RealmsBridge.getNotificationScreen(RealmsBridge.java:38) [classes/:?]
+	at net.minecraft.client.gui.GuiMainMenu.initGui(GuiMainMenu.java:246) [classes/:?]
+	at net.minecraft.client.gui.GuiScreen.setWorldAndResolution(GuiScreen.java:556) [classes/:?]
+	at net.minecraft.client.Minecraft.displayGuiScreen(Minecraft.java:1192) [classes/:?]
+	at net.minecraft.client.gui.GuiSelectWorld.func_146615_e(GuiSelectWorld.java:180) [classes/:?]
+	at net.minecraft.client.gui.GuiSelectWorld$List.elementClicked(GuiSelectWorld.java:284) [classes/:?]
+	at net.minecraft.client.gui.GuiSlot.handleMouseInput(GuiSlot.java:354) [classes/:?]
+	at net.minecraft.client.gui.GuiSelectWorld.handleMouseInput(GuiSelectWorld.java:83) [classes/:?]
 	at net.minecraft.client.gui.GuiScreen.handleInput(GuiScreen.java:588) [classes/:?]
 	at net.minecraft.client.Minecraft.runTick(Minecraft.java:1975) [classes/:?]
 	at net.minecraft.client.Minecraft.runGameLoop(Minecraft.java:1296) [classes/:?]
 	at net.minecraft.client.Minecraft.run(Minecraft.java:427) [classes/:?]
 	at net.minecraft.client.main.Main.main(Main.java:113) [classes/:?]
 	at StartDev.main(StartDev.java:22) [test-classes/:?]
-[00:05:20] [Client thread/INFO]: Stopping!
-[00:05:20] [Client thread/INFO]: SoundSystem shutting down...
-[00:05:20] [Client thread/WARN]: Author: Paul Lamb, www.paulscode.com
+[10:27:00] [Server thread/INFO]: Starting integrated minecraft server version 1.8.9
+[10:27:00] [Server thread/INFO]: Generating keypair
+[10:27:00] [Server thread/INFO]: Preparing start region for level 0
+[10:27:01] [Server thread/INFO]: Changing view distance to 12, from 10
+[10:27:01] [Client thread/ERROR]: Realms module missing
+java.lang.ClassNotFoundException: com.mojang.realmsclient.gui.screens.RealmsNotificationsScreen
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:381) ~[?:1.8.0_181]
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:424) ~[?:1.8.0_181]
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:349) ~[?:1.8.0_181]
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357) ~[?:1.8.0_181]
+	at java.lang.Class.forName0(Native Method) ~[?:1.8.0_181]
+	at java.lang.Class.forName(Class.java:264) ~[?:1.8.0_181]
+	at net.minecraft.realms.RealmsBridge.getNotificationScreen(RealmsBridge.java:38) [classes/:?]
+	at net.minecraft.client.gui.GuiMainMenu.initGui(GuiMainMenu.java:246) [classes/:?]
+	at net.minecraft.client.gui.GuiScreen.setWorldAndResolution(GuiScreen.java:556) [classes/:?]
+	at net.minecraft.client.Minecraft.displayGuiScreen(Minecraft.java:1192) [classes/:?]
+	at net.minecraft.client.Minecraft.launchIntegratedServer(Minecraft.java:2569) [classes/:?]
+	at net.minecraft.client.gui.GuiSelectWorld.func_146615_e(GuiSelectWorld.java:201) [classes/:?]
+	at net.minecraft.client.gui.GuiSelectWorld$List.elementClicked(GuiSelectWorld.java:284) [classes/:?]
+	at net.minecraft.client.gui.GuiSlot.handleMouseInput(GuiSlot.java:354) [classes/:?]
+	at net.minecraft.client.gui.GuiSelectWorld.handleMouseInput(GuiSelectWorld.java:83) [classes/:?]
+	at net.minecraft.client.gui.GuiScreen.handleInput(GuiScreen.java:588) [classes/:?]
+	at net.minecraft.client.Minecraft.runTick(Minecraft.java:1975) [classes/:?]
+	at net.minecraft.client.Minecraft.runGameLoop(Minecraft.java:1296) [classes/:?]
+	at net.minecraft.client.Minecraft.run(Minecraft.java:427) [classes/:?]
+	at net.minecraft.client.main.Main.main(Main.java:113) [classes/:?]
+	at StartDev.main(StartDev.java:22) [test-classes/:?]
+[10:27:01] [Server thread/INFO]: leziink[local:E:61256613] logged in with entity id 214 at (-15.489413027035718, 71.0, 269.96487429022693)
+[10:27:01] [Server thread/INFO]: leziink joined the game
+[10:27:01] [Client thread/INFO]: [CustomPackets] ✓ Packet REGISTER envoyé pour : CUSTOM:HDV_S2C CUSTOM:HDV_C2S CUSTOM:SHOP_S2C CUSTOM:SHOP_C2S CUSTOM:PDATA_S2C CUSTOM:PDATA_C2S CUSTOM:C2S CUSTOM:S2C
+[10:27:01] [Client thread/INFO]: [NetHandler] Custom payload reçu: canal = 'MC|Brand'
+[10:27:01] [Client thread/INFO]: [NetHandler] CustomPacketSystem initialisé
+[10:27:01] [Client thread/INFO]: [NetHandler] PacketDispatcher.handles('MC|Brand') = false
+[10:27:03] [Server thread/INFO]: Saving and pausing game...
+[10:27:03] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
+[10:27:03] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
+[10:27:03] [Server thread/INFO]: Saving chunks for level 'New World'/The End
+[10:27:31] [Client thread/WARN]: Unable to play unknown soundEvent: minecraft:step.anvil
+[10:27:39] [Client thread/WARN]: Unable to play unknown soundEvent: minecraft:step.anvil
+[10:27:57] [Server thread/INFO]: Saving and pausing game...
+[10:27:57] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
+[10:27:57] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
+[10:27:57] [Server thread/INFO]: Saving chunks for level 'New World'/The End
+[10:27:57] [Server thread/INFO]: Stopping server
+[10:27:57] [Server thread/INFO]: Saving players
+[10:27:57] [Server thread/INFO]: Saving worlds
+[10:27:57] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
+[10:27:57] [Client thread/ERROR]: Realms module missing
+java.lang.ClassNotFoundException: com.mojang.realmsclient.gui.screens.RealmsNotificationsScreen
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:381) ~[?:1.8.0_181]
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:424) ~[?:1.8.0_181]
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:349) ~[?:1.8.0_181]
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357) ~[?:1.8.0_181]
+	at java.lang.Class.forName0(Native Method) ~[?:1.8.0_181]
+	at java.lang.Class.forName(Class.java:264) ~[?:1.8.0_181]
+	at net.minecraft.realms.RealmsBridge.getNotificationScreen(RealmsBridge.java:38) [classes/:?]
+	at net.minecraft.client.gui.GuiMainMenu.initGui(GuiMainMenu.java:246) [classes/:?]
+	at net.minecraft.client.gui.GuiScreen.setWorldAndResolution(GuiScreen.java:556) [classes/:?]
+	at net.minecraft.client.Minecraft.displayGuiScreen(Minecraft.java:1192) [classes/:?]
+	at net.minecraft.client.gui.GuiIngameMenu.actionPerformed(GuiIngameMenu.java:62) [classes/:?]
+	at net.minecraft.client.gui.GuiScreen.mouseClicked(GuiScreen.java:511) [classes/:?]
+	at net.minecraft.client.gui.GuiScreen.handleMouseInput(GuiScreen.java:619) [classes/:?]
+	at net.minecraft.client.gui.GuiScreen.handleInput(GuiScreen.java:588) [classes/:?]
+	at net.minecraft.client.Minecraft.runTick(Minecraft.java:1975) [classes/:?]
+	at net.minecraft.client.Minecraft.runGameLoop(Minecraft.java:1296) [classes/:?]
+	at net.minecraft.client.Minecraft.run(Minecraft.java:427) [classes/:?]
+	at net.minecraft.client.main.Main.main(Main.java:113) [classes/:?]
+	at StartDev.main(StartDev.java:22) [test-classes/:?]
+[10:27:57] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
+[10:27:57] [Server thread/INFO]: Saving chunks for level 'New World'/The End
+[10:27:58] [Client thread/INFO]: Stopping!
+[10:27:58] [Client thread/INFO]: SoundSystem shutting down...
+[10:27:58] [Client thread/WARN]: Author: Paul Lamb, www.paulscode.com

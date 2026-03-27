@@ -733,6 +733,10 @@ public class GuiTextField extends Gui
         return this.getEnableBackgroundDrawing() ? this.width - 8 : this.width;
     }
 
+    public int getHeight() {
+        return this.height;
+    }
+
     /**
      * Sets the position of the selection anchor (i.e. position the selection was started at)
      */
