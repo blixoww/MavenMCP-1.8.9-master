@@ -56,14 +56,15 @@ public class GuiUIEditor extends GuiScreen {
         this.buttonList.add(new GuiButton(200, this.width / 2 - 100, this.height - 28, 200, 20, I18n.format("gui.done")));
         UIManager.getInstance().setEditorActive(true);
         
-        if (this.width < 400) {
-            widgetListW_dyn = Math.max(100, this.width - 24);
+        if (this.width < 420) {
+            // Écrans très étroits
+            widgetListW_dyn = Math.max(110, this.width - 32);
             widgetListX = 4;
-            sidebarW = Math.max(160, this.width - 8);
+            sidebarW = Math.max(180, this.width - 8);
         } else {
-            widgetListW_dyn = GuiRenderUtils.clamp(this.width / 5, 140, 180);
-            widgetListX = this.width - widgetListW_dyn - 28;
-            sidebarW = 240; 
+            widgetListW_dyn = GuiRenderUtils.clamp(this.width / 5, 150, 200);
+            widgetListX = this.width - widgetListW_dyn - 32;
+            sidebarW = 160; // Largeur de base plus raisonnable
         }
         widgetListY = 32;
         sidebarX = 10;
@@ -197,17 +198,30 @@ public class GuiUIEditor extends GuiScreen {
     private void drawWidgetSidebar() {
         if (selected == null) return;
         int px = (int) (sidebarX - (1.0f - sidebarAnim) * 100);
-        int py = sidebarY, w = sidebarW;
+        int py = sidebarY;
+        int w = 180; // Augmenter un peu la largeur par défaut
+        sidebarW = w;
         
-        int h = 135;
+        // Calcul dynamique de la hauteur
+        int h = 40; // Header
+        h += 18; // Section Général
+        h += 20; // Activé
         if (selected instanceof BaseWidget) {
             BaseWidget bw = (BaseWidget) selected;
-            if (bw instanceof KeyStrokeWidget) h += 40 + ((KeyStrokeWidget) bw).getKeyCount() * 18;
-            if (bw instanceof PotionStatusWidget) h += 60;
-            if (bw instanceof ArmorGroupWidget) h += 60;
-            if (bw instanceof ToggleSneakWidget || bw instanceof ToggleSprintWidget) h += 40;
+            h += 20; // Mode Rainbow
+            if (bw instanceof CombatLogWidget) h += 20; // Design circulaire
+            h += 20; // Aligner Grid
+            h += 20; // Couleur
+            
+            if (bw instanceof KeyStrokeWidget) {
+                h += 22 + ((KeyStrokeWidget) bw).getKeyCount() * 18 + 20;
+            } else if (bw instanceof PotionStatusWidget) {
+                h += 22 + 20 + 20;
+            } else if (bw instanceof ArmorGroupWidget) {
+                h += 22 + 20 + 20;
+            }
         }
-        h += 24; 
+        h += 35; // Espace pour les boutons du bas et marges
         sidebarH = h;
         
         GuiRenderUtils.drawRoundedPanel(px, py, w, sidebarH, 0xEE0D0D15, 0xFF151525, 24, 0xFF2A7FFF);
@@ -232,6 +246,14 @@ public class GuiUIEditor extends GuiScreen {
             drawToggle(px + w - 40, y, bw.isRGBMode());
             hbRainbowGeneral[0] = px + w - 40; hbRainbowGeneral[1] = y; hbRainbowGeneral[2] = 28; hbRainbowGeneral[3] = 12;
             y += 20;
+
+            if (bw instanceof CombatLogWidget) {
+                boolean orig = Boolean.TRUE.equals(bw.getPropOrDefault("originalDesign", false));
+                this.fontRendererObj.drawStringWithShadow("Design circulaire", px + 12, y + 2, 0xFFCCCCCC);
+                drawToggle(px + w - 40, y, orig);
+                hbOriginalDesign[0] = px + w - 40; hbOriginalDesign[1] = y; hbOriginalDesign[2] = 28; hbOriginalDesign[3] = 12;
+                y += 20;
+            }
 
             boolean align = Boolean.TRUE.equals(bw.getPropOrDefault("snapGrid", false));
             this.fontRendererObj.drawStringWithShadow("Aligner (Intelligent)", px + 12, y + 2, 0xFFCCCCCC);
@@ -291,7 +313,7 @@ public class GuiUIEditor extends GuiScreen {
             }
         }
 
-        int rbtnY = py + sidebarH - 20;
+        int rbtnY = py + sidebarH - 22;
         int btnW = (w - 30) / 2;
         // Reset Position
         GuiRenderUtils.drawStyledButton(px + 10, rbtnY, btnW, 14, 0xFF1A1A2A, 0xFF33334A, inRect(lastMouseX, lastMouseY, px + 10, rbtnY, btnW, 14));
@@ -431,6 +453,13 @@ public class GuiUIEditor extends GuiScreen {
                 bw.setRGBMode(!bw.isRGBMode()); ui.saveConfig(); return true;
             }
             y += 20;
+            if (bw instanceof CombatLogWidget) {
+                if (inRect(mx, my, hbOriginalDesign[0], hbOriginalDesign[1], hbOriginalDesign[2], hbOriginalDesign[3])) {
+                    boolean cur = Boolean.TRUE.equals(bw.getPropOrDefault("originalDesign", false));
+                    bw.setProp("originalDesign", !cur);
+                    ui.saveConfig(); return true;
+                }
+            }
             if (inRect(mx, my, hbAlignGrid[0], hbAlignGrid[1], hbAlignGrid[2], hbAlignGrid[3])) {
                 boolean cur = Boolean.TRUE.equals(bw.getPropOrDefault("snapGrid", false));
                 bw.setProp("snapGrid", !cur); ui.saveConfig(); return true;
@@ -451,7 +480,6 @@ public class GuiUIEditor extends GuiScreen {
                         boolean vis = Boolean.TRUE.equals(bw.getPropOrDefault("showKey" + i, true));
                         bw.setProp("showKey" + i, !vis); ui.saveConfig(); return true;
                     }
-                    y += 18;
                 }
                 if (inRect(mx, my, hbSpaceRainbow[0], hbSpaceRainbow[1], hbSpaceRainbow[2], hbSpaceRainbow[3])) {
                     boolean cur = Boolean.TRUE.equals(bw.getPropOrDefault("showSpaceRainbow", false));
@@ -642,6 +670,7 @@ public class GuiUIEditor extends GuiScreen {
             case "helditem": return "Objet tenu"; case "armor_group": return "Armure";
             case "potions": return "Potions"; case "cps": return "CPS";
             case "toggle_sneak": return "Toggle Sneak"; case "toggle_sprint": return "Toggle Sprint";
+            case "combatlog": return "Combat Tag";
             default: return id;
         }
     }
@@ -658,6 +687,7 @@ public class GuiUIEditor extends GuiScreen {
     private int draggingSlider = -1;
     private final int[] hbSidebarClose = new int[4], hbColorClose = new int[4], hbColorPreview = new int[4], hbResetPosition = new int[4], hbResetColor = new int[4];
     private final int[] hbPotionDur = new int[4], hbPotionIcons = new int[4], hbArmorLayout = new int[4], hbArmorPercent = new int[4], hbAlignGrid = new int[4], hbRainbowGeneral = new int[4], hbSpaceRainbow = new int[4];
+    private final int[] hbOriginalDesign = new int[4];
     private final int[][] hbKeyToggle = new int[9][4];
     private final java.util.Map<String, Float> toggleAnimMap = new java.util.HashMap<>();
 

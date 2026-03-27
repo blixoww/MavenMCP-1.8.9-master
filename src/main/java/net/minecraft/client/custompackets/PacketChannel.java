@@ -38,5 +38,7 @@ public final class PacketChannel {
     // ── Canal dédié aux données joueur (stats, rangs, économie…) ────────────
     public static final String PLAYER_DATA_S2C = "CUSTOM:PDATA_S2C";
     public static final String PLAYER_DATA_C2S = "CUSTOM:PDATA_C2S";
-}
 
+    // ── Canal dédié au CombatLog (nom court pour compatibilité Bukkit/Spigot)
+    public static final String COMBATLOG = "OF_COMBAT";
+}

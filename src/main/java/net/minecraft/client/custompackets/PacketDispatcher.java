@@ -9,17 +9,6 @@ import java.util.Map;
 
 /**
  * Dispatche les packets entrants (serveur → client) vers les handlers enregistrés.
- *
- * <p>Ce dispatcher est appelé depuis {@link net.minecraft.client.network.NetHandlerPlayClient#handleCustomPayload}
- * pour chaque canal listé dans {@link PacketChannel}.
- *
- * <h3>Enregistrement d'un handler</h3>
- * <pre>
- *   PacketDispatcher.register(PacketChannel.HDV_S2C, PacketId.HDV_LIST_RESPONSE, buf -> {
- *       int count = buf.readVarIntFromBuffer();
- *       // traiter les données…
- *   });
- * </pre>
  */
 public final class PacketDispatcher {
 
@@ -34,7 +23,6 @@ public final class PacketDispatcher {
 
     /**
      * Enregistre un handler pour un canal et un identifiant de packet donnés.
-     * Un seul handler par (canal, packetId) – le dernier enregistré gagne.
      */
     public static void register(String channel, int packetId, IPacketHandler handler) {
         String key = buildKey(channel, packetId);
@@ -44,10 +32,6 @@ public final class PacketDispatcher {
 
     /**
      * Dispatch un payload entrant.
-     * La méthode lit d'abord le VarInt packetId puis route vers le handler.
-     *
-     * @param channel le nom du canal reçu
-     * @param buf     le buffer brut (position 0, VarInt packetId non encore lu)
      */
     public static void dispatch(String channel, PacketBuffer buf) {
         if (!buf.isReadable()) {
@@ -84,7 +68,8 @@ public final class PacketDispatcher {
                 || PacketChannel.SHOP_S2C.equals(channel)
                 || PacketChannel.SHOP_C2S.equals(channel)
                 || PacketChannel.PLAYER_DATA_S2C.equals(channel)
-                || PacketChannel.PLAYER_DATA_C2S.equals(channel);
+                || PacketChannel.PLAYER_DATA_C2S.equals(channel)
+                || PacketChannel.COMBATLOG.equals(channel);
     }
 
     // ── Interne ──────────────────────────────────────────────────────────────
@@ -93,4 +78,3 @@ public final class PacketDispatcher {
         return channel + "#" + packetId;
     }
 }
-

@@ -31,7 +31,7 @@ public class ItemPotion extends Item {
     private static final Map<List<PotionEffect>, Integer> SUB_ITEMS_CACHE = Maps.<List<PotionEffect>, Integer>newLinkedHashMap();
 
     public ItemPotion() {
-        this.setMaxStackSize(1);
+        this.setMaxStackSize(2);
         this.setHasSubtypes(true);
         this.setMaxDamage(0);
         this.setCreativeTab(CreativeTabs.tabBrewing);

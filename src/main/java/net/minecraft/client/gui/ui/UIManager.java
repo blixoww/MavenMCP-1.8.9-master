@@ -66,6 +66,9 @@ public class UIManager {
         ToggleSprintWidget toggleSprintW = new ToggleSprintWidget("toggle_sprint", 90, 210);
         toggleSprintW.setColor(0xFF44EE77);
         register(toggleSprintW);
+        // CombatLog widget
+        register(new CombatLogWidget("combatlog", 10, 230));
+
         boolean loaded = loadConfig();
         if (!loaded) {
             // Par defaut: tout desactive sauf FPS
