@@ -1,46 +1,46 @@
-[15:34:41] [Client thread/INFO]: Setting user: leziink
-[15:34:41] [Client thread/INFO]: (Session ID is token:0:leziink)
-[15:34:42] [Client thread/INFO]: LWJGL Version: 2.9.4
-[15:34:42] [Client thread/INFO]: Reloading ResourceManager: Default
-[15:34:42] [Client thread/ERROR]: Couldn't initialize twitch stream
-[15:34:42] [Sound Library Loader/INFO]: Starting up SoundSystem...
-[15:34:42] [Thread-7/INFO]: Initializing LWJGL OpenAL
-[15:34:42] [Thread-7/INFO]: (The LWJGL binding of OpenAL.  For more information, see http://www.lwjgl.org)
-[15:34:42] [Thread-7/INFO]: OpenAL initialized.
-[15:34:42] [Client thread/WARN]: Unable to load variant: seamless=false,variant=nether_brick from minecraft:double_obsidian_slab#seamless=false,variant=nether_brick
-[15:34:42] [Client thread/WARN]: Unable to load variant: half=bottom,variant=nether_brick from minecraft:obsidian_slab#half=bottom,variant=nether_brick
-[15:34:42] [Client thread/WARN]: Unable to load variant: half=bottom,variant=sandstone from minecraft:obsidian_slab#half=bottom,variant=sandstone
-[15:34:42] [Client thread/WARN]: Unable to load variant: seamless=true,variant=sandstone from minecraft:double_obsidian_slab#seamless=true,variant=sandstone
-[15:34:42] [Client thread/WARN]: Unable to load variant: seamless=false,variant=cobblestone from minecraft:double_obsidian_slab#seamless=false,variant=cobblestone
-[15:34:42] [Client thread/WARN]: Unable to load variant: seamless=true,variant=cobblestone from minecraft:double_obsidian_slab#seamless=true,variant=cobblestone
-[15:34:42] [Client thread/WARN]: Unable to load variant: seamless=true,variant=quartz from minecraft:double_obsidian_slab#seamless=true,variant=quartz
-[15:34:42] [Client thread/WARN]: Unable to load variant: seamless=true,variant=nether_brick from minecraft:double_obsidian_slab#seamless=true,variant=nether_brick
-[15:34:42] [Client thread/WARN]: Unable to load variant: half=top,variant=stone_brick from minecraft:obsidian_slab#half=top,variant=stone_brick
-[15:34:42] [Client thread/WARN]: Unable to load variant: seamless=false,variant=quartz from minecraft:double_obsidian_slab#seamless=false,variant=quartz
-[15:34:42] [Client thread/WARN]: Unable to load variant: seamless=true,variant=brick from minecraft:double_obsidian_slab#seamless=true,variant=brick
-[15:34:42] [Client thread/WARN]: Unable to load variant: half=bottom,variant=brick from minecraft:obsidian_slab#half=bottom,variant=brick
-[15:34:42] [Client thread/WARN]: Unable to load variant: half=top,variant=cobblestone from minecraft:obsidian_slab#half=top,variant=cobblestone
-[15:34:42] [Client thread/WARN]: Unable to load variant: half=bottom,variant=cobblestone from minecraft:obsidian_slab#half=bottom,variant=cobblestone
-[15:34:42] [Client thread/WARN]: Unable to load variant: half=top,variant=brick from minecraft:obsidian_slab#half=top,variant=brick
-[15:34:42] [Client thread/WARN]: Unable to load variant: half=top,variant=wood_old from minecraft:obsidian_slab#half=top,variant=wood_old
-[15:34:42] [Client thread/WARN]: Unable to load variant: half=bottom,variant=quartz from minecraft:obsidian_slab#half=bottom,variant=quartz
-[15:34:42] [Client thread/WARN]: Unable to load variant: seamless=false,variant=brick from minecraft:double_obsidian_slab#seamless=false,variant=brick
-[15:34:42] [Client thread/WARN]: Unable to load variant: seamless=true,variant=wood_old from minecraft:double_obsidian_slab#seamless=true,variant=wood_old
-[15:34:42] [Client thread/WARN]: Unable to load variant: seamless=false,variant=stone_brick from minecraft:double_obsidian_slab#seamless=false,variant=stone_brick
-[15:34:42] [Client thread/WARN]: Unable to load variant: half=top,variant=quartz from minecraft:obsidian_slab#half=top,variant=quartz
-[15:34:42] [Client thread/WARN]: Unable to load variant: seamless=false,variant=wood_old from minecraft:double_obsidian_slab#seamless=false,variant=wood_old
-[15:34:42] [Client thread/WARN]: Unable to load variant: half=bottom,variant=stone_brick from minecraft:obsidian_slab#half=bottom,variant=stone_brick
-[15:34:42] [Client thread/WARN]: Unable to load variant: half=bottom,variant=wood_old from minecraft:obsidian_slab#half=bottom,variant=wood_old
-[15:34:42] [Client thread/WARN]: Unable to load variant: seamless=false,variant=sandstone from minecraft:double_obsidian_slab#seamless=false,variant=sandstone
-[15:34:42] [Client thread/WARN]: Unable to load variant: seamless=true,variant=stone_brick from minecraft:double_obsidian_slab#seamless=true,variant=stone_brick
-[15:34:42] [Client thread/WARN]: Unable to load variant: half=top,variant=sandstone from minecraft:obsidian_slab#half=top,variant=sandstone
-[15:34:42] [Client thread/WARN]: Unable to load variant: half=top,variant=nether_brick from minecraft:obsidian_slab#half=top,variant=nether_brick
-[15:34:43] [Sound Library Loader/INFO]: Sound engine started
-[15:34:44] [Client thread/INFO]: Created: 1024x1024 textures-atlas
-[15:34:44] [Client thread/INFO]: [CustomPackets] ✓ Initialisation du système de packets custom...
-[15:34:44] [Client thread/INFO]: [CustomPackets] ✓ HdvPacketHandler enregistré
-[15:34:44] [Client thread/INFO]: [CustomPackets] ✓ CombatLogManager initialisé
-[15:34:44] [Client thread/INFO]: [CustomPackets] ✓ Système initialisé avec succès.
-[15:35:20] [Client thread/INFO]: Stopping!
-[15:35:20] [Client thread/INFO]: SoundSystem shutting down...
-[15:35:20] [Client thread/WARN]: Author: Paul Lamb, www.paulscode.com
+[16:43:38] [Client thread/INFO]: Setting user: leziink
+[16:43:38] [Client thread/INFO]: (Session ID is token:0:leziink)
+[16:43:38] [Client thread/INFO]: LWJGL Version: 2.9.4
+[16:43:38] [Client thread/INFO]: Reloading ResourceManager: Default
+[16:43:39] [Client thread/ERROR]: Couldn't initialize twitch stream
+[16:43:39] [Sound Library Loader/INFO]: Starting up SoundSystem...
+[16:43:39] [Thread-7/INFO]: Initializing LWJGL OpenAL
+[16:43:39] [Thread-7/INFO]: (The LWJGL binding of OpenAL.  For more information, see http://www.lwjgl.org)
+[16:43:39] [Thread-7/INFO]: OpenAL initialized.
+[16:43:39] [Client thread/WARN]: Unable to load variant: seamless=false,variant=nether_brick from minecraft:double_obsidian_slab#seamless=false,variant=nether_brick
+[16:43:39] [Client thread/WARN]: Unable to load variant: half=bottom,variant=nether_brick from minecraft:obsidian_slab#half=bottom,variant=nether_brick
+[16:43:39] [Client thread/WARN]: Unable to load variant: half=bottom,variant=sandstone from minecraft:obsidian_slab#half=bottom,variant=sandstone
+[16:43:39] [Client thread/WARN]: Unable to load variant: seamless=true,variant=sandstone from minecraft:double_obsidian_slab#seamless=true,variant=sandstone
+[16:43:39] [Client thread/WARN]: Unable to load variant: seamless=false,variant=cobblestone from minecraft:double_obsidian_slab#seamless=false,variant=cobblestone
+[16:43:39] [Client thread/WARN]: Unable to load variant: seamless=true,variant=cobblestone from minecraft:double_obsidian_slab#seamless=true,variant=cobblestone
+[16:43:39] [Client thread/WARN]: Unable to load variant: seamless=true,variant=quartz from minecraft:double_obsidian_slab#seamless=true,variant=quartz
+[16:43:39] [Client thread/WARN]: Unable to load variant: seamless=true,variant=nether_brick from minecraft:double_obsidian_slab#seamless=true,variant=nether_brick
+[16:43:39] [Client thread/WARN]: Unable to load variant: half=top,variant=stone_brick from minecraft:obsidian_slab#half=top,variant=stone_brick
+[16:43:39] [Client thread/WARN]: Unable to load variant: seamless=false,variant=quartz from minecraft:double_obsidian_slab#seamless=false,variant=quartz
+[16:43:39] [Client thread/WARN]: Unable to load variant: seamless=true,variant=brick from minecraft:double_obsidian_slab#seamless=true,variant=brick
+[16:43:39] [Client thread/WARN]: Unable to load variant: half=bottom,variant=brick from minecraft:obsidian_slab#half=bottom,variant=brick
+[16:43:39] [Client thread/WARN]: Unable to load variant: half=top,variant=cobblestone from minecraft:obsidian_slab#half=top,variant=cobblestone
+[16:43:39] [Client thread/WARN]: Unable to load variant: half=bottom,variant=cobblestone from minecraft:obsidian_slab#half=bottom,variant=cobblestone
+[16:43:39] [Client thread/WARN]: Unable to load variant: half=top,variant=brick from minecraft:obsidian_slab#half=top,variant=brick
+[16:43:39] [Client thread/WARN]: Unable to load variant: half=top,variant=wood_old from minecraft:obsidian_slab#half=top,variant=wood_old
+[16:43:39] [Client thread/WARN]: Unable to load variant: half=bottom,variant=quartz from minecraft:obsidian_slab#half=bottom,variant=quartz
+[16:43:39] [Client thread/WARN]: Unable to load variant: seamless=false,variant=brick from minecraft:double_obsidian_slab#seamless=false,variant=brick
+[16:43:39] [Client thread/WARN]: Unable to load variant: seamless=true,variant=wood_old from minecraft:double_obsidian_slab#seamless=true,variant=wood_old
+[16:43:39] [Client thread/WARN]: Unable to load variant: seamless=false,variant=stone_brick from minecraft:double_obsidian_slab#seamless=false,variant=stone_brick
+[16:43:39] [Client thread/WARN]: Unable to load variant: half=top,variant=quartz from minecraft:obsidian_slab#half=top,variant=quartz
+[16:43:39] [Client thread/WARN]: Unable to load variant: seamless=false,variant=wood_old from minecraft:double_obsidian_slab#seamless=false,variant=wood_old
+[16:43:39] [Client thread/WARN]: Unable to load variant: half=bottom,variant=stone_brick from minecraft:obsidian_slab#half=bottom,variant=stone_brick
+[16:43:39] [Client thread/WARN]: Unable to load variant: half=bottom,variant=wood_old from minecraft:obsidian_slab#half=bottom,variant=wood_old
+[16:43:39] [Client thread/WARN]: Unable to load variant: seamless=false,variant=sandstone from minecraft:double_obsidian_slab#seamless=false,variant=sandstone
+[16:43:39] [Client thread/WARN]: Unable to load variant: seamless=true,variant=stone_brick from minecraft:double_obsidian_slab#seamless=true,variant=stone_brick
+[16:43:39] [Client thread/WARN]: Unable to load variant: half=top,variant=sandstone from minecraft:obsidian_slab#half=top,variant=sandstone
+[16:43:39] [Client thread/WARN]: Unable to load variant: half=top,variant=nether_brick from minecraft:obsidian_slab#half=top,variant=nether_brick
+[16:43:39] [Sound Library Loader/INFO]: Sound engine started
+[16:43:41] [Client thread/INFO]: Created: 1024x1024 textures-atlas
+[16:43:41] [Client thread/INFO]: [CustomPackets] ✓ Initialisation du système de packets custom...
+[16:43:41] [Client thread/INFO]: [CustomPackets] ✓ HdvPacketHandler enregistré
+[16:43:41] [Client thread/INFO]: [CustomPackets] ✓ CombatLogManager initialisé
+[16:43:41] [Client thread/INFO]: [CustomPackets] ✓ Système initialisé avec succès.
+[16:44:02] [Client thread/INFO]: Stopping!
+[16:44:02] [Client thread/INFO]: SoundSystem shutting down...
+[16:44:02] [Client thread/WARN]: Author: Paul Lamb, www.paulscode.com

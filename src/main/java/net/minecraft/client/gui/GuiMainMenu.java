@@ -2,7 +2,6 @@ package net.minecraft.client.gui;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -57,7 +56,10 @@ public class GuiMainMenu extends GuiScreen
     // ── Timing ──────────────────────────────────────────────────────────────
     private long openTime = -1L;
     /** Durée totale du fade-in global (ms) */
-    private static final float FADEIN_TOTAL = 1100f;
+    private static final float FADEIN_TOTAL = 600f; // raccourci pour réduire la latence visuelle
+
+    // FRAME_TIME global: synchronise les updates temporels pour les boutons (évite micro-diffs entre boutons)
+    static long FRAME_TIME = -1L;
 
     // ── Particules ──────────────────────────────────────────────────────────
     private final List<AmbientParticle> particles = new ArrayList<>();
@@ -65,13 +67,16 @@ public class GuiMainMenu extends GuiScreen
     private final List<AmbientParticle> particlePool = new ArrayList<>();
     private final Random rng = new Random();
     /** Nombre max de particules simultanées */
-    private static final int PARTICLE_MAX = 120;
+    private static final int PARTICLE_MAX = 60; // réduit pour fluidité
 
     // ── Layout (calculé à l'init) ───────────────────────────────────────────
     private int logoY, btnStartY, btnW, btnH, btnGap, smallBtnW;
 
     // Largeur du logo en pixels-écran (approximée, mise à jour au premier rendu)
     private float logoPxHalfWidth = 130f;
+
+    // cache réutilisable des yPositions des boutons pour éviter allocations par frame
+    private int[] btnYCache = new int[0];
 
     // ── Constantes de couleur ───────────────────────────────────────────────
     private static final int RED        = 0xDD2222;
@@ -90,7 +95,7 @@ public class GuiMainMenu extends GuiScreen
         ++this.panoramaTimer;
 
         // Spawn progressif de particules (utilisation du pool si disponible)
-        if (particles.size() < PARTICLE_MAX && rng.nextInt(2) == 0)
+        if (particles.size() < PARTICLE_MAX && rng.nextInt(4) == 0)
         {
             float spawnX = rng.nextFloat() * (this.width  > 0 ? this.width  : 854);
             float spawnY = (this.height > 0 ? this.height : 480) + 10f;
@@ -127,9 +132,10 @@ public class GuiMainMenu extends GuiScreen
     @Override
     public void initGui()
     {
-        this.openTime = Minecraft.getSystemTime();
-        this.viewportTexture  = new DynamicTexture(256, 256);
-        this.backgroundTexture = this.mc.getTextureManager()
+        // Only set openTime and create textures once — avoid resetting on resize
+        if (this.openTime < 0L) this.openTime = Minecraft.getSystemTime();
+        if (this.viewportTexture == null) this.viewportTexture  = new DynamicTexture(256, 256);
+        if (this.backgroundTexture == null) this.backgroundTexture = this.mc.getTextureManager()
                 .getDynamicTextureLocation("background", this.viewportTexture);
 
         computeLayout();
@@ -155,6 +161,10 @@ public class GuiMainMenu extends GuiScreen
         String discLabel = "Discord";
         int discW = fontRendererObj.getStringWidth(discLabel) + 16;
         this.buttonList.add(new IconButton(10, this.width - discW - 10, 7, discW, discLabel, 0xFF5865F2, ""));
+
+        // init cache yPositions
+        ensureBtnCacheCapacity();
+        for (int i = 0; i < this.buttonList.size(); i++) btnYCache[i] = this.buttonList.get(i).yPosition;
     }
 
     /** Recompute layout values according to current width/height. Call when size changes. */
@@ -175,11 +185,61 @@ public class GuiMainMenu extends GuiScreen
         // logo scale adaptative selon largeur
         float base = MathHelper.clamp_float(this.width / 480f, 1.0f, 6.0f);
         logoScale = 3.2f * base; // base scale
-        // logo position : environ 26% down from top but never too low
+        // logo position : environ 26% down from top mais jamais trop bas
         logoY = Math.max(24, (int)(this.height * 0.22f));
 
         // button start Y relative to height
-        btnStartY = Math.min(this.height - 120, this.height / 2 + btnH);
+        // Remonter légèrement les boutons pour un rendu plus compact et visuellement "au-dessus"
+        // On remonte un peu plus les boutons pour qu'ils soient plus proches du logo
+        int preferred = this.height / 2 + btnH - 56; // remonter de ~56px par défaut (plus haut)
+        btnStartY = Math.max(logoY + 50, Math.min(this.height - 120, preferred));
+    }
+
+    /** Repositionne les boutons existants sans réinitialiser l'état global (utile pour le resize). */
+    private void repositionButtons()
+    {
+        // Recompute small button width & derived Y
+        smallBtnW = (btnW - btnGap) / 2;
+        row3Y = btnStartY + (btnH + btnGap) * 2;
+
+        for (GuiButton b : this.buttonList)
+        {
+            switch (b.id)
+            {
+                case 1: // singleplayer
+                    b.xPosition = cx - btnW / 2;
+                    b.yPosition = btnStartY;
+                    b.width = btnW; b.height = btnH;
+                    break;
+                case 2: // multiplayer
+                    b.xPosition = cx - btnW / 2;
+                    b.yPosition = btnStartY + btnH + btnGap;
+                    b.width = btnW; b.height = btnH;
+                    break;
+                case 0: // options
+                    b.xPosition = cx - btnW / 2;
+                    b.yPosition = row3Y;
+                    b.width = smallBtnW; b.height = btnH;
+                    break;
+                case 4: // quit
+                    b.xPosition = cx - btnW / 2 + smallBtnW + btnGap;
+                    b.yPosition = row3Y;
+                    b.width = smallBtnW; b.height = btnH;
+                    break;
+                case 10: // icon (right)
+                    int discW = fontRendererObj.getStringWidth(b.displayString) + 16;
+                    b.xPosition = this.width - discW - 10;
+                    b.yPosition = 7;
+                    b.width = discW; b.height = 18;
+                    break;
+                default:
+                    // leave others as-is
+            }
+        }
+
+        // update cache too
+        ensureBtnCacheCapacity();
+        for (int i = 0; i < this.buttonList.size(); i++) btnYCache[i] = this.buttonList.get(i).yPosition;
     }
 
     @Override
@@ -199,17 +259,18 @@ public class GuiMainMenu extends GuiScreen
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
-        // si la fenêtre a été redimensionnée, recalculer le layout et re-créer les boutons
+        // si la fenêtre a été redimensionnée, recalculer le layout et repositionner les boutons
         if (this.width != prevWidth || this.height != prevHeight)
         {
             computeLayout();
-            this.buttonList.clear();
-            // recreate buttons in same order (IDs kept)
-            this.initGui();
-            // Note: initGui recrée les boutons et repositionne en fonction de computeLayout
+            repositionButtons();
+            // Note: on évite d'appeler initGui() pour ne pas reset openTime/texture — évite la "latence" visuelle
         }
 
-        long  now     = Minecraft.getSystemTime();
+        // set global frame time once per frame to synchronise tous les boutons
+        FRAME_TIME = Minecraft.getSystemTime();
+
+        long  now     = FRAME_TIME;
         float elapsed = (openTime < 0L) ? FADEIN_TOTAL : Math.min(FADEIN_TOTAL, now - openTime);
         float rawT    = elapsed / FADEIN_TOTAL;  // 0→1 linéaire
 
@@ -246,18 +307,42 @@ public class GuiMainMenu extends GuiScreen
         // ── PANEL VERRE (derrière les boutons) ───────────────────────────
         renderButtonPanel(fadeBtns);
 
-        // ── BOUTONS (slide-in depuis le bas) ─────────────────────────────
-        float slideY = (1f - fadeBtns) * 14f;
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(0f, slideY, 0f);
+        // ── BOUTONS (slide-in depuis le bas) with eased & staggered entrance ─
+        float entrance = easeOutQuart(fadeBtns);
+        float invEntrance = 1f - entrance;
+        int baseSlide = 14; // réduit pour une entrée plus douce
+
+        // Temporarily offset each button's yPosition for a staggered entrance
+        ensureBtnCacheCapacity();
+        for (int i = 0; i < this.buttonList.size(); i++) {
+            GuiButton b = this.buttonList.get(i);
+            btnYCache[i] = b.yPosition; // store original
+            float stagger = Math.min(1f, i * 0.08f);
+            float per = easeOutQuart(1f - stagger);
+            int offset = (int)(invEntrance * baseSlide * (0.6f + per * 0.5f));
+            b.yPosition += offset;
+        }
+
+        // Draw buttons (they were offset above)
         super.drawScreen(mouseX, mouseY, partialTicks);
-        GlStateManager.popMatrix();
+
+        // Restore original y positions using cache (no allocation)
+        for (int i = 0; i < this.buttonList.size(); i++) {
+            this.buttonList.get(i).yPosition = btnYCache[i];
+        }
 
         // ── TOP BAR ──────────────────────────────────────────────────────
         renderTopBar(fadeLogo);
 
         // ── FOOTER ───────────────────────────────────────────────────────
         renderFooter(fadeFooter);
+    }
+
+    // ensure btnYCache has sufficient capacity
+    private void ensureBtnCacheCapacity() {
+        if (btnYCache == null || btnYCache.length < this.buttonList.size()) {
+            btnYCache = new int[Math.max(4, this.buttonList.size())];
+        }
     }
 
     // =========================================================================
@@ -480,7 +565,7 @@ public class GuiMainMenu extends GuiScreen
         mc.getFramebuffer().unbindFramebuffer();
         GlStateManager.viewport(0, 0, 256, 256);
         drawPanorama(mx, my, pt);
-        for (int i = 0; i < 7; i++) blurSkybox(pt);
+        for (int i = 0; i < 4; i++) blurSkybox(pt); // réduit pour perf et latence
         mc.getFramebuffer().bindFramebuffer(true);
         GlStateManager.viewport(0, 0, mc.displayWidth, mc.displayHeight);
 
@@ -496,7 +581,7 @@ public class GuiMainMenu extends GuiScreen
         tr.draw();
     }
 
-    private void drawPanorama(int mx, int my, float pt)
+    private void drawPanorama(int _mx, int _my, float _pt)
     {
         Tessellator tr = Tessellator.getInstance();
         WorldRenderer wr = tr.getWorldRenderer();
@@ -508,15 +593,15 @@ public class GuiMainMenu extends GuiScreen
         GlStateManager.enableBlend(); GlStateManager.disableAlpha();
         GlStateManager.disableCull(); GlStateManager.depthMask(false);
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-        int n = 8;
+        int n = 6; // réduit pour performance (avant 8)
         for (int j = 0; j < n * n; ++j)
         {
             GlStateManager.pushMatrix();
             GlStateManager.translate(
                     ((float)(j % n) / n - 0.5f) / 64f,
                     ((float)(j / n) / n - 0.5f) / 64f, 0f);
-            GlStateManager.rotate(MathHelper.sin(((float)panoramaTimer + pt) / 400f) * 25f + 20f, 1, 0, 0);
-            GlStateManager.rotate(-((float)panoramaTimer + pt) * 0.1f, 0, 1, 0);
+            GlStateManager.rotate(MathHelper.sin(((float)panoramaTimer + _pt) / 400f) * 25f + 20f, 1, 0, 0);
+            GlStateManager.rotate(-((float)panoramaTimer + _pt) * 0.1f, 0, 1, 0);
             for (int k = 0; k < 6; ++k)
             {
                 GlStateManager.pushMatrix();
@@ -545,7 +630,7 @@ public class GuiMainMenu extends GuiScreen
         GlStateManager.depthMask(true); GlStateManager.enableCull(); GlStateManager.enableDepth();
     }
 
-    private void blurSkybox(float pt)
+    private void blurSkybox(float _pt)
     {
         mc.getTextureManager().bindTexture(backgroundTexture);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
@@ -597,7 +682,6 @@ public class GuiMainMenu extends GuiScreen
         float prevX, prevY;
         float vx, vy;
         float alpha;     // 0→1
-        float decay;     // alpha lost per tick
         float size;
         int color;
         int age;         // ticks lived
@@ -662,7 +746,7 @@ public class GuiMainMenu extends GuiScreen
         private float hover = 0f;
         private long  lastTime = -1L;
 
-        private static final float TRANS_MS = 120f;
+        private static final float TRANS_MS = 80f; // allongé pour un hover plus doux
 
         IconButton(int id, int x, int y, int w, String text, int accent, String tooltip)
         {
@@ -676,7 +760,8 @@ public class GuiMainMenu extends GuiScreen
         {
             if (!this.visible) return;
 
-            long  now = Minecraft.getSystemTime();
+            // utilise FRAME_TIME global pour synchronisation
+            long  now = GuiMainMenu.FRAME_TIME;
             float dt  = (lastTime < 0L) ? 0f : (float)(now - lastTime);
             lastTime  = now;
 
@@ -712,11 +797,23 @@ public class GuiMainMenu extends GuiScreen
             }
         }
 
-        private static float easeInOutQuad(float t)
+        @Override
+        public boolean mousePressed(Minecraft mc, int mouseX, int mouseY)
         {
-            return t < 0.5f ? 2f * t * t : 1f - 2f * (1f - t) * (1f - t);
+            boolean res = super.mousePressed(mc, mouseX, mouseY);
+            if (res) {
+                // force hover state immediately on click for instant feedback
+                this.hover = 1f;
+                this.lastTime = GuiMainMenu.FRAME_TIME;
+            }
+            return res;
         }
-    }
+
+         private static float easeInOutQuad(float t)
+         {
+             return t < 0.5f ? 2f * t * t : 1f - 2f * (1f - t) * (1f - t);
+         }
+     }
 
     // =========================================================================
     //   CLASSE : MenuButton
@@ -732,7 +829,7 @@ public class GuiMainMenu extends GuiScreen
         private long  lastTime = -1L;
 
         /** Durée de transition hover (ms) */
-        private static final float TRANS_MS = 140f;
+        private static final float TRANS_MS = 80f; // allongé pour rendre le hover plus fluide
 
         // Palette
         private static final int BG_IDLE     = 0x12FFFFFF;
@@ -756,7 +853,7 @@ public class GuiMainMenu extends GuiScreen
             if (!this.visible) return;
 
             // ── Delta-time ────────────────────────────────────────────────
-            long  now = Minecraft.getSystemTime();
+            long  now = GuiMainMenu.FRAME_TIME;
             float dt  = (lastTime < 0L) ? 0f : (float)(now - lastTime);
             lastTime  = now;
 
@@ -807,9 +904,20 @@ public class GuiMainMenu extends GuiScreen
                     GuiRenderUtils.colorLerp(TXT_IDLE, TXT_HOV, t));
         }
 
-        private static float easeInOutQuad(float t)
+        @Override
+        public boolean mousePressed(Minecraft mc, int mouseX, int mouseY)
         {
-            return t < 0.5f ? 2f * t * t : 1f - 2f * (1f - t) * (1f - t);
+            boolean res = super.mousePressed(mc, mouseX, mouseY);
+            if (res) {
+                this.hover = 1f;
+                this.lastTime = GuiMainMenu.FRAME_TIME;
+            }
+            return res;
         }
-    }
-}
+
+         private static float easeInOutQuad(float t)
+         {
+             return t < 0.5f ? 2f * t * t : 1f - 2f * (1f - t) * (1f - t);
+         }
+     }
+ }
