@@ -150,6 +150,7 @@ public class EffectRenderer
 
         if (this.fxLayers[i][j].size() >= 4000)
         {
+            // Remove the oldest particle by index pour éviter l'allocation d'une nouvelle liste
             this.fxLayers[i][j].remove(0);
         }
 
@@ -163,19 +164,17 @@ public class EffectRenderer
             this.updateEffectLayer(i);
         }
 
-        List<EntityParticleEmitter> list = Lists.<EntityParticleEmitter>newArrayList();
-
-        for (EntityParticleEmitter entityparticleemitter : this.particleEmitters)
+        // Mettre à jour les émetteurs; suppression en itérant à l'envers pour éviter de créer une liste temporaire
+        for (int idx = this.particleEmitters.size() - 1; idx >= 0; --idx)
         {
+            EntityParticleEmitter entityparticleemitter = this.particleEmitters.get(idx);
             entityparticleemitter.onUpdate();
 
             if (entityparticleemitter.isDead)
             {
-                list.add(entityparticleemitter);
+                this.particleEmitters.remove(idx);
             }
         }
-
-        this.particleEmitters.removeAll(list);
     }
 
     private void updateEffectLayer(int layer)
@@ -188,20 +187,17 @@ public class EffectRenderer
 
     private void updateEffectAlphaLayer(List<EntityFX> entitiesFX)
     {
-        List<EntityFX> list = Lists.<EntityFX>newArrayList();
-
-        for (int i = 0; i < entitiesFX.size(); ++i)
+        // Supprimer les particules mortes en itérant à l'envers afin d'éviter la création d'une liste temporaire
+        for (int i = entitiesFX.size() - 1; i >= 0; --i)
         {
-            EntityFX entityfx = (EntityFX)entitiesFX.get(i);
+            EntityFX entityfx = entitiesFX.get(i);
             this.tickParticle(entityfx);
 
             if (entityfx.isDead)
             {
-                list.add(entityfx);
+                entitiesFX.remove(i);
             }
         }
-
-        entitiesFX.removeAll(list);
     }
 
     private void tickParticle(final EntityFX particle)

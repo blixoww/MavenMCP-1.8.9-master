@@ -1,6 +1,5 @@
 package net.minecraft.client.renderer;
 
-import com.google.common.primitives.Floats;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -8,7 +7,6 @@ import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Comparator;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.util.MathHelper;
@@ -32,6 +30,11 @@ public class WorldRenderer
     private double zOffset;
     private VertexFormat vertexFormat;
     public boolean isDrawing;
+
+    // Buffers temporaires réutilisables pour éviter des allocations fréquentes dans sortVertexData
+    private float[] tmpDistances = null;
+    private Integer[] tmpOrderObj = null;
+    private int[] tmpScratch = null;
 
     public WorldRenderer(int bufferSizeIn)
     {
@@ -66,57 +69,61 @@ public class WorldRenderer
     public void sortVertexData(float p_181674_1_, float p_181674_2_, float p_181674_3_)
     {
         int i = this.vertexCount / 4;
-        final float[] afloat = new float[i];
+
+        // (Re)allouer ou redimensionner nos buffers temporaires seulement si nécessaire
+        if (this.tmpDistances == null || this.tmpDistances.length < i)
+        {
+            this.tmpDistances = new float[i];
+        }
+
+        if (this.tmpOrderObj == null || this.tmpOrderObj.length < i)
+        {
+            this.tmpOrderObj = new Integer[i];
+        }
 
         for (int j = 0; j < i; ++j)
         {
-            afloat[j] = getDistanceSq(this.rawFloatBuffer, (float)((double)p_181674_1_ + this.xOffset), (float)((double)p_181674_2_ + this.yOffset), (float)((double)p_181674_3_ + this.zOffset), this.vertexFormat.getIntegerSize(), j * this.vertexFormat.getNextOffset());
+            this.tmpDistances[j] = getDistanceSq(this.rawFloatBuffer, (float)((double)p_181674_1_ + this.xOffset), (float)((double)p_181674_2_ + this.yOffset), (float)((double)p_181674_3_ + this.zOffset), this.vertexFormat.getIntegerSize(), j * this.vertexFormat.getNextOffset());
+            this.tmpOrderObj[j] = j; // autobox
         }
 
-        Integer[] ainteger = new Integer[i];
+        // Tri des indices en utilisant un comparateur simple sur tmpDistances (tri d'entiers par distance)
+        Arrays.sort(this.tmpOrderObj, 0, i, (a, b) -> Float.compare(this.tmpDistances[b], this.tmpDistances[a]));
 
-        for (int k = 0; k < ainteger.length; ++k)
-        {
-            ainteger[k] = Integer.valueOf(k);
-        }
-
-        Arrays.sort(ainteger, new Comparator<Integer>()
-        {
-            public int compare(Integer p_compare_1_, Integer p_compare_2_)
-            {
-                return Floats.compare(afloat[p_compare_2_.intValue()], afloat[p_compare_1_.intValue()]);
-            }
-        });
         BitSet bitset = new BitSet();
         int l = this.vertexFormat.getNextOffset();
-        int[] aint = new int[l];
 
-        for (int l1 = 0; (l1 = bitset.nextClearBit(l1)) < ainteger.length; ++l1)
+        if (this.tmpScratch == null || this.tmpScratch.length < l)
         {
-            int i1 = ainteger[l1].intValue();
+            this.tmpScratch = new int[l];
+        }
+
+        for (int l1 = 0; (l1 = bitset.nextClearBit(l1)) < i; ++l1)
+        {
+            int i1 = this.tmpOrderObj[l1];
 
             if (i1 != l1)
             {
-                ((java.nio.Buffer)this.rawIntBuffer).limit(i1 * l + l);
-                ((java.nio.Buffer)this.rawIntBuffer).position(i1 * l);
-                this.rawIntBuffer.get(aint);
+                this.rawIntBuffer.limit(i1 * l + l);
+                this.rawIntBuffer.position(i1 * l);
+                this.rawIntBuffer.get(this.tmpScratch);
                 int j1 = i1;
 
-                for (int k1 = ainteger[i1].intValue(); j1 != l1; k1 = ainteger[k1].intValue())
+                for (int k1 = this.tmpOrderObj[i1]; j1 != l1; k1 = this.tmpOrderObj[k1])
                 {
-                    ((java.nio.Buffer)this.rawIntBuffer).limit(k1 * l + l);
-                    ((java.nio.Buffer)this.rawIntBuffer).position(k1 * l);
+                    this.rawIntBuffer.limit(k1 * l + l);
+                    this.rawIntBuffer.position(k1 * l);
                     IntBuffer intbuffer = this.rawIntBuffer.slice();
-                    ((java.nio.Buffer)this.rawIntBuffer).limit(j1 * l + l);
-                    ((java.nio.Buffer)this.rawIntBuffer).position(j1 * l);
+                    this.rawIntBuffer.limit(j1 * l + l);
+                    this.rawIntBuffer.position(j1 * l);
                     this.rawIntBuffer.put(intbuffer);
                     bitset.set(j1);
                     j1 = k1;
                 }
 
-                ((java.nio.Buffer)this.rawIntBuffer).limit(l1 * l + l);
-                ((java.nio.Buffer)this.rawIntBuffer).position(l1 * l);
-                this.rawIntBuffer.put(aint);
+                this.rawIntBuffer.limit(l1 * l + l);
+                this.rawIntBuffer.position(l1 * l);
+                this.rawIntBuffer.put(this.tmpScratch);
             }
 
             bitset.set(l1);
@@ -127,11 +134,11 @@ public class WorldRenderer
     {
         this.rawIntBuffer.rewind();
         int i = this.getBufferSize();
-        ((java.nio.Buffer)this.rawIntBuffer).limit(i);
+        this.rawIntBuffer.limit(i);
         int[] aint = new int[i];
         this.rawIntBuffer.get(aint);
-        ((java.nio.Buffer)this.rawIntBuffer).limit(this.rawIntBuffer.capacity());
-        ((java.nio.Buffer)this.rawIntBuffer).position(i);
+        this.rawIntBuffer.limit(this.rawIntBuffer.capacity());
+        this.rawIntBuffer.position(i);
         return new WorldRenderer.State(aint, new VertexFormat(this.vertexFormat));
     }
 
@@ -140,29 +147,30 @@ public class WorldRenderer
         return this.vertexCount * this.vertexFormat.getIntegerSize();
     }
 
-    private static float getDistanceSq(FloatBuffer p_181665_0_, float p_181665_1_, float p_181665_2_, float p_181665_3_, int p_181665_4_, int p_181665_5_)
+    private static float getDistanceSq(FloatBuffer buf, float x, float y, float z, int intSize, int base)
     {
-        float f = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 0 + 0);
-        float f1 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 0 + 1);
-        float f2 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 0 + 2);
-        float f3 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 1 + 0);
-        float f4 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 1 + 1);
-        float f5 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 1 + 2);
-        float f6 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 2 + 0);
-        float f7 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 2 + 1);
-        float f8 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 2 + 2);
-        float f9 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 3 + 0);
-        float f10 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 3 + 1);
-        float f11 = p_181665_0_.get(p_181665_5_ + p_181665_4_ * 3 + 2);
-        float f12 = (f + f3 + f6 + f9) * 0.25F - p_181665_1_;
-        float f13 = (f1 + f4 + f7 + f10) * 0.25F - p_181665_2_;
-        float f14 = (f2 + f5 + f8 + f11) * 0.25F - p_181665_3_;
+        // base refers to the starting float index for the first vertex
+        float f = buf.get(base + 0);
+        float f1 = buf.get(base + 1);
+        float f2 = buf.get(base + 2);
+        float f3 = buf.get(base + intSize + 0);
+        float f4 = buf.get(base + intSize + 1);
+        float f5 = buf.get(base + intSize + 2);
+        float f6 = buf.get(base + intSize * 2 + 0);
+        float f7 = buf.get(base + intSize * 2 + 1);
+        float f8 = buf.get(base + intSize * 2 + 2);
+        float f9 = buf.get(base + intSize * 3 + 0);
+        float f10 = buf.get(base + intSize * 3 + 1);
+        float f11 = buf.get(base + intSize * 3 + 2);
+        float f12 = (f + f3 + f6 + f9) * 0.25F - x;
+        float f13 = (f1 + f4 + f7 + f10) * 0.25F - y;
+        float f14 = (f2 + f5 + f8 + f11) * 0.25F - z;
         return f12 * f12 + f13 * f13 + f14 * f14;
     }
 
     public void setVertexState(WorldRenderer.State state)
     {
-        ((java.nio.Buffer)this.rawIntBuffer).clear();
+        this.rawIntBuffer.clear();
         this.growBuffer(state.getRawBuffer().length);
         this.rawIntBuffer.put(state.getRawBuffer());
         this.vertexCount = state.getVertexCount();
@@ -429,7 +437,7 @@ public class WorldRenderer
     public void addVertexData(int[] vertexData)
     {
         this.growBuffer(vertexData.length);
-        ((java.nio.Buffer)this.rawIntBuffer).position(this.getBufferSize());
+        this.rawIntBuffer.position(this.getBufferSize());
         this.rawIntBuffer.put(vertexData);
         this.vertexCount += vertexData.length / this.vertexFormat.getIntegerSize();
     }
@@ -556,8 +564,8 @@ public class WorldRenderer
         else
         {
             this.isDrawing = false;
-            ((java.nio.Buffer)this.byteBuffer).position(0);
-            ((java.nio.Buffer)this.byteBuffer).limit(this.getBufferSize() * 4);
+            this.byteBuffer.position(0);
+            this.byteBuffer.limit(this.getBufferSize() * 4);
         }
     }
 
@@ -597,7 +605,7 @@ public class WorldRenderer
         }
     }
 
-    public class State
+    public static class State
     {
         private final int[] stateRawBuffer;
         private final VertexFormat stateVertexFormat;

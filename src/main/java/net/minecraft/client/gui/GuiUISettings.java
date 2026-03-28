@@ -2,6 +2,7 @@ package net.minecraft.client.gui;
 
 import net.minecraft.client.gui.ui.UIManager;
 import net.minecraft.client.gui.ui.UIElement;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.GameSettings;
 import org.lwjgl.input.Mouse;
@@ -9,14 +10,19 @@ import org.lwjgl.input.Mouse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GuiUISettings extends GuiScreen {
     private final GuiScreen parent;
     private final UIManager ui = UIManager.getInstance();
-    private int widgetScroll = 0;
+    private int scrollOffset = 0;
     private int lastMouseX, lastMouseY;
+    
     private final Map<String, Float> toggleAnimMap = new HashMap<>();
+    private final Map<String, Float> hoverAnimMap = new HashMap<>();
+    
+    private final List<SettingRow> rows = new ArrayList<>();
 
     public GuiUISettings(GuiScreen parent) {
         this.parent = parent;
@@ -25,9 +31,20 @@ public class GuiUISettings extends GuiScreen {
     @Override
     public void initGui() {
         this.buttonList.clear();
-        int btnW = 200;
-        this.buttonList.add(new GuiButton(201, this.width / 2 - 100, this.height - 52, btnW, 20, "Éditer positions des Widgets..."));
-        this.buttonList.add(new GuiButton(200, this.width / 2 - 100, this.height - 28, btnW, 20, I18n.format("gui.done")));
+        
+        // Refresh the list of rows
+        rows.clear();
+        rows.add(new SettingRow("CONFIGURATION DES WIDGETS", true));
+        for (UIElement e : ui.all()) {
+            rows.add(new SettingRow(e));
+        }
+        rows.add(new SettingRow("OPTIONS DE MOUVEMENT", true));
+        rows.add(new SettingRow("Toggle Sneak", "sneak"));
+        rows.add(new SettingRow("Toggle Sprint", "sprint"));
+
+        int btnW = Math.min(150, this.width / 2 - 20);
+        this.buttonList.add(new GuiButton(201, this.width / 2 - btnW - 5, this.height - 26, btnW, 20, "Éditer l'HUD"));
+        this.buttonList.add(new GuiButton(200, this.width / 2 + 5, this.height - 26, btnW, 20, I18n.format("gui.done")));
     }
 
     @Override
@@ -39,94 +56,94 @@ public class GuiUISettings extends GuiScreen {
         }
     }
 
-    private int getMaxVisible() {
-        int available = this.height - 40 - 80 - 100; // Marge pour titre, options et boutons
-        return Math.max(4, available / 22);
-    }
-
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
         
         // --- TITLE ---
-        int titleW = 160, titleH = 22;
-        int tx = (this.width - titleW) / 2, ty = 6;
-        GuiRenderUtils.drawRoundedPanel(tx, ty, titleW, titleH, 0xEE0D0D15, 0xFF151525, 0, 0xFF2A7FFF);
-        String title = "UI SETTINGS";
-        this.fontRendererObj.drawStringWithShadow(title, tx + (titleW - this.fontRendererObj.getStringWidth(title)) / 2, ty + 7, 0xFF8EC8FF);
+        int titleY = 10;
+        String title = "PARAMÈTRES DE L'INTERFACE";
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(1.2, 1.2, 1.2);
+        this.fontRendererObj.drawStringWithShadow(title, (float)((this.width / 1.2 - this.fontRendererObj.getStringWidth(title)) / 2), (float)(titleY / 1.2), 0xFFFFFFFF);
+        GlStateManager.popMatrix();
 
-        GameSettings gs = this.mc.gameSettings;
-        int px = this.width / 2 - 160;
-        int w = 320;
-        int rowH = 22;
-
-        ArrayList<UIElement> list = new ArrayList<>(ui.all());
-        int total = list.size();
-        int maxVis = Math.min(getMaxVisible(), total);
-        widgetScroll = Math.max(0, Math.min(widgetScroll, total - maxVis));
-
-        // --- WIDGETS PANEL ---
+        // --- CALC LAYOUT ---
+        int paneW = Math.min(320, this.width - 40);
+        int px = (this.width - paneW) / 2;
         int py = 35;
-        int listH = 28 + maxVis * rowH + (total > maxVis ? 22 : 8);
-        GuiRenderUtils.drawRoundedPanel(px, py, w, listH, 0xEE0D0D15, 0xFF151525, 26, 0xFF2A7FFF);
-        GuiRenderUtils.drawSectionHeader(this.fontRendererObj, px, py + 4, w, "Configuration des Widgets", 0xFF2A7FFF);
-
-        int y = py + 28;
-        int start = widgetScroll;
-        int end = Math.min(start + maxVis, total);
-        for (int i = start; i < end; i++) {
-            UIElement e = list.get(i);
-            boolean on = e.isEnabled();
-            boolean hovered = inRect(mouseX, mouseY, px + 4, y, w - 8, rowH);
-            
-            if (hovered) Gui.drawRect(px + 4, y, px + w - 4, y + rowH, 0x11FFFFFF);
-            
-            int dotCol = on ? 0xFF44EE77 : 0xFF666666;
-            Gui.drawRect(px + 12, y + 9, px + 16, y + 13, dotCol);
-            
-            String name = friendlyName(e.getId());
-            this.fontRendererObj.drawStringWithShadow(name, px + 24, y + 7, hovered ? 0xFFFFFFFF : 0xFFCCCCCC);
-            
-            // Edit icon hint
-            if (hovered) {
-                String hint = "Click to edit details";
-                int hw = fontRendererObj.getStringWidth(hint);
-                this.fontRendererObj.drawString(hint, px + w - 45 - hw, y + 7, 0x55FFFFFF);
-            }
-            
-            drawToggle(px + w - 40, y + 5, on);
-            y += rowH;
-        }
-
-        if (total > maxVis) {
-            int scrollY = py + 28 + maxVis * rowH;
-            Gui.drawRect(px + 10, scrollY + 4, px + w - 10, scrollY + 5, 0x11FFFFFF);
-            String scrollText = (widgetScroll + 1) + "-" + end + " / " + total;
-            this.fontRendererObj.drawString(scrollText, px + (w - fontRendererObj.getStringWidth(scrollText)) / 2, scrollY + 8, 0xFF555577);
-            
-            boolean canUp = widgetScroll > 0;
-            boolean canDown = widgetScroll < total - maxVis;
-            if (canUp) this.fontRendererObj.drawString("▲", px + 15, scrollY + 8, inRect(mouseX, mouseY, px + 10, scrollY + 4, 20, 14) ? 0xFFFFFFFF : 0xFF7777AA);
-            if (canDown) this.fontRendererObj.drawString("▼", px + w - 25, scrollY + 8, inRect(mouseX, mouseY, px + w - 30, scrollY + 4, 20, 14) ? 0xFFFFFFFF : 0xFF7777AA);
-        }
-
-        // --- MOVEMENT PANEL ---
-        int oh = 76;
-        int oy = py + listH + 8;
-        GuiRenderUtils.drawRoundedPanel(px, oy, w, oh, 0xEE0D0D15, 0xFF151525, 26, 0xFF2ECC71);
-        GuiRenderUtils.drawSectionHeader(this.fontRendererObj, px, oy + 4, w, "Options de mouvement", 0xFF2ECC71);
-
-        int optY = oy + 32;
-        // Toggle Sneak
-        this.fontRendererObj.drawStringWithShadow("Toggle Sneak", px + 12, optY + 2, 0xFFCCCCCC);
-        drawToggle(px + w - 40, optY, gs.toggleSneakEnabled);
+        int bottomLimit = this.height - 35;
+        int availableH = bottomLimit - py;
         
-        optY += 22;
-        // Toggle Sprint
-        this.fontRendererObj.drawStringWithShadow("Toggle Sprint", px + 12, optY + 2, 0xFFCCCCCC);
-        drawToggle(px + w - 40, optY, gs.toggleSprintEnabled);
+        int rowH = 22;
+        int maxVisible = availableH / rowH;
+        
+        // Ensure scroll is in bounds
+        scrollOffset = Math.max(0, Math.min(scrollOffset, rows.size() - maxVisible));
+        
+        // --- MAIN PANEL ---
+        int actualListH = Math.min(rows.size(), maxVisible) * rowH + 4;
+        GuiRenderUtils.drawRoundedPanel(px, py, paneW, actualListH, 0xCC05050A, 0xFF101015, 0, 0xFF2A7FFF);
+        GuiRenderUtils.drawRectOutline(px, py, paneW, actualListH, 0x33FFFFFF);
+
+        int currentY = py + 2;
+        int start = scrollOffset;
+        int end = Math.min(start + maxVisible, rows.size());
+        
+        for (int i = start; i < end; i++) {
+            SettingRow row = rows.get(i);
+            renderRow(row, px, currentY, paneW, rowH, mouseX, mouseY);
+            currentY += rowH;
+        }
+
+        // Scrollbar if needed
+        if (rows.size() > maxVisible) {
+            int sbW = 2;
+            int sbX = px + paneW - sbW - 2;
+            int sbH = actualListH - 4;
+            Gui.drawRect(sbX, py + 2, sbX + sbW, py + 2 + sbH, 0x22FFFFFF);
+            
+            float percentage = (float) maxVisible / rows.size();
+            int thumbH = (int) (sbH * percentage);
+            int thumbY = (int) (sbH * ((float) scrollOffset / rows.size()));
+            Gui.drawRect(sbX, py + 2 + thumbY, sbX + sbW, py + 2 + thumbY + thumbH, 0xFF2A7FFF);
+        }
 
         super.drawScreen(mouseX, mouseY, partialTicks);
+    }
+
+    private void renderRow(SettingRow row, int x, int y, int w, int h, int mx, int my) {
+        if (row.isHeader) {
+            Gui.drawRect(x + 5, y + h - 2, x + w - 5, y + h - 1, 0x22FFFFFF);
+            this.fontRendererObj.drawString(row.label, x + 8, y + 7, 0xFF2A7FFF);
+            return;
+        }
+
+        boolean hovered = inRect(mx, my, x + 2, y, w - 4, h);
+        String hKey = "hover_" + row.getId();
+        float hAnim = hoverAnimMap.getOrDefault(hKey, 0f);
+        hAnim = GuiRenderUtils.lerp(hAnim, hovered ? 1f : 0f, 0.2f);
+        hoverAnimMap.put(hKey, hAnim);
+
+        if (hAnim > 0) {
+            int alpha = (int) (hAnim * 0x1A);
+            Gui.drawRect(x + 4, y + 1, x + w - 4, y + h - 1, (alpha << 24) | 0xFFFFFF);
+        }
+
+        boolean enabled = row.isEnabled(this.mc.gameSettings);
+        int dotCol = enabled ? 0xFF44EE77 : 0xFFEE4444;
+        Gui.drawRect(x + 10, y + 9, x + 13, y + 12, dotCol);
+        
+        String displayLabel = row.element != null ? friendlyName(row.element.getId()) : row.label;
+        this.fontRendererObj.drawStringWithShadow(displayLabel, x + 20, y + 7, hovered ? 0xFFFFFFFF : 0xFFCCCCCC);
+
+        if (row.element != null && hovered) {
+            String edit = "CLIC POUR CONFIGURER";
+            int ew = fontRendererObj.getStringWidth(edit);
+            this.fontRendererObj.drawString(edit, x + w - 45 - ew, y + 8, 0x44FFFFFF);
+        }
+
+        drawToggle(x + w - 35, y + 5, enabled);
     }
 
     private void drawToggle(int x, int y, boolean value) {
@@ -141,54 +158,33 @@ public class GuiUISettings extends GuiScreen {
     @Override
     protected void mouseClicked(int mx, int my, int btn) throws IOException {
         super.mouseClicked(mx, my, btn);
-        GameSettings gs = this.mc.gameSettings;
-        int px = this.width / 2 - 160;
-        int w = 320;
-        int rowH = 22;
-        ArrayList<UIElement> list = new ArrayList<>(ui.all());
-        int total = list.size();
-        int maxVis = Math.min(getMaxVisible(), total);
         
+        int paneW = Math.min(320, this.width - 40);
+        int px = (this.width - paneW) / 2;
         int py = 35;
-        int y = py + 28;
-        for (int i = widgetScroll; i < Math.min(widgetScroll + maxVis, total); i++) {
-            UIElement e = list.get(i);
-            if (inRect(mx, my, px, y, w, rowH)) {
-                if (inRect(mx, my, px + w - 40, y, 35, 15)) {
-                    e.setEnabled(!e.isEnabled());
-                    ui.saveConfig();
-                } else {
-                    this.mc.displayGuiScreen(new GuiUIEditor(this, e.getId()));
+        int bottomLimit = this.height - 35;
+        int availableH = bottomLimit - py;
+        int rowH = 22;
+        int maxVisible = availableH / rowH;
+        
+        int currentY = py + 2;
+        int start = scrollOffset;
+        int end = Math.min(start + maxVisible, rows.size());
+
+        for (int i = start; i < end; i++) {
+            SettingRow row = rows.get(i);
+            if (!row.isHeader && inRect(mx, my, px, currentY, paneW, rowH)) {
+                if (inRect(mx, my, px + paneW - 40, currentY, 35, 15)) {
+                    row.toggle(this.mc.gameSettings);
+                    if (row.element != null) ui.saveConfig();
+                    else this.mc.gameSettings.saveOptions();
+                } else if (row.element != null) {
+                    this.mc.displayGuiScreen(new GuiUIEditor(this, row.element.getId()));
                 }
                 return;
             }
-            y += rowH;
+            currentY += rowH;
         }
-
-        if (total > maxVis) {
-            int scrollY = py + 28 + maxVis * rowH;
-            if (inRect(mx, my, px + 10, scrollY + 4, 30, 14) && widgetScroll > 0) widgetScroll--;
-            if (inRect(mx, my, px + w - 40, scrollY + 4, 30, 14) && widgetScroll < total - maxVis) widgetScroll++;
-        }
-
-        int listH = 28 + maxVis * rowH + (total > maxVis ? 22 : 8);
-        int oy = py + listH + 8;
-        int optY = oy + 32;
-        if (inRect(mx, my, px + w - 40, optY, 35, 15)) {
-            gs.toggleSneakEnabled = !gs.toggleSneakEnabled;
-            if (!gs.toggleSneakEnabled) gs.isToggleSneakActive = false;
-            gs.saveOptions();
-        }
-        optY += 22;
-        if (inRect(mx, my, px + w - 40, optY, 35, 15)) {
-            gs.toggleSprintEnabled = !gs.toggleSprintEnabled;
-            if (!gs.toggleSprintEnabled) gs.isToggleSprintActive = false;
-            gs.saveOptions();
-        }
-    }
-
-    private boolean inRect(int mx, int my, int rx, int ry, int rw, int rh) {
-        return mx >= rx && my >= ry && mx <= rx + rw && my <= ry + rh;
     }
 
     @Override
@@ -198,15 +194,23 @@ public class GuiUISettings extends GuiScreen {
         lastMouseY = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
         int scroll = Mouse.getEventDWheel();
         if (scroll != 0) {
-            int px = this.width / 2 - 160, py = 35, w = 320;
-            int total = ui.all().size();
-            int maxVis = Math.min(getMaxVisible(), total);
-            int listH = 28 + maxVis * 22 + (total > maxVis ? 22 : 8);
-            if (inRect(lastMouseX, lastMouseY, px, py, w, listH)) {
-                if (scroll > 0) widgetScroll = Math.max(0, widgetScroll - 1);
-                else widgetScroll = Math.min(total - maxVis, widgetScroll + 1);
+            int paneW = Math.min(320, this.width - 40);
+            int px = (this.width - paneW) / 2;
+            int py = 35;
+            int bottomLimit = this.height - 35;
+            int availableH = bottomLimit - py;
+            int rowH = 22;
+            int maxVisible = availableH / rowH;
+
+            if (inRect(lastMouseX, lastMouseY, px, py, paneW, Math.min(rows.size(), maxVisible) * rowH)) {
+                if (scroll > 0) scrollOffset = Math.max(0, scrollOffset - 1);
+                else scrollOffset = Math.min(rows.size() - maxVisible, scrollOffset + 1);
             }
         }
+    }
+
+    private boolean inRect(int mx, int my, int rx, int ry, int rw, int rh) {
+        return mx >= rx && my >= ry && mx <= rx + rw && my <= ry + rh;
     }
 
     private String friendlyName(String id) {
@@ -215,11 +219,58 @@ public class GuiUISettings extends GuiScreen {
             case "biome": return "Biome"; case "coords": return "Coordonnées";
             case "dir": return "Direction"; case "date": return "Date";
             case "helditem": return "Objet tenu"; case "armor_group": return "Armure";
-            case "potions": return "Potions"; case "cps": return "CPS";
-            case "toggle_sneak": return "Toggle Sneak"; case "toggle_sprint": return "Toggle Sprint";
+            case "potions": return "Effets de Potion"; case "cps": return "CPS";
+            case "toggle_sneak": return "Affichage Sneak"; case "toggle_sprint": return "Affichage Sprint";
             default: 
                 String s = id.replace('_', ' ');
                 return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+        }
+    }
+
+    private static class SettingRow {
+        String label;
+        boolean isHeader;
+        UIElement element;
+        String settingKey;
+
+        SettingRow(String label, boolean isHeader) {
+            this.label = label;
+            this.isHeader = isHeader;
+        }
+
+        SettingRow(UIElement element) {
+            this.element = element;
+            this.label = element.getId();
+        }
+
+        SettingRow(String label, String settingKey) {
+            this.label = label;
+            this.settingKey = settingKey;
+        }
+
+        String getId() {
+            if (element != null) return element.getId();
+            if (settingKey != null) return settingKey;
+            return label;
+        }
+
+        boolean isEnabled(GameSettings gs) {
+            if (element != null) return element.isEnabled();
+            if ("sneak".equals(settingKey)) return gs.toggleSneakEnabled;
+            if ("sprint".equals(settingKey)) return gs.toggleSprintEnabled;
+            return false;
+        }
+
+        void toggle(GameSettings gs) {
+            if (element != null) element.setEnabled(!element.isEnabled());
+            if ("sneak".equals(settingKey)) {
+                gs.toggleSneakEnabled = !gs.toggleSneakEnabled;
+                if (!gs.toggleSneakEnabled) gs.isToggleSneakActive = false;
+            }
+            if ("sprint".equals(settingKey)) {
+                gs.toggleSprintEnabled = !gs.toggleSprintEnabled;
+                if (!gs.toggleSprintEnabled) gs.isToggleSprintActive = false;
+            }
         }
     }
 }

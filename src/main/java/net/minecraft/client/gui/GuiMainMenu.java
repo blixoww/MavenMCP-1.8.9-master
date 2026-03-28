@@ -61,6 +61,8 @@ public class GuiMainMenu extends GuiScreen
 
     // ── Particules ──────────────────────────────────────────────────────────
     private final List<AmbientParticle> particles = new ArrayList<>();
+    // pool pour réutiliser les AmbientParticle et éviter des allocations fréquentes
+    private final List<AmbientParticle> particlePool = new ArrayList<>();
     private final Random rng = new Random();
     /** Nombre max de particules simultanées */
     private static final int PARTICLE_MAX = 120;
@@ -87,21 +89,32 @@ public class GuiMainMenu extends GuiScreen
     {
         ++this.panoramaTimer;
 
-        // Spawn progressif de particules
+        // Spawn progressif de particules (utilisation du pool si disponible)
         if (particles.size() < PARTICLE_MAX && rng.nextInt(2) == 0)
         {
             float spawnX = rng.nextFloat() * (this.width  > 0 ? this.width  : 854);
             float spawnY = (this.height > 0 ? this.height : 480) + 10f;
-            particles.add(new AmbientParticle(spawnX, spawnY, rng));
+
+            AmbientParticle p;
+            if (!particlePool.isEmpty()) {
+                p = particlePool.remove(particlePool.size() - 1);
+                p.reset(spawnX, spawnY, rng);
+            } else {
+                p = new AmbientParticle(spawnX, spawnY, rng);
+            }
+            particles.add(p);
         }
 
-        // Mise à jour + nettoyage
-        Iterator<AmbientParticle> it = particles.iterator();
-        while (it.hasNext())
+        // Mise à jour + nettoyage (retourne les particules mortes dans le pool)
+        for (int i = particles.size() - 1; i >= 0; --i)
         {
-            AmbientParticle p = it.next();
+            AmbientParticle p = particles.get(i);
             p.tick();
-            if (p.isDead()) it.remove();
+            if (p.isDead())
+            {
+                particles.remove(i);
+                if (particlePool.size() < PARTICLE_MAX) particlePool.add(p);
+            }
         }
     }
 
@@ -254,6 +267,16 @@ public class GuiMainMenu extends GuiScreen
     /** Particules ambiantes : rendu interpolé pour smoothness */
     private void renderParticles(float fade, float partialTicks)
     {
+        if (particles.isEmpty() || fade <= 0.01f) return;
+
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(770, 771);
+        GlStateManager.alphaFunc(516, 0.003921569F);
+
+        Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+        worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
+
         for (AmbientParticle p : particles)
         {
             // interp positions
@@ -263,14 +286,26 @@ public class GuiMainMenu extends GuiScreen
             float alphaFactor = p.alpha * fade;
             if (alphaFactor <= 0.02f) continue;
 
-            int a = (int)(MathHelper.clamp_float(alphaFactor, 0f, 1f) * 200f);
-            int col = (a << 24) | (p.color & 0x00FFFFFF);
+            float a = MathHelper.clamp_float(alphaFactor, 0f, 1f);
+            int col = p.color & 0x00FFFFFF; // RGB only
+            float rf = ((col >> 16) & 0xFF) / 255f;
+            float gf = ((col >> 8) & 0xFF) / 255f;
+            float bf = (col & 0xFF) / 255f;
 
-            int size = Math.max(1, Math.round(p.size));
-            int px = Math.round(ix) - size/2;
-            int py = Math.round(iy) - size/2;
-            drawRect(px, py, px + size, py + size, col);
+            float size = Math.max(1f, p.size);
+            float half = size / 2f;
+
+            // Quad (screen-aligned)
+            worldrenderer.pos(ix - half, iy + half, zLevel).tex(0.0D, 1.0D).color(rf, gf, bf, a).endVertex();
+            worldrenderer.pos(ix + half, iy + half, zLevel).tex(1.0D, 1.0D).color(rf, gf, bf, a).endVertex();
+            worldrenderer.pos(ix + half, iy - half, zLevel).tex(1.0D, 0.0D).color(rf, gf, bf, a).endVertex();
+            worldrenderer.pos(ix - half, iy - half, zLevel).tex(0.0D, 0.0D).color(rf, gf, bf, a).endVertex();
         }
+
+        tessellator.draw();
+
+        GlStateManager.disableBlend();
+        GlStateManager.alphaFunc(516, 0.1F);
     }
 
     /**
@@ -565,34 +600,54 @@ public class GuiMainMenu extends GuiScreen
         float decay;     // alpha lost per tick
         float size;
         int color;
+        int age;         // ticks lived
+        int life;        // ticks total life
+        float seed;      // phase for noise
 
         AmbientParticle(float x, float y, Random rng)
         {
-            this.x = x; this.y = y;
-            this.prevX = x; this.prevY = y;
+            this.prevX = this.x = x; this.prevY = this.y = y;
             // velocity
-            this.vy = - (0.05f + rng.nextFloat() * 0.35f);
-            this.vx = (rng.nextFloat() - 0.5f) * 0.24f;
-            this.alpha  = 0.45f + rng.nextFloat() * 0.5f;
-            this.decay  = 0.0006f + rng.nextFloat() * 0.0022f;
-            this.size   = 0.9f + rng.nextFloat() * 1.6f;
-            this.color = (rng.nextInt(5) == 0) ? 0xFFFFCC33 : 0xFFDD2222;
+            this.vy = - (0.06f + rng.nextFloat() * 0.28f);
+            this.vx = (rng.nextFloat() - 0.5f) * 0.18f;
+            this.size   = 1.0f + rng.nextFloat() * 2.4f;
+            this.color = (rng.nextInt(6) == 0) ? 0xFFFFFF33 : 0xFFDD2222; // rare bright
+            this.age = 0;
+            this.life = 80 + rng.nextInt(160); // 4s → 12s approx at 20tps
+            this.seed = rng.nextFloat() * 6.2831f;
+            this.alpha = 1f;
+        }
+
+        void reset(float x, float y, Random rng)
+        {
+            this.prevX = this.x = x; this.prevY = this.y = y;
+            this.vy = - (0.06f + rng.nextFloat() * 0.28f);
+            this.vx = (rng.nextFloat() - 0.5f) * 0.18f;
+            this.size   = 1.0f + rng.nextFloat() * 2.4f;
+            this.color = (rng.nextInt(6) == 0) ? 0xFFFFFF33 : 0xFFDD2222;
+            this.age = 0;
+            this.life = 80 + rng.nextInt(160);
+            this.seed = rng.nextFloat() * 6.2831f;
+            this.alpha = 1f;
         }
 
         void tick()
         {
             // store prev
             prevX = x; prevY = y;
-            // small random walk for vx
-            vx += (MathHelper.sin(x * 0.01f) * 0.006f);
-            // apply velocities
+            // subtle horizontal drift using age+seed for per-particle coherence
+            float drift = MathHelper.sin(age * 0.12f + seed) * 0.006f;
+            vx = vx * 0.985f + drift;
             x += vx;
             y += vy;
-            // slowly decay alpha
-            alpha -= decay;
+            age++;
+            float lifeNorm = MathHelper.clamp_float((float)age / (float)life, 0f, 1f);
+            // smooth fade-out (ease out)
+            alpha = (1f - lifeNorm);
+            alpha = alpha * alpha; // nicer curve
         }
 
-        boolean isDead() { return alpha <= 0f || y < -6f; }
+        boolean isDead() { return age >= life || alpha <= 0f || y < -6f; }
     }
 
     // =========================================================================
@@ -635,7 +690,7 @@ public class GuiMainMenu extends GuiScreen
             // Fond
             int bgA = (int)((hovered ? 60 : 28) * t + 18);
             drawRect(xPosition, yPosition, xPosition + width, yPosition + height,
-                    (bgA << 24) | 0x000000);
+                    (bgA << 24));
 
             // Bordure — gris → couleur accent
             int border = GuiRenderUtils.colorLerp(0x28FFFFFF, 0xFF000000 | accent, t);
