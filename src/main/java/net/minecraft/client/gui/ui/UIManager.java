@@ -68,6 +68,8 @@ public class UIManager {
         register(toggleSprintW);
         // CombatLog widget
         register(new CombatLogWidget("combatlog", 10, 230));
+        // Reach widget
+        register(new ReachWidget("Reach", 10, 250));
 
         boolean loaded = loadConfig();
         if (!loaded) {

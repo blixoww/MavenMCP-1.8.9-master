@@ -746,7 +746,7 @@ public class GuiMainMenu extends GuiScreen
         private float hover = 0f;
         private long  lastTime = -1L;
 
-        private static final float TRANS_MS = 80f; // allongé pour un hover plus doux
+        private static final float TRANS_MS = 100f; // allongé pour un hover plus doux
 
         IconButton(int id, int x, int y, int w, String text, int accent, String tooltip)
         {
@@ -770,7 +770,7 @@ public class GuiMainMenu extends GuiScreen
 
             float step = dt / TRANS_MS;
             hover = MathHelper.clamp_float(hover + (hovered ? step : -step), 0f, 1f);
-            float t = easeInOutQuad(hover);
+            float t = hover * hover * (3 - 2 * hover); // cubic smoothstep
 
             // Fond
             int bgA = (int)((hovered ? 60 : 28) * t + 18);
@@ -808,11 +808,6 @@ public class GuiMainMenu extends GuiScreen
             }
             return res;
         }
-
-         private static float easeInOutQuad(float t)
-         {
-             return t < 0.5f ? 2f * t * t : 1f - 2f * (1f - t) * (1f - t);
-         }
      }
 
     // =========================================================================
@@ -829,7 +824,7 @@ public class GuiMainMenu extends GuiScreen
         private long  lastTime = -1L;
 
         /** Durée de transition hover (ms) */
-        private static final float TRANS_MS = 80f; // allongé pour rendre le hover plus fluide
+        private static final float TRANS_MS = 100f; // allongé pour rendre le hover plus fluide
 
         // Palette
         private static final int BG_IDLE     = 0x12FFFFFF;
@@ -864,7 +859,7 @@ public class GuiMainMenu extends GuiScreen
             hover = MathHelper.clamp_float(hover + (hovered ? step : -step), 0f, 1f);
 
             // Easing pour l'affichage
-            float t = easeInOutQuad(hover);
+            float t = hover * hover * (3 - 2 * hover); // cubic smoothstep
 
             // ── FOND (coins simulés, 1px coupés) ─────────────────────────
             int bg = GuiRenderUtils.colorLerp(BG_IDLE, BG_HOV, t);
@@ -914,10 +909,5 @@ public class GuiMainMenu extends GuiScreen
             }
             return res;
         }
-
-         private static float easeInOutQuad(float t)
-         {
-             return t < 0.5f ? 2f * t * t : 1f - 2f * (1f - t) * (1f - t);
-         }
      }
  }

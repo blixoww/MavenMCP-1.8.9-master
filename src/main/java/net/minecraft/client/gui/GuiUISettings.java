@@ -221,6 +221,7 @@ public class GuiUISettings extends GuiScreen {
             case "helditem": return "Objet tenu"; case "armor_group": return "Armure";
             case "potions": return "Effets de Potion"; case "cps": return "CPS";
             case "toggle_sneak": return "Affichage Sneak"; case "toggle_sprint": return "Affichage Sprint";
+            case "reach": return "Reach Display";
             default: 
                 String s = id.replace('_', ' ');
                 return Character.toUpperCase(s.charAt(0)) + s.substring(1);

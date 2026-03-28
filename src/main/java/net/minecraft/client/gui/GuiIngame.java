@@ -164,7 +164,7 @@ public class GuiIngame extends Gui {
                     this.mc.gameSettings.keyBindAttack,
                     this.mc.gameSettings.keyBindUseItem
             };
-            KeyStrokeWidget ks = new KeyStrokeWidget("keystrokes", 0, 0, keys);
+            KeyStrokeWidget ks = new KeyStrokeWidget("Keystrokes", 0, 0, keys);
             // defaults if no config exists
             try {
                 java.io.File cfg = new java.io.File(Minecraft.getMinecraft().mcDataDir, "config/ui_widgets.json");
