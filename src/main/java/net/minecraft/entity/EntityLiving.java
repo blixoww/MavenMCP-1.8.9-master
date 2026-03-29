@@ -622,6 +622,13 @@ public abstract class EntityLiving extends EntityLivingBase
         this.worldObj.theProfiler.startSection("checkDespawn");
         this.despawnEntity();
         this.worldObj.theProfiler.endSection();
+
+        // Si l'IA est désactivée pour cette entité, on skip toutes les sections d'IA (sensing, target/goal, navigation, mob tick, controls)
+        if (this.aiDisabled)
+        {
+            return;
+        }
+
         this.worldObj.theProfiler.startSection("sensing");
         this.senses.clearSensingCache();
         this.worldObj.theProfiler.endSection();
@@ -1045,6 +1052,8 @@ public abstract class EntityLiving extends EntityLivingBase
     public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, IEntityLivingData livingdata)
     {
         this.getEntityAttribute(SharedMonsterAttributes.followRange).applyModifier(new AttributeModifier("Random spawn bonus", this.rand.nextGaussian() * 0.05D, 1));
+        // Désactive automatiquement l'IA pour les entités nouvellement spawnées afin d'empêcher tout calcul AI
+        net.minecraft.entity.MobAIManager.disableAI(this);
         return livingdata;
     }
 
@@ -1291,6 +1300,8 @@ public abstract class EntityLiving extends EntityLivingBase
     public void setNoAI(boolean disable)
     {
         this.dataWatcher.updateObject(15, Byte.valueOf((byte)(disable ? 1 : 0)));
+        // Maintenir le flag aiDisabled en phase avec NoAI (permet accès direct via NMS au flag public)
+        this.aiDisabled = disable;
     }
 
     /**

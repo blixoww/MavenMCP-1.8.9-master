@@ -190,6 +190,7 @@ public abstract class PathNavigate
 
     public void onUpdateNavigation()
     {
+        if (this.theEntity.aiDisabled) return;
         ++this.totalTicks;
 
         if (!this.noPath())

@@ -95,6 +95,14 @@ public abstract class EntityCreature extends EntityLiving
     {
         super.updateLeashedState();
 
+        // Bloquer tout déplacement si l'IA est désactivée : conserver la gravité (motionY) intacte
+        if (this.aiDisabled)
+        {
+            this.motionX = 0.0D;
+            this.motionZ = 0.0D;
+            return;
+        }
+
         if (this.getLeashed() && this.getLeashedToEntity() != null && this.getLeashedToEntity().worldObj == this.worldObj)
         {
             Entity entity = this.getLeashedToEntity();

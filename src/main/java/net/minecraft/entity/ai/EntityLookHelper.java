@@ -70,6 +70,7 @@ public class EntityLookHelper
      */
     public void onUpdateLook()
     {
+        if (this.entity.aiDisabled) return;
         this.entity.rotationPitch = 0.0F;
 
         if (this.isLooking)

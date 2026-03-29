@@ -127,6 +127,15 @@ public class EntityAITasks
     }
 
     /**
+     * Clear all registered and executing AI tasks. Safe utility used when disabling AI on an entity.
+     */
+    public void clearTasks()
+    {
+        this.taskEntries.clear();
+        this.executingTaskEntries.clear();
+    }
+
+    /**
      * Determine if a specific AI Task should continue being executed.
      */
     private boolean canContinue(EntityAITasks.EntityAITaskEntry taskEntry)

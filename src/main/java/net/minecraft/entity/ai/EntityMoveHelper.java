@@ -48,6 +48,7 @@ public class EntityMoveHelper
 
     public void onUpdateMoveHelper()
     {
+        if (this.entity.aiDisabled) return;
         this.entity.setMoveForward(0.0F);
 
         if (this.update)

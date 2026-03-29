@@ -243,6 +243,12 @@ public abstract class Entity implements ICommandSender
     /** The command result statistics for this Entity. */
     private final CommandResultStats cmdResultStats;
 
+    /**
+     * Flag to completely disable AI for this entity. When true, AI-related ticks and controllers
+     * should be short-circuited to reduce CPU usage for the entity. Public to allow NMS/Spigot access.
+     */
+    public boolean aiDisabled = false;
+
     public int getEntityId()
     {
         return this.entityId;
