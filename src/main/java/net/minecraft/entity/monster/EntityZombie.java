@@ -631,7 +631,7 @@ public class EntityZombie extends EntityMob
 
             if (!this.worldObj.isRemote)
             {
-                this.startConversion(this.rand.nextInt(2401) + 3600);
+                this.startConversion(this.rand.nextInt(601) + 600);
             }
 
             return true;
@@ -720,36 +720,7 @@ public class EntityZombie extends EntityMob
      */
     protected int getConversionTimeBoost()
     {
-        int i = 1;
-
-        if (this.rand.nextFloat() < 0.01F)
-        {
-            int j = 0;
-            BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
-
-            for (int k = (int)this.posX - 4; k < (int)this.posX + 4 && j < 14; ++k)
-            {
-                for (int l = (int)this.posY - 4; l < (int)this.posY + 4 && j < 14; ++l)
-                {
-                    for (int i1 = (int)this.posZ - 4; i1 < (int)this.posZ + 4 && j < 14; ++i1)
-                    {
-                        Block block = this.worldObj.getBlockState(blockpos$mutableblockpos.set(k, l, i1)).getBlock();
-
-                        if (block == Blocks.iron_bars || block == Blocks.bed)
-                        {
-                            if (this.rand.nextFloat() < 0.3F)
-                            {
-                                ++i;
-                            }
-
-                            ++j;
-                        }
-                    }
-                }
-            }
-        }
-
-        return i;
+        return 1;
     }
 
     /**
