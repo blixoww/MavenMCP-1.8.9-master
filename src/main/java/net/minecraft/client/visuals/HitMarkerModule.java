@@ -7,8 +7,7 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
 /**
- * Hit marker style CoD : 4 barres diagonales autour du crosshair
- * (entre les branches du +), avec fade smooth.
+ * Hit marker style CoD : 4 barres diagonales autour du crosshair.
  */
 public class HitMarkerModule {
 
@@ -29,6 +28,12 @@ public class HitMarkerModule {
             return;
         }
 
+        renderStatic(screenW / 2.0f, screenH / 2.0f, elapsed, s);
+    }
+
+    public void renderStatic(float cx, float cy, long elapsed, VisualSettings s) {
+        if (elapsed > s.hitMarkerDurationMs) return;
+
         float progress = (float) elapsed / s.hitMarkerDurationMs;
         float alpha = s.hitMarkerOpacity;
 
@@ -38,15 +43,12 @@ public class HitMarkerModule {
 
         if (alpha <= 0.01f) return;
 
-        float cx = screenW / 2.0f;
-        float cy = screenH / 2.0f;
-
-        // Léger punch vers l'intérieur au début
-        float punch = (1.0f - progress) * 0.25f;
+        // Punch vers l'intérieur au début
+        float punch = (1.0f - progress) * 0.3f;
         float sizeRatio = s.hitMarkerSize / 8.0f;
-        float gap = (3.0f - punch * 2.0f) * sizeRatio;
-        float barLen = s.hitMarkerSize * 0.55f;
-        float thickness = 1.5f * sizeRatio;
+        float gap = (3.5f - punch * 2.5f) * sizeRatio;
+        float barLen = s.hitMarkerSize * 0.5f;
+        float thickness = 1.2f * sizeRatio;
 
         int r = (s.hitMarkerColor >> 16) & 0xFF;
         int g = (s.hitMarkerColor >> 8) & 0xFF;
@@ -55,33 +57,24 @@ public class HitMarkerModule {
 
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         GlStateManager.disableTexture2D();
+        GlStateManager.enableAlpha();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        GlStateManager.disableCull();
+        GlStateManager.color(1, 1, 1, 1);
 
         Tessellator tess = Tessellator.getInstance();
         WorldRenderer wr = tess.getWorldRenderer();
 
-        // 4 barres diagonales (entre les branches du crosshair +)
-        // Haut-gauche : du centre vers haut-gauche
+        // 4 barres diagonales
         drawLine(wr, tess, cx - gap, cy - gap, cx - gap - barLen, cy - gap - barLen, thickness, r, g, b, a);
-        // Haut-droite
         drawLine(wr, tess, cx + gap, cy - gap, cx + gap + barLen, cy - gap - barLen, thickness, r, g, b, a);
-        // Bas-gauche
         drawLine(wr, tess, cx - gap, cy + gap, cx - gap - barLen, cy + gap + barLen, thickness, r, g, b, a);
-        // Bas-droite
         drawLine(wr, tess, cx + gap, cy + gap, cx + gap + barLen, cy + gap + barLen, thickness, r, g, b, a);
 
+        GlStateManager.enableCull();
         GlStateManager.enableTexture2D();
-        GlStateManager.disableBlend();
         GlStateManager.popMatrix();
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public long getHitTime() {
-        return hitTime;
     }
 
     private void drawLine(WorldRenderer wr, Tessellator tess, float x1, float y1, float x2, float y2,

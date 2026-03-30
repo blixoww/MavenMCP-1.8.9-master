@@ -6,10 +6,12 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.item.ItemAxe;
+import net.minecraft.item.ItemStack;
 
 /**
  * Central manager for all visual effect modules.
- * Singleton — accessed via VisualManager.getInstance().
  */
 public class VisualManager {
 
@@ -55,10 +57,6 @@ public class VisualManager {
 
     // ── Event hooks ─────────────────────────────────────────────────────
 
-    /**
-     * Called when the local player attacks an entity.
-     * @param healthBefore entity health captured BEFORE attackTargetEntityWithCurrentItem
-     */
     public void onAttack(Entity target, float healthBefore) {
         if (target instanceof EntityLivingBase) {
             EntityLivingBase living = (EntityLivingBase) target;
@@ -81,8 +79,14 @@ public class VisualManager {
     }
 
     /**
-     * Called when an entity dies (status byte 3).
+     * Appelé depuis EntityArrow ou PlayerControllerMP quand une flèche touche.
      */
+    public void onArrowHit() {
+        if (settings.hitMarkerEnabled) {
+            hitMarker.onHit();
+        }
+    }
+
     public void onEntityDeath(Entity entity) {
         if (entity instanceof EntityLivingBase) {
             EntityLivingBase living = (EntityLivingBase) entity;
@@ -94,9 +98,6 @@ public class VisualManager {
         }
     }
 
-    /**
-     * Called every frame to render HUD overlays (combo, hit marker).
-     */
     public void renderHUD(float partialTicks) {
         Minecraft mc = Minecraft.getMinecraft();
         if (mc.thePlayer == null || mc.theWorld == null) return;
@@ -113,18 +114,12 @@ public class VisualManager {
         }
     }
 
-    /**
-     * Called every frame to render world-space effects (hearts).
-     */
     public void renderWorld(float partialTicks) {
         if (settings.heartsEnabled) {
             hearts.render(partialTicks, settings);
         }
     }
 
-    /**
-     * Tick update for time-based effects.
-     */
     public void tick() {
         combo.tick(settings);
         hearts.tick();
