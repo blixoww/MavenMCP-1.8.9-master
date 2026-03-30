@@ -1332,6 +1332,12 @@ public class EntityRenderer implements IResourceManagerReloadListener {
         this.mc.mcProfiler.endStartSection("waypoints");
         net.minecraft.client.waypoint.WaypointRenderer.render(partialTicks);
 
+        // ── Visual Effects (Hearts / Damage Indicators) ──────────────────────────
+        try {
+            net.minecraft.client.visuals.VisualManager.getInstance().renderWorld(partialTicks);
+        } catch (Exception ignored) {
+        }
+
         if (this.renderHand) {
             GlStateManager.clear(256);
             this.renderHand(partialTicks, pass);

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mvn compile:*)",
+      "Bash(cmd /c \"cd /d \\\\\"C:\\\\Users\\\\Valentin\\\\Desktop\\\\JAVA MC\\\\Project\\\\IntelliJ\\\\MavenMCP-1.8.9-master\\\\\" && mvn compile -q 2>&1\")"
+    ]
+  }
+}

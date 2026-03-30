@@ -484,6 +484,12 @@ public class GuiIngame extends Gui {
         } catch (Exception e) {
             // éviter crash si erreur
         }
+
+        // Render visual effects HUD (combo, hit marker)
+        try {
+            net.minecraft.client.visuals.VisualManager.getInstance().renderHUD(partialTicks);
+        } catch (Exception ignored) {
+        }
     }
 
     protected void renderTooltip(ScaledResolution sr, float partialTicks) {
@@ -1073,6 +1079,12 @@ public class GuiIngame extends Gui {
 
         ++this.updateCounter;
         this.streamIndicator.updateStreamAlpha();
+
+        // Tick visual effects (combo reset, heart cleanup)
+        try {
+            net.minecraft.client.visuals.VisualManager.getInstance().tick();
+        } catch (Exception ignored) {
+        }
 
         if (this.mc.thePlayer != null) {
             ItemStack itemstack = this.mc.thePlayer.inventory.getCurrentItem();

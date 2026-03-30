@@ -1038,6 +1038,9 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
             else
             {
                 entity.handleStatusUpdate(packetIn.getOpCode());
+                if (packetIn.getOpCode() == 3) {
+                    net.minecraft.client.visuals.VisualManager.getInstance().onEntityDeath(entity);
+                }
             }
         }
     }

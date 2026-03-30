@@ -45,7 +45,8 @@ public class GuiIngameMenu extends GuiScreen {
         this.buttonList.add(new GuiMenuButton(8, px - bWidth / 2, py - 4, halfW, bHeight, "§7HUD"));
         this.buttonList.add(new GuiMenuButton(0, px + 2, py - 4, halfW, bHeight, "§7SETTINGS"));
 
-        this.buttonList.add(new GuiMenuButton(1, px - bWidth / 2, py + 22, bWidth, bHeight, "§c§lDISCONNECT"));
+        this.buttonList.add(new GuiMenuButton(9, px - bWidth / 2, py + 22, bWidth, bHeight, "§7VISUALS"));
+        this.buttonList.add(new GuiMenuButton(1, px - bWidth / 2, py + 48, bWidth, bHeight, "§c§lDISCONNECT"));
 
         this.btnYCache = new int[this.buttonList.size()];
     }
@@ -64,6 +65,7 @@ public class GuiIngameMenu extends GuiScreen {
                 break;
             case 4: this.mc.displayGuiScreen(null); this.mc.setIngameFocus(); break;
             case 8: this.mc.displayGuiScreen(new GuiUISettings(this)); break;
+            case 9: this.mc.displayGuiScreen(new net.minecraft.client.visuals.GuiVisualSettings(this)); break;
         }
     }
 
@@ -87,7 +89,7 @@ public class GuiIngameMenu extends GuiScreen {
 
         // --- PANEL ---
         int pW = 180;
-        int pH = 155;
+        int pH = 181;
         int px = this.width / 2 - pW / 2;
         int py = this.height / 2 - pH / 2 - 5;
 

@@ -499,7 +499,10 @@ public class PlayerControllerMP
 
         if (this.currentGameType != WorldSettings.GameType.SPECTATOR)
         {
+            float healthBefore = (targetEntity instanceof net.minecraft.entity.EntityLivingBase)
+                ? ((net.minecraft.entity.EntityLivingBase) targetEntity).getHealth() : -1;
             playerIn.attackTargetEntityWithCurrentItem(targetEntity);
+            net.minecraft.client.visuals.VisualManager.getInstance().onAttack(targetEntity, healthBefore);
         }
     }
 
