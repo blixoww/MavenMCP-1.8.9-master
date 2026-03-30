@@ -30,6 +30,11 @@ public class GuiVisualSettings extends GuiScreen {
         0xFFFFFFFF, 0xFFFF3333, 0xFFFF7F33, 0xFFFFFF33, 0xFF33FF33, 0xFF33FFFF, 0xFF3333FF, 0xFF8833FF, 0xFFFF33FF, 0xFF888888, 0xFF111111
     };
 
+    // Layout constant pour les sliders
+    private static final int SW = 100; // Slider Width
+    private static final int TW = 40;  // Text Width
+    private static final int GAP = 10; // Gap between label and control
+
     private int panelX, panelY, panelW, panelH;
     private int catW, settingsX, settingsW;
 
@@ -198,8 +203,7 @@ public class GuiVisualSettings extends GuiScreen {
 
     private int drawHeartSettings(int x, int y, int w, int mx, int my, int ct, int cb) {
         y = drawToggle(x, y, w, "Activ\u00e9", settings.heartsEnabled, mx, my, ct, cb);
-        y = drawToggle(x, y, w, "Afficher d\u00e9g\u00e2ts", settings.heartsShowDamage, mx, my, ct, cb);
-        y = drawSlider(x, y, w, "Quantit\u00e9", settings.heartsQuantity, 1, 10, mx, my, ct, cb);
+        y = drawToggle(x, y, w, "Afficher d\u00e9g\u00e2ts \u007C Vie Restante", settings.heartsShowDamage, mx, my, ct, cb);
         y = drawEnum(x, y, w, "Filtre", new String[]{"Joueurs", "Mobs", "Tous"}, settings.heartsFilter, mx, my, ct, cb);
         y = drawColorSelector(x, y, w, "Couleur", settings.heartsColor, mx, my, ct, cb, 8);
         return y;
@@ -224,16 +228,18 @@ public class GuiVisualSettings extends GuiScreen {
         fontRendererObj.drawStringWithShadow(label, x, y + 3, 0xFFCCCCCC);
         
         String valStr = (max > 10 && min >= 1) ? String.valueOf((int) value) : String.format("%.2f", value);
-        int valW = fontRendererObj.getStringWidth("100.00"); // Largeur fixe max pour éviter le décalage
-        int sw = w / 2 - 20;
-        int sx = x + w - sw - valW - 12;
+        
+        int sx = x + w - SW - TW - GAP;
         int sy = y + 7;
         
-        fontRendererObj.drawStringWithShadow(valStr, x + w - fontRendererObj.getStringWidth(valStr), y + 3, 0xFFFF8888);
+        // Texte fixe à droite
+        int tx = x + w - TW;
+        fontRendererObj.drawStringWithShadow(valStr, tx + (TW - fontRendererObj.getStringWidth(valStr)), y + 3, 0xFFFF8888);
         
-        Gui.drawRect(sx, sy, sx + sw, sy + 3, 0xFF2A2A3A);
+        // Barre fixe
+        Gui.drawRect(sx, sy, sx + SW, sy + 3, 0xFF2A2A3A);
         float ratio = MathHelper.clamp_float((value - min) / (max - min), 0, 1);
-        int filledW = (int)(sw * ratio);
+        int filledW = (int)(SW * ratio);
         Gui.drawRect(sx, sy, sx + filledW, sy + 3, ACCENT);
         Gui.drawRect(sx + filledW - 2, sy - 1, sx + filledW + 2, sy + 4, 0xFFEEEEEE);
         return y + 16;
@@ -463,7 +469,7 @@ public class GuiVisualSettings extends GuiScreen {
             case 2: handleParticleClick(row, mx, x, w); break;
             case 3: handleHeartClick(row, mx, x, w); break;
         }
-        settings.save();
+        // settings.save() retiré d'ici pour éviter lag pendant drag
     }
 
     private void handleComboClick(int row, int mx, int x, int w) {
@@ -504,8 +510,8 @@ public class GuiVisualSettings extends GuiScreen {
             if (row == 0) settings.heartsEnabled = !settings.heartsEnabled;
             if (row == 1) settings.heartsShowDamage = !settings.heartsShowDamage;
         }
-        if (isOverEnum(mx, x, w) && row == 3) settings.heartsFilter = (settings.heartsFilter + 1) % 3;
-        handleColorClick(row, mx, x, w, 4, 8);
+        if (isOverEnum(mx, x, w) && row == 2) settings.heartsFilter = (settings.heartsFilter + 1) % 3;
+        handleColorClick(row, mx, x, w, 3, 8);
     }
 
     private boolean isOverToggle(int mx, int x, int w) {
@@ -520,10 +526,9 @@ public class GuiVisualSettings extends GuiScreen {
 
     private void handleColorClick(int row, int mx, int x, int w, int targetRow, int colorId) {
         if (row != targetRow) return;
-        int sz = 10;
-        int cx = x + w - sz - 15;
+        int cx = x + w - 10 - 15;
         int lx = cx - 14;
-        int rx = cx + sz + 4;
+        int rx = cx + 10 + 4;
         if (mx >= lx && mx < lx + 10) cycleColor(colorId, -1);
         if (mx >= rx && mx < rx + 10) cycleColor(colorId, 1);
     }
@@ -540,6 +545,7 @@ public class GuiVisualSettings extends GuiScreen {
         if (index == -1) index = 0;
         int next = (index + dir + PRESET_COLORS.length) % PRESET_COLORS.length;
         setColorForId(id, PRESET_COLORS[next]);
+        settings.save();
     }
 
     private int getColorForId(int id) {
@@ -580,19 +586,19 @@ public class GuiVisualSettings extends GuiScreen {
         int row = relY / 16;
         if (draggingSlider == -1) draggingSlider = row;
         
-        int valW = fontRendererObj.getStringWidth("100.00");
-        int sw = w / 2 - 20;
-        int sx = x + w - sw - valW - 12;
+        int sx = x + w - SW - TW - GAP;
         
-        float ratio = MathHelper.clamp_float((float)(mx - sx) / sw, 0.0f, 1.0f);
+        float ratio = MathHelper.clamp_float((float)(mx - sx) / SW, 0.0f, 1.0f);
         applySliderValue(selectedCategory, draggingSlider, ratio);
-        settings.save();
     }
 
     @Override
     protected void mouseReleased(int mx, int my, int btn) {
         super.mouseReleased(mx, my, btn);
-        draggingSlider = -1;
+        if (draggingSlider != -1) {
+            settings.save();
+            draggingSlider = -1;
+        }
     }
 
     private void applySliderValue(int cat, int row, float ratio) {

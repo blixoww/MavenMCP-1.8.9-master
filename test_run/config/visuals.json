@@ -26,11 +26,11 @@
   "particleColor1": -65536,
   "particleColor2": -22016,
   "particleColor3": -256,
-  "particleQuantity": 1,
+  "particleQuantity": 8,
   "particleSize": 1.0,
   "particleFilter": 2,
   "heartsEnabled": true,
-  "heartsColor": -52429,
+  "heartsColor": -13369345,
   "heartsShowDamage": true,
   "heartsQuantity": 3,
   "heartsFilter": 2
