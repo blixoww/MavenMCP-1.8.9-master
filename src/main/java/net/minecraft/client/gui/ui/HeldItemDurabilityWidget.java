@@ -78,9 +78,12 @@ public class HeldItemDurabilityWidget extends BaseWidget {
 
         try {
             GlStateManager.pushMatrix();
+            // Enable depth testing to ensure the enchantment glint is masked to the item model
+            GlStateManager.enableDepth();
             RenderHelper.enableGUIStandardItemLighting();
             mc.getRenderItem().renderItemAndEffectIntoGUI(stack, sX, sY);
             RenderHelper.disableStandardItemLighting();
+            GlStateManager.disableDepth();
             GlStateManager.popMatrix();
         } catch (Throwable ignored) {}
 
