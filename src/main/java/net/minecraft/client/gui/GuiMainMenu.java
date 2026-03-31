@@ -551,7 +551,7 @@ public class GuiMainMenu extends GuiScreen
 
         // ── Droite ────────────────────────────────────────────
         int ac = (int)(70f * fade);
-        String copy = "2026";
+        String copy = "";
         int tw = fontRendererObj.getStringWidth(copy);
         fontRendererObj.drawString(copy, width - tw - 10, py, (ac << 24) | 0xFFFFFF);
     }

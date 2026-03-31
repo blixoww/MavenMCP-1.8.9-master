@@ -57,7 +57,6 @@ public class GuiIngame extends Gui {
      * ChatGUI instance that retains all previous chat data
      */
     private final GuiNewChat persistantChatGUI;
-    private final GuiStreamIndicator streamIndicator;
     private int updateCounter;
 
     /**
@@ -146,7 +145,6 @@ public class GuiIngame extends Gui {
         this.overlayDebug = new GuiOverlayDebug(mcIn);
         this.spectatorGui = new GuiSpectator(mcIn);
         this.persistantChatGUI = new GuiNewChat(mcIn);
-        this.streamIndicator = new GuiStreamIndicator(mcIn);
         this.overlayPlayerList = new GuiPlayerTabOverlay(mcIn, this);
         this.setDefaultTitlesTimes();
         try {
@@ -621,11 +619,6 @@ public class GuiIngame extends Gui {
         this.mc.mcProfiler.endSection();
     }
 
-
-    public void renderStreamIndicator(ScaledResolution scaledRes) {
-        this.streamIndicator.render(scaledRes.getScaledWidth() - 10, 10);
-    }
-
     private void renderScoreboard(ScoreObjective objective, ScaledResolution scaledRes) {
         Scoreboard scoreboard = objective.getScoreboard();
         Collection<Score> collection = scoreboard.getSortedScores(objective);
@@ -1078,7 +1071,6 @@ public class GuiIngame extends Gui {
         }
 
         ++this.updateCounter;
-        this.streamIndicator.updateStreamAlpha();
 
         // Tick visual effects (combo reset, heart cleanup)
         try {

@@ -1,241 +1,145 @@
 package net.minecraft.client.gui;
 
+import java.awt.Color;
 import java.io.IOException;
-import net.minecraft.client.audio.PositionedSoundRecord;
-import net.minecraft.client.audio.SoundCategory;
-import net.minecraft.client.audio.SoundEventAccessorComposite;
-import net.minecraft.client.audio.SoundHandler;
-import net.minecraft.client.gui.stream.GuiStreamOptions;
-import net.minecraft.client.gui.stream.GuiStreamUnavailable;
-import net.minecraft.client.resources.I18n;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.settings.GameSettings;
-import net.minecraft.client.stream.IStream;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.IChatComponent;
-import net.minecraft.world.EnumDifficulty;
+import net.minecraft.util.MathHelper;
 
-public class GuiOptions extends GuiScreen implements GuiYesNoCallback
-{
-    private static final GameSettings.Options[] field_146440_f = new GameSettings.Options[] {GameSettings.Options.FOV};
-    private final GuiScreen field_146441_g;
+public class GuiOptions extends GuiScreen implements GuiYesNoCallback {
+    
+    private final GuiScreen parentScreen;
+    private final GameSettings settings;
+    
+    private float animation = 0.0f;
+    private long lastTime = -1L;
+    private final int accentColor = new Color(220, 30, 30).getRGB();
+    private int[] btnYCache;
 
-    /** Reference to the GameSettings object. */
-    private final GameSettings game_settings_1;
-    private GuiButton field_175357_i;
-    private GuiLockIconButton field_175356_r;
-    protected String field_146442_a = "Options";
-
-    public GuiOptions(GuiScreen p_i1046_1_, GameSettings p_i1046_2_)
-    {
-        this.field_146441_g = p_i1046_1_;
-        this.game_settings_1 = p_i1046_2_;
+    public GuiOptions(GuiScreen parent, GameSettings settings) {
+        this.parentScreen = parent;
+        this.settings = settings;
     }
 
-    /**
-     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
-     * window resizes, the buttonList is cleared beforehand.
-     */
-    public void initGui()
-    {
-        int i = 0;
-        this.field_146442_a = I18n.format("options.title", new Object[0]);
+    @Override
+    public void initGui() {
+        this.buttonList.clear();
+        this.lastTime = Minecraft.getSystemTime();
 
-        for (GameSettings.Options gamesettings$options : field_146440_f)
-        {
-            if (gamesettings$options.getEnumFloat())
-            {
-                this.buttonList.add(new GuiOptionSlider(gamesettings$options.returnEnumOrdinal(), this.width / 2 - 155 + i % 2 * 160, this.height / 6 - 12 + 24 * (i >> 1), gamesettings$options));
-            }
-            else
-            {
-                GuiOptionButton guioptionbutton = new GuiOptionButton(gamesettings$options.returnEnumOrdinal(), this.width / 2 - 155 + i % 2 * 160, this.height / 6 - 12 + 24 * (i >> 1), gamesettings$options, this.game_settings_1.getKeyBinding(gamesettings$options));
-                this.buttonList.add(guioptionbutton);
-            }
+        int bWidth = 150;
+        int bHeight = 22;
+        int px = this.width / 2;
+        int py = this.height / 2;
 
-            ++i;
-        }
+        // --- Layout (Remonté de 10px pour que Done rentre mieux) ---
+        // Top row
+        this.buttonList.add(new GuiMenuButton(101, px - bWidth - 5, py - 55, bWidth, bHeight, "VIDEO SETTINGS", false));
+        this.buttonList.add(new GuiMenuButton(106, px + 5, py - 55, bWidth, bHeight, "SOUNDS"));
 
-        if (this.mc.theWorld != null)
-        {
-            EnumDifficulty enumdifficulty = this.mc.theWorld.getDifficulty();
-            this.field_175357_i = new GuiButton(108, this.width / 2 - 155 + i % 2 * 160, this.height / 6 - 12 + 24 * (i >> 1), 150, 20, this.func_175355_a(enumdifficulty));
-            this.buttonList.add(this.field_175357_i);
+        // Middle rows
+        this.buttonList.add(new GuiMenuButton(100, px - bWidth - 5, py - 29, bWidth, bHeight, "CONTROLS"));
+        this.buttonList.add(new GuiMenuButton(103, px + 5, py - 29, bWidth, bHeight, "CHAT"));
 
-            if (this.mc.isSingleplayer() && !this.mc.theWorld.getWorldInfo().isHardcoreModeEnabled())
-            {
-                this.field_175357_i.setWidth(this.field_175357_i.getButtonWidth() - 20);
-                this.field_175356_r = new GuiLockIconButton(109, this.field_175357_i.xPosition + this.field_175357_i.getButtonWidth(), this.field_175357_i.yPosition);
-                this.buttonList.add(this.field_175356_r);
-                this.field_175356_r.func_175229_b(this.mc.theWorld.getWorldInfo().isDifficultyLocked());
-                this.field_175356_r.enabled = !this.field_175356_r.func_175230_c();
-                this.field_175357_i.enabled = !this.field_175356_r.func_175230_c();
-            }
-            else
-            {
-                this.field_175357_i.enabled = false;
-            }
-        }
-        else
-        {
-            GuiOptionButton guioptionbutton1 = new GuiOptionButton(GameSettings.Options.REALMS_NOTIFICATIONS.returnEnumOrdinal(), this.width / 2 - 155 + i % 2 * 160, this.height / 6 - 12 + 24 * (i >> 1), GameSettings.Options.REALMS_NOTIFICATIONS, this.game_settings_1.getKeyBinding(GameSettings.Options.REALMS_NOTIFICATIONS));
-            this.buttonList.add(guioptionbutton1);
-        }
+        this.buttonList.add(new GuiMenuButton(105, px - bWidth - 5, py - 3, bWidth, bHeight, "RESOURCES"));
+        this.buttonList.add(new GuiMenuButton(102, px + 5, py - 3, bWidth, bHeight, "LANGUAGE"));
 
-        this.buttonList.add(new GuiButton(110, this.width / 2 - 155, this.height / 6 + 48 - 6, 150, 20, I18n.format("options.skinCustomisation", new Object[0])));
-        this.buttonList.add(new GuiButton(8675309, this.width / 2 + 5, this.height / 6 + 48 - 6, 150, 20, "Super Secret Settings...")
-        {
-            public void playPressSound(SoundHandler soundHandlerIn)
-            {
-                SoundEventAccessorComposite soundeventaccessorcomposite = soundHandlerIn.getRandomSoundFromCategories(new SoundCategory[] {SoundCategory.ANIMALS, SoundCategory.BLOCKS, SoundCategory.MOBS, SoundCategory.PLAYERS, SoundCategory.WEATHER});
+        this.buttonList.add(new GuiMenuButton(110, px - bWidth - 5, py + 23, bWidth, bHeight, "SKIN CUSTOMS"));
+        this.buttonList.add(new GuiMenuButton(104, px + 5, py + 23, bWidth, bHeight, "SNOOPER"));
 
-                if (soundeventaccessorcomposite != null)
-                {
-                    soundHandlerIn.playSound(PositionedSoundRecord.create(soundeventaccessorcomposite.getSoundEventLocation(), 0.5F));
-                }
-            }
-        });
-        this.buttonList.add(new GuiButton(106, this.width / 2 - 155, this.height / 6 + 72 - 6, 150, 20, I18n.format("options.sounds", new Object[0])));
-        this.buttonList.add(new GuiButton(107, this.width / 2 + 5, this.height / 6 + 72 - 6, 150, 20, I18n.format("options.stream", new Object[0])));
-        this.buttonList.add(new GuiButton(101, this.width / 2 - 155, this.height / 6 + 96 - 6, 150, 20, I18n.format("options.video", new Object[0])));
-        this.buttonList.add(new GuiButton(100, this.width / 2 + 5, this.height / 6 + 96 - 6, 150, 20, I18n.format("options.controls", new Object[0])));
-        this.buttonList.add(new GuiButton(102, this.width / 2 - 155, this.height / 6 + 120 - 6, 150, 20, I18n.format("options.language", new Object[0])));
-        this.buttonList.add(new GuiButton(103, this.width / 2 + 5, this.height / 6 + 120 - 6, 150, 20, I18n.format("options.chat.title", new Object[0])));
-        this.buttonList.add(new GuiButton(105, this.width / 2 - 155, this.height / 6 + 144 - 6, 150, 20, I18n.format("options.resourcepack", new Object[0])));
-        this.buttonList.add(new GuiButton(104, this.width / 2 + 5, this.height / 6 + 144 - 6, 150, 20, I18n.format("options.snooper.view", new Object[0])));
-        this.buttonList.add(new GuiButton(200, this.width / 2 - 100, this.height / 6 + 168, I18n.format("gui.done", new Object[0])));
+        // Bottom (Done)
+        this.buttonList.add(new GuiMenuButton(200, px - 75, py + 55, 150, bHeight, "DONE"));
+
+        this.btnYCache = new int[this.buttonList.size()];
     }
 
-    public String func_175355_a(EnumDifficulty p_175355_1_)
-    {
-        IChatComponent ichatcomponent = new ChatComponentText("");
-        ichatcomponent.appendSibling(new ChatComponentTranslation("options.difficulty", new Object[0]));
-        ichatcomponent.appendText(": ");
-        ichatcomponent.appendSibling(new ChatComponentTranslation(p_175355_1_.getDifficultyResourceKey(), new Object[0]));
-        return ichatcomponent.getFormattedText();
-    }
+    @Override
+    protected void actionPerformed(GuiButton button) throws IOException {
+        if (!button.enabled) return;
 
-    public void confirmClicked(boolean result, int id)
-    {
-        this.mc.displayGuiScreen(this);
-
-        if (id == 109 && result && this.mc.theWorld != null)
-        {
-            this.mc.theWorld.getWorldInfo().setDifficultyLocked(true);
-            this.field_175356_r.func_175229_b(true);
-            this.field_175356_r.enabled = false;
-            this.field_175357_i.enabled = false;
+        switch (button.id) {
+            case 100: this.mc.displayGuiScreen(new GuiControls(this, this.settings)); break;
+            case 101: this.mc.displayGuiScreen(new GuiVideoSettings(this, this.settings)); break;
+            case 102: this.mc.displayGuiScreen(new GuiLanguage(this, this.settings, this.mc.getLanguageManager())); break;
+            case 103: this.mc.displayGuiScreen(new ScreenChatOptions(this, this.settings)); break;
+            case 104: this.mc.displayGuiScreen(new GuiSnooper(this, this.settings)); break;
+            case 105: this.mc.displayGuiScreen(new GuiScreenResourcePacks(this)); break;
+            case 106: this.mc.displayGuiScreen(new GuiScreenOptionsSounds(this, this.settings)); break;
+            case 110: this.mc.displayGuiScreen(new GuiCustomizeSkin(this)); break;
+            case 200: 
+                this.settings.saveOptions();
+                this.mc.displayGuiScreen(this.parentScreen); 
+                break;
         }
     }
 
-    /**
-     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
-     */
-    protected void actionPerformed(GuiButton button) throws IOException
-    {
-        if (button.enabled)
-        {
-            if (button.id < 100 && button instanceof GuiOptionButton)
-            {
-                GameSettings.Options gamesettings$options = ((GuiOptionButton)button).returnEnumOptions();
-                this.game_settings_1.setOptionValue(gamesettings$options, 1);
-                button.displayString = this.game_settings_1.getKeyBinding(GameSettings.Options.getEnumOptions(button.id));
-            }
-
-            if (button.id == 108)
-            {
-                this.mc.theWorld.getWorldInfo().setDifficulty(EnumDifficulty.getDifficultyEnum(this.mc.theWorld.getDifficulty().getDifficultyId() + 1));
-                this.field_175357_i.displayString = this.func_175355_a(this.mc.theWorld.getDifficulty());
-            }
-
-            if (button.id == 109)
-            {
-                this.mc.displayGuiScreen(new GuiYesNo(this, (new ChatComponentTranslation("difficulty.lock.title", new Object[0])).getFormattedText(), (new ChatComponentTranslation("difficulty.lock.question", new Object[] {new ChatComponentTranslation(this.mc.theWorld.getWorldInfo().getDifficulty().getDifficultyResourceKey(), new Object[0])})).getFormattedText(), 109));
-            }
-
-            if (button.id == 110)
-            {
-                this.mc.gameSettings.saveOptions();
-                this.mc.displayGuiScreen(new GuiCustomizeSkin(this));
-            }
-
-            if (button.id == 8675309)
-            {
-                this.mc.entityRenderer.activateNextShader();
-            }
-
-            if (button.id == 101)
-            {
-                this.mc.gameSettings.saveOptions();
-                this.mc.displayGuiScreen(new GuiVideoSettings(this, this.game_settings_1));
-            }
-
-            if (button.id == 100)
-            {
-                this.mc.gameSettings.saveOptions();
-                this.mc.displayGuiScreen(new GuiControls(this, this.game_settings_1));
-            }
-
-            if (button.id == 102)
-            {
-                this.mc.gameSettings.saveOptions();
-                this.mc.displayGuiScreen(new GuiLanguage(this, this.game_settings_1, this.mc.getLanguageManager()));
-            }
-
-            if (button.id == 103)
-            {
-                this.mc.gameSettings.saveOptions();
-                this.mc.displayGuiScreen(new ScreenChatOptions(this, this.game_settings_1));
-            }
-
-            if (button.id == 104)
-            {
-                this.mc.gameSettings.saveOptions();
-                this.mc.displayGuiScreen(new GuiSnooper(this, this.game_settings_1));
-            }
-
-            if (button.id == 200)
-            {
-                this.mc.gameSettings.saveOptions();
-                this.mc.displayGuiScreen(this.field_146441_g);
-            }
-
-            if (button.id == 105)
-            {
-                this.mc.gameSettings.saveOptions();
-                this.mc.displayGuiScreen(new GuiScreenResourcePacks(this));
-            }
-
-            if (button.id == 106)
-            {
-                this.mc.gameSettings.saveOptions();
-                this.mc.displayGuiScreen(new GuiScreenOptionsSounds(this, this.game_settings_1));
-            }
-
-            if (button.id == 107)
-            {
-                this.mc.gameSettings.saveOptions();
-                IStream istream = this.mc.getTwitchStream();
-
-                if (istream.func_152936_l() && istream.func_152928_D())
-                {
-                    this.mc.displayGuiScreen(new GuiStreamOptions(this, this.game_settings_1));
-                }
-                else
-                {
-                    GuiStreamUnavailable.func_152321_a(this);
-                }
-            }
+    @Override
+    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        long now = Minecraft.getSystemTime();
+        if (lastTime != -1) {
+            float dt = (now - lastTime) / 1000.0f;
+            animation = MathHelper.clamp_float(animation + dt * 4.0f, 0.0f, 1.0f);
         }
-    }
+        lastTime = now;
 
-    /**
-     * Draws the screen and all the components in it. Args : mouseX, mouseY, renderPartialTicks
-     */
-    public void drawScreen(int mouseX, int mouseY, float partialTicks)
-    {
-        this.drawDefaultBackground();
-        this.drawCenteredString(this.fontRendererObj, this.field_146442_a, this.width / 2, 15, 16777215);
+        this.drawRect(0, 0, this.width, this.height, (int)(animation * 150) << 24);
+
+        float easedAnim = animation * animation * (3.0f - 2.0f * animation);
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(0, (1.0f - easedAnim) * 10, 0);
+
+        int pW = 340;
+        int pH = 190; // Légèrement agrandi
+        int px = this.width / 2 - pW / 2;
+        int py = this.height / 2 - pH / 2 - 10;
+
+        GuiRenderUtils.drawShadow(px, py, pW, pH, 12, (int)(animation * 130));
+        // Fond à 80% d'opacité (204 sur 255)
+        Gui.drawRect(px, py, px + pW, py + pH, (int)(animation * 204) << 24 | 0x0C0C0C);
+        Gui.drawRect(px, py, px + pW, py + 1, (int)(animation * 255) << 24 | (accentColor & 0xFFFFFF));
+        GuiRenderUtils.drawRectOutline(px, py, pW, pH, (int)(animation * 40) << 24 | 0xFFFFFF);
+
+        String t1 = "§c§lCLIENT ";
+        String t2 = "§f§lOPTIONS";
+        int w1 = this.fontRendererObj.getStringWidth(t1);
+        int w2 = this.fontRendererObj.getStringWidth(t2);
+        int totalW = w1 + w2;
+        int titleX = this.width / 2 - totalW / 2;
+        int titleY = py + 12;
+
+        int textAlpha = (int)(animation * 255) << 24;
+        this.fontRendererObj.drawStringWithShadow(t1, titleX, titleY, textAlpha | 0xFFFFFF);
+        this.fontRendererObj.drawStringWithShadow(t2, titleX + w1, titleY, textAlpha | 0xFFFFFF);
+        
+        int divW = (int)((totalW + 20) * easedAnim);
+        int divX = this.width / 2 - divW / 2;
+        Gui.drawRect(divX, titleY + 14, divX + divW, titleY + 15, (int)(animation * 50) << 24 | 0xFFFFFF);
+
+        if (btnYCache == null || btnYCache.length != this.buttonList.size()) {
+            btnYCache = new int[this.buttonList.size()];
+        }
+
+        for (int i = 0; i < this.buttonList.size(); i++) {
+            GuiButton b = this.buttonList.get(i);
+            btnYCache[i] = b.yPosition;
+            float stagger = (i / 2) * 0.15f;
+            float btnAnim = MathHelper.clamp_float(animation * 1.5f - stagger, 0.0f, 1.0f);
+            btnAnim = btnAnim * btnAnim * (3.0f - 2.0f * btnAnim);
+            b.yPosition += (int)((1.0f - btnAnim) * 15);
+        }
+
         super.drawScreen(mouseX, mouseY, partialTicks);
+
+        for (int i = 0; i < this.buttonList.size(); i++) {
+            this.buttonList.get(i).yPosition = btnYCache[i];
+        }
+
+        GlStateManager.popMatrix();
+    }
+
+    @Override
+    public void confirmClicked(boolean result, int id) {
+        this.mc.displayGuiScreen(this);
     }
 }

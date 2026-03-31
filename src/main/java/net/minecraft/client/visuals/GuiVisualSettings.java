@@ -584,10 +584,16 @@ public class GuiVisualSettings extends GuiScreen {
         int baseY = panelY + 22 - scrollOffset;
         int relY = my - baseY;
         int row = relY / 16;
-        if (draggingSlider == -1) draggingSlider = row;
-        
+
         int sx = x + w - SW - TW - GAP;
-        
+
+        if (draggingSlider == -1) {
+            // Ne démarre un drag que si le clic initial était sur la barre du slider,
+            // évite de régler la valeur à 1 quand on clique sur le label (côté gauche)
+            if (mx < sx) return;
+            draggingSlider = row;
+        }
+
         float ratio = MathHelper.clamp_float((float)(mx - sx) / SW, 0.0f, 1.0f);
         applySliderValue(selectedCategory, draggingSlider, ratio);
     }

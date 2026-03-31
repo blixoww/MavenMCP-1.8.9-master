@@ -37,13 +37,13 @@ public class GuiIngameMenu extends GuiScreen {
         int halfW = (bWidth / 2) - 2;
 
         // --- BUTTONS ---
-        this.buttonList.add(new GuiMenuButton(4, px - bWidth / 2, py - 45, bWidth, bHeight, "§f§lCONTINUE", true));
+        this.buttonList.add(new GuiMenuButton(4, px - bWidth / 2, py - 45, bWidth, bHeight, "CONTINUE", true));
         
-        this.buttonList.add(new GuiMenuButton(8, px - bWidth / 2, py - 19, halfW, bHeight, "§7HUD"));
-        this.buttonList.add(new GuiMenuButton(9, px + 2, py - 19, halfW, bHeight, "§7VISUALS"));
+        this.buttonList.add(new GuiMenuButton(8, px - bWidth / 2, py - 19, halfW, bHeight, "HUD"));
+        this.buttonList.add(new GuiMenuButton(9, px + 2, py - 19, halfW, bHeight, "VISUALS"));
 
-        this.buttonList.add(new GuiMenuButton(0, px - bWidth / 2, py + 7, bWidth, bHeight, "§7SETTINGS"));
-        this.buttonList.add(new GuiMenuButton(1, px - bWidth / 2, py + 33, bWidth, bHeight, "§c§lDISCONNECT"));
+        this.buttonList.add(new GuiMenuButton(0, px - bWidth / 2, py + 7, bWidth, bHeight, "SETTINGS"));
+        this.buttonList.add(new GuiMenuButton(1, px - bWidth / 2, py + 33, bWidth, bHeight, "§cDISCONNECT"));
 
         this.btnYCache = new int[this.buttonList.size()];
     }
@@ -88,7 +88,8 @@ public class GuiIngameMenu extends GuiScreen {
         int py = this.height / 2 - pH / 2 - 10;
 
         GuiRenderUtils.drawShadow(px, py, pW, pH, 12, (int)(animation * 130));
-        Gui.drawRect(px, py, px + pW, py + pH, (int)(animation * 250) << 24 | 0x0C0C0C);
+        // Fond à 80% d'opacité
+        Gui.drawRect(px, py, px + pW, py + pH, (int)(animation * 204) << 24 | 0x0C0C0C);
         Gui.drawRect(px, py, px + pW, py + 1, (int)(animation * 255) << 24 | (accentColor & 0xFFFFFF));
         GuiRenderUtils.drawRectOutline(px, py, pW, pH, (int)(animation * 40) << 24 | 0xFFFFFF);
 
