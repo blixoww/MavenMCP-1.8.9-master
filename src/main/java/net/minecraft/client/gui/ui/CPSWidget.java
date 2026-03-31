@@ -38,10 +38,18 @@ public class CPSWidget extends BaseWidget {
             if (it.next() < now - 1000L) it.remove();
         }
         int cps = clicks.size();
+        
+        // Preview in editor
+        if (cps == 0 && UIManager.getInstance().isEditorActive()) {
+            cps = 7;
+        }
+        
         FontRenderer fr = mc.fontRendererObj;
         String s = "CPS: " + cps;
-        this.width = fr.getStringWidth(s) + 8;
-        this.height = 14;
+        if (!Boolean.TRUE.equals(getPropOrDefault("customSize", false))) {
+            this.width = fr.getStringWidth(s) + 8;
+            this.height = 14;
+        }
         // compute color from widget props
         int storedColor = getColor();
         int storedAlpha = (storedColor >> 24) & 0xFF;
@@ -51,7 +59,7 @@ public class CPSWidget extends BaseWidget {
         if (showBg) {
             int bgAlpha = Math.max(40, storedAlpha / 2);
             int bgCol = (bgAlpha << 24) | baseRgb;
-            Gui.drawRect(x, y, x + getWidth(), y + getHeight(), bgCol);
+            Gui.drawRect(0, 0, getWidth(), getHeight(), bgCol);
         }
         // text color: support rainbow if rgbMode
         int drawCol = (0xFF << 24) | baseRgb;
@@ -61,6 +69,6 @@ public class CPSWidget extends BaseWidget {
             int c = java.awt.Color.HSBtoRGB(hue, 0.8f, 0.9f);
             drawCol = (storedColor & 0xFF000000) | (c & 0x00FFFFFF);
         }
-        fr.drawStringWithShadow(s, x + 4, y + 3, drawCol);
+        fr.drawStringWithShadow(s, 4, 3, drawCol);
     }
 }

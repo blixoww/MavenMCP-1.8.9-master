@@ -1,0 +1,893 @@
+{
+  "activeProfile": -1,
+  "profileNames": [
+    "PvP",
+    "Exploration",
+    "Perso",
+    "Profil 4",
+    "Profil 5"
+  ],
+  "profiles": [
+    {
+      "fps": {
+        "x": 5,
+        "y": 5,
+        "enabled": true,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.008445945945945946,
+        "relY": 0.015384615384615385,
+        "refW": 640,
+        "refH": 337,
+        "width": 48,
+        "height": 12,
+        "props": {
+          "snapGrid": true,
+          "snapAlign": false
+        }
+      },
+      "ping": {
+        "x": 5,
+        "y": 17,
+        "enabled": true,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.008305647840531562,
+        "relY": 0.052307692307692305,
+        "refW": 640,
+        "refH": 337,
+        "width": 38,
+        "height": 12,
+        "props": {
+          "snapAlign": true
+        }
+      },
+      "biome": {
+        "x": 6,
+        "y": 54,
+        "enabled": false,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.011538461538461539,
+        "relY": 0.16615384615384615,
+        "refW": 640,
+        "refH": 337,
+        "width": 120,
+        "height": 12,
+        "props": {
+          "snapGrid": false,
+          "snapAlign": true
+        }
+      },
+      "coords": {
+        "x": 10,
+        "y": 19,
+        "enabled": false,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.018115942028985508,
+        "relY": 0.05864197530864197,
+        "refW": 640,
+        "refH": 337,
+        "width": 88,
+        "height": 13,
+        "props": {
+          "rgbMode": false,
+          "snapGrid": true,
+          "snapAlign": true,
+          "rawColor": -1.0
+        }
+      },
+      "dir": {
+        "x": 5,
+        "y": 53,
+        "enabled": true,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.01,
+        "relY": 0.16307692307692306,
+        "refW": 640,
+        "refH": 337,
+        "width": 140,
+        "height": 12,
+        "props": {
+          "snapGrid": false,
+          "snapAlign": false
+        }
+      },
+      "date": {
+        "x": 9,
+        "y": 58,
+        "enabled": false,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.018,
+        "relY": 0.17846153846153845,
+        "refW": 640,
+        "refH": 337,
+        "width": 140,
+        "height": 12,
+        "props": {
+          "snapGrid": false,
+          "snapAlign": true
+        }
+      },
+      "helditem": {
+        "x": 160,
+        "y": 317,
+        "enabled": true,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.2857142857142857,
+        "relY": 0.9937304075235109,
+        "refW": 640,
+        "refH": 337,
+        "width": 80,
+        "height": 18,
+        "props": {
+          "snapGrid": false,
+          "showBackground": false,
+          "snapAlign": false
+        }
+      },
+      "armor_group": {
+        "x": 555,
+        "y": 247,
+        "enabled": true,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.940677966101695,
+        "relY": 0.9919678714859438,
+        "refW": 640,
+        "refH": 337,
+        "width": 50,
+        "height": 88,
+        "props": {
+          "layout": "vertical",
+          "snapGrid": true,
+          "displayPercent": true,
+          "initialized": true,
+          "snapAlign": false
+        }
+      },
+      "potions": {
+        "x": 5,
+        "y": 138,
+        "enabled": true,
+        "color": -13703495,
+        "rgb": true,
+        "scale": 1.0,
+        "relX": 0.00992063492063492,
+        "relY": 0.4584717607973422,
+        "refW": 640,
+        "refH": 337,
+        "width": 136,
+        "height": 36,
+        "props": {
+          "showIcons": true,
+          "snapGrid": true,
+          "initialized": true,
+          "snapAlign": true,
+          "customSize": true,
+          "rawColor": -1.0,
+          "showDuration": true
+        }
+      },
+      "cps": {
+        "x": 5,
+        "y": 29,
+        "enabled": true,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.008305647840531562,
+        "relY": 0.08978328173374613,
+        "refW": 640,
+        "refH": 337,
+        "width": 38,
+        "height": 14,
+        "props": {
+          "background": false,
+          "showBackground": false,
+          "initialized": false
+        }
+      },
+      "toggle_sneak": {
+        "x": 7,
+        "y": 300,
+        "enabled": false,
+        "color": -12259721,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.01232394366197183,
+        "relY": 0.9287925696594427,
+        "refW": 640,
+        "refH": 337,
+        "width": 72,
+        "height": 14,
+        "props": {
+          "snapAlign": true
+        }
+      },
+      "toggle_sprint": {
+        "x": 5,
+        "y": 323,
+        "enabled": true,
+        "color": -12259721,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.008802816901408451,
+        "relY": 1.0,
+        "refW": 640,
+        "refH": 337,
+        "width": 72,
+        "height": 14,
+        "props": {
+          "snapAlign": true
+        }
+      },
+      "combatlog": {
+        "x": 5,
+        "y": 305,
+        "enabled": true,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.008278145695364239,
+        "relY": 1.0,
+        "refW": 640,
+        "refH": 337,
+        "width": 36,
+        "height": 36,
+        "props": {
+          "originalDesign": true,
+          "snapGrid": true,
+          "customSize": true,
+          "debugCombatLog": false
+        }
+      },
+      "Reach": {
+        "x": 5,
+        "y": 41,
+        "enabled": true,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.02,
+        "relX": 0.008635578583765112,
+        "relY": 0.12615384615384614,
+        "refW": 640,
+        "refH": 337,
+        "width": 60,
+        "height": 12,
+        "props": {
+          "snapGrid": false,
+          "customSize": true
+        }
+      },
+      "Keystrokes": {
+        "x": 547,
+        "y": 5,
+        "enabled": true,
+        "color": -13703495,
+        "rgb": true,
+        "scale": 1.0,
+        "relX": 0.9838129496402878,
+        "relY": 0.020833333333333332,
+        "refW": 640,
+        "refH": 337,
+        "width": 84,
+        "height": 97,
+        "props": {
+          "showKey1": true,
+          "snapGrid": true,
+          "showBackground": false,
+          "showKey0": true,
+          "showKey3": true,
+          "showSpaceRainbow": true,
+          "initialized": true,
+          "showKey2": true,
+          "showKey5": true,
+          "customSize": true,
+          "showKey4": true,
+          "showKey6": true
+        }
+      }
+    },
+    {
+      "fps": {
+        "x": 5,
+        "y": 5,
+        "enabled": true,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.008445945945945946,
+        "relY": 0.015384615384615385,
+        "refW": 640,
+        "refH": 337,
+        "width": 48,
+        "height": 12,
+        "props": {
+          "snapGrid": true,
+          "snapAlign": false
+        }
+      },
+      "ping": {
+        "x": 5,
+        "y": 19,
+        "enabled": false,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.008305647840531562,
+        "relY": 0.05846153846153846,
+        "refW": 640,
+        "refH": 337,
+        "width": 38,
+        "height": 12,
+        "props": {
+          "snapAlign": true
+        }
+      },
+      "biome": {
+        "x": 5,
+        "y": 41,
+        "enabled": true,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.009615384615384616,
+        "relY": 0.12615384615384614,
+        "refW": 640,
+        "refH": 337,
+        "width": 120,
+        "height": 12,
+        "props": {
+          "snapGrid": false,
+          "snapAlign": true
+        }
+      },
+      "coords": {
+        "x": 5,
+        "y": 17,
+        "enabled": true,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.009057971014492754,
+        "relY": 0.05246913580246913,
+        "refW": 640,
+        "refH": 337,
+        "width": 88,
+        "height": 13,
+        "props": {
+          "rgbMode": false,
+          "snapGrid": true,
+          "snapAlign": true,
+          "rawColor": -1.0
+        }
+      },
+      "dir": {
+        "x": 5,
+        "y": 29,
+        "enabled": true,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.01,
+        "relY": 0.08923076923076922,
+        "refW": 640,
+        "refH": 337,
+        "width": 140,
+        "height": 12,
+        "props": {
+          "snapGrid": false,
+          "snapAlign": false
+        }
+      },
+      "date": {
+        "x": 5,
+        "y": 53,
+        "enabled": true,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.01,
+        "relY": 0.16307692307692306,
+        "refW": 640,
+        "refH": 337,
+        "width": 140,
+        "height": 12,
+        "props": {
+          "snapGrid": false,
+          "snapAlign": true
+        }
+      },
+      "helditem": {
+        "x": 585,
+        "y": 317,
+        "enabled": true,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 1.0,
+        "relY": 0.9937304075235109,
+        "refW": 640,
+        "refH": 337,
+        "width": 80,
+        "height": 18,
+        "props": {
+          "snapGrid": false,
+          "showBackground": false,
+          "snapAlign": false
+        }
+      },
+      "armor_group": {
+        "x": 581,
+        "y": 221,
+        "enabled": false,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.9847457627118644,
+        "relY": 0.8875502008032129,
+        "refW": 640,
+        "refH": 337,
+        "width": 50,
+        "height": 88,
+        "props": {
+          "layout": "vertical",
+          "snapGrid": true,
+          "displayPercent": true,
+          "initialized": true,
+          "snapAlign": false
+        }
+      },
+      "potions": {
+        "x": 10,
+        "y": 170,
+        "enabled": false,
+        "color": -13703494,
+        "rgb": true,
+        "scale": 1.0,
+        "relX": 0.01984126984126984,
+        "relY": 0.5647840531561462,
+        "refW": 640,
+        "refH": 337,
+        "width": 136,
+        "height": 36,
+        "props": {
+          "showIcons": true,
+          "snapGrid": true,
+          "initialized": true,
+          "snapAlign": true,
+          "customSize": true,
+          "rawColor": -1.0,
+          "showDuration": true
+        }
+      },
+      "cps": {
+        "x": 5,
+        "y": 33,
+        "enabled": false,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.008305647840531562,
+        "relY": 0.1021671826625387,
+        "refW": 640,
+        "refH": 337,
+        "width": 38,
+        "height": 14,
+        "props": {
+          "background": false,
+          "showBackground": false,
+          "initialized": false
+        }
+      },
+      "toggle_sneak": {
+        "x": 7,
+        "y": 300,
+        "enabled": false,
+        "color": -12259721,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.01232394366197183,
+        "relY": 0.9287925696594427,
+        "refW": 640,
+        "refH": 337,
+        "width": 72,
+        "height": 14,
+        "props": {
+          "snapAlign": true
+        }
+      },
+      "toggle_sprint": {
+        "x": 5,
+        "y": 319,
+        "enabled": false,
+        "color": -12259721,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.008802816901408451,
+        "relY": 0.9876160990712074,
+        "refW": 640,
+        "refH": 337,
+        "width": 72,
+        "height": 14,
+        "props": {
+          "snapAlign": true
+        }
+      },
+      "combatlog": {
+        "x": 10,
+        "y": 273,
+        "enabled": false,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.016556291390728478,
+        "relY": 0.9069767441860465,
+        "refW": 640,
+        "refH": 337,
+        "width": 36,
+        "height": 36,
+        "props": {
+          "originalDesign": true,
+          "snapGrid": true,
+          "customSize": true,
+          "debugCombatLog": false
+        }
+      },
+      "Reach": {
+        "x": 10,
+        "y": 43,
+        "enabled": false,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.02,
+        "relX": 0.017271157167530225,
+        "relY": 0.13230769230769232,
+        "refW": 640,
+        "refH": 337,
+        "width": 60,
+        "height": 12,
+        "props": {
+          "snapGrid": false,
+          "customSize": true
+        }
+      },
+      "Keystrokes": {
+        "x": 547,
+        "y": 19,
+        "enabled": false,
+        "color": -13703494,
+        "rgb": true,
+        "scale": 1.0,
+        "relX": 0.9838129496402878,
+        "relY": 0.07916666666666666,
+        "refW": 640,
+        "refH": 337,
+        "width": 84,
+        "height": 97,
+        "props": {
+          "showKey1": true,
+          "snapGrid": true,
+          "showBackground": false,
+          "showKey0": true,
+          "showKey3": true,
+          "showSpaceRainbow": true,
+          "initialized": true,
+          "showKey2": true,
+          "showKey5": true,
+          "customSize": true,
+          "showKey4": true,
+          "showKey6": true
+        }
+      }
+    },
+    {
+      "fps": {
+        "x": 10.0,
+        "y": 7.0,
+        "enabled": true,
+        "color": -1.0,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.017271157167530225,
+        "relY": 0.021739130434782608,
+        "refW": 640.0,
+        "refH": 337.0,
+        "width": 48.0,
+        "height": 12.0,
+        "props": {
+          "snapGrid": true,
+          "snapAlign": false
+        }
+      },
+      "ping": {
+        "x": 5.0,
+        "y": 19.0,
+        "enabled": false,
+        "color": -1.0,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.008305647840531562,
+        "relY": 0.05846153846153846,
+        "refW": 640.0,
+        "refH": 337.0,
+        "width": 38.0,
+        "height": 12.0,
+        "props": {
+          "snapAlign": true
+        }
+      },
+      "biome": {
+        "x": 6.0,
+        "y": 54.0,
+        "enabled": false,
+        "color": -1.0,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.011538461538461539,
+        "relY": 0.16615384615384615,
+        "refW": 640.0,
+        "refH": 337.0,
+        "width": 120.0,
+        "height": 12.0,
+        "props": {
+          "snapGrid": false,
+          "snapAlign": true
+        }
+      },
+      "coords": {
+        "x": 10.0,
+        "y": 19.0,
+        "enabled": true,
+        "color": -1.0,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.018115942028985508,
+        "relY": 0.05864197530864197,
+        "refW": 640.0,
+        "refH": 337.0,
+        "width": 88.0,
+        "height": 13.0,
+        "props": {
+          "rgbMode": false,
+          "snapGrid": true,
+          "snapAlign": true,
+          "rawColor": -1.0
+        }
+      },
+      "dir": {
+        "x": 10.0,
+        "y": 31.0,
+        "enabled": true,
+        "color": -1.0,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.02,
+        "relY": 0.09538461538461539,
+        "refW": 640.0,
+        "refH": 337.0,
+        "width": 140.0,
+        "height": 12.0,
+        "props": {
+          "snapGrid": false,
+          "snapAlign": false
+        }
+      },
+      "date": {
+        "x": 9.0,
+        "y": 58.0,
+        "enabled": false,
+        "color": -1.0,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.018,
+        "relY": 0.17846153846153845,
+        "refW": 640.0,
+        "refH": 337.0,
+        "width": 140.0,
+        "height": 12.0,
+        "props": {
+          "snapGrid": false,
+          "snapAlign": true
+        }
+      },
+      "helditem": {
+        "x": 501.0,
+        "y": 295.0,
+        "enabled": true,
+        "color": -1.0,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.8946428571428572,
+        "relY": 0.9247648902821317,
+        "refW": 640.0,
+        "refH": 337.0,
+        "width": 80.0,
+        "height": 18.0,
+        "props": {
+          "snapGrid": false,
+          "showBackground": false,
+          "snapAlign": false
+        }
+      },
+      "armor_group": {
+        "x": 581.0,
+        "y": 221.0,
+        "enabled": true,
+        "color": -1.0,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.9847457627118644,
+        "relY": 0.8875502008032129,
+        "refW": 640.0,
+        "refH": 337.0,
+        "width": 50.0,
+        "height": 88.0,
+        "props": {
+          "layout": "vertical",
+          "snapGrid": true,
+          "displayPercent": true,
+          "initialized": true,
+          "snapAlign": false
+        }
+      },
+      "potions": {
+        "x": 13.0,
+        "y": 190.0,
+        "enabled": true,
+        "color": -8919506.0,
+        "rgb": true,
+        "scale": 1.0,
+        "relX": 0.01984126984126984,
+        "relY": 0.5647840531561462,
+        "refW": 640.0,
+        "refH": 337.0,
+        "width": 0.0,
+        "height": 0.0,
+        "props": {
+          "showIcons": true,
+          "snapGrid": true,
+          "initialized": true,
+          "snapAlign": true,
+          "customSize": true,
+          "rawColor": -1.0,
+          "showDuration": true
+        }
+      },
+      "cps": {
+        "x": 5.0,
+        "y": 33.0,
+        "enabled": false,
+        "color": -1.0,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.008305647840531562,
+        "relY": 0.1021671826625387,
+        "refW": 640.0,
+        "refH": 337.0,
+        "width": 38.0,
+        "height": 14.0,
+        "props": {
+          "background": false,
+          "showBackground": false,
+          "initialized": false
+        }
+      },
+      "toggle_sneak": {
+        "x": 7.0,
+        "y": 300.0,
+        "enabled": false,
+        "color": -1.2259721E7,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.01232394366197183,
+        "relY": 0.9287925696594427,
+        "refW": 640.0,
+        "refH": 337.0,
+        "width": 72.0,
+        "height": 14.0,
+        "props": {
+          "snapAlign": true
+        }
+      },
+      "toggle_sprint": {
+        "x": 5.0,
+        "y": 319.0,
+        "enabled": false,
+        "color": -1.2259721E7,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.008802816901408451,
+        "relY": 0.9876160990712074,
+        "refW": 640.0,
+        "refH": 337.0,
+        "width": 72.0,
+        "height": 14.0,
+        "props": {
+          "snapAlign": true
+        }
+      },
+      "combatlog": {
+        "x": 10.0,
+        "y": 273.0,
+        "enabled": true,
+        "color": -1.0,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.016556291390728478,
+        "relY": 0.9069767441860465,
+        "refW": 640.0,
+        "refH": 337.0,
+        "width": 36.0,
+        "height": 36.0,
+        "props": {
+          "originalDesign": true,
+          "snapGrid": true,
+          "customSize": true,
+          "debugCombatLog": false
+        }
+      },
+      "Reach": {
+        "x": 10.0,
+        "y": 43.0,
+        "enabled": true,
+        "color": -1.0,
+        "rgb": false,
+        "scale": 1.02,
+        "relX": 0.017271157167530225,
+        "relY": 0.13230769230769232,
+        "refW": 640.0,
+        "refH": 337.0,
+        "width": 60.0,
+        "height": 12.0,
+        "props": {
+          "snapGrid": false,
+          "customSize": true
+        }
+      },
+      "Keystrokes": {
+        "x": 547.0,
+        "y": 19.0,
+        "enabled": true,
+        "color": -8919506.0,
+        "rgb": true,
+        "scale": 1.0,
+        "relX": 0.9838129496402878,
+        "relY": 0.07916666666666666,
+        "refW": 640.0,
+        "refH": 337.0,
+        "width": 84.0,
+        "height": 97.0,
+        "props": {
+          "showKey1": true,
+          "snapGrid": true,
+          "showBackground": false,
+          "showKey0": true,
+          "showKey3": true,
+          "showSpaceRainbow": true,
+          "initialized": true,
+          "showKey2": true,
+          "showKey5": true,
+          "customSize": true,
+          "showKey4": true,
+          "showKey6": true
+        }
+      }
+    },
+    null,
+    null
+  ]
+}

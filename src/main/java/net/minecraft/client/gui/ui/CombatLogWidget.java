@@ -54,6 +54,10 @@ public class CombatLogWidget extends BaseWidget {
         // On prend la valeur maximale (serveur prioritaire si présent)
         long remaining = Math.max(serverRemaining, localRemaining);
 
+        // Preview in editor
+        if (remaining <= 0 && UIManager.getInstance().isEditorActive()) {
+            remaining = 15500L; // 15.5s
+        }
 
         // Durée max utilisée pour l'affichage du progrès : 30s (cohérent avec le plugin serveur)
         float maxCombatTime = 30000f;
@@ -69,8 +73,10 @@ public class CombatLogWidget extends BaseWidget {
     private void drawClassicDesign(Minecraft mc, long remaining) {
         String timeStr = remaining <= 0 ? "Combat: 0.0s" : String.format("Combat: %.1fs", remaining / 1000.0);
         FontRenderer fr = mc.fontRendererObj;
-        this.width = fr.getStringWidth(timeStr);
-        this.height = 9;
+        if (!Boolean.TRUE.equals(getPropOrDefault("customSize", false))) {
+            this.width = fr.getStringWidth(timeStr);
+            this.height = 9;
+        }
 
         int color = getColor();
         // S'assurer que la couleur est opaque (0xFFxxxxxx)
@@ -78,7 +84,7 @@ public class CombatLogWidget extends BaseWidget {
             color = 0xFFFFFFFF;
         }
 
-        fr.drawStringWithShadow(timeStr, x, y, color);
+        fr.drawStringWithShadow(timeStr, 0, 0, color);
     }
 
     private void drawOriginalDesign(Minecraft mc, long remaining, float progress) {
@@ -86,11 +92,13 @@ public class CombatLogWidget extends BaseWidget {
         String timeStr = formatTimeMillis(remaining);
 
         int radius = 18;
-        this.width = radius * 2;
-        this.height = radius * 2;
+        if (!Boolean.TRUE.equals(getPropOrDefault("customSize", false))) {
+            this.width = radius * 2;
+            this.height = radius * 2;
+        }
 
-        int centerX = x + radius;
-        int centerY = y + radius;
+        int centerX = radius;
+        int centerY = radius;
 
         // Couleur dynamique : Rouge (30s) -> Jaune (15s) -> Vert (0s)
         int color;

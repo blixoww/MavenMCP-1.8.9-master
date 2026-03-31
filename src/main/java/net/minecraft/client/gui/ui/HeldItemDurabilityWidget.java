@@ -15,8 +15,6 @@ public class HeldItemDurabilityWidget extends BaseWidget {
         super(id, x, y);
         this.width = 80;
         this.height = 18;
-        if (getPropOrDefault("showBackground", null) == null) setProp("showBackground", Boolean.FALSE);
-        if (getPropOrDefault("editorPreview", null) == null) setProp("editorPreview", Boolean.FALSE);
     }
 
     private static ItemStack getFallbackStack() {
@@ -35,24 +33,24 @@ public class HeldItemDurabilityWidget extends BaseWidget {
         Minecraft mc = Minecraft.getMinecraft();
         if (mc == null || mc.thePlayer == null) return;
 
-        // Double vérification : UIManager ET écran courant
-        boolean inEditor = UIManager.getInstance().isEditorActive()
-                || (mc.currentScreen instanceof net.minecraft.client.gui.GuiUIEditor);
-
-        ItemStack stack = null;
+        boolean inEditor = false;
         try {
-            stack = mc.thePlayer.getHeldItem();
-        } catch (Throwable ignored) {
-        }
+            inEditor = UIManager.getInstance().isEditorActive();
+        } catch (Throwable ignored) {}
 
+        ItemStack stack = mc.thePlayer.getHeldItem();
         if (inEditor && stack == null) {
             stack = getFallbackStack();
         }
 
         if (stack == null) {
-            // Hors éditeur seulement : on masque le widget
-            this.width = 0;
-            this.height = 0;
+            if (inEditor) {
+                this.width = 26; // keep a small visible placeholder so it's selectable in editor
+                this.height = 18;
+            } else {
+                this.width = 0;
+                this.height = 0;
+            }
             return;
         }
 
@@ -64,8 +62,7 @@ public class HeldItemDurabilityWidget extends BaseWidget {
             int dmg = stack.getItemDamage();
             if (max > 0) {
                 int rem = max - dmg;
-                boolean showPercent = Boolean.TRUE.equals(getPropOrDefault("displayPercent", Boolean.TRUE));
-                text = showPercent ? ((int) (rem * 100.0F / max)) + "%" : rem + "/" + max;
+                text = rem + "/" + max;
             } else {
                 text = stack.getDisplayName();
             }
@@ -73,29 +70,21 @@ public class HeldItemDurabilityWidget extends BaseWidget {
             text = stack.getDisplayName();
         }
 
-        // Autosize — toujours calculé si on a un stack
         this.width = fr.getStringWidth(text) + 26;
         this.height = 18;
 
-        // Icône
+        // Draw from 0,0 because BaseWidget handles translation
+        int sX = 0, sY = 0;
+
         try {
             GlStateManager.pushMatrix();
             RenderHelper.enableGUIStandardItemLighting();
-            mc.getRenderItem().renderItemAndEffectIntoGUI(stack, this.x, this.y);
+            mc.getRenderItem().renderItemAndEffectIntoGUI(stack, sX, sY);
             RenderHelper.disableStandardItemLighting();
             GlStateManager.popMatrix();
-        } catch (Throwable ignored) {
-        }
+        } catch (Throwable ignored) {}
 
-        // Texte
         int col = getColor();
-        if ((col & 0x00FFFFFF) == 0) col = 0x00FFFFFF;
-        fr.drawStringWithShadow(text, this.x + 18, this.y + 4, col & 0x00FFFFFF);
-
-        // Recalcul position uniquement hors éditeur
-        try {
-            if (!inEditor) updateAbsolutePosition();
-        } catch (Throwable ignored) {
-        }
+        fr.drawStringWithShadow(text, sX + 18, sY + 4, col);
     }
 }

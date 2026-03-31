@@ -13,11 +13,19 @@ public class HitMarkerModule {
 
     private long hitTime;
     private boolean active;
+    private boolean isCritical = false;
+    private long shakeStartTime = 0;
 
-    public void onHit() {
+    public void onHit(boolean critical) {
         hitTime = System.currentTimeMillis();
         active = true;
+        isCritical = critical;
+        if (critical) {
+            shakeStartTime = System.currentTimeMillis();
+        }
     }
+
+    public void onHit() { onHit(false); }
 
     public void render(Minecraft mc, int screenW, int screenH, float partialTicks, VisualSettings s) {
         if (!active) return;
@@ -28,7 +36,19 @@ public class HitMarkerModule {
             return;
         }
 
-        renderStatic(screenW / 2.0f, screenH / 2.0f, elapsed, s);
+        float shakeX = 0, shakeY = 0;
+        if (s.critShakeEnabled && isCritical && shakeStartTime > 0) {
+            long shakeElapsed = System.currentTimeMillis() - shakeStartTime;
+            if (shakeElapsed < s.critShakeDurationMs) {
+                float shakeDecay = 1.0f - (float) shakeElapsed / s.critShakeDurationMs;
+                float direction = ((shakeElapsed / 25) % 2 == 0) ? 1.0f : -1.0f;
+                shakeX = direction * s.critShakeIntensity * shakeDecay;
+                shakeY = ((shakeElapsed / 20) % 2 == 0 ? 1.0f : -1.0f) * s.critShakeIntensity * 0.7f * shakeDecay;
+            } else {
+                isCritical = false;
+            }
+        }
+        renderStatic(screenW / 2.0f + shakeX, screenH / 2.0f + shakeY, elapsed, s);
     }
 
     public void renderStatic(float cx, float cy, long elapsed, VisualSettings s) {

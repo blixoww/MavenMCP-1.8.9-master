@@ -30,11 +30,14 @@ public class SimpleTextWidget extends BaseWidget {
         Minecraft mc = Minecraft.getMinecraft();
         if (mc == null) return;
         FontRenderer fr = mc.fontRendererObj;
-        this.width = fr.getStringWidth(text) + 6;
-        this.height = 12;
+        if (!Boolean.TRUE.equals(getPropOrDefault("customSize", false))) {
+            this.width = fr.getStringWidth(text) + 6;
+            this.height = 12;
+        }
         int col = getColor();
         if ((col & 0xFF000000) == 0) col |= 0xFF000000;
         if ((col & 0x00FFFFFF) == 0) col = 0xFFFFFFFF;
-        fr.drawStringWithShadow(text, x, y, col);
+        // BaseWidget handles translation, draw at (0,0)
+        fr.drawStringWithShadow(text, 0, 0, col);
     }
 }

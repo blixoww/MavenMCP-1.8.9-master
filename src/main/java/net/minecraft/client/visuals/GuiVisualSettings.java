@@ -175,6 +175,11 @@ public class GuiVisualSettings extends GuiScreen {
         y = drawColorSelector(x, y, w, "Couleur S2", settings.comboColor2, mx, my, ct, cb, 2);
         y = drawSlider(x, y, w, "Seuil 3", settings.comboThreshold3, 2, 100, mx, my, ct, cb);
         y = drawColorSelector(x, y, w, "Couleur S3", settings.comboColor3, mx, my, ct, cb, 3);
+        y = drawSlider(x, y, w, "Impact S1", settings.comboScaleThreshold1, 1.0f, 3.0f, mx, my, ct, cb);
+        y = drawSlider(x, y, w, "Impact S2", settings.comboScaleThreshold2, 1.0f, 3.0f, mx, my, ct, cb);
+        y = drawSlider(x, y, w, "Impact S3", settings.comboScaleThreshold3, 1.0f, 3.0f, mx, my, ct, cb);
+        y = drawToggle(x, y, w, "Shake combo (S3)", settings.comboScreenShake, mx, my, ct, cb);
+        y = drawSlider(x, y, w, "Intensit\u00e9 shake", settings.comboScreenShakeIntensity, 1.0f, 5.0f, mx, my, ct, cb);
         return y;
     }
 
@@ -185,6 +190,9 @@ public class GuiVisualSettings extends GuiScreen {
         y = drawSlider(x, y, w, "Dur\u00e9e", settings.hitMarkerDurationMs / 1000.0f, 0.05f, 1.0f, mx, my, ct, cb);
         y = drawToggle(x, y, w, "Fondu", settings.hitMarkerFade, mx, my, ct, cb);
         y = drawColorSelector(x, y, w, "Couleur", settings.hitMarkerColor, mx, my, ct, cb, 4);
+        y = drawToggle(x, y, w, "Shake critique", settings.critShakeEnabled, mx, my, ct, cb);
+        y = drawSlider(x, y, w, "Intensit\u00e9 shake", settings.critShakeIntensity, 1.0f, 10.0f, mx, my, ct, cb);
+        y = drawSlider(x, y, w, "Dur\u00e9e shake", settings.critShakeDurationMs / 1000.0f, 0.05f, 0.5f, mx, my, ct, cb);
         return y;
     }
 
@@ -478,6 +486,7 @@ public class GuiVisualSettings extends GuiScreen {
             if (row == 1) settings.comboShowLabel = !settings.comboShowLabel;
             if (row == 6) settings.comboAnimScale = !settings.comboAnimScale;
             if (row == 7) settings.comboAnimFade = !settings.comboAnimFade;
+            if (row == 18) { settings.comboScreenShake = !settings.comboScreenShake; settings.save(); }
         }
         handleColorClick(row, mx, x, w, 8, 0);
         handleColorClick(row, mx, x, w, 10, 1);
@@ -489,6 +498,7 @@ public class GuiVisualSettings extends GuiScreen {
         if (isOverToggle(mx, x, w)) {
             if (row == 0) settings.hitMarkerEnabled = !settings.hitMarkerEnabled;
             if (row == 4) settings.hitMarkerFade = !settings.hitMarkerFade;
+            if (row == 6) { settings.critShakeEnabled = !settings.critShakeEnabled; settings.save(); }
         }
         handleColorClick(row, mx, x, w, 5, 4);
     }
@@ -618,6 +628,10 @@ public class GuiVisualSettings extends GuiScreen {
                     case 9: settings.comboThreshold1 = 2 + (int)(ratio * 28); break;
                     case 11: settings.comboThreshold2 = 2 + (int)(ratio * 48); break;
                     case 13: settings.comboThreshold3 = 2 + (int)(ratio * 98); break;
+                    case 15: settings.comboScaleThreshold1 = 1.0f + ratio * 2.0f; break;
+                    case 16: settings.comboScaleThreshold2 = 1.0f + ratio * 2.0f; break;
+                    case 17: settings.comboScaleThreshold3 = 1.0f + ratio * 2.0f; break;
+                    case 19: settings.comboScreenShakeIntensity = 1.0f + ratio * 4.0f; break;
                 }
                 break;
             case 1:
@@ -625,6 +639,8 @@ public class GuiVisualSettings extends GuiScreen {
                     case 1: settings.hitMarkerSize = 2.0f + ratio * 18.0f; break;
                     case 2: settings.hitMarkerOpacity = 0.1f + ratio * 0.9f; break;
                     case 3: settings.hitMarkerDurationMs = (int)(50 + ratio * 950); break;
+                    case 7: settings.critShakeIntensity = 1.0f + ratio * 9.0f; break;
+                    case 8: settings.critShakeDurationMs = (int)(50 + ratio * 450); break;
                 }
                 break;
             case 2:

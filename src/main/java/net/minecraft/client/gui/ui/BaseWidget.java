@@ -13,9 +13,13 @@ public abstract class BaseWidget implements UIElement {
     protected final String id;
     protected int x, y;
     protected int width = 60, height = 12;
+    protected int minWidth = 20, minHeight = 10, maxWidth = 400, maxHeight = 300;
+    public int defaultWidth = 60;
+    public int defaultHeight = 12;
     protected boolean enabled = true;
     protected int color = 0xFFFFFFFF;
     protected boolean rgbMode = false;
+    protected float scale = 1.0f;
 
     protected final Map<String, Object> props = new HashMap<>();
 
@@ -28,6 +32,9 @@ public abstract class BaseWidget implements UIElement {
 
     protected int lastMouseX = 0;
     protected int lastMouseY = 0;
+    // absolute screen position of this widget saved during render so draw() can use it
+    protected int renderAbsX = 0;
+    protected int renderAbsY = 0;
 
     public BaseWidget(String id, int x, int y) {
         this.id = id;
@@ -63,8 +70,28 @@ public abstract class BaseWidget implements UIElement {
         }
     }
 
-    @Override public int getWidth() { return width; }
-    @Override public int getHeight() { return height; }
+    @Override public int getWidth() { return (int) (width * scale); }
+    @Override public int getHeight() { return (int) (height * scale); }
+
+    @Override
+    public void setWidth(int w) {
+        this.width = Math.max(minWidth, Math.min(maxWidth, w));
+    }
+
+    @Override
+    public void setHeight(int h) {
+        this.height = Math.max(minHeight, Math.min(maxHeight, h));
+    }
+
+    @Override
+    public float getScale() {
+        return scale;
+    }
+
+    @Override
+    public void setScale(float scale) {
+        this.scale = Math.max(0.5f, Math.min(2.0f, scale));
+    }
 
     @Override
     public boolean containsPoint(int mx, int my) {
@@ -106,6 +133,11 @@ public abstract class BaseWidget implements UIElement {
     @Override public boolean isRGBMode() { return rgbMode; }
     @Override public void setRGBMode(boolean v) { this.rgbMode = v; }
 
+    public int getMinWidth() { return minWidth; }
+    public int getMinHeight() { return minHeight; }
+    public int getMaxWidth() { return maxWidth; }
+    public int getMaxHeight() { return maxHeight; }
+
     public Object getProp(String key) { return props.get(key); }
     public Object getPropOrDefault(String key, Object def) { return props.getOrDefault(key, def); }
     public void setProp(String key, Object value) { props.put(key, value); }
@@ -120,16 +152,27 @@ public abstract class BaseWidget implements UIElement {
                 int sw = sr.getScaledWidth();
                 int sh = sr.getScaledHeight();
                 if (sw > 0 && sh > 0) {
-                    int newMaxX = Math.max(1, sw - this.getWidth());
-                    int newMaxY = Math.max(1, sh - this.getHeight());
+                    // Only recalculate when the screen resolution has changed since last save/positioning.
+                    if (this.refW == sw && this.refH == sh) {
+                        return;
+                    }
+                    int curW = this.getWidth();
+                    int curH = this.getHeight();
+                    int newMaxX = Math.max(1, sw - curW);
+                    int newMaxY = Math.max(1, sh - curH);
                     int nx = (int) Math.round(this.relX * newMaxX);
                     int ny = (int) Math.round(this.relY * newMaxY);
-                    this.x = Math.max(0, Math.min(sw - this.getWidth(), nx));
-                    this.y = Math.max(0, Math.min(sh - this.getHeight(), ny));
-                }
-            } catch (Throwable ignored) {}
-        }
-    }
+                    this.x = Math.max(0, Math.min(sw - curW, nx));
+                    this.y = Math.max(0, Math.min(sh - curH, ny));
+                    // Update screen reference and record the widget size at time of recalculation
+                    this.refW = sw;
+                    this.refH = sh;
+                    this.refWidgetW = curW;
+                    this.refWidgetH = curH;
+                 }
+             } catch (Throwable ignored) {}
+         }
+     }
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
@@ -142,17 +185,36 @@ public abstract class BaseWidget implements UIElement {
             updateAbsolutePosition();
         }
 
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(this.x, this.y, 0);
+        GlStateManager.scale(this.scale, this.scale, 1.0f);
+
         boolean showBg = Boolean.TRUE.equals(getPropOrDefault("showBackground", Boolean.FALSE));
         if (showBg) {
             int bgCol = 0x88000000; // Default dark semi-transparent
             int outlineCol = getColor();
 
             GlStateManager.enableBlend();
-            Gui.drawRect(this.x - 2, this.y - 2, this.x + getWidth() + 2, this.y + getHeight() + 2, bgCol);
-            GuiRenderUtils.drawRectOutline(this.x - 2, this.y - 2, getWidth() + 4, getHeight() + 4, (0xAA << 24) | (outlineCol & 0xFFFFFF));
+            Gui.drawRect(-2, -2, width + 2, height + 2, bgCol);
+            GuiRenderUtils.drawRectOutline(-2, -2, width + 4, height + 4, (0xAA << 24) | (outlineCol & 0xFFFFFF));
         }
 
-        try { draw(); } catch (Exception e) { e.printStackTrace(); }
+        try { 
+            // We pass 0,0 as base coordinates for internal draw call. Save absolute position for draw()
+            int oldX = this.x;
+            int oldY = this.y;
+            this.renderAbsX = oldX;
+            this.renderAbsY = oldY;
+            this.x = 0;
+            this.y = 0;
+            draw();
+            this.x = oldX;
+            this.y = oldY;
+        } catch (Exception e) {
+            e.printStackTrace(); 
+        }
+        
+        GlStateManager.popMatrix();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
     }
 

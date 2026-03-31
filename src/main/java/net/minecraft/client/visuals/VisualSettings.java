@@ -33,6 +33,13 @@ public class VisualSettings {
     public int comboThreshold3 = 20;
     public int comboColor3 = 0xFFFF00FF;
 
+    // ── Combo Impact ────────────────────────────────────────────────────
+    public float comboScaleThreshold1 = 1.5f;
+    public float comboScaleThreshold2 = 1.7f;
+    public float comboScaleThreshold3 = 2.0f;
+    public boolean comboScreenShake = false;
+    public float comboScreenShakeIntensity = 2.0f;
+
     // ── Hit Marker ───────────────────────────────────────────────────────
     public boolean hitMarkerEnabled = true;
     public float hitMarkerSize = 5.5f;        // Plus petit par défaut
@@ -40,6 +47,11 @@ public class VisualSettings {
     public int hitMarkerColor = 0xFFFFFFFF;
     public int hitMarkerDurationMs = 250;     // Un peu plus rapide
     public boolean hitMarkerFade = true;
+
+    // ── Critical Hit Shake ───────────────────────────────────────────────
+    public boolean critShakeEnabled = true;
+    public float critShakeIntensity = 3.0f;
+    public int critShakeDurationMs = 150;
 
     // ── Particules ───────────────────────────────────────────────────────
     public boolean particlesEnabled = true;

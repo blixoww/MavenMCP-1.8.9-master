@@ -6,7 +6,9 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.util.MathHelper;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,7 +46,6 @@ public class GuiUIEditor extends GuiScreen {
     private float widgetListAnim = 0.0f;
     private long lastTime = -1L;
     private final Map<String, Float> toggleAnimMap = new HashMap<>();
-    private final Map<String, Float> hoverAnimMap = new HashMap<>();
 
     // ---- Widget list panel ----
     private int wlX, wlY, wlW;
@@ -57,6 +58,7 @@ public class GuiUIEditor extends GuiScreen {
 
     // ---- Sidebar panel ----
     private int sbX, sbY, sbW, sbH;
+    private int sbScroll = 0;
 
     // ---- Color editor ----
     private boolean colorEditorOpen = false;
@@ -72,8 +74,19 @@ public class GuiUIEditor extends GuiScreen {
     private int draggingSlider = -1;
     private int lastMouseX, lastMouseY;
 
+    // ---- Resize state ----
+    private boolean isResizingWidget = false;
+    private int resizeEdge = 0; // bitmask: 1=left, 2=right, 4=top, 8=bottom
+    private int resizeStartX, resizeStartY;
+    private int resizeStartW, resizeStartH, resizeStartWidgetX, resizeStartWidgetY;
+    private float resizeStartScale;
+    private static final int RESIZE_HANDLE_SIZE = 6; // smaller handles to avoid accidental resize
+
     // ---- Snapping ----
     private int snapLineX = -1, snapLineY = -1;
+    // Alignment guide caches (x and y positions of other widgets used for visual guides while dragging)
+    private final List<Integer> guideXs = new ArrayList<>();
+    private final List<Integer> guideYs = new ArrayList<>();
 
     // ---- Panel ordering ----
     private final List<String> panelOrder = new ArrayList<String>() {{
@@ -98,6 +111,9 @@ public class GuiUIEditor extends GuiScreen {
     private final int[] hbArmorLayout = new int[4];
     private final int[] hbArmorPercent = new int[4];
     private final int[][] hbKeyToggle = new int[9][4];
+    private final int[] hbDoneBtn = new int[4];
+    private final int[] hbResetSize = new int[4];
+    private final int[] hbScaleSlider = new int[4];
 
     public GuiUIEditor(GuiScreen parent) {
         this(parent, null);
@@ -115,17 +131,14 @@ public class GuiUIEditor extends GuiScreen {
         this.openAnim = 0.0f;
         UIManager.getInstance().setEditorActive(true);
 
-        // Widget list layout
         wlW = GuiRenderUtils.clamp(this.width / 5, 140, 190);
         wlX = this.width - wlW - 28;
         wlY = 30;
 
-        // Sidebar layout
         sbW = 185;
         sbX = 10;
         sbY = 30;
 
-        // Color editor layout
         ceX = this.width / 2 - CE_W / 2;
         ceY = this.height / 2 - CE_H / 2;
 
@@ -180,26 +193,23 @@ public class GuiUIEditor extends GuiScreen {
         drawGrid(16, (int)(ease * 5) << 24 | 0xFFFFFF);
 
         // Snap lines
-        if (snapLineX != -1) {
-            Gui.drawRect(snapLineX, 0, snapLineX + 1, this.height, 0x882A7FFF);
-        }
-        if (snapLineY != -1) {
-            Gui.drawRect(0, snapLineY, this.width, snapLineY + 1, 0x882A7FFF);
-        }
+        if (snapLineX != -1) Gui.drawRect(snapLineX, 0, snapLineX + 1, this.height, 0xCC2A7FFF);
+        if (snapLineY != -1) Gui.drawRect(0, snapLineY, this.width, snapLineY + 1, 0xCC2A7FFF);
 
-        // Render all widgets
+        // Render all widgets (BACKGROUND LAYER)
         for (UIElement e : ui.all()) {
             e.render(mouseX, mouseY, partialTicks);
-            if (selected == e) {
-                GuiRenderUtils.drawSelectionHalo(e.getX(), e.getY(), e.getWidth(), e.getHeight(), ACCENT);
-            }
+            if (selected == e) GuiRenderUtils.drawSelectionHalo(e.getX(), e.getY(), e.getWidth(), e.getHeight(), ACCENT);
         }
+
+        // Draw resize handles on selected widget
+        if (selected != null) drawResizeHandles(selected);
 
         // Panel animations
         sidebarAnim = GuiRenderUtils.lerp(sidebarAnim, selected != null ? 1.0f : 0.0f, 0.15f);
         widgetListAnim = GuiRenderUtils.lerp(widgetListAnim, wlX > -400 ? 1.0f : 0.0f, 0.15f);
 
-        // Render panels in z-order
+        // Render panels in z-order (OVERLAY LAYER)
         for (String panel : panelOrder) {
             if ("widgetList".equals(panel) && widgetListAnim > 0.01f) drawWidgetList(mouseX, mouseY);
             else if ("sidebar".equals(panel) && sidebarAnim > 0.01f) drawSidebar(mouseX, mouseY);
@@ -215,6 +225,7 @@ public class GuiUIEditor extends GuiScreen {
         int btnY = this.height - 28;
         boolean btnHover = inRect(mouseX, mouseY, btnX, btnY, btnW, btnH);
         drawStyledButton(btnX, btnY, btnW, btnH, I18n.format("gui.done"), 0xFF1A1A28, btnHover);
+        setHB(hbDoneBtn, btnX, btnY, btnW, btnH);
     }
 
     private void drawTitleBar(float ease) {
@@ -224,740 +235,277 @@ public class GuiUIEditor extends GuiScreen {
         Gui.drawRect(tx, ty, tx + tw, ty + th, 0xEE0D0D15);
         Gui.drawRect(tx, ty, tx + tw, ty + 1, ACCENT);
         Gui.drawRect(tx, ty + th, tx + tw, ty + th + 1, BORDER);
-
         String title = "EDITEUR D'INTERFACE";
-        int titleW = this.fontRendererObj.getStringWidth(title);
-        this.fontRendererObj.drawStringWithShadow(title, tx + (tw - titleW) / 2.0f, ty + 7, 0xFF8EC8FF);
+        fontRendererObj.drawStringWithShadow(title, tx + (tw - fontRendererObj.getStringWidth(title)) / 2.0f, ty + 7, 0xFF8EC8FF);
     }
-
-    // ---- Widget List Panel ----
 
     private void drawWidgetList(int mx, int my) {
         int px = wlX, py = wlY;
         int totalW = wlW + 20;
-
         List<UIElement> items = getFilteredWidgets();
-
         int maxH = Math.min(WL_MAX_H, this.height - 80);
         int maxVisible = (maxH - 50) / WL_ROW_H;
         int listH = Math.min(maxVisible, Math.max(1, items.size())) * WL_ROW_H;
         int h = 50 + listH;
-
         wlScroll = GuiRenderUtils.clamp(wlScroll, 0, Math.max(0, items.size() - maxVisible));
 
-        // Panel
         GuiRenderUtils.drawShadow(px, py, totalW, h, 6, 0x60);
         Gui.drawRect(px, py, px + totalW, py + h, BG_PANEL);
         Gui.drawRect(px, py, px + totalW, py + 1, ACCENT);
         Gui.drawRect(px, py + 1, px + totalW, py + 22, BG_HEADER);
         Gui.drawRect(px, py + 22, px + totalW, py + 23, BORDER);
         GuiRenderUtils.drawRectOutline(px, py, totalW, h, BORDER);
+        fontRendererObj.drawStringWithShadow("Widgets", px + 10, py + 7, 0xFFAAD4FF);
 
-        // Header
-        this.fontRendererObj.drawStringWithShadow("Widgets", px + 10, py + 7, 0xFFAAD4FF);
-
-        // Close button
         int ccx = px + totalW - 16, ccy = py + 6, ccs = 10;
-        boolean closeHover = inRect(mx, my, ccx, ccy, ccs, ccs);
-        drawMiniClose(ccx, ccy, ccs, closeHover);
+        drawMiniClose(ccx, ccy, ccs, inRect(mx, my, ccx, ccy, ccs, ccs));
         setHB(hbWlClose, ccx, ccy, ccs, ccs);
 
-        // Search bar
-        int searchY = py + 26;
-        int searchW = totalW - 16;
+        int searchY = py + 26, searchW = totalW - 16;
         Gui.drawRect(px + 8, searchY, px + 8 + searchW, searchY + 16, searchFocused ? 0x33FFFFFF : 0x18FFFFFF);
         GuiRenderUtils.drawRectOutline(px + 8, searchY, searchW, 16, searchFocused ? ACCENT : 0x22FFFFFF);
         GuiRenderUtils.drawSearchIcon(px + 12, searchY + 4, TEXT_MUTED);
+        if (searchFilter.isEmpty() && !searchFocused) fontRendererObj.drawString("Rechercher...", px + 24, searchY + 4, TEXT_MUTED);
+        else fontRendererObj.drawString(searchFilter + (searchFocused && (System.currentTimeMillis() / 500 % 2 == 0) ? "|" : ""), px + 24, searchY + 4, TEXT_PRIMARY);
 
-        if (searchFilter.isEmpty() && !searchFocused) {
-            this.fontRendererObj.drawString("Rechercher...", px + 24, searchY + 4, TEXT_MUTED);
-        } else {
-            String disp = searchFilter + (searchFocused && (System.currentTimeMillis() / 500 % 2 == 0) ? "|" : "");
-            this.fontRendererObj.drawString(disp, px + 24, searchY + 4, TEXT_PRIMARY);
-        }
-
-        // List items
         int y = py + 46;
-        if (items.isEmpty()) {
-            this.fontRendererObj.drawString("Aucun resultat", px + 10, y + 4, TEXT_MUTED);
-        } else {
+        if (items.isEmpty()) fontRendererObj.drawString("Aucun resultat", px + 10, y + 4, TEXT_MUTED);
+        else {
             int end = Math.min(wlScroll + maxVisible, items.size());
             for (int i = wlScroll; i < end; i++) {
                 UIElement e = items.get(i);
-                boolean isSel = selected == e;
-                boolean isHover = inRect(mx, my, px, y, totalW - 6, WL_ROW_H); // Adjusted width to exclude scrollbar area
-
-                // Row background
-                if (isSel) {
-                    Gui.drawRect(px + 1, y, px + totalW - 6, y + WL_ROW_H, 0x222A7FFF);
-                    Gui.drawRect(px + 1, y, px + 3, y + WL_ROW_H, ACCENT);
-                } else if (isHover) {
-                    Gui.drawRect(px + 1, y, px + totalW - 6, y + WL_ROW_H, 0x0DFFFFFF);
-                }
-
-                // Status dot
-                int dotCol = e.isEnabled() ? 0xFF44DD66 : TEXT_MUTED;
-                Gui.drawRect(px + 10, y + 9, px + 14, y + 13, dotCol);
-
-                // Name
-                String name = friendlyName(e.getId());
-                int nameCol = isSel ? TEXT_PRIMARY : (isHover ? 0xFFDDDDDD : TEXT_SECONDARY);
-                this.fontRendererObj.drawStringWithShadow(name, px + 20, y + 7, nameCol);
-
-                // Toggle
+                boolean isSel = selected == e, isHover = inRect(mx, my, px, y, totalW - 6, WL_ROW_H);
+                if (isSel) { Gui.drawRect(px+1, y, px+totalW-6, y+WL_ROW_H, 0x222A7FFF); Gui.drawRect(px+1, y, px+3, y+WL_ROW_H, ACCENT); }
+                else if (isHover) Gui.drawRect(px+1, y, px+totalW-6, y+WL_ROW_H, 0x0DFFFFFF);
+                Gui.drawRect(px + 10, y + 9, px + 14, y + 13, e.isEnabled() ? 0xFF44DD66 : TEXT_MUTED);
+                fontRendererObj.drawStringWithShadow(friendlyName(e.getId()), px + 20, y + 7, isSel ? TEXT_PRIMARY : (isHover ? 0xFFDDDDDD : TEXT_SECONDARY));
                 drawToggle(px + totalW - 40, y + 5, e.isEnabled(), "wl_" + e.getId());
                 y += WL_ROW_H;
             }
-
-            // Scrollbar
             if (items.size() > maxVisible) {
-                int sbTrackX = px + totalW - 5;
-                int sbTrackTop = py + 46;
-                int sbTrackH = listH;
-                Gui.drawRect(sbTrackX, sbTrackTop, sbTrackX + 4, sbTrackTop + sbTrackH, 0x10FFFFFF);
-
-                float ratio = (float) maxVisible / items.size();
-                int thumbH = Math.max(12, (int)(sbTrackH * ratio));
-                int thumbY = (int)((sbTrackH - thumbH) * ((float) wlScroll / Math.max(1, items.size() - maxVisible)));
+                int sbTrackX = px + totalW - 5, sbTrackTop = py + 46;
+                Gui.drawRect(sbTrackX, sbTrackTop, sbTrackX + 4, sbTrackTop + listH, 0x10FFFFFF);
+                int thumbH = Math.max(12, (int)(listH * ((float)maxVisible / items.size())));
+                int thumbY = (int)((listH - thumbH) * ((float) wlScroll / (items.size() - maxVisible)));
                 Gui.drawRect(sbTrackX, sbTrackTop + thumbY, sbTrackX + 4, sbTrackTop + thumbY + thumbH, ACCENT);
             }
         }
     }
 
-    // ---- Sidebar Panel ----
-
     private void drawSidebar(int mx, int my) {
         if (selected == null) return;
+        int px = (int)(sbX - (1.0f - sidebarAnim) * 80), py = sbY;
+        int w = (selected instanceof KeyStrokeWidget) ? 260 : sbW;
+        List<SidebarItem> actions = buildSidebarItems();
+        int contentH = calculateContentHeight(actions);
+        int maxPanelH = this.height - py - 20;
+        sbH = Math.min(maxPanelH, contentH + 28);
+        if (py + sbH > this.height - 10) py = Math.max(5, this.height - sbH - 10);
+        sbScroll = GuiRenderUtils.clamp(sbScroll, 0, Math.max(0, contentH - (sbH - 28)));
 
-        // Calculate height dynamically
-        int h = computeSidebarHeight();
-        sbH = h;
-
-        int px = (int)(sbX - (1.0f - sidebarAnim) * 80);
-        int py = sbY;
-        int w = sbW;
-
-        // Panel
-        GuiRenderUtils.drawShadow(px, py, w, h, 6, 0x60);
-        Gui.drawRect(px, py, px + w, py + h, BG_PANEL);
+        GuiRenderUtils.drawShadow(px, py, w, sbH, 6, 0x60);
+        Gui.drawRect(px, py, px + w, py + sbH, BG_PANEL);
         Gui.drawRect(px, py, px + w, py + 1, ACCENT);
         Gui.drawRect(px, py + 1, px + w, py + 22, BG_HEADER);
         Gui.drawRect(px, py + 22, px + w, py + 23, BORDER);
-        GuiRenderUtils.drawRectOutline(px, py, w, h, BORDER);
-
-        // Title
-        String name = friendlyName(selected.getId());
-        this.fontRendererObj.drawStringWithShadow(name, px + 10, py + 7, 0xFFAAD4FF);
-
-        // Close
+        GuiRenderUtils.drawRectOutline(px, py, w, sbH, BORDER);
+        fontRendererObj.drawStringWithShadow(friendlyName(selected.getId()), px + 10, py + 7, 0xFFAAD4FF);
         int ccx = px + w - 16, ccy = py + 6, ccs = 10;
         drawMiniClose(ccx, ccy, ccs, inRect(mx, my, ccx, ccy, ccs, ccs));
         setHB(hbSbClose, ccx, ccy, ccs, ccs);
 
-        int y = py + 28;
+        GL11.glEnable(GL11.GL_SCISSOR_TEST);
+        ScaledResolution sr = new ScaledResolution(mc);
+        int f = sr.getScaleFactor();
+        GL11.glScissor(px * f, (this.height - py - sbH + 2) * f, w * f, (sbH - 25) * f);
+        int curY = py + 28 - sbScroll;
+        for (SidebarItem item : actions) { item.draw(px, curY, w, mx, my); curY += item.getHeight(); }
+        GL11.glDisable(GL11.GL_SCISSOR_TEST);
 
-        // Section: General
-        y = drawSectionHeader(px, y, w, "General", ACCENT);
-
-        // Enabled toggle
-        y = drawPropertyToggle(px, y, w, "Active", selected.isEnabled(), mx, my, null);
-
-        if (selected instanceof BaseWidget) {
-            BaseWidget bw = (BaseWidget) selected;
-
-            // Rainbow
-            y = drawPropertyToggle(px, y, w, "Mode Rainbow", bw.isRGBMode(), mx, my, hbRainbow);
-
-            // Original design (CombatLog)
-            if (bw instanceof CombatLogWidget) {
-                boolean orig = Boolean.TRUE.equals(bw.getPropOrDefault("originalDesign", false));
-                y = drawPropertyToggle(px, y, w, "Design circulaire", orig, mx, my, hbOrigDesign);
-            }
-
-            // Snap grid
-            boolean align = Boolean.TRUE.equals(bw.getPropOrDefault("snapGrid", false));
-            y = drawPropertyToggle(px, y, w, "Aligner (Smart)", align, mx, my, hbAlignGrid);
-
-            // Color preview
-            this.fontRendererObj.drawStringWithShadow("Couleur", px + 12, y + 3, TEXT_SECONDARY);
-            int cpX = px + w - 42, cpW = 28, cpH = 12;
-            GuiRenderUtils.drawCheckerboard(cpX, y + 1, cpW, cpH, 4, 0xFF999999, 0xFF666666);
-            Gui.drawRect(cpX, y + 1, cpX + cpW, y + 1 + cpH, bw.getColor());
-            GuiRenderUtils.drawRectOutline(cpX, y + 1, cpW, cpH, 0x66FFFFFF);
-            setHB(hbColorPreview, cpX, y + 1, cpW, cpH);
-            y += 18;
-
-            // Widget-specific sections
-            if (bw instanceof KeyStrokeWidget) {
-                y = drawKeystrokeSection(px, y, w, bw, mx, my);
-            } else if (bw instanceof PotionStatusWidget) {
-                y = drawPotionSection(px, y, w, bw, mx, my);
-            } else if (bw instanceof ArmorGroupWidget) {
-                y = drawArmorSection(px, y, w, bw, mx, my);
-            }
+        if (contentH > sbH - 28) {
+            int sX = px + w - 3, sY = py + 25, sH = sbH - 30;
+            Gui.drawRect(sX, sY, sX + 1, sY + sH, 0x10FFFFFF);
+            int tH = Math.max(10, (int)(sH * ((float)(sbH - 28) / contentH)));
+            int tY = (int)((sH - tH) * ((float)sbScroll / (contentH - (sbH - 28))));
+            Gui.drawRect(sX, sY + tY, sX + 1, sY + tY + tH, ACCENT);
         }
-
-        // Bottom buttons
-        y += 6;
-        int btnW = (w - 26) / 2;
-        int btnH = 16;
-
-        boolean hoverReset = inRect(mx, my, px + 8, y, btnW, btnH);
-        drawStyledButton(px + 8, y, btnW, btnH, "Reset Pos.", 0xFF1A1A28, hoverReset);
-        setHB(hbResetPos, px + 8, y, btnW, btnH);
-
-        boolean hoverWhite = inRect(mx, my, px + 18 + btnW, y, btnW, btnH);
-        drawStyledButton(px + 18 + btnW, y, btnW, btnH, "Blanc", 0xFF1A1A28, hoverWhite);
-        setHB(hbResetColor, px + 18 + btnW, y, btnW, btnH);
     }
 
-    private int computeSidebarHeight() {
-        int h = 28; // header
-        h += 16;    // section header "General"
-        h += 18;    // Enabled
-        if (selected instanceof BaseWidget) {
-            h += 18;  // Rainbow
-            BaseWidget bw = (BaseWidget) selected;
-            if (bw instanceof CombatLogWidget) h += 18;
-            h += 18;  // Align
-            h += 18;  // Color
-            if (bw instanceof KeyStrokeWidget) {
-                h += 16 + ((KeyStrokeWidget) bw).getKeyCount() * 18 + 18;
-            } else if (bw instanceof PotionStatusWidget) {
-                h += 16 + 18 + 18;
-            } else if (bw instanceof ArmorGroupWidget) {
-                h += 16 + 18 + 18;
-            }
-        }
-        h += 30; // buttons + padding
-        return h;
+    private int calculateContentHeight(List<SidebarItem> items) {
+        int h = 0;
+        for (SidebarItem i : items) h += i.getHeight();
+        return h + 5;
     }
-
-    private int drawSectionHeader(int px, int y, int w, String label, int accent) {
-        Gui.drawRect(px + 8, y + 4, px + 11, y + 11, accent);
-        this.fontRendererObj.drawStringWithShadow(label, px + 15, y + 3, TEXT_PRIMARY);
-        int textEnd = px + 15 + this.fontRendererObj.getStringWidth(label) + 6;
-        GuiRenderUtils.drawGradientRect(textEnd, y + 7, px + w - 8, y + 8, (0x33 << 24) | (accent & 0xFFFFFF), 0);
-        return y + 16;
-    }
-
-    private int drawPropertyToggle(int px, int y, int w, String label, boolean value, int mx, int my, int[] hitbox) {
-        boolean hover = inRect(mx, my, px + 4, y, w - 8, 16);
-        if (hover) {
-            Gui.drawRect(px + 4, y, px + w - 4, y + 16, 0x08FFFFFF);
-        }
-        this.fontRendererObj.drawStringWithShadow(label, px + 12, y + 3, hover ? TEXT_PRIMARY : TEXT_SECONDARY);
-        drawToggle(px + w - 42, y + 2, value, "sb_" + label);
-        if (hitbox != null) {
-            setHB(hitbox, px + w - 42, y + 2, 28, 12);
-        }
-        return y + 18;
-    }
-
-    private int drawKeystrokeSection(int px, int y, int w, BaseWidget bw, int mx, int my) {
-        y = drawSectionHeader(px, y + 2, w, "Keystrokes", ACCENT_PURPLE);
-        KeyStrokeWidget ks = (KeyStrokeWidget) bw;
-        for (int i = 0; i < ks.getKeyCount(); i++) {
-            String label = ks.getKeyLabel(i);
-            boolean vis = Boolean.TRUE.equals(bw.getPropOrDefault("showKey" + i, true));
-            boolean hover = inRect(mx, my, px + 4, y, w - 8, 16);
-            if (hover) Gui.drawRect(px + 4, y, px + w - 4, y + 16, 0x08FFFFFF);
-            this.fontRendererObj.drawStringWithShadow(label, px + 12, y + 3, vis ? TEXT_SECONDARY : TEXT_MUTED);
-            drawToggle(px + w - 42, y + 2, vis, "key_" + i);
-            setHB(hbKeyToggle[i], px + w - 42, y + 2, 28, 12);
-            y += 18;
-        }
-        boolean spaceRainbow = Boolean.TRUE.equals(bw.getPropOrDefault("showSpaceRainbow", false));
-        y = drawPropertyToggle(px, y, w, "Rainbow Espace", spaceRainbow, mx, my, hbSpaceRainbow);
-        return y;
-    }
-
-    private int drawPotionSection(int px, int y, int w, BaseWidget bw, int mx, int my) {
-        y = drawSectionHeader(px, y + 2, w, "Potions", ACCENT_GREEN);
-        boolean showDur = Boolean.TRUE.equals(bw.getPropOrDefault("showDuration", true));
-        y = drawPropertyToggle(px, y, w, "Afficher duree", showDur, mx, my, hbPotionDur);
-        boolean showIcons = Boolean.TRUE.equals(bw.getPropOrDefault("showIcons", false));
-        y = drawPropertyToggle(px, y, w, "Afficher icones", showIcons, mx, my, hbPotionIcons);
-        return y;
-    }
-
-    private int drawArmorSection(int px, int y, int w, BaseWidget bw, int mx, int my) {
-        y = drawSectionHeader(px, y + 2, w, "Armure", ACCENT_ORANGE);
-        String layout = String.valueOf(bw.getPropOrDefault("layout", "horizontal"));
-        y = drawPropertyToggle(px, y, w, "Disposition Verticale", "vertical".equals(layout), mx, my, hbArmorLayout);
-        boolean dispPct = Boolean.TRUE.equals(bw.getPropOrDefault("displayPercent", true));
-        y = drawPropertyToggle(px, y, w, "Afficher en %", dispPct, mx, my, hbArmorPercent);
-        return y;
-    }
-
-    // ---- Color Editor Panel ----
 
     private void drawColorEditor(int mx, int my) {
         int px = ceX, py = ceY;
-
-        // Panel
         GuiRenderUtils.drawShadow(px, py, CE_W, CE_H, 8, 0x70);
         Gui.drawRect(px, py, px + CE_W, py + CE_H, BG_PANEL);
         Gui.drawRect(px, py, px + CE_W, py + 1, ACCENT_PURPLE);
         Gui.drawRect(px, py + 1, px + CE_W, py + 22, BG_HEADER);
         Gui.drawRect(px, py + 22, px + CE_W, py + 23, BORDER);
         GuiRenderUtils.drawRectOutline(px, py, CE_W, CE_H, BORDER);
-
         this.fontRendererObj.drawStringWithShadow("Editeur de couleur", px + 10, py + 7, 0xFFCC88FF);
-
-        // Close
         int ccx = px + CE_W - 16, ccy = py + 6, ccs = 10;
         drawMiniClose(ccx, ccy, ccs, inRect(mx, my, ccx, ccy, ccs, ccs));
         setHB(hbCeClose, ccx, ccy, ccs, ccs);
-
-        // Spectrum
         int specX = px + 10, specY = py + 28;
         for (int sx = 0; sx < ceSpecW; sx++) {
             float hue = sx / (float) ceSpecW;
             for (int sy = 0; sy < ceSpecH; sy++) {
                 float val = 1.0f - (sy / (float) ceSpecH);
-                Gui.drawRect(specX + sx, specY + sy, specX + sx + 1, specY + sy + 1,
-                        0xFF000000 | java.awt.Color.HSBtoRGB(hue, 1.0f, val));
+                Gui.drawRect(specX + sx, specY + sy, specX + sx + 1, specY + sy + 1, 0xFF000000 | Color.HSBtoRGB(hue, 1.0f, val));
             }
         }
         GuiRenderUtils.drawRectOutline(specX, specY, ceSpecW, ceSpecH, 0x33FFFFFF);
-
-        // RGBA sliders
-        int sldX = specX + ceSpecW + 15;
-        int sldW = CE_W - ceSpecW - 35;
+        int sldX = specX + ceSpecW + 15, sldW = CE_W - ceSpecW - 35;
         drawChannelSlider(sldX, specY, sldW, "R", r, 0xFFEE4444);
         drawChannelSlider(sldX, specY + 22, sldW, "G", g, 0xFF44EE44);
         drawChannelSlider(sldX, specY + 44, sldW, "B", b, 0xFF4444EE);
         drawChannelSlider(sldX, specY + 66, sldW, "A", a, 0xFF888888);
-
-        // Preview
         int pvY = specY + 88;
         GuiRenderUtils.drawCheckerboard(sldX, pvY, sldW, 14, 4, 0xFF999999, 0xFF666666);
         Gui.drawRect(sldX, pvY, sldX + sldW, pvY + 14, (a << 24) | (r << 16) | (g << 8) | b);
         GuiRenderUtils.drawRectOutline(sldX, pvY, sldW, 14, 0x66FFFFFF);
-
-        // Hex display
-        String hex = String.format("#%02X%02X%02X", r, g, b);
-        this.fontRendererObj.drawString(hex, px + 10, py + CE_H - 14, TEXT_MUTED);
+        this.fontRendererObj.drawString(String.format("#%02X%02X%02X", r, g, b), px + 10, py + CE_H - 14, TEXT_MUTED);
     }
 
     private void drawChannelSlider(int x, int y, int w, String label, int val, int color) {
         this.fontRendererObj.drawStringWithShadow(label, x - 10, y + 1, color);
         Gui.drawRect(x, y + 3, x + w, y + 9, 0xFF111122);
         int fill = (int)(val / 255f * w);
-        GuiRenderUtils.drawGradientRect(x, y + 3, x + fill, y + 9,
-                GuiRenderUtils.colorLerp(0xFF111122, color, 0.3f), color);
-        // Thumb
+        GuiRenderUtils.drawGradientRect(x, y + 3, x + fill, y + 9, GuiRenderUtils.colorLerp(0xFF111122, color, 0.3f), color);
         Gui.drawRect(x + fill - 1, y + 1, x + fill + 1, y + 11, 0xFFEEEEEE);
-        // Value text
-        String valStr = String.valueOf(val);
-        this.fontRendererObj.drawString(valStr, x + w + 3, y + 1, TEXT_MUTED);
+        this.fontRendererObj.drawString(String.valueOf(val), x + w + 3, y + 1, TEXT_MUTED);
     }
 
-    // ---- Shared drawing helpers ----
-
-    private void drawToggle(int x, int y, boolean value, String id) {
-        float target = value ? 1.0f : 0.0f;
-        float current = toggleAnimMap.getOrDefault(id, target);
-        current = GuiRenderUtils.lerp(current, target, 0.18f);
-        toggleAnimMap.put(id, current);
-        GuiRenderUtils.drawSmoothToggle(x, y, value, current);
-    }
-
-    private void drawMiniClose(int x, int y, int size, boolean hovered) {
-        int bg = hovered ? 0xCCCC3333 : 0x44662222;
-        Gui.drawRect(x, y, x + size, y + size, bg);
-        GuiRenderUtils.drawRectOutline(x, y, size, size, 0x22FFFFFF);
-        // X icon
-        int col = hovered ? 0xFFFFFFFF : 0xAABBBBBB;
-        this.fontRendererObj.drawString("x", x + 2, y + 1, col);
-    }
-
-    private void drawStyledButton(int x, int y, int w, int h, String text, int bgColor, boolean hovered) {
-        int bg = hovered ? GuiRenderUtils.colorLerp(bgColor, 0xFFFFFFFF, 0.12f) : bgColor;
-        Gui.drawRect(x, y, x + w, y + h, bg);
-        GuiRenderUtils.drawRectOutline(x, y, w, h, hovered ? 0x33FFFFFF : 0x1AFFFFFF);
-        if (hovered) {
-            GuiRenderUtils.drawGradientRect(x + 1, y + 1, x + w - 1, y + 3, 0x18FFFFFF, 0x00000000);
-        }
-        int tw = this.fontRendererObj.getStringWidth(text);
-        this.fontRendererObj.drawStringWithShadow(text,
-                x + (w - tw) / 2.0f, y + (h - 8) / 2.0f,
-                hovered ? TEXT_PRIMARY : TEXT_SECONDARY);
-    }
-
-    private void drawGrid(int step, int color) {
-        for (int gx = 0; gx < this.width; gx += step) Gui.drawRect(gx, 0, gx + 1, this.height, color);
-        for (int gy = 0; gy < this.height; gy += step) Gui.drawRect(0, gy, this.width, gy + 1, color);
-    }
-
-    // ========================================================================
-    // INPUT HANDLING
-    // ========================================================================
-
-    @Override
-    protected void mouseClicked(int mx, int my, int btn) throws IOException {
-        super.mouseClicked(mx, my, btn);
-        if (btn != 0) return;
-        searchFocused = false;
-
-        // Done button
-        int dBtnW = 100, dBtnH = 18;
-        int dBtnX = (this.width - dBtnW) / 2, dBtnY = this.height - 28;
-        if (inRect(mx, my, dBtnX, dBtnY, dBtnW, dBtnH)) {
-            this.mc.displayGuiScreen(parent);
-            return;
-        }
-
-        // Check panels in reverse z-order
-        for (int i = panelOrder.size() - 1; i >= 0; i--) {
-            String p = panelOrder.get(i);
-            if ("colorEditor".equals(p) && colorEditorOpen && handleColorClick(mx, my)) return;
-            if ("sidebar".equals(p) && selected != null && handleSidebarClick(mx, my)) return;
-            if ("widgetList".equals(p) && handleWidgetListClick(mx, my)) return;
-        }
-
-        // Click on a widget in the viewport
-        for (UIElement e : ui.all()) {
-            if (e.isEnabled() && e.containsPoint(mx, my)) {
-                selected = e;
-                isDraggingWidget = true;
-                dragOffsetX = mx - e.getX();
-                dragOffsetY = my - e.getY();
-                bringToFront("sidebar");
-                return;
-            }
-        }
-        selected = null;
-    }
-
-    private boolean handleWidgetListClick(int mx, int my) {
-        int totalW = wlW + 20;
-        List<UIElement> items = getFilteredWidgets();
-        int maxH = Math.min(WL_MAX_H, this.height - 80);
-        int maxVisible = (maxH - 50) / WL_ROW_H;
-        int listH = Math.min(maxVisible, Math.max(1, items.size())) * WL_ROW_H;
-        int h = 50 + listH;
-
-        if (!inRect(mx, my, wlX, wlY, totalW, h)) return false;
-        bringToFront("widgetList");
-
-        // Close
-        if (inRect(mx, my, hbWlClose[0], hbWlClose[1], hbWlClose[2], hbWlClose[3])) {
-            wlX = -500;
-            return true;
-        }
-        
-        // Scrollbar dragging (priority)
-        if (items.size() > maxVisible) {
-            int sbTrackX = wlX + totalW - 5;
-            if (mx >= sbTrackX && mx <= sbTrackX + 4 && my >= wlY + 46 && my <= wlY + 46 + listH) {
-                wlScrollDragging = true;
-                updateWlScrollFromMouse(my);
-                return true;
-            }
-        }
-
-        // Header drag
-        if (inRect(mx, my, wlX, wlY, totalW, 22)) {
-            wlDragging = true;
-            wlDragOX = mx;
-            wlDragOY = my;
-            return true;
-        }
-        // Search bar
-        if (inRect(mx, my, wlX + 8, wlY + 26, totalW - 16, 16)) {
-            searchFocused = true;
-            return true;
-        }
-        // List items
-        int y = wlY + 46;
-        for (int i = wlScroll; i < Math.min(wlScroll + maxVisible, items.size()); i++) {
-            UIElement e = items.get(i);
-            // Toggle
-            if (inRect(mx, my, wlX + totalW - 40, y + 5, 28, 12)) {
-                e.setEnabled(!e.isEnabled());
-                ui.saveConfig();
-                return true;
-            }
-            // Selection (if not clicking scrollbar area)
-            if (inRect(mx, my, wlX, y, totalW - 6, WL_ROW_H)) {
-                selected = e;
-                bringToFront("sidebar");
-                return true;
-            }
-            y += WL_ROW_H;
-        }
-        return true;
-    }
-
-    private void updateWlScrollFromMouse(int my) {
-        List<UIElement> items = getFilteredWidgets();
-        int maxH = Math.min(WL_MAX_H, this.height - 80);
-        int maxVisible = (maxH - 50) / WL_ROW_H;
-        int listH = Math.min(maxVisible, Math.max(1, items.size())) * WL_ROW_H;
-        
-        float ratio = (float)(my - (wlY + 46)) / (float)listH;
-        wlScroll = (int)(ratio * items.size() - maxVisible / 2.0f);
-        wlScroll = GuiRenderUtils.clamp(wlScroll, 0, Math.max(0, items.size() - maxVisible));
-    }
-
-    private boolean handleSidebarClick(int mx, int my) {
-        int px = (int)(sbX - (1.0f - sidebarAnim) * 80);
-        if (!inRect(mx, my, px, sbY, sbW, sbH)) return false;
-        bringToFront("sidebar");
-
-        // Close
-        if (inRect(mx, my, hbSbClose[0], hbSbClose[1], hbSbClose[2], hbSbClose[3])) {
-            selected = null;
-            return true;
-        }
-        // Header drag
-        if (inRect(mx, my, px, sbY, sbW, 22)) {
-            sbDragging = true;
-            sbDragOX = mx;
-            sbDragOY = my;
-            return true;
-        }
-
-        // Enabled toggle (first toggle after section header)
-        int y = sbY + 28 + 16; // after header + section header
-        if (inRect(mx, my, px + sbW - 42, y + 2, 28, 12)) {
-            selected.setEnabled(!selected.isEnabled());
-            ui.saveConfig();
-            return true;
-        }
-
+    private interface SidebarItem { int getHeight(); void draw(int px, int y, int w, int mx, int my); }
+    private List<SidebarItem> buildSidebarItems() {
+        List<SidebarItem> items = new ArrayList<>();
+        items.add(new HeaderItem("General", ACCENT));
+        items.add(new ToggleItem("Active", selected.isEnabled(), null, v -> selected.setEnabled(v)));
         if (selected instanceof BaseWidget) {
             BaseWidget bw = (BaseWidget) selected;
-
-            // Rainbow
-            if (inRect(mx, my, hbRainbow[0], hbRainbow[1], hbRainbow[2], hbRainbow[3])) {
-                bw.setRGBMode(!bw.isRGBMode());
-                ui.saveConfig();
-                return true;
-            }
-            // Original design
-            if (bw instanceof CombatLogWidget && inRect(mx, my, hbOrigDesign[0], hbOrigDesign[1], hbOrigDesign[2], hbOrigDesign[3])) {
-                boolean cur = Boolean.TRUE.equals(bw.getPropOrDefault("originalDesign", false));
-                bw.setProp("originalDesign", !cur);
-                ui.saveConfig();
-                return true;
-            }
-            // Align grid
-            if (inRect(mx, my, hbAlignGrid[0], hbAlignGrid[1], hbAlignGrid[2], hbAlignGrid[3])) {
-                boolean cur = Boolean.TRUE.equals(bw.getPropOrDefault("snapGrid", false));
-                bw.setProp("snapGrid", !cur);
-                ui.saveConfig();
-                return true;
-            }
-            // Color preview
-            if (inRect(mx, my, hbColorPreview[0], hbColorPreview[1], hbColorPreview[2], hbColorPreview[3])) {
-                colorEditorOpen = true;
-                bringToFront("colorEditor");
-                int c = bw.getColor();
-                a = (c >> 24) & 0xFF;
-                r = (c >> 16) & 0xFF;
-                g = (c >> 8) & 0xFF;
-                b = c & 0xFF;
-                return true;
-            }
-
-            // Widget-specific toggles
+            items.add(new ToggleItem("Mode Rainbow", bw.isRGBMode(), hbRainbow, bw::setRGBMode));
+            if (bw instanceof CombatLogWidget) items.add(new ToggleItem("Design circulaire", Boolean.TRUE.equals(bw.getProps().getOrDefault("originalDesign", false)), hbOrigDesign, v -> bw.getProps().put("originalDesign", v)));
+            items.add(new ToggleItem("Aligner (Smart)", Boolean.TRUE.equals(bw.getProps().getOrDefault("snapGrid", false)), hbAlignGrid, v -> bw.getProps().put("snapGrid", v)));
+            items.add(new ColorItem(bw.getColor()));
             if (bw instanceof KeyStrokeWidget) {
-                KeyStrokeWidget ks = (KeyStrokeWidget) bw;
-                for (int i = 0; i < ks.getKeyCount(); i++) {
-                    if (inRect(mx, my, hbKeyToggle[i][0], hbKeyToggle[i][1], hbKeyToggle[i][2], hbKeyToggle[i][3])) {
-                        boolean vis = Boolean.TRUE.equals(bw.getPropOrDefault("showKey" + i, true));
-                        bw.setProp("showKey" + i, !vis);
-                        ui.saveConfig();
-                        return true;
-                    }
-                }
-                if (inRect(mx, my, hbSpaceRainbow[0], hbSpaceRainbow[1], hbSpaceRainbow[2], hbSpaceRainbow[3])) {
-                    boolean cur = Boolean.TRUE.equals(bw.getPropOrDefault("showSpaceRainbow", false));
-                    bw.setProp("showSpaceRainbow", !cur);
-                    ui.saveConfig();
-                    return true;
-                }
+                items.add(new HeaderItem("Keystrokes", ACCENT_PURPLE));
+                items.add(new DoubleToggleItem(bw));
             } else if (bw instanceof PotionStatusWidget) {
-                if (inRect(mx, my, hbPotionDur[0], hbPotionDur[1], hbPotionDur[2], hbPotionDur[3])) {
-                    boolean cur = Boolean.TRUE.equals(bw.getPropOrDefault("showDuration", true));
-                    bw.setProp("showDuration", !cur);
-                    ui.saveConfig();
-                    return true;
-                }
-                if (inRect(mx, my, hbPotionIcons[0], hbPotionIcons[1], hbPotionIcons[2], hbPotionIcons[3])) {
-                    boolean cur = Boolean.TRUE.equals(bw.getPropOrDefault("showIcons", false));
-                    bw.setProp("showIcons", !cur);
-                    ui.saveConfig();
-                    return true;
-                }
+                items.add(new HeaderItem("Potions", ACCENT_GREEN));
+                items.add(new ToggleItem("Afficher duree", Boolean.TRUE.equals(bw.getProps().getOrDefault("showDuration", true)), hbPotionDur, v -> bw.getProps().put("showDuration", v)));
+                items.add(new ToggleItem("Afficher icones", Boolean.TRUE.equals(bw.getProps().getOrDefault("showIcons", false)), hbPotionIcons, v -> bw.getProps().put("showIcons", v)));
             } else if (bw instanceof ArmorGroupWidget) {
-                if (inRect(mx, my, hbArmorLayout[0], hbArmorLayout[1], hbArmorLayout[2], hbArmorLayout[3])) {
-                    String cur = String.valueOf(bw.getPropOrDefault("layout", "horizontal"));
-                    bw.setProp("layout", "horizontal".equals(cur) ? "vertical" : "horizontal");
-                    ui.saveConfig();
-                    return true;
-                }
-                if (inRect(mx, my, hbArmorPercent[0], hbArmorPercent[1], hbArmorPercent[2], hbArmorPercent[3])) {
-                    boolean cur = Boolean.TRUE.equals(bw.getPropOrDefault("displayPercent", true));
-                    bw.setProp("displayPercent", !cur);
-                    ui.saveConfig();
-                    return true;
-                }
+                items.add(new HeaderItem("Armure", ACCENT_ORANGE));
+                items.add(new ToggleItem("Disposition Verticale", "vertical".equals(bw.getProps().getOrDefault("layout", "horizontal")), hbArmorLayout, v -> bw.getProps().put("layout", v ? "vertical" : "horizontal")));
+                items.add(new ToggleItem("Afficher en %", Boolean.TRUE.equals(bw.getProps().getOrDefault("displayPercent", true)), hbArmorPercent, v -> bw.getProps().put("displayPercent", v)));
             }
+            items.add(new HeaderItem("Taille", ACCENT_ORANGE));
+            items.add(new ScaleItem(bw));
+            items.add(new ButtonItem("Reset Taille", hbResetSize, () -> bw.setScale(1.0f)));
         }
-
-        // Reset buttons
-        if (inRect(mx, my, hbResetPos[0], hbResetPos[1], hbResetPos[2], hbResetPos[3])) {
-            selected.setPosition(10, 10);
-            ui.saveConfig();
-            return true;
-        }
-        if (inRect(mx, my, hbResetColor[0], hbResetColor[1], hbResetColor[2], hbResetColor[3])) {
-            selected.setColor(0xFFFFFFFF);
-            if (selected instanceof BaseWidget) ((BaseWidget) selected).setRGBMode(false);
-            ui.saveConfig();
-            return true;
-        }
-        return true;
+        items.add(new MultiButtonItem());
+        return items;
     }
 
-    private boolean handleColorClick(int mx, int my) {
-        if (!inRect(mx, my, ceX, ceY, CE_W, CE_H)) return false;
-        bringToFront("colorEditor");
-
-        if (inRect(mx, my, hbCeClose[0], hbCeClose[1], hbCeClose[2], hbCeClose[3])) {
-            colorEditorOpen = false;
-            return true;
-        }
-        if (inRect(mx, my, ceX, ceY, CE_W, 22)) {
-            ceDragging = true;
-            ceDragOX = mx;
-            ceDragOY = my;
-            return true;
-        }
-
-        int specX = ceX + 10, specY = ceY + 28;
-        if (inRect(mx, my, specX, specY, ceSpecW, ceSpecH)) {
-            draggingSpectrum = true;
-            updateColorFromSpectrum(mx, my);
-            return true;
-        }
-
-        int sldX = specX + ceSpecW + 15, sldW = CE_W - ceSpecW - 35;
-        for (int i = 0; i < 4; i++) {
-            if (inRect(mx, my, sldX, specY + i * 22, sldW, 12)) {
-                draggingSlider = i;
-                updateColorFromSlider(mx);
-                return true;
-            }
-        }
-        return true;
+    private class HeaderItem implements SidebarItem {
+        String l; int a; HeaderItem(String l, int a) { this.l=l; this.a=a; }
+        public int getHeight() { return 16; }
+        public void draw(int px, int y, int w, int mx, int my) { Gui.drawRect(px + 8, y + 4, px + 11, y + 11, a); fontRendererObj.drawStringWithShadow(l, px + 15, y + 3, TEXT_PRIMARY); }
     }
-
-    @Override
-    protected void mouseClickMove(int mx, int my, int btn, long time) {
-        if (isDraggingWidget && selected != null) {
-            int nx = mx - dragOffsetX;
-            int ny = my - dragOffsetY;
-            snapLineX = -1;
-            snapLineY = -1;
-
-            if (selected instanceof BaseWidget
-                    && Boolean.TRUE.equals(((BaseWidget) selected).getPropOrDefault("snapGrid", false))
-                    && !isShiftKeyDown()) {
-                int threshold = 4;
-                int w = selected.getWidth();
-                int h = selected.getHeight();
-
-                // Screen snapping
-                if (Math.abs(nx) < threshold) { nx = 0; snapLineX = 0; }
-                else if (Math.abs(nx + w - this.width) < threshold) { nx = this.width - w; snapLineX = this.width; }
-                else if (Math.abs(nx + w / 2 - this.width / 2) < threshold) { nx = this.width / 2 - w / 2; snapLineX = this.width / 2; }
-
-                if (Math.abs(ny) < threshold) { ny = 0; snapLineY = 0; }
-                else if (Math.abs(ny + h - this.height) < threshold) { ny = this.height - h; snapLineY = this.height; }
-                else if (Math.abs(ny + h / 2 - this.height / 2) < threshold) { ny = this.height / 2 - h / 2; snapLineY = this.height / 2; }
-
-                // Widget snapping
-                for (UIElement other : ui.all()) {
-                    if (other == selected || !other.isEnabled()) continue;
-                    int ox = other.getX(), oy = other.getY();
-                    int ow = other.getWidth(), oh = other.getHeight();
-
-                    if (Math.abs(nx - ox) < threshold) { nx = ox; snapLineX = ox; }
-                    else if (Math.abs(nx + w - (ox + ow)) < threshold) { nx = ox + ow - w; snapLineX = ox + ow; }
-                    else if (Math.abs(nx - (ox + ow)) < threshold) { nx = ox + ow; snapLineX = ox + ow; }
-                    else if (Math.abs(nx + w - ox) < threshold) { nx = ox - w; snapLineX = ox; }
-                    else if (Math.abs(nx + w / 2 - (ox + ow / 2)) < threshold) { nx = ox + ow / 2 - w / 2; snapLineX = ox + ow / 2; }
-
-                    if (Math.abs(ny - oy) < threshold) { ny = oy; snapLineY = oy; }
-                    else if (Math.abs(ny + h - (oy + oh)) < threshold) { ny = oy + oh - h; snapLineY = oy + oh; }
-                    else if (Math.abs(ny - (oy + oh)) < threshold) { ny = oy + oh; snapLineY = oy + oh; }
-                    else if (Math.abs(ny + h - oy) < threshold) { ny = oy - h; snapLineY = oy; }
-                    else if (Math.abs(ny + h / 2 - (oy + oh / 2)) < threshold) { ny = oy + oh / 2 - h / 2; snapLineY = oy + oh / 2; }
-                }
-            }
-            selected.setPosition(nx, ny);
+    private class ToggleItem implements SidebarItem {
+        String l; boolean v; int[] hb; java.util.function.Consumer<Boolean> c;
+        ToggleItem(String l, boolean v, int[] hb, java.util.function.Consumer<Boolean> c) { this.l=l; this.v=v; this.hb=hb; this.c=c; }
+        public int getHeight() { return 18; }
+        public void draw(int px, int y, int w, int mx, int my) {
+            boolean hov = inRect(mx, my, px + 4, y, w - 8, 16);
+            if (hov) Gui.drawRect(px + 4, y, px + w - 4, y + 16, 0x08FFFFFF);
+            fontRendererObj.drawStringWithShadow(l, px + 12, y + 3, hov ? TEXT_PRIMARY : TEXT_SECONDARY);
+            drawToggle(px + w - 42, y + 2, v, "sb_" + l);
+            if (hb != null) setHB(hb, px + w - 42, y + 2, 28, 12);
         }
-
-        if (wlDragging) {
-            wlX += mx - wlDragOX;
-            wlY += my - wlDragOY;
-            wlDragOX = mx;
-            wlDragOY = my;
-        }
-        if (wlScrollDragging) {
-            updateWlScrollFromMouse(my);
-        }
-        if (sbDragging) {
-            sbX += mx - sbDragOX;
-            sbY += my - sbDragOY;
-            sbDragOX = mx;
-            sbDragOY = my;
-        }
-        if (ceDragging) {
-            ceX += mx - ceDragOX;
-            ceY += my - ceDragOY;
-            ceDragOX = mx;
-            ceDragOY = my;
-        }
-        if (draggingSpectrum) updateColorFromSpectrum(mx, my);
-        if (draggingSlider != -1) updateColorFromSlider(mx);
     }
-
-    @Override
-    protected void mouseReleased(int mx, int my, int state) {
-        isDraggingWidget = false;
-        wlDragging = false;
-        wlScrollDragging = false;
-        sbDragging = false;
-        ceDragging = false;
-        draggingSpectrum = false;
-        draggingSlider = -1;
-        snapLineX = -1;
-        snapLineY = -1;
-        ui.saveConfig();
-        super.mouseReleased(mx, my, state);
-    }
-
-    @Override
-    protected void keyTyped(char typedChar, int keyCode) throws IOException {
-        if (searchFocused) {
-            if (keyCode == Keyboard.KEY_ESCAPE) {
-                searchFocused = false;
-            } else if (keyCode == Keyboard.KEY_BACK) {
-                if (!searchFilter.isEmpty()) searchFilter = searchFilter.substring(0, searchFilter.length() - 1);
-            } else if (keyCode == Keyboard.KEY_RETURN) {
-                searchFocused = false;
-            } else if (typedChar >= 32) {
-                searchFilter += typedChar;
-            }
-            return;
+    private class DoubleToggleItem implements SidebarItem {
+        BaseWidget bw; DoubleToggleItem(BaseWidget bw) { this.bw = bw; }
+        public int getHeight() { 
+            KeyStrokeWidget ks = (KeyStrokeWidget) bw;
+            return ((ks.getKeyCount() + 1) / 2) * 18 + 18; // keys + rainbow space
         }
-        super.keyTyped(typedChar, keyCode);
+        public void draw(int px, int y, int w, int mx, int my) {
+            KeyStrokeWidget ks = (KeyStrokeWidget) bw;
+            int half = w / 2;
+            int curY = y;
+            for (int i = 0; i < ks.getKeyCount(); i++) {
+                int col = i % 2;
+                int ox = px + col * half;
+                String label = ks.getKeyLabel(i);
+                boolean val = Boolean.TRUE.equals(bw.getProps().getOrDefault("showKey" + i, true));
+                boolean hov = inRect(mx, my, ox + 4, curY, half - 8, 16);
+                if (hov) Gui.drawRect(ox + 4, curY, ox + half - 4, curY + 16, 0x08FFFFFF);
+                String disp = label;
+                if (fontRendererObj.getStringWidth(disp) > half - 45) disp = fontRendererObj.trimStringToWidth(disp, half - 50) + "..";
+                fontRendererObj.drawStringWithShadow(disp, ox + 12, curY + 3, hov ? TEXT_PRIMARY : TEXT_SECONDARY);
+                drawToggle(ox + half - 38, curY + 2, val, "sb_" + i);
+                setHB(hbKeyToggle[i], ox + half - 38, curY + 2, 28, 12);
+                if (col == 1) curY += 18;
+            }
+            if (ks.getKeyCount() % 2 != 0) curY += 18;
+            boolean spaceVal = Boolean.TRUE.equals(bw.getProps().getOrDefault("showSpaceRainbow", false));
+            boolean hovS = inRect(mx, my, px + 4, curY, w - 8, 16);
+            if (hovS) Gui.drawRect(px + 4, curY, px + w - 4, curY + 16, 0x08FFFFFF);
+            fontRendererObj.drawStringWithShadow("Rainbow Espace", px + 12, curY + 3, hovS ? TEXT_PRIMARY : TEXT_SECONDARY);
+            drawToggle(px + w - 42, curY + 2, spaceVal, "sb_space");
+            setHB(hbSpaceRainbow, px + w - 42, curY + 2, 28, 12);
+        }
+    }
+    private class ColorItem implements SidebarItem {
+        int c; ColorItem(int c) { this.c=c; }
+        public int getHeight() { return 18; }
+        public void draw(int px, int y, int w, int mx, int my) {
+            fontRendererObj.drawStringWithShadow("Couleur", px + 12, y + 3, TEXT_SECONDARY);
+            int cpX = px + w - 42, cpW = 28, cpH = 12;
+            GuiRenderUtils.drawCheckerboard(cpX, y + 1, cpW, cpH, 4, 0xFF999999, 0xFF666666);
+            Gui.drawRect(cpX, y + 1, cpX + cpW, y + 1 + cpH, c);
+            GuiRenderUtils.drawRectOutline(cpX, y + 1, cpW, cpH, 0x66FFFFFF);
+            setHB(hbColorPreview, cpX, y + 1, cpW, cpH);
+        }
+    }
+    private class ScaleItem implements SidebarItem {
+        BaseWidget bw; ScaleItem(BaseWidget bw) { this.bw=bw; }
+        public int getHeight() { return 38; }
+        public void draw(int px, int y, int w, int mx, int my) {
+            fontRendererObj.drawStringWithShadow("Echelle: " + String.format("%.2f", bw.getScale()), px + 12, y + 2, TEXT_SECONDARY);
+            int sX = px + 12, sW = w - 24, sH = 6;
+            Gui.drawRect(sX, y + 14, sX + sW, y + 14 + sH, 0xFF111122);
+            int fill = (int)(((bw.getScale() - 0.5f) / 1.5f) * sW);
+            GuiRenderUtils.drawGradientRect(sX, y + 14, sX + fill, y + 14 + sH, 0xFFE67E22, 0xFFFFCC88);
+            Gui.drawRect(sX + fill - 1, y + 13, sX + fill + 1, y + 15 + sH, 0xFFEEEEEE);
+            setHB(hbScaleSlider, sX, y + 14, sW, sH);
+            fontRendererObj.drawStringWithShadow(bw.getWidth() + "x" + bw.getHeight(), px + w - 12 - fontRendererObj.getStringWidth(bw.getWidth() + "x" + bw.getHeight()), y + 2, TEXT_MUTED);
+        }
+    }
+    private class ButtonItem implements SidebarItem {
+        String l; int[] hb; Runnable r; ButtonItem(String l, int[] hb, Runnable r) { this.l=l; this.hb=hb; this.r=r; }
+        public int getHeight() { return 22; }
+        public void draw(int px, int y, int w, int mx, int my) {
+            boolean hov = inRect(mx, my, px + 10, y + 2, w - 20, 16);
+            drawStyledButton(px + 10, y + 2, w - 20, 16, l, 0xFF1A1A28, hov);
+            setHB(hb, px + 10, y + 2, w - 20, 16);
+        }
+    }
+    private class MultiButtonItem implements SidebarItem {
+        public int getHeight() { return 30; }
+        public void draw(int px, int y, int w, int mx, int my) {
+            int bw = (w - 26) / 2;
+            boolean hR = inRect(mx, my, px + 8, y + 6, bw, 16);
+            drawStyledButton(px + 8, y + 6, bw, 16, "Reset Pos.", 0xFF1A1A28, hR);
+            setHB(hbResetPos, px + 8, y + 6, bw, 16);
+            boolean hW = inRect(mx, my, px + 18 + bw, y + 6, bw, 16);
+            drawStyledButton(px + 18 + bw, y + 6, bw, 16, "Blanc", 0xFF1A1A28, hW);
+            setHB(hbResetColor, px + 18 + bw, y + 6, bw, 16);
+        }
     }
 
     @Override
@@ -966,96 +514,319 @@ public class GuiUIEditor extends GuiScreen {
         lastMouseX = Mouse.getEventX() * this.width / this.mc.displayWidth;
         lastMouseY = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
         int scroll = Mouse.getEventDWheel();
-        if (scroll != 0 && inRect(lastMouseX, lastMouseY, wlX, wlY, wlW + 20, WL_MAX_H)) {
-            if (scroll > 0) wlScroll = Math.max(0, wlScroll - 1);
-            else wlScroll++;
+        if (scroll != 0) {
+            if (inRect(lastMouseX, lastMouseY, wlX, wlY, wlW + 20, WL_MAX_H)) { wlScroll += (scroll > 0 ? -1 : 1); }
+            else if (inRect(lastMouseX, lastMouseY, (int)(sbX - (1.0f - sidebarAnim) * 80), sbY, (selected instanceof KeyStrokeWidget ? 260 : sbW), sbH)) { sbScroll += (scroll > 0 ? -12 : 12); }
         }
     }
 
     @Override
-    public boolean doesGuiPauseGame() {
-        return false;
+    protected void mouseClicked(int mx, int my, int btn) throws IOException {
+        if (btn != 0) return;
+        searchFocused = false;
+        for (int i = panelOrder.size() - 1; i >= 0; i--) {
+            String p = panelOrder.get(i);
+            if ("colorEditor".equals(p) && colorEditorOpen && handleColorClick(mx, my)) return;
+            if ("sidebar".equals(p) && selected != null && handleSidebarClick(mx, my)) return;
+            if ("widgetList".equals(p) && handleWidgetListClick(mx, my)) return;
+        }
+        if (inRect(mx, my, hbDoneBtn[0], hbDoneBtn[1], hbDoneBtn[2], hbDoneBtn[3])) { this.mc.displayGuiScreen(parent); return; }
+        
+        // Determine clicked widget (topmost) first
+        UIElement clicked = null;
+        List<UIElement> all = new ArrayList<>(ui.all());
+        for (int i = all.size() - 1; i >= 0; i--) {
+            UIElement e = all.get(i);
+            if (!e.isEnabled()) continue;
+            if (e.containsPoint(mx, my)) { clicked = e; break; }
+        }
+        if (clicked != null) {
+            // If clicking on a resize handle of this widget, start resizing (select it first)
+            int edge = getResizeEdge(mx, my, clicked);
+            if (edge != 0) {
+                selected = clicked;
+                isResizingWidget = true; resizeEdge = edge;
+                resizeStartX = mx; resizeStartY = my;
+                resizeStartW = selected.getWidth(); resizeStartH = selected.getHeight();
+                resizeStartWidgetX = selected.getX(); resizeStartWidgetY = selected.getY();
+                if (selected instanceof BaseWidget) resizeStartScale = ((BaseWidget)selected).getScale();
+                bringToFront("sidebar"); sbScroll = 0; return;
+            }
+            // Otherwise select and start dragging
+            selected = clicked; isDraggingWidget = true;
+            dragOffsetX = mx - selected.getX(); dragOffsetY = my - selected.getY();
+            bringToFront("sidebar"); sbScroll = 0; return;
+         }
+        selected = null;
     }
 
-    // ========================================================================
-    // COLOR LOGIC
-    // ========================================================================
+    private boolean handleSidebarClick(int mx, int my) {
+        int px = (int)(sbX - (1.0f - sidebarAnim) * 80);
+        int w = (selected instanceof KeyStrokeWidget) ? 260 : sbW;
+        if (!inRect(mx, my, px, sbY, w, sbH)) return false;
+        bringToFront("sidebar");
+        if (inRect(mx, my, hbSbClose[0], hbSbClose[1], hbSbClose[2], hbSbClose[3])) { selected = null; return true; }
+        if (inRect(mx, my, px, sbY, w, 22)) { sbDragging = true; sbDragOX = mx; sbDragOY = my; return true; }
+
+        int sY = sbScroll;
+        if (inRect(mx, my + sY, px + w - 42, sbY + 44, 28, 12)) { selected.setEnabled(!selected.isEnabled()); ui.saveConfig(); return true; }
+        if (selected instanceof BaseWidget) {
+            BaseWidget bw = (BaseWidget) selected;
+            if (clickHB(mx, my + sY, hbRainbow)) { bw.setRGBMode(!bw.isRGBMode()); ui.saveConfig(); return true; }
+            if (bw instanceof CombatLogWidget && clickHB(mx, my + sY, hbOrigDesign)) { bw.getProps().put("originalDesign", !Boolean.TRUE.equals(bw.getProps().getOrDefault("originalDesign", false))); ui.saveConfig(); return true; }
+            if (clickHB(mx, my + sY, hbAlignGrid)) { bw.getProps().put("snapGrid", !Boolean.TRUE.equals(bw.getProps().getOrDefault("snapGrid", false))); ui.saveConfig(); return true; }
+            if (clickHB(mx, my + sY, hbColorPreview)) { colorEditorOpen = true; bringToFront("colorEditor"); int c = bw.getColor(); a=(c>>24)&0xFF; r=(c>>16)&0xFF; g=(c>>8)&0xFF; b=c&0xFF; return true; }
+            if (bw instanceof KeyStrokeWidget) {
+                for(int i=0; i<9; i++) if(clickHB(mx, my + sY, hbKeyToggle[i])) { bw.getProps().put("showKey"+i, !Boolean.TRUE.equals(bw.getProps().getOrDefault("showKey"+i, true))); ui.saveConfig(); return true; }
+                if(clickHB(mx, my + sY, hbSpaceRainbow)) { bw.getProps().put("showSpaceRainbow", !Boolean.TRUE.equals(bw.getProps().getOrDefault("showSpaceRainbow", false))); ui.saveConfig(); return true; }
+            } else if (bw instanceof PotionStatusWidget) {
+                if(clickHB(mx, my + sY, hbPotionDur)) { bw.getProps().put("showDuration", !Boolean.TRUE.equals(bw.getProps().getOrDefault("showDuration", true))); ui.saveConfig(); return true; }
+                if(clickHB(mx, my + sY, hbPotionIcons)) { bw.getProps().put("showIcons", !Boolean.TRUE.equals(bw.getProps().getOrDefault("showIcons", false))); ui.saveConfig(); return true; }
+            } else if (bw instanceof ArmorGroupWidget) {
+                if(clickHB(mx, my + sY, hbArmorLayout)) { bw.getProps().put("layout", "vertical".equals(bw.getProps().getOrDefault("layout", "horizontal")) ? "horizontal" : "vertical"); ui.saveConfig(); return true; }
+                if(clickHB(mx, my + sY, hbArmorPercent)) { bw.getProps().put("displayPercent", !Boolean.TRUE.equals(bw.getProps().getOrDefault("displayPercent", true))); ui.saveConfig(); return true; }
+            }
+            if(clickHB(mx, my + sY, hbScaleSlider)) { draggingSlider=100; updateScaleFromSlider(mx); return true; }
+            if(clickHB(mx, my + sY, hbResetSize)) { bw.setScale(1.0f); ui.saveConfig(); return true; }
+        }
+        if(clickHB(mx, my + sY, hbResetPos)) { selected.setPosition(10, 10); ui.saveConfig(); return true; }
+        if(clickHB(mx, my + sY, hbResetColor)) { selected.setColor(0xFFFFFFFF); if(selected instanceof BaseWidget) ((BaseWidget)selected).setRGBMode(false); ui.saveConfig(); return true; }
+        return true;
+    }
+
+    private boolean clickHB(int mx, int my, int[] hb) { return mx >= hb[0] && mx < hb[0] + hb[2] && my >= hb[1] && my < hb[1] + hb[3]; }
+
+    private boolean handleWidgetListClick(int mx, int my) {
+        int totalW = wlW + 20; List<UIElement> items = getFilteredWidgets();
+        int maxH = Math.min(WL_MAX_H, this.height - 80), maxVisible = (maxH - 50) / WL_ROW_H, listH = Math.min(maxVisible, Math.max(1, items.size())) * WL_ROW_H, h = 50 + listH;
+        if (!inRect(mx, my, wlX, wlY, totalW, h)) return false;
+        bringToFront("widgetList");
+        if (inRect(mx, my, hbWlClose[0], hbWlClose[1], hbWlClose[2], hbWlClose[3])) { wlX = -500; return true; }
+        if (inRect(mx, my, wlX, wlY, totalW, 22)) { wlDragging = true; wlDragOX = mx; wlDragOY = my; return true; }
+        if (inRect(mx, my, wlX + 8, wlY + 26, totalW - 16, 16)) { searchFocused = true; return true; }
+        int y = wlY + 46;
+        for (int i = wlScroll; i < Math.min(wlScroll + maxVisible, items.size()); i++) {
+            UIElement e = items.get(i);
+            if (inRect(mx, my, wlX + totalW - 40, y + 5, 28, 12)) { e.setEnabled(!e.isEnabled()); ui.saveConfig(); return true; }
+            if (inRect(mx, my, wlX, y, totalW - 6, WL_ROW_H)) { selected = e; bringToFront("sidebar"); sbScroll = 0; return true; }
+            y += WL_ROW_H;
+        }
+        return true;
+    }
+
+    private void updateWlScrollFromMouse(int my) {
+        List<UIElement> items = getFilteredWidgets();
+        int maxH = Math.min(WL_MAX_H, this.height - 80), maxVisible = (maxH - 50) / WL_ROW_H, listH = Math.min(maxVisible, Math.max(1, items.size())) * WL_ROW_H;
+        float ratio = (float)(my - (wlY + 46)) / (float)listH;
+        wlScroll = GuiRenderUtils.clamp((int)(ratio * items.size() - maxVisible / 2.0f), 0, Math.max(0, items.size() - maxVisible));
+    }
+
+    @Override
+    protected void mouseClickMove(int mx, int my, int btn, long time) {
+        if (isDraggingWidget && selected != null) {
+            int nx = mx - dragOffsetX, ny = my - dragOffsetY;
+            snapLineX = -1; snapLineY = -1;
+            guideXs.clear(); guideYs.clear();
+            // Smart alignment: snap to other widgets' left/center/right and top/center/bottom
+            if (selected instanceof BaseWidget && Boolean.TRUE.equals(((BaseWidget) selected).getPropOrDefault("snapGrid", false)) && !isShiftKeyDown()) {
+                int threshold = 6;
+                int sw = this.width, sh = this.height;
+                int w = selected.getWidth(), h = selected.getHeight();
+                // candidate positions of the moving widget
+                int candLeft = nx;
+                int candCenterX = nx + w/2;
+                int candRight = nx + w;
+                int candTop = ny;
+                int candCenterY = ny + h/2;
+                int candBottom = ny + h;
+
+                // Iterate other widgets
+                for (UIElement other : ui.all()) {
+                    if (other == selected || !other.isEnabled()) continue;
+                    int ox = other.getX(), oy = other.getY(), ow = other.getWidth(), oh = other.getHeight();
+                    int oLeft = ox, oCenterX = ox + ow/2, oRight = ox + ow;
+                    int oTop = oy, oCenterY = oy + oh/2, oBottom = oy + oh;
+
+                    // collect guides for visual assistance
+                    if (!guideXs.contains(oLeft)) guideXs.add(oLeft);
+                    if (!guideXs.contains(oCenterX)) guideXs.add(oCenterX);
+                    if (!guideXs.contains(oRight)) guideXs.add(oRight);
+                    if (!guideYs.contains(oTop)) guideYs.add(oTop);
+                    if (!guideYs.contains(oCenterY)) guideYs.add(oCenterY);
+                    if (!guideYs.contains(oBottom)) guideYs.add(oBottom);
+
+                    // horizontal snaps
+                    if (Math.abs(candLeft - oLeft) <= threshold) { nx = oLeft; snapLineX = oLeft; }
+                    else if (Math.abs(candLeft - oCenterX) <= threshold) { nx = oCenterX; snapLineX = oCenterX; }
+                    else if (Math.abs(candLeft - oRight) <= threshold) { nx = oRight; snapLineX = oRight; }
+
+                    if (Math.abs(candCenterX - oLeft) <= threshold) { nx = oLeft - w/2; snapLineX = oLeft; }
+                    else if (Math.abs(candCenterX - oCenterX) <= threshold) { nx = oCenterX - w/2; snapLineX = oCenterX; }
+                    else if (Math.abs(candCenterX - oRight) <= threshold) { nx = oRight - w/2; snapLineX = oRight; }
+
+                    if (Math.abs(candRight - oLeft) <= threshold) { nx = oLeft - w; snapLineX = oLeft; }
+                    else if (Math.abs(candRight - oCenterX) <= threshold) { nx = oCenterX - w; snapLineX = oCenterX; }
+                    else if (Math.abs(candRight - oRight) <= threshold) { nx = oRight - w; snapLineX = oRight; }
+
+                    // vertical snaps
+                    if (Math.abs(candTop - oTop) <= threshold) { ny = oTop; snapLineY = oTop; }
+                    else if (Math.abs(candTop - oCenterY) <= threshold) { ny = oCenterY; snapLineY = oCenterY; }
+                    else if (Math.abs(candTop - oBottom) <= threshold) { ny = oBottom; snapLineY = oBottom; }
+
+                    if (Math.abs(candCenterY - oTop) <= threshold) { ny = oTop - h/2; snapLineY = oTop; }
+                    else if (Math.abs(candCenterY - oCenterY) <= threshold) { ny = oCenterY - h/2; snapLineY = oCenterY; }
+                    else if (Math.abs(candCenterY - oBottom) <= threshold) { ny = oBottom - h/2; snapLineY = oBottom; }
+
+                    if (Math.abs(candBottom - oTop) <= threshold) { ny = oTop - h; snapLineY = oTop; }
+                    else if (Math.abs(candBottom - oCenterY) <= threshold) { ny = oCenterY - h; snapLineY = oCenterY; }
+                    else if (Math.abs(candBottom - oBottom) <= threshold) { ny = oBottom - h; snapLineY = oBottom; }
+                }
+
+                // Also keep simple snap to screen edges
+                if (Math.abs(nx) <= threshold) { nx = 0; snapLineX = 0; }
+                if (Math.abs(nx + w - sw) <= threshold) { nx = sw - w; snapLineX = sw; }
+                if (Math.abs(ny) <= threshold) { ny = 0; snapLineY = 0; }
+                if (Math.abs(ny + h - sh) <= threshold) { ny = sh - h; snapLineY = sh; }
+            }
+            selected.setPosition(nx, ny);
+        }
+        if (isResizingWidget && selected instanceof BaseWidget) {
+            BaseWidget bw = (BaseWidget) selected;
+            int dx = mx - resizeStartX, dy = my - resizeStartY;
+            boolean hor = (resizeEdge & (1 | 2)) != 0;
+            boolean ver = (resizeEdge & (4 | 8)) != 0;
+            float delta;
+            if (hor && ver) delta = (float) Math.max(Math.abs(dx), Math.abs(dy));
+            else if (hor) delta = (float) dx;
+            else delta = (float) dy;
+            float newScale = MathHelper.clamp_float(resizeStartScale + delta / 100.0f, 0.5f, 2.0f);
+            bw.setScale(newScale);
+            // If resizing from left/top, we need to adjust position so opposite edge remains anchored
+            if ((resizeEdge & 1) != 0) { // left
+                int newW = bw.getWidth();
+                int diff = newW - resizeStartW;
+                bw.setPosition(resizeStartWidgetX - diff, bw.getY());
+            }
+            if ((resizeEdge & 4) != 0) { // top
+                int newH = bw.getHeight();
+                int diff = newH - resizeStartH;
+                bw.setPosition(bw.getX(), resizeStartWidgetY - diff);
+            }
+        }
+        if (wlDragging) { wlX += mx - wlDragOX; wlY += my - wlDragOY; wlDragOX = mx; wlDragOY = my; }
+        if (sbDragging) { sbX += mx - sbDragOX; sbY += my - sbDragOY; sbDragOX = mx; sbDragOY = my; }
+        if (ceDragging) { ceX += mx - ceDragOX; ceY += my - ceDragOY; ceDragOX = mx; ceDragOY = my; }
+        if (draggingSpectrum) updateColorFromSpectrum(mx, my);
+        if (draggingSlider != -1) { if (draggingSlider == 100) updateScaleFromSlider(mx); else updateColorFromSlider(mx); }
+    }
+
+    @Override
+    protected void mouseReleased(int mx, int my, int state) {
+        isDraggingWidget = false; isResizingWidget = false; wlDragging = false; sbDragging = false; ceDragging = false; draggingSpectrum = false; draggingSlider = -1;
+        snapLineX = -1; snapLineY = -1; ui.saveConfig(); super.mouseReleased(mx, my, state);
+    }
+
+    private void updateScaleFromSlider(int mx) {
+        if (!(selected instanceof BaseWidget)) return;
+        int sx = hbScaleSlider[0], sw = hbScaleSlider[2];
+        ((BaseWidget)selected).setScale(0.5f + ((float)GuiRenderUtils.clamp(mx - sx, 0, sw) / sw) * 1.5f);
+    }
+
+    private boolean handleColorClick(int mx, int my) {
+        if (!inRect(mx, my, ceX, ceY, CE_W, CE_H)) return false;
+        bringToFront("colorEditor");
+        if (inRect(mx, my, hbCeClose[0], hbCeClose[1], hbCeClose[2], hbCeClose[3])) { colorEditorOpen = false; return true; }
+        if (inRect(mx, my, ceX, ceY, CE_W, 22)) { ceDragging = true; ceDragOX = mx; ceDragOY = my; return true; }
+        int specX = ceX + 10, specY = ceY + 28;
+        if (inRect(mx, my, specX, specY, ceSpecW, ceSpecH)) { draggingSpectrum = true; updateColorFromSpectrum(mx, my); return true; }
+        int sldX = specX + ceSpecW + 15, sldW = CE_W - ceSpecW - 35;
+        for (int i = 0; i < 4; i++) if (inRect(mx, my, sldX, specY + i * 22, sldW, 12)) { draggingSlider = i; updateColorFromSlider(mx); return true; }
+        return true;
+    }
 
     private void updateColorFromSpectrum(int mx, int my) {
         float hue = GuiRenderUtils.clamp(mx - (ceX + 10), 0, ceSpecW) / (float) ceSpecW;
         float val = 1.0f - GuiRenderUtils.clamp(my - (ceY + 28), 0, ceSpecH) / (float) ceSpecH;
-        int rgb = java.awt.Color.HSBtoRGB(hue, 1.0f, val);
-        r = (rgb >> 16) & 0xFF;
-        g = (rgb >> 8) & 0xFF;
-        b = rgb & 0xFF;
-        applyColor();
+        int rgb = Color.HSBtoRGB(hue, 1.0f, val);
+        r = (rgb >> 16) & 0xFF; g = (rgb >> 8) & 0xFF; b = rgb & 0xFF; applyColor();
     }
-
     private void updateColorFromSlider(int mx) {
-        int sldX = ceX + 10 + ceSpecW + 15;
-        int sldW = CE_W - ceSpecW - 35;
-        int val = (int)(GuiRenderUtils.clamp(mx - sldX, 0, sldW) / (float) sldW * 255);
-        if (draggingSlider == 0) r = val;
-        else if (draggingSlider == 1) g = val;
-        else if (draggingSlider == 2) b = val;
-        else if (draggingSlider == 3) a = val;
+        int sldX = ceX + 10 + ceSpecW + 15, sldW = CE_W - ceSpecW - 35;
+        int val = (int)((float)GuiRenderUtils.clamp(mx - sldX, 0, sldW) / sldW * 255);
+        if (draggingSlider == 0) r = val; else if (draggingSlider == 1) g = val; else if (draggingSlider == 2) b = val; else if (draggingSlider == 3) a = val;
         applyColor();
     }
-
-    private void applyColor() {
-        if (selected instanceof BaseWidget) {
-            ((BaseWidget) selected).setColor((a << 24) | (r << 16) | (g << 8) | b);
-            ui.saveConfig();
-        }
-    }
-
-    // ========================================================================
-    // UTILITIES
-    // ========================================================================
-
-    private List<UIElement> getFilteredWidgets() {
-        return ui.all().stream()
-                .filter(e -> searchFilter.isEmpty()
-                        || friendlyName(e.getId()).toLowerCase().contains(searchFilter.toLowerCase()))
-                .collect(Collectors.toList());
-    }
-
-    private void bringToFront(String name) {
-        panelOrder.remove(name);
-        panelOrder.add(name);
-    }
-
-    private boolean inRect(int mx, int my, int rx, int ry, int rw, int rh) {
-        return mx >= rx && my >= ry && mx < rx + rw && my < ry + rh;
-    }
-
-    private void setHB(int[] hb, int x, int y, int w, int h) {
-        hb[0] = x;
-        hb[1] = y;
-        hb[2] = w;
-        hb[3] = h;
-    }
-
+    private void applyColor() { if (selected instanceof BaseWidget) { ((BaseWidget) selected).setColor((a << 24) | (r << 16) | (g << 8) | b); ui.saveConfig(); } }
+    private List<UIElement> getFilteredWidgets() { return ui.all().stream().filter(e -> searchFilter.isEmpty() || friendlyName(e.getId()).toLowerCase().contains(searchFilter.toLowerCase())).collect(Collectors.toList()); }
+    private void bringToFront(String name) { panelOrder.remove(name); panelOrder.add(name); }
+    private boolean inRect(int mx, int my, int rx, int ry, int rw, int rh) { return mx >= rx && my >= ry && mx < rx + rw && my < ry + rh; }
+    private void setHB(int[] hb, int x, int y, int w, int h) { hb[0] = x; hb[1] = y; hb[2] = w; hb[3] = h; }
     private String friendlyName(String id) {
         switch (id) {
-            case "fps": return "FPS";
-            case "ping": return "Ping";
-            case "biome": return "Biome";
-            case "coords": return "Coordonnees";
-            case "dir": return "Direction";
-            case "date": return "Date";
-            case "helditem": return "Objet tenu";
-            case "armor_group": return "Armure";
-            case "potions": return "Potions";
-            case "cps": return "CPS";
-            case "toggle_sneak": return "Toggle Sneak";
-            case "toggle_sprint": return "Toggle Sprint";
-            case "combatlog": return "Combat Tag";
-            case "keystrokes": return "Keystrokes";
-            case "reach": return "Reach Display";
-            default:
-                String s = id.replace('_', ' ');
-                return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+            case "fps": return "FPS"; case "ping": return "Ping"; case "biome": return "Biome"; case "coords": return "Coordonnees";
+            case "dir": return "Direction"; case "date": return "Date"; case "helditem": return "Objet tenu";
+            case "armor_group": return "Armure"; case "potions": return "Potions"; case "cps": return "CPS";
+            case "toggle_sneak": return "Toggle Sneak"; case "toggle_sprint": return "Toggle Sprint";
+            case "combatlog": return "Combat Tag"; case "keystrokes": return "Keystrokes"; case "Keystrokes": return "Keystrokes";
+            case "reach": return "Reach Display"; case "Reach": return "Reach Display";
+            default: String s = id.replace('_', ' '); return Character.toUpperCase(s.charAt(0)) + s.substring(1);
         }
+    }
+    private void drawGrid(int step, int color) { for (int gx = 0; gx < this.width; gx += step) Gui.drawRect(gx, 0, gx + 1, this.height, color); for (int gy = 0; gy < this.height; gy += step) Gui.drawRect(0, gy, this.width, gy + 1, color); }
+    private void drawResizeHandles(UIElement e) {
+        int wx = e.getX(), wy = e.getY(), ww = e.getWidth(), wh = e.getHeight(), hs = 6;
+        // Only draw corner handles to reduce accidental resize
+        int[][] corners = { {wx-hs/2, wy-hs/2}, {wx+ww-hs/2, wy-hs/2}, {wx+ww-hs/2, wy+wh-hs/2}, {wx-hs/2, wy+wh-hs/2} };
+        for (int[] hpos : corners) { Gui.drawRect(hpos[0], hpos[1], hpos[0] + hs, hpos[1] + hs, 0xFFFFFFFF); GuiRenderUtils.drawRectOutline(hpos[0], hpos[1], hs, hs, ACCENT); }
+    }
+    private int getResizeEdge(int mx, int my, UIElement e) {
+        // Precise detection: only treat as resize when clicking on one of the 8 small handles
+        int wx = e.getX(), wy = e.getY(), ww = e.getWidth(), wh = e.getHeight();
+        int s = RESIZE_HANDLE_SIZE;
+        // handle positions: TL, TC, TR, RT, BR, BC, BL, LT (clockwise)
+        int[][] handles = new int[][]{
+            {wx - s/2, wy - s/2}, {wx + ww/2 - s/2, wy - s/2}, {wx + ww - s/2, wy - s/2},
+            {wx + ww - s/2, wy + wh/2 - s/2}, {wx + ww - s/2, wy + wh - s/2}, {wx + ww/2 - s/2, wy + wh - s/2},
+            {wx - s/2, wy + wh - s/2}, {wx - s/2, wy + wh/2 - s/2}
+        };
+        int edge = 0;
+        for (int i = 0; i < handles.length; i++) {
+            int hx = handles[i][0], hy = handles[i][1];
+            // Only consider corner handles (0,2,4,6) to avoid accidental resizes on edges
+            if (i != 0 && i != 2 && i != 4 && i != 6) continue;
+            if (mx >= hx && mx <= hx + s && my >= hy && my <= hy + s) {
+                switch (i) {
+                    case 0: edge |= 1 | 4; break; // top-left
+                    case 2: edge |= 2 | 4; break; // top-right
+                    case 4: edge |= 2 | 8; break; // bottom-right
+                    case 6: edge |= 1 | 8; break; // bottom-left
+                    case 7: edge |= 1; break;     // left-center (handles array index 7 won't be hit because we limited to corners above)
+                }
+                break;
+            }
+        }
+        return edge;
+    }
+    private void drawStyledButton(int x, int y, int w, int h, String text, int bgColor, boolean hovered) {
+        int bg = hovered ? GuiRenderUtils.colorLerp(bgColor, 0xFFFFFFFF, 0.12f) : bgColor;
+        Gui.drawRect(x, y, x + w, y + h, bg); GuiRenderUtils.drawRectOutline(x, y, w, h, hovered ? 0x33FFFFFF : 0x1AFFFFFF);
+        if (hovered) GuiRenderUtils.drawGradientRect(x + 1, y + 1, x + w - 1, y + 3, 0x18FFFFFF, 0x00000000);
+        fontRendererObj.drawStringWithShadow(text, x + (w - fontRendererObj.getStringWidth(text)) / 2.0f, y + (h - 8) / 2.0f, hovered ? TEXT_PRIMARY : TEXT_SECONDARY);
+    }
+    private void drawMiniClose(int x, int y, int size, boolean hovered) {
+        int bg = hovered ? 0xCCCC3333 : 0x44662222;
+        Gui.drawRect(x, y, x + size, y + size, bg); GuiRenderUtils.drawRectOutline(x, y, size, size, 0x22FFFFFF);
+        fontRendererObj.drawString("x", x + 2, y + 1, hovered ? 0xFFFFFFFF : 0xAABBBBBB);
+    }
+    private void drawToggle(int x, int y, boolean value, String id) {
+        float target = value ? 1.0f : 0.0f;
+        float current = toggleAnimMap.getOrDefault(id, target);
+        current = GuiRenderUtils.lerp(current, target, 0.18f);
+        toggleAnimMap.put(id, current);
+        GuiRenderUtils.drawSmoothToggle(x, y, value, current);
+    }
+    @Override protected void keyTyped(char typedChar, int keyCode) throws IOException {
+        if (searchFocused) { if (keyCode == Keyboard.KEY_ESCAPE || keyCode == Keyboard.KEY_RETURN) searchFocused = false; else if (keyCode == Keyboard.KEY_BACK) { if (!searchFilter.isEmpty()) searchFilter = searchFilter.substring(0, searchFilter.length() - 1); } else if (typedChar >= 32) searchFilter += typedChar; return; }
+        super.keyTyped(typedChar, keyCode);
     }
 }

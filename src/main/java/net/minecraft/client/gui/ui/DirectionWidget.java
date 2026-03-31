@@ -33,6 +33,6 @@ public class DirectionWidget extends BaseWidget {
         }
         int col = getColor();
         if ((col & 0x00FFFFFF) == 0) col = 0x00FFFFFF;
-        mc.fontRendererObj.drawStringWithShadow("Direction: " + dir, x, y, col & 0x00FFFFFF);
+        mc.fontRendererObj.drawStringWithShadow("Direction: " + dir, 0, 0, col & 0x00FFFFFF);
     }
 }

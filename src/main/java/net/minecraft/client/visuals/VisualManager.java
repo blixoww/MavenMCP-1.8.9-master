@@ -62,10 +62,17 @@ public class VisualManager {
             EntityLivingBase living = (EntityLivingBase) target;
 
             if (settings.comboEnabled) {
-                combo.onHit();
+                combo.onHit(settings);
+            }
+            boolean isCritical = false;
+            Minecraft mc2 = Minecraft.getMinecraft();
+            if (mc2 != null && mc2.thePlayer != null) {
+                isCritical = mc2.thePlayer.fallDistance > 0 && !mc2.thePlayer.onGround
+                        && !mc2.thePlayer.isSprinting() && !mc2.thePlayer.isOnLadder()
+                        && !mc2.thePlayer.isInWater();
             }
             if (settings.hitMarkerEnabled) {
-                hitMarker.onHit();
+                hitMarker.onHit(isCritical);
             }
             if (settings.particlesEnabled && passesFilter(target, settings.particleFilter)) {
                 if (settings.particleTrigger == 0 || settings.particleTrigger == 2) {

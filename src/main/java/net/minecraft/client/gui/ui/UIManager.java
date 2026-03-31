@@ -70,6 +70,7 @@ public class UIManager {
         register(new CombatLogWidget("combatlog", 10, 230));
         // Reach widget
         register(new ReachWidget("Reach", 10, 250));
+        // Keystrokes widget is registered in GuiIngame (needs GameSettings.keyBind* to be ready)
 
         boolean loaded = loadConfig();
         if (!loaded) {
@@ -92,7 +93,11 @@ public class UIManager {
                 }
             }
         }
+
+        // Les profils par défaut sont initialisés lors du premier rendu (voir renderAll)
     }
+
+    private boolean defaultProfilesInitialized = false;
 
     private void autoArrangeDefaults() {
         List<UIElement> list = new ArrayList<>(widgets.values());
@@ -140,6 +145,13 @@ public class UIManager {
     }
 
     public void renderAll(int mouseX, int mouseY, float partialTicks) {
+        // Initialiser les profils par défaut une seule fois après que l'instance est prête
+        if (!defaultProfilesInitialized) {
+            defaultProfilesInitialized = true;
+            HudProfileManager.getInstance().initDefaultPvPProfile();
+            HudProfileManager.getInstance().initDefaultExplorationProfile();
+        }
+
         // Recalculate proportional positions after config load (resolution is now known)
         if (needsPositionRecalc) {
             needsPositionRecalc = false;
@@ -206,6 +218,13 @@ public class UIManager {
             } catch (Throwable t) { /* log minimal */
                 System.err.println("UI widget render error: " + t.getMessage());
             }
+            // Clear GL states that item rendering may have left enabled (depth/lighting)
+            try {
+                GlStateManager.disableLighting();
+            } catch (Throwable ignored) {}
+            try {
+                GlStateManager.disableDepth();
+            } catch (Throwable ignored) {}
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         }
     }
@@ -222,6 +241,7 @@ public class UIManager {
                 m.put("enabled", e.isEnabled());
                 m.put("color", e.getColor());
                 m.put("rgb", e.isRGBMode());
+                m.put("scale", e.getScale());
                 // Sauvegarde alignement proportionnel si BaseWidget
                 if (e instanceof BaseWidget) {
                     BaseWidget bw = (BaseWidget) e;
@@ -231,6 +251,8 @@ public class UIManager {
                     m.put("refH", bw.refH);
                     m.put("refWidgetW", bw.refWidgetW);
                     m.put("refWidgetH", bw.refWidgetH);
+                    m.put("width", bw.width); // Use internal raw width
+                    m.put("height", bw.height); // Use internal raw height
                 }
                 // persist props if BaseWidget
                 if (e instanceof BaseWidget) {
@@ -274,6 +296,9 @@ public class UIManager {
                     Number ny = (Number) m.get("y");
                     e.setPosition(nx.intValue(), ny.intValue());
                 }
+                if (m.containsKey("scale")) {
+                    e.setScale(((Number) m.get("scale")).floatValue());
+                }
                 if (e instanceof BaseWidget) {
                     BaseWidget bw = (BaseWidget) e;
                     if (m.containsKey("relX")) bw.relX = ((Number) m.get("relX")).doubleValue();
@@ -282,6 +307,8 @@ public class UIManager {
                     if (m.containsKey("refH")) bw.refH = ((Number) m.get("refH")).intValue();
                     if (m.containsKey("refWidgetW")) bw.refWidgetW = ((Number) m.get("refWidgetW")).intValue();
                     if (m.containsKey("refWidgetH")) bw.refWidgetH = ((Number) m.get("refWidgetH")).intValue();
+                    if (m.containsKey("width")) bw.setWidth(((Number) m.get("width")).intValue());
+                    if (m.containsKey("height")) bw.setHeight(((Number) m.get("height")).intValue());
                     // Ne pas appeler updateAbsolutePosition ici : la résolution n'est pas encore connue
                 }
                 if (m.containsKey("enabled")) e.setEnabled(Boolean.parseBoolean(String.valueOf(m.get("enabled"))));

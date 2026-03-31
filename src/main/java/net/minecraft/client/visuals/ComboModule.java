@@ -17,6 +17,22 @@ public class ComboModule {
     private float displayAlpha = 0.0f;
     private String cachedCountText = "";
 
+    public void onHit(VisualSettings s) {
+        comboCount++;
+        lastHitTime = System.currentTimeMillis();
+        cachedCountText = "x" + comboCount;
+        displayAlpha = 1.0f;
+        if (comboCount >= s.comboThreshold3) {
+            displayScale = s.comboScaleThreshold3;
+        } else if (comboCount >= s.comboThreshold2) {
+            displayScale = s.comboScaleThreshold2;
+        } else if (comboCount >= s.comboThreshold1) {
+            displayScale = s.comboScaleThreshold1;
+        } else {
+            displayScale = 1.4f;
+        }
+    }
+
     public void onHit() {
         comboCount++;
         lastHitTime = System.currentTimeMillis();
@@ -71,7 +87,15 @@ public class ComboModule {
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
 
         float scale = s.comboSize * displayScale;
-        GlStateManager.translate(x, y, 0);
+        float shakeOffset = 0;
+        if (s.comboScreenShake && comboCount >= s.comboThreshold3) {
+            long sinceHit = now - lastHitTime;
+            if (sinceHit < 300) {
+                float shakeDecay = 1.0f - sinceHit / 300.0f;
+                shakeOffset = (float)(Math.sin(sinceHit * 0.05) * s.comboScreenShakeIntensity * shakeDecay);
+            }
+        }
+        GlStateManager.translate(x + shakeOffset, y, 0);
         GlStateManager.scale(scale, scale, 1.0f);
 
         if (s.comboShowLabel) {

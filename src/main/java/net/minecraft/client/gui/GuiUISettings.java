@@ -46,7 +46,7 @@ public class GuiUISettings extends GuiScreen {
     private int panelX, panelY, panelW, panelH;
     private int headerH = 28;
     private int rowH = 24;
-    private int footerH = 36;
+    private int footerH = 50; // Increased to fit two rows of buttons
     private int contentTop, contentBottom, contentH;
     private int maxScroll;
 
@@ -81,7 +81,7 @@ public class GuiUISettings extends GuiScreen {
 
         // Layout
         panelW = MathHelper.clamp_int(this.width - 60, 260, 360);
-        panelH = MathHelper.clamp_int(this.height - 40, 180, 400);
+        panelH = MathHelper.clamp_int(this.height - 40, 200, 420);
         panelX = (this.width - panelW) / 2;
         panelY = (this.height - panelH) / 2;
 
@@ -95,15 +95,6 @@ public class GuiUISettings extends GuiScreen {
         }
         maxScroll = Math.max(0, totalContentH - contentH);
         scrollTarget = MathHelper.clamp_float(scrollTarget, 0, maxScroll);
-    }
-
-    @Override
-    protected void actionPerformed(GuiButton button) throws IOException {
-        if (button.id == 201) {
-            this.mc.displayGuiScreen(new GuiUIEditor(this));
-        } else if (button.id == 200) {
-            this.mc.displayGuiScreen(parent);
-        }
     }
 
     @Override
@@ -190,17 +181,25 @@ public class GuiUISettings extends GuiScreen {
         Gui.drawRect(panelX, contentBottom, panelX + panelW, contentBottom + 1, BORDER);
 
         // Footer buttons
-        int btnW = (panelW - 30) / 2;
-        int btnH = 18;
-        int btnY = contentBottom + (footerH - btnH) / 2;
+        int btnW = (panelW - 20);
+        int btnH = 16;
+        int gap = 4;
+        
+        // Row 1: HUD Editor
+        int btnY1 = contentBottom + 6;
+        boolean hoverEdit = inRect(mouseX, mouseY, panelX + 10, btnY1, btnW, btnH);
+        drawFooterButton(panelX + 10, btnY1, btnW, btnH, "Editeur HUD", ACCENT, hoverEdit);
 
-        // Edit HUD button
-        boolean hoverEdit = inRect(mouseX, mouseY, panelX + 10, btnY, btnW, btnH);
-        drawFooterButton(panelX + 10, btnY, btnW, btnH, "Editeur HUD", ACCENT, hoverEdit);
-
-        // Done button
-        boolean hoverDone = inRect(mouseX, mouseY, panelX + 20 + btnW, btnY, btnW, btnH);
-        drawFooterButton(panelX + 20 + btnW, btnY, btnW, btnH, I18n.format("gui.done"), 0xFF333344, hoverDone);
+        // Row 2: Profiles & Done
+        int btnY2 = btnY1 + btnH + gap;
+        int halfW = (btnW - gap) / 2;
+        
+        boolean hoverProf = inRect(mouseX, mouseY, panelX + 10, btnY2, halfW, btnH);
+        // Changed color to a clearer blue-green to stand out
+        drawFooterButton(panelX + 10, btnY2, halfW, btnH, "Profils HUD", 0xFF2ECC71, hoverProf);
+        
+        boolean hoverDone = inRect(mouseX, mouseY, panelX + 10 + halfW + gap, btnY2, halfW, btnH);
+        drawFooterButton(panelX + 10 + halfW + gap, btnY2, halfW, btnH, I18n.format("gui.done"), 0xFF333344, hoverDone);
 
         // Panel outline
         GuiRenderUtils.drawRectOutline(panelX, panelY, panelW, panelH, BORDER);
@@ -315,16 +314,26 @@ public class GuiUISettings extends GuiScreen {
     protected void mouseClicked(int mx, int my, int btn) throws IOException {
         if (btn != 0) return;
 
-        // Footer buttons
-        int btnW = (panelW - 30) / 2;
-        int btnH = 18;
-        int btnY = contentBottom + (footerH - btnH) / 2;
+        // Footer layout logic
+        int btnW = (panelW - 20);
+        int btnH = 16;
+        int gap = 4;
+        int btnY1 = contentBottom + 6;
+        int btnY2 = btnY1 + btnH + gap;
+        int halfW = (btnW - gap) / 2;
 
-        if (inRect(mx, my, panelX + 10, btnY, btnW, btnH)) {
+        // HUD Editor
+        if (inRect(mx, my, panelX + 10, btnY1, btnW, btnH)) {
             this.mc.displayGuiScreen(new GuiUIEditor(this));
             return;
         }
-        if (inRect(mx, my, panelX + 20 + btnW, btnY, btnW, btnH)) {
+        // HUD Profiles
+        if (inRect(mx, my, panelX + 10, btnY2, halfW, btnH)) {
+            this.mc.displayGuiScreen(new GuiHudProfiles(this));
+            return;
+        }
+        // Done
+        if (inRect(mx, my, panelX + 10 + halfW + gap, btnY2, halfW, btnH)) {
             this.mc.displayGuiScreen(parent);
             return;
         }

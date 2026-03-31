@@ -8,6 +8,12 @@ public interface UIElement
     void setPosition(int x, int y);
     int getWidth();
     int getHeight();
+    void setWidth(int w);
+    void setHeight(int h);
+    
+    float getScale();
+    void setScale(float scale);
+
     void render(int mouseX, int mouseY, float partialTicks);
     boolean containsPoint(int x, int y);
     boolean isEnabled();

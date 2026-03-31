@@ -19,6 +19,6 @@ public class CoordsWidget extends BaseWidget {
         String s = "XYZ: " + px + "," + py + "," + pz;
         int col = getColor();
         if ((col & 0x00FFFFFF) == 0) col = 0x00FFFFFF;
-        mc.fontRendererObj.drawStringWithShadow(s, x, y, col & 0x00FFFFFF);
+        mc.fontRendererObj.drawStringWithShadow(s, 0, 0, col & 0x00FFFFFF);
     }
 }

@@ -71,11 +71,13 @@ public class ReachWidget extends BaseWidget {
         }
 
         FontRenderer fr = mc.fontRendererObj;
-        this.width = fr.getStringWidth(s) + 4;
+        if (!Boolean.TRUE.equals(getPropOrDefault("customSize", false))) {
+            this.width = fr.getStringWidth(s) + 4;
+        }
         
         int drawCol = getColor();
         if ((drawCol & 0xFF000000) == 0) drawCol |= 0xFF000000;
         
-        fr.drawStringWithShadow(s, x, y, drawCol);
+        fr.drawStringWithShadow(s, 0, 0, drawCol);
     }
 }

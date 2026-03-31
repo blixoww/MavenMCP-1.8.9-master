@@ -5,7 +5,6 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.settings.GameSettings;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 
 import java.util.ArrayList;
@@ -48,7 +47,6 @@ public class KeyStrokeWidget extends BaseWidget {
         this.width = 88;
         this.height = 96;
         if (getPropOrDefault("showBackground", null) == null) setProp("showBackground", Boolean.FALSE);
-        if (getPropOrDefault("initialized", null) == null) setProp("initialized", Boolean.FALSE);
         if (getPropOrDefault("showSpaceRainbow", null) == null) setProp("showSpaceRainbow", Boolean.FALSE);
         try {
             this.setRGBMode(true);
@@ -100,44 +98,6 @@ public class KeyStrokeWidget extends BaseWidget {
                 if (getPropOrDefault("showKey" + i, null) == null) setProp("showKey" + i, Boolean.TRUE);
         }
 
-        if (!Boolean.TRUE.equals(getPropOrDefault("initialized", Boolean.FALSE))) {
-            ScaledResolution sr = new ScaledResolution(mc);
-            if (this.x == 0 && this.y == 0) {
-                this.x = Math.max(10, sr.getScaledWidth() - this.width - 10);
-                this.y = 10;
-            }
-            setProp("initialized", Boolean.TRUE);
-        }
-
-        try {
-            ScaledResolution sr = new ScaledResolution(mc);
-            int sw = sr.getScaledWidth();
-            int sh = sr.getScaledHeight();
-            
-            if (sw > 0 && sh > 0 && (sw != this.refW || sh != this.refH)) {
-                if (this.refW > 0 && this.refH > 0) {
-                    int maxX = Math.max(1, sw - this.width);
-                    int maxY = Math.max(1, sh - this.height);
-                    this.x = (int) Math.round(this.relX * maxX);
-                    this.y = (int) Math.round(this.relY * maxY);
-                    this.x = Math.max(0, Math.min(maxX, this.x));
-                    this.y = Math.max(0, Math.min(maxY, this.y));
-                }
-                this.refW = sw; this.refH = sh;
-                this.refWidgetW = this.width; this.refWidgetH = this.height;
-                int currentMaxX = Math.max(1, sw - this.width);
-                int currentMaxY = Math.max(1, sh - this.height);
-                this.relX = (double) this.x / currentMaxX;
-                this.relY = (double) this.y / currentMaxY;
-            } else {
-                int maxX = Math.max(1, sw - this.width);
-                int maxY = Math.max(1, sh - this.height);
-                this.relX = (double) this.x / maxX;
-                this.relY = (double) this.y / maxY;
-                this.refW = sw; this.refH = sh;
-            }
-        } catch (Throwable ignored) {}
-
         FontRenderer fr = mc.fontRendererObj;
         long now = System.currentTimeMillis();
 
@@ -165,6 +125,8 @@ public class KeyStrokeWidget extends BaseWidget {
         int kW = 26, kH = 26, gap = 3;
         int rowW = kW * 3 + gap * 2;
         int mH = 26, spH = 10;
+        
+        // Always maintain size to prevent reset issues and allow selection
         this.width = rowW;
         this.height = kH + gap + kH + gap + mH + gap + spH;
 
@@ -172,7 +134,9 @@ public class KeyStrokeWidget extends BaseWidget {
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
 
         int txtColor = isRGBMode() ? getRainbowColor() : getColor();
-        int sX = this.x, sY = this.y;
+        
+        // BaseWidget handles translation, so we draw from (0,0)
+        int sX = 0, sY = 0;
 
         // Ligne 1
         if (isEditorKeyVisible(0) && 0 < keys.length) drawKey(fr, sX + kW + gap, sY, kW, kH, 0, txtColor, now);
@@ -210,6 +174,12 @@ public class KeyStrokeWidget extends BaseWidget {
 
     private void drawMouse(FontRenderer fr, int x, int y, int w, int h, int physIdx, int txt, long now, String label, int cps, long lastPress) {
         boolean pressed = prevDown[physIdx];
+        
+        // Preview in editor
+        if (cps == 0 && UIManager.getInstance().isEditorActive()) {
+            cps = 7;
+        }
+
         Gui.drawRect(x, y, x + w, y + h, pressed ? BOX_PRESSED : BOX_NORMAL);
         drawBorder1px(x, y, w, h, pressed ? BOX_BORDER_PRESSED : BOX_BORDER);
         long elapsed = now - lastPress;

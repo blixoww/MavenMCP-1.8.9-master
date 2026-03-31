@@ -21,6 +21,6 @@ public class DateWidget extends BaseWidget {
         String s = df.format(new Date());
         int col = getColor();
         if ((col & 0x00FFFFFF) == 0) col = 0x00FFFFFF;
-        mc.fontRendererObj.drawStringWithShadow(s, x, y, col & 0x00FFFFFF);
+        mc.fontRendererObj.drawStringWithShadow(s, 0, 0, col & 0x00FFFFFF);
     }
 }

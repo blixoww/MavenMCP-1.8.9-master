@@ -2,8 +2,6 @@ package net.minecraft.client.gui.ui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
 
 public class BiomeWidget extends BaseWidget {
     public BiomeWidget(String id, int x, int y) {
@@ -21,6 +19,6 @@ public class BiomeWidget extends BaseWidget {
         String s = "Biome: " + biome;
         int col = getColor();
         if ((col & 0x00FFFFFF) == 0) col = 0x00FFFFFF;
-        fr.drawStringWithShadow(s, x, y, col & 0x00FFFFFF);
+        fr.drawStringWithShadow(s, 0, 0, col & 0x00FFFFFF);
     }
 }
