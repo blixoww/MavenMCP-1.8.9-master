@@ -16,17 +16,17 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
 /**
- * GuiMainMenu — RedConflict Client
+ * GuiMainMenu — RedConflict Client (PvP Faction 1.8.9)
  *
- * Inspiration visuelle : Badlion Client / Lunar Client
- * Caractéristiques :
- *   • Overlay sombre uniforme (sans bandes latérales)
- *   • Logo avec aura rouge ambiante (glow multi-couches)
- *   • Particules ambiantes (drift fluide, taille variable, fade naturel)
- *   • Panel "verre" derrière les boutons
- *   • Barre de status en haut + footer avec séparateur 1px
- *   • Animations d'entrée échelonnées par élément (staggered)
- *   • Hover delta-time (fluide à tout FPS)
+ * Design moderne et fluide :
+ *   - Panorama avec overlay gradient anime
+ *   - Logo pulse avec glow multi-couches dynamique
+ *   - Particules ambiantes (drift, taille variable, couleurs variees)
+ *   - Boutons avec hover smooth, glow lateral, shimmer effect
+ *   - Barre de statut avec infos joueur + version
+ *   - Separateur anime avec onde sinusoidale
+ *   - Animations d'entree echelonnees (staggered fade+slide)
+ *   - Scanlines subtiles pour un look PvP agressif
  */
 public class GuiMainMenu extends GuiScreen
 {
@@ -38,9 +38,9 @@ public class GuiMainMenu extends GuiScreen
     // Responsive layout cache
     private int prevWidth = -1;
     private int prevHeight = -1;
-    private float logoScale = 4f; // échelle du logo, recalculée
+    private float logoScale = 4f;
 
-    // layout calculé
+    // layout calcule
     private int cx;
     private int row3Y;
 
@@ -55,33 +55,32 @@ public class GuiMainMenu extends GuiScreen
 
     // ── Timing ──────────────────────────────────────────────────────────────
     private long openTime = -1L;
-    /** Durée totale du fade-in global (ms) */
-    private static final float FADEIN_TOTAL = 600f; // raccourci pour réduire la latence visuelle
+    private static final float FADEIN_TOTAL = 800f;
 
-    // FRAME_TIME global: synchronise les updates temporels pour les boutons (évite micro-diffs entre boutons)
+    // FRAME_TIME global
     static long FRAME_TIME = -1L;
 
     // ── Particules ──────────────────────────────────────────────────────────
     private final List<AmbientParticle> particles = new ArrayList<>();
-    // pool pour réutiliser les AmbientParticle et éviter des allocations fréquentes
     private final List<AmbientParticle> particlePool = new ArrayList<>();
     private final Random rng = new Random();
-    /** Nombre max de particules simultanées */
-    private static final int PARTICLE_MAX = 60; // réduit pour fluidité
+    private static final int PARTICLE_MAX = 100;
 
-    // ── Layout (calculé à l'init) ───────────────────────────────────────────
+    // ── Layout ──────────────────────────────────────────────────────────────
     private int logoY, btnStartY, btnW, btnH, btnGap, smallBtnW;
-
-    // Largeur du logo en pixels-écran (approximée, mise à jour au premier rendu)
     private float logoPxHalfWidth = 130f;
-
-    // cache réutilisable des yPositions des boutons pour éviter allocations par frame
     private int[] btnYCache = new int[0];
 
-    // ── Constantes de couleur ───────────────────────────────────────────────
-    private static final int RED        = 0xDD2222;
-    private static final int RED_BRIGHT = 0xFF3333;
-    private static final int RED_DIM    = 0xAA1414;
+    // ── Couleurs (Ajustées pour plus de modernité et moins de saturation brute) ──
+    private static final int RED        = 0xE63946;
+    private static final int RED_BRIGHT = 0xFF5E6A;
+    private static final int RED_DIM    = 0xB22D38;
+    private static final int RED_DARK   = 0x8D222B;
+
+    // ── Client info ─────────────────────────────────────────────────────────
+    private static final String CLIENT_NAME = "REDCONFLICT";
+    private static final String CLIENT_VERSION = "v1.0.0";
+    private static final String CLIENT_EDITION = "PvP Faction";
 
     public GuiMainMenu() {}
 
@@ -94,8 +93,8 @@ public class GuiMainMenu extends GuiScreen
     {
         ++this.panoramaTimer;
 
-        // Spawn progressif de particules (utilisation du pool si disponible)
-        if (particles.size() < PARTICLE_MAX && rng.nextInt(4) == 0)
+        // Spawn progressif de particules
+        if (particles.size() < PARTICLE_MAX && rng.nextInt(2) == 0)
         {
             float spawnX = rng.nextFloat() * (this.width  > 0 ? this.width  : 854);
             float spawnY = (this.height > 0 ? this.height : 480) + 10f;
@@ -110,7 +109,7 @@ public class GuiMainMenu extends GuiScreen
             particles.add(p);
         }
 
-        // Mise à jour + nettoyage (retourne les particules mortes dans le pool)
+        // Mise a jour + nettoyage
         for (int i = particles.size() - 1; i >= 0; --i)
         {
             AmbientParticle p = particles.get(i);
@@ -132,7 +131,6 @@ public class GuiMainMenu extends GuiScreen
     @Override
     public void initGui()
     {
-        // Only set openTime and create textures once — avoid resetting on resize
         if (this.openTime < 0L) this.openTime = Minecraft.getSystemTime();
         if (this.viewportTexture == null) this.viewportTexture  = new DynamicTexture(256, 256);
         if (this.backgroundTexture == null) this.backgroundTexture = this.mc.getTextureManager()
@@ -144,61 +142,50 @@ public class GuiMainMenu extends GuiScreen
 
         // ── Boutons principaux ────────────────────────────────────────────
         this.buttonList.add(new MenuButton(1, cx - btnW / 2, btnStartY,
-                btnW, btnH, "SINGLEPLAYER", MenuButton.Style.PRIMARY));
+                btnW, btnH, "SINGLEPLAYER", MenuButton.Style.PRIMARY, 0));
         this.buttonList.add(new MenuButton(2, cx - btnW / 2, btnStartY + btnH + btnGap,
-                btnW, btnH, "MULTIPLAYER",  MenuButton.Style.PRIMARY));
+                btnW, btnH, "MULTIPLAYER",  MenuButton.Style.PRIMARY, 1));
 
-        // ── Boutons secondaires côte à côte ───────────────────────────────
+        // ── Boutons secondaires ───────────────────────────────────────────
         smallBtnW = (btnW - btnGap) / 2;
         row3Y = btnStartY + (btnH + btnGap) * 2;
         this.buttonList.add(new MenuButton(0, cx - btnW / 2,
-                row3Y, smallBtnW, btnH, "OPTIONS", MenuButton.Style.SECONDARY));
+                row3Y, smallBtnW, btnH, "OPTIONS", MenuButton.Style.SECONDARY, 2));
         this.buttonList.add(new MenuButton(4, cx - btnW / 2 + smallBtnW + btnGap,
-                row3Y, smallBtnW, btnH, "QUIT",    MenuButton.Style.SECONDARY));
+                row3Y, smallBtnW, btnH, "QUIT",    MenuButton.Style.QUIT, 3));
 
-        // ── Boutons icône (top-right) ─────────────────────────────────────
-        // Discord
+        // ── Bouton Discord (top-right) ───────────────────────────────────
         String discLabel = "Discord";
         int discW = fontRendererObj.getStringWidth(discLabel) + 16;
-        this.buttonList.add(new IconButton(10, this.width - discW - 10, 7, discW, discLabel, 0xFF5865F2, ""));
+        this.buttonList.add(new IconButton(10, this.width - discW - 10, 7, discW, discLabel, 0xFF5865F2, "Join our Discord!"));
 
-        // init cache yPositions
+        // init cache
         ensureBtnCacheCapacity();
         for (int i = 0; i < this.buttonList.size(); i++) btnYCache[i] = this.buttonList.get(i).yPosition;
     }
 
-    /** Recompute layout values according to current width/height. Call when size changes. */
     private void computeLayout()
     {
         if (this.width == prevWidth && this.height == prevHeight && btnW != 0) return;
         prevWidth = this.width;
         prevHeight = this.height;
 
-        // centre
         cx = this.width / 2;
 
-        // responsive sizes
-        btnW = Math.min(300, Math.max(120, this.width / 4));
-        btnH = Math.max(20, this.height / 24);
+        btnW = Math.min(280, Math.max(120, this.width / 4));
+        btnH = Math.max(22, this.height / 22);
         btnGap = Math.max(6, btnH / 3);
 
-        // logo scale adaptative selon largeur
         float base = MathHelper.clamp_float(this.width / 480f, 1.0f, 6.0f);
-        logoScale = 3.2f * base; // base scale
-        // logo position : environ 26% down from top mais jamais trop bas
-        logoY = Math.max(24, (int)(this.height * 0.22f));
+        logoScale = 3.0f * base;
+        logoY = Math.max(24, (int)(this.height * 0.18f));
 
-        // button start Y relative to height
-        // Remonter légèrement les boutons pour un rendu plus compact et visuellement "au-dessus"
-        // On remonte un peu plus les boutons pour qu'ils soient plus proches du logo
-        int preferred = this.height / 2 + btnH - 56; // remonter de ~56px par défaut (plus haut)
-        btnStartY = Math.max(logoY + 50, Math.min(this.height - 120, preferred));
+        int preferred = this.height / 2 + btnH - 48;
+        btnStartY = Math.max((int)(logoY + 8 * logoScale) + 50, Math.min(this.height - 130, preferred));
     }
 
-    /** Repositionne les boutons existants sans réinitialiser l'état global (utile pour le resize). */
     private void repositionButtons()
     {
-        // Recompute small button width & derived Y
         smallBtnW = (btnW - btnGap) / 2;
         row3Y = btnStartY + (btnH + btnGap) * 2;
 
@@ -206,38 +193,25 @@ public class GuiMainMenu extends GuiScreen
         {
             switch (b.id)
             {
-                case 1: // singleplayer
-                    b.xPosition = cx - btnW / 2;
-                    b.yPosition = btnStartY;
-                    b.width = btnW; b.height = btnH;
-                    break;
-                case 2: // multiplayer
-                    b.xPosition = cx - btnW / 2;
-                    b.yPosition = btnStartY + btnH + btnGap;
-                    b.width = btnW; b.height = btnH;
-                    break;
-                case 0: // options
-                    b.xPosition = cx - btnW / 2;
-                    b.yPosition = row3Y;
-                    b.width = smallBtnW; b.height = btnH;
-                    break;
-                case 4: // quit
-                    b.xPosition = cx - btnW / 2 + smallBtnW + btnGap;
-                    b.yPosition = row3Y;
-                    b.width = smallBtnW; b.height = btnH;
-                    break;
-                case 10: // icon (right)
+                case 1:
+                    b.xPosition = cx - btnW / 2; b.yPosition = btnStartY;
+                    b.width = btnW; b.height = btnH; break;
+                case 2:
+                    b.xPosition = cx - btnW / 2; b.yPosition = btnStartY + btnH + btnGap;
+                    b.width = btnW; b.height = btnH; break;
+                case 0:
+                    b.xPosition = cx - btnW / 2; b.yPosition = row3Y;
+                    b.width = smallBtnW; b.height = btnH; break;
+                case 4:
+                    b.xPosition = cx - btnW / 2 + smallBtnW + btnGap; b.yPosition = row3Y;
+                    b.width = smallBtnW; b.height = btnH; break;
+                case 10:
                     int discW = fontRendererObj.getStringWidth(b.displayString) + 16;
                     b.xPosition = this.width - discW - 10;
-                    b.yPosition = 7;
-                    b.width = discW; b.height = 18;
-                    break;
-                default:
-                    // leave others as-is
+                    b.yPosition = 7; b.width = discW; b.height = 18; break;
             }
         }
 
-        // update cache too
         ensureBtnCacheCapacity();
         for (int i = 0; i < this.buttonList.size(); i++) btnYCache[i] = this.buttonList.get(i).yPosition;
     }
@@ -249,7 +223,6 @@ public class GuiMainMenu extends GuiScreen
         if (button.id == 1) mc.displayGuiScreen(new GuiSelectWorld(this));
         if (button.id == 2) mc.displayGuiScreen(new GuiMultiplayer(this));
         if (button.id == 4) mc.shutdown();
-        // id 10 : ouvrir Discord (non implémenté ici)
     }
 
     // =========================================================================
@@ -259,74 +232,79 @@ public class GuiMainMenu extends GuiScreen
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
-        // si la fenêtre a été redimensionnée, recalculer le layout et repositionner les boutons
         if (this.width != prevWidth || this.height != prevHeight)
         {
             computeLayout();
             repositionButtons();
-            // Note: on évite d'appeler initGui() pour ne pas reset openTime/texture — évite la "latence" visuelle
         }
 
-        // set global frame time once per frame to synchronise tous les boutons
         FRAME_TIME = Minecraft.getSystemTime();
 
         long  now     = FRAME_TIME;
         float elapsed = (openTime < 0L) ? FADEIN_TOTAL : Math.min(FADEIN_TOTAL, now - openTime);
-        float rawT    = elapsed / FADEIN_TOTAL;  // 0→1 linéaire
+        float rawT    = elapsed / FADEIN_TOTAL;
 
-        // Niveaux de fade échelonnés pour chaque couche
-        float fadeBase    = easeOutQuart(rawT);                           // fond + particules
-        float fadeLogo    = easeOutQuart(Math.min(1f, rawT * 1.4f));      // logo (arrive en premier)
-        float fadeSep     = easeOutQuart(Math.max(0f, rawT - 0.1f) * 1.3f); // séparateur
-        float fadeBtns    = easeOutQuart(Math.max(0f, rawT - 0.2f) * 1.4f); // boutons
-        float fadeFooter  = easeOutQuart(Math.max(0f, rawT - 0.3f) * 1.5f); // footer
+        // Niveaux de fade echelonnes
+        float fadeBase    = easeOutQuart(rawT);
+        float fadeLogo    = easeOutQuart(Math.min(1f, rawT * 1.5f));
+        float fadeSep     = easeOutQuart(Math.max(0f, rawT - 0.08f) * 1.3f);
+        float fadeBtns    = easeOutQuart(Math.max(0f, rawT - 0.15f) * 1.4f);
+        float fadeFooter  = easeOutQuart(Math.max(0f, rawT - 0.25f) * 1.5f);
+        float fadeInfo    = easeOutQuart(Math.max(0f, rawT - 0.35f) * 1.6f);
 
         // ── PANORAMA ─────────────────────────────────────────────────────
         GlStateManager.disableAlpha();
         renderSkybox(mouseX, mouseY, partialTicks);
         GlStateManager.enableAlpha();
 
-        // ── OVERLAY UNIFORME (pas de bandes latérales) ────────────────────
-        drawRect(0, 0, width, height, 0xAA000000);
-        // Légère vignette haut/bas pour ancrer les éléments
-        drawGradientRect(0, 0,           width, 44,     0x55000000, 0x00000000);
-        drawGradientRect(0, height - 50, width, height, 0x00000000, 0x65000000);
+        // ── OVERLAY GRADIENT ANIME ───────────────────────────────────────
+        renderAnimatedOverlay(fadeBase);
+
+        // ── SCANLINES SUBTILES ───────────────────────────────────────────
+        renderScanlines(fadeBase);
 
         // ── PARTICULES ───────────────────────────────────────────────────
         renderParticles(fadeBase, partialTicks);
 
-        // ── GLOW LOGO ────────────────────────────────────────────────────
+        // ── GLOW LOGO (pulse dynamique) ──────────────────────────────────
         renderLogoGlow(fadeLogo);
 
         // ── LOGO ─────────────────────────────────────────────────────────
         renderLogo(fadeLogo);
 
-        // ── SÉPARATEUR ───────────────────────────────────────────────────
-        renderSeparator(fadeSep);
+        // ── SOUS-TITRE ──────────────────────────────────────────────────
+        renderSubtitle(fadeLogo);
 
-        // ── PANEL VERRE (derrière les boutons) ───────────────────────────
+        // ── SEPARATEUR ANIME ─────────────────────────────────────────────
+        renderAnimatedSeparator(fadeSep);
+
+        // ── PANEL VERRE (derriere les boutons) ───────────────────────────
         renderButtonPanel(fadeBtns);
 
-        // ── BOUTONS (slide-in depuis le bas) with eased & staggered entrance ─
+        // ── BOUTONS (slide-in staggered) ─────────────────────────────────
         float entrance = easeOutQuart(fadeBtns);
         float invEntrance = 1f - entrance;
-        int baseSlide = 14; // réduit pour une entrée plus douce
+        int baseSlide = 18;
 
-        // Temporarily offset each button's yPosition for a staggered entrance
         ensureBtnCacheCapacity();
         for (int i = 0; i < this.buttonList.size(); i++) {
             GuiButton b = this.buttonList.get(i);
-            btnYCache[i] = b.yPosition; // store original
-            float stagger = Math.min(1f, i * 0.08f);
+            btnYCache[i] = b.yPosition;
+            float stagger = Math.min(1f, i * 0.1f);
             float per = easeOutQuart(1f - stagger);
-            int offset = (int)(invEntrance * baseSlide * (0.6f + per * 0.5f));
+            int offset = (int)(invEntrance * baseSlide * (0.5f + per * 0.6f));
             b.yPosition += offset;
         }
 
-        // Draw buttons (they were offset above)
+        // Draw buttons with fade
+        if (fadeBtns > 0.01f) {
+            float btnAlpha = MathHelper.clamp_float(fadeBtns, 0f, 1f);
+            GlStateManager.enableBlend();
+            GlStateManager.color(1f, 1f, 1f, btnAlpha);
+        }
         super.drawScreen(mouseX, mouseY, partialTicks);
 
-        // Restore original y positions using cache (no allocation)
+        // Restore positions
         for (int i = 0; i < this.buttonList.size(); i++) {
             this.buttonList.get(i).yPosition = btnYCache[i];
         }
@@ -334,11 +312,13 @@ public class GuiMainMenu extends GuiScreen
         // ── TOP BAR ──────────────────────────────────────────────────────
         renderTopBar(fadeLogo);
 
+        // ── PLAYER INFO ──────────────────────────────────────────────────
+        renderPlayerInfo(fadeInfo);
+
         // ── FOOTER ───────────────────────────────────────────────────────
         renderFooter(fadeFooter);
     }
 
-    // ensure btnYCache has sufficient capacity
     private void ensureBtnCacheCapacity() {
         if (btnYCache == null || btnYCache.length < this.buttonList.size()) {
             btnYCache = new int[Math.max(4, this.buttonList.size())];
@@ -346,25 +326,68 @@ public class GuiMainMenu extends GuiScreen
     }
 
     // =========================================================================
-    //   ÉLÉMENTS VISUELS
+    //   ELEMENTS VISUELS
     // =========================================================================
 
-    /** Particules ambiantes : rendu interpolé pour smoothness */
+    /** Overlay gradient anime - couleur sombre avec teinte rouge subtile qui pulse */
+    private void renderAnimatedOverlay(float fade)
+    {
+        if (fade <= 0.01f) return;
+
+        float time = (float)(System.currentTimeMillis() % 10000L) / 10000f;
+        float pulse = (float)(Math.sin(time * Math.PI * 2.0) * 0.5 + 0.5);
+
+        // Overlay sombre principal
+        int baseAlpha = (int)(180f * fade);
+        drawRect(0, 0, width, height, (baseAlpha << 24));
+
+        // Gradient rouge subtil du bas vers le haut
+        int redTint = (int)(15f * fade * pulse);
+        GuiRenderUtils.drawGradientRect(0, height / 2, width, height,
+                0x00000000, (redTint << 24) | RED_DARK);
+
+        // Vignette haut
+        int vigA = (int)(80f * fade);
+        drawGradientRect(0, 0, width, 60, (vigA << 24), 0x00000000);
+        // Vignette bas
+        drawGradientRect(0, height - 60, width, height, 0x00000000, (vigA << 24));
+
+        // Vignettes laterales subtiles
+        int sideA = (int)(30f * fade);
+        for (int i = 0; i < 40; i++) {
+            int a = sideA * (40 - i) / 40;
+            drawRect(i, 0, i + 1, height, (a << 24));
+            drawRect(width - i - 1, 0, width - i, height, (a << 24));
+        }
+    }
+
+    /** Scanlines subtiles pour un look tech/PvP */
+    private void renderScanlines(float fade)
+    {
+        if (fade <= 0.3f) return;
+        int a = (int)(6f * fade);
+        if (a <= 0) return;
+
+        // Dessiner des lignes horizontales tous les 3 pixels
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(770, 771);
+        for (int y = 0; y < height; y += 3) {
+            drawRect(0, y, width, y + 1, (a << 24));
+        }
+        GlStateManager.disableBlend();
+    }
+
+    /** Particules ambiantes ameliorees */
     private void renderParticles(float fade, float partialTicks)
     {
         if (particles.isEmpty() || fade <= 0.01f) return;
 
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(770, 771);
-        GlStateManager.alphaFunc(516, 0.003921569F);
-
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-        worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
+        GlStateManager.disableTexture2D();
 
         for (AmbientParticle p : particles)
         {
-            // interp positions
             float ix = p.prevX + (p.x - p.prevX) * partialTicks;
             float iy = p.prevY + (p.y - p.prevY) * partialTicks;
 
@@ -372,56 +395,63 @@ public class GuiMainMenu extends GuiScreen
             if (alphaFactor <= 0.02f) continue;
 
             float a = MathHelper.clamp_float(alphaFactor, 0f, 1f);
-            int col = p.color & 0x00FFFFFF; // RGB only
-            float rf = ((col >> 16) & 0xFF) / 255f;
-            float gf = ((col >> 8) & 0xFF) / 255f;
-            float bf = (col & 0xFF) / 255f;
+            int col = p.color & 0x00FFFFFF;
+            int alpha = (int)(a * 255f);
+            int color = (alpha << 24) | col;
 
             float size = Math.max(1f, p.size);
-            float half = size / 2f;
+            int half = (int)(size / 2f);
 
-            // Quad (screen-aligned)
-            worldrenderer.pos(ix - half, iy + half, zLevel).tex(0.0D, 1.0D).color(rf, gf, bf, a).endVertex();
-            worldrenderer.pos(ix + half, iy + half, zLevel).tex(1.0D, 1.0D).color(rf, gf, bf, a).endVertex();
-            worldrenderer.pos(ix + half, iy - half, zLevel).tex(1.0D, 0.0D).color(rf, gf, bf, a).endVertex();
-            worldrenderer.pos(ix - half, iy - half, zLevel).tex(0.0D, 0.0D).color(rf, gf, bf, a).endVertex();
+            // Dessiner un petit carre pour la particule (mouvement ameliore dans tick)
+            drawRect((int)(ix - half), (int)(iy - half),
+                     (int)(ix + half), (int)(iy + half), color);
+
+            // Glow subtil autour des particules plus grosses
+            if (size > 2f && alpha > 40) {
+                int glowA = alpha / 5;
+                int glowCol = (glowA << 24) | col;
+                drawRect((int)(ix - half - 1), (int)(iy - half - 1),
+                         (int)(ix + half + 1), (int)(iy + half + 1), glowCol);
+            }
         }
 
-        tessellator.draw();
-
+        GlStateManager.enableTexture2D();
         GlStateManager.disableBlend();
-        GlStateManager.alphaFunc(516, 0.1F);
     }
 
-    /**
-     * Aura rouge ambiante sous le logo.
-     * Technique : 6 couches de rects semi-transparents, chaque couche
-     * est légèrement plus grande et moins opaque que la précédente.
-     */
+    /** Glow dynamique avec pulsation sous le logo */
     private void renderLogoGlow(float fade)
     {
         if (fade <= 0.01f) return;
+
+        float time = (float)(System.currentTimeMillis() % 4000L) / 4000f;
+        float pulse = (float)(Math.sin(time * Math.PI * 2.0) * 0.3 + 0.7);
+
         int cx   = width / 2;
         int halfW = (int)logoPxHalfWidth;
-        int cy   = logoY + 16; // centre vertical du logo (32px hauteur / 2)
+        int cy   = logoY + 16;
 
-        // Couches de l'intérieur vers l'extérieur
-        // alpha de base = ~22, divisé par sqrt(i) pour une falloff douce
-        int layers = 7;
+        int layers = 8;
         for (int i = 1; i <= layers; i++)
         {
             float factor = 1f - (float)(i - 1) / layers;
-            int a = (int)(22f * factor * factor * fade);
+            int a = (int)(24f * factor * factor * fade * pulse);
             if (a <= 0) continue;
             int c = (a << 24) | RED_DIM;
-            int pad = i * 5;
-            // Rect englobant chaque couche
-            drawRect(cx - halfW - pad, cy - 16 - i * 3,
-                    cx + halfW + pad, cy + 16 + i * 3, c);
+            int pad = i * 6;
+            drawRect(cx - halfW - pad, cy - 18 - i * 4,
+                    cx + halfW + pad, cy + 18 + i * 4, c);
         }
+
+        // Ligne de lumiere horizontale sous le logo
+        int lineA = (int)(35f * fade * pulse);
+        GuiRenderUtils.drawGradientRect(cx - halfW, cy + 14, cx, cy + 16,
+                0x00000000, (lineA << 24) | RED_BRIGHT);
+        GuiRenderUtils.drawGradientRect(cx, cy + 14, cx + halfW, cy + 16,
+                (lineA << 24) | RED_BRIGHT, 0x00000000);
     }
 
-    /** Rendu du logo REDCONFLICT (scale ×4, ombre légère) */
+    /** Logo REDCONFLICT avec effet de profondeur */
     private void renderLogo(float fade)
     {
         GlStateManager.pushMatrix();
@@ -434,130 +464,204 @@ public class GuiMainMenu extends GuiScreen
         int w2    = fontRendererObj.getStringWidth(t2);
         int total = w1 + w2;
 
-        // Mettre à jour la demi-largeur en px pour le glow et le séparateur
-        // (total * 4 car scale ×4, /2 car centré)
-        // mettre à l'échelle correctement selon logoScale
         logoPxHalfWidth = (total * logoScale) / 2f;
 
         int aFull = (int)(255f * fade);
-        int aShadow = (int)(40f * fade);
+        int aShadow = (int)(60f * fade);
 
-        // Ombre décalée +0.5 unité
-        fontRendererObj.drawString(t1, (int)(-total / 2f),      1, (aShadow << 24), false);
-        fontRendererObj.drawString(t2, (int)(-total / 2f + w1), 1, (aShadow << 24), false);
+        // Ombre profonde (2 couches)
+        fontRendererObj.drawString(t1, (int)(-total / 2f),      2, (aShadow << 24), false);
+        fontRendererObj.drawString(t2, (int)(-total / 2f + w1), 2, (aShadow << 24), false);
 
-        // Texte principal — flat (pas de shadow builtin pour un look pro)
+        // Texte principal
         fontRendererObj.drawString(t1, (int)(-total / 2f),      0, (aFull << 24) | RED,        false);
-        fontRendererObj.drawString(t2, (int)(-total / 2f + w1), 0, (aFull << 24) | 0xF0F0F0,  false);
+        fontRendererObj.drawString(t2, (int)(-total / 2f + w1), 0, (aFull << 24) | 0xEEEEEE,   false);
 
         GlStateManager.popMatrix();
     }
 
-    /**
-     * Séparateur ──────●──────
-     * Aligné sur la largeur réelle du logo (80% de sa largeur).
-     * Bras : dégradé rouge opaque → transparent vers le centre.
-     * Point central : carré 3×3 blanc-rouge.
-     */
-    private void renderSeparator(float fade)
+    /** Sous-titre sous le logo */
+    private void renderSubtitle(float fade)
     {
-        int cx    = width / 2;
-        int halfW = (int)(logoPxHalfWidth * 0.75f);  // 75% de la demi-largeur logo
-        int y     = logoY + 36;                        // juste sous le logo (32px hauteur + 4px marge)
-        int a     = (int)(200f * fade);
+        if (fade <= 0.1f) return;
+        int a = (int)(100f * fade);
 
-        // Bras gauche : rouge opaque → transparent
-        drawGradientRect(cx - halfW, y, cx - 5, y + 1,
-                (a << 24) | RED, 0x00000000);
-        // Bras droit : transparent → rouge opaque
-        drawGradientRect(cx + 5, y, cx + halfW, y + 1,
-                0x00000000, (a << 24) | RED);
-
-        // Point central 3×3, légèrement plus clair
-        int da = (int)(230f * fade);
-        drawRect(cx - 1, y - 1, cx + 2, y + 2, (da << 24) | RED_BRIGHT);
+        String sub = CLIENT_EDITION + " Edition";
+        int sw = fontRendererObj.getStringWidth(sub);
+        // Position ajustée pour être plus proche du titre
+        int yOff = (int)(8 * logoScale) + 8;
+        fontRendererObj.drawString(sub, width / 2 - sw / 2, logoY + yOff, (a << 24) | 0x999999, false);
     }
 
-    /**
-     * Panel "verre" semi-transparent derrière la zone des boutons.
-     * Donne de la profondeur et isole visuellement les contrôles.
-     */
+    /** Separateur anime avec onde sinusoidale */
+    private void renderAnimatedSeparator(float fade)
+    {
+        if (fade <= 0.01f) return;
+
+        int cx    = width / 2;
+        int halfW = (int)(logoPxHalfWidth * 0.7f);
+        int y     = logoY + (int)(8 * logoScale) + 22;
+        int a     = (int)(200f * fade);
+
+        float time = (float)(System.currentTimeMillis() % 3000L) / 3000f;
+
+        // Bras gauche avec animation
+        for (int i = 0; i < halfW - 5; i++) {
+            float progress = (float)i / (halfW - 5);
+            float wave = (float)(Math.sin(progress * 4.0 + time * Math.PI * 2.0) * 0.5 + 0.5);
+            int lineA = (int)(a * progress * (0.6f + 0.4f * wave));
+            drawRect(cx - halfW + i, y, cx - halfW + i + 1, y + 1,
+                    (lineA << 24) | RED);
+        }
+
+        // Bras droit avec animation
+        for (int i = 0; i < halfW - 5; i++) {
+            float progress = (float)i / (halfW - 5);
+            float wave = (float)(Math.sin(progress * 4.0 - time * Math.PI * 2.0) * 0.5 + 0.5);
+            int lineA = (int)(a * progress * (0.6f + 0.4f * wave));
+            drawRect(cx + 5 + (halfW - 5 - i) - 1, y, cx + 5 + (halfW - 5 - i), y + 1,
+                    (lineA << 24) | RED);
+        }
+
+        // Point central anime (pulsation)
+        float centerPulse = (float)(Math.sin(time * Math.PI * 4.0) * 0.3 + 0.7);
+        int da = (int)(240f * fade * centerPulse);
+        drawRect(cx - 2, y - 1, cx + 3, y + 2, (da << 24) | RED_BRIGHT);
+        // Glow du point central
+        int ga = (int)(80f * fade * centerPulse);
+        drawRect(cx - 3, y - 2, cx + 4, y + 3, (ga << 24) | RED);
+    }
+
+    /** Panel "verre" derriere la zone des boutons */
     private void renderButtonPanel(float fade)
     {
         if (fade <= 0.02f) return;
         int cx    = width / 2;
         int row3Y = btnStartY + (btnH + btnGap) * 2;
-        int padX  = 18;
-        int padY  = 14;
+        int padX  = 22;
+        int padY  = 16;
         int x1    = cx - btnW / 2 - padX;
         int y1    = btnStartY - padY;
         int x2    = cx + btnW / 2 + padX;
         int y2    = row3Y + btnH + padY;
 
-        // Fond verre
-        int bgA = (int)(14f * fade);
-        drawRect(x1, y1, x2, y2, (bgA << 24) | 0xFFFFFF);
+        // Fond verre avec gradient subtil
+        int bgA = (int)(16f * fade);
+        GuiRenderUtils.drawGradientRect(x1, y1, x2, y2,
+                (bgA << 24) | 0x111111, ((bgA + 4) << 24) | 0x080808);
 
-        // Bordure fine (1px)
-        int borderA = (int)(22f * fade);
+        // Bordure fine
+        int borderA = (int)(24f * fade);
         GuiRenderUtils.drawRectOutline(x1, y1, x2 - x1, y2 - y1, (borderA << 24) | 0xFFFFFF);
 
-        // (Supprimé) Filet accent rouge en haut du panel — l'utilisateur préfère sans la longue barre
+        // Accent rouge en haut du panel (fine ligne)
+        int accentA = (int)(60f * fade);
+        GuiRenderUtils.drawGradientRect(x1 + 1, y1, cx, y1 + 1,
+                (0 << 24) | RED, (accentA << 24) | RED);
+        GuiRenderUtils.drawGradientRect(cx, y1, x2 - 1, y1 + 1,
+                (accentA << 24) | RED, (0 << 24) | RED);
     }
 
-    /**
-     * Barre supérieure : badge CLIENT (gauche) + boutons icônes (droite) + ligne séparatrice.
-     * Inspiré Lunar : ligne 1px subtile à y=28 pour ancrer la barre.
-     */
+    /** Barre superieure avec badge client et infos */
     private void renderTopBar(float fade)
     {
-        // Ligne séparatrice 1px
-        int lineA = (int)(28f * fade);
-        drawRect(0, 28, width, 29, (lineA << 24) | 0xFFFFFF);
+        if (fade <= 0.01f) return;
 
-        // Badge CLIENT
-        String lbl = "CLIENT";
+        // Fond de la barre
+        int barBgA = (int)(40f * fade);
+        drawRect(0, 0, width, 28, (barBgA << 24));
+
+        // Ligne separatrice avec gradient
+        int lineA = (int)(35f * fade);
+        GuiRenderUtils.drawGradientRect(0, 28, width / 2, 29,
+                0x00000000, (lineA << 24) | 0xFFFFFF);
+        GuiRenderUtils.drawGradientRect(width / 2, 28, width, 29,
+                (lineA << 24) | 0xFFFFFF, 0x00000000);
+
+        // Badge CLIENT avec style
+        String lbl = CLIENT_NAME;
         int tw  = fontRendererObj.getStringWidth(lbl);
-        int px  = 10, py = 8;
-        int pX  = 5, pY = 3;
+        int px  = 10, py = 6;
+        int pX  = 6, pY = 4;
         int bdgA = (int)(255f * fade);
-        // Fond sombre rouge
-        drawRect(px, py, px + tw + pX * 2, py + 8 + pY * 2, (bdgA << 24) | 0x881010);
-        // Bordure
-        GuiRenderUtils.drawRectOutline(px, py, tw + pX * 2, 8 + pY * 2, (bdgA << 24) | RED);
+
+        // Fond du badge
+        drawRect(px, py, px + tw + pX * 2, py + 8 + pY * 2, (bdgA << 24) | 0x0A0A0A);
+        // Bordure rouge
+        GuiRenderUtils.drawRectOutline(px, py, tw + pX * 2, 8 + pY * 2, (bdgA << 24) | RED_DIM);
+        // Accent gauche
+        drawRect(px, py + 1, px + 2, py + 8 + pY * 2 - 1, (bdgA << 24) | RED);
         // Texte
-        fontRendererObj.drawString(lbl, px + pX, py + pY, (bdgA << 24) | 0xFFFFFF);
+        fontRendererObj.drawString(lbl, px + pX + 1, py + pY, (bdgA << 24) | 0xFFFFFF);
+
+        // Version a droite du badge
+        String ver = CLIENT_VERSION;
+        int verA = (int)(120f * fade);
+        fontRendererObj.drawString(ver, px + tw + pX * 2 + 6, py + pY, (verA << 24) | 0x888888);
     }
 
-    /**
-     * Footer : ligne séparatrice 1px + version (gauche).
-     * Inspiré Badlion : propre, discret, aligné.
-     */
+    /** Affiche les infos du joueur en haut a droite, sans chevaucher le Discord */
+    private void renderPlayerInfo(float fade)
+    {
+        if (fade <= 0.05f) return;
+
+        String playerName = mc.getSession().getUsername();
+        int nameW = fontRendererObj.getStringWidth(playerName);
+        int a = (int)(200f * fade);
+        int dimA = (int)(80f * fade);
+
+        // On prend en compte le bouton Discord (positionné à width - discW - 10)
+        String discLabel = "Discord";
+        int discW = fontRendererObj.getStringWidth(discLabel) + 16;
+        
+        int rx = width - nameW - discW - 35; // Positionné à gauche du Discord
+        int ry = 12; // Aligné avec le texte du bouton Discord (7 + 5)
+
+        // Petit indicateur "online" (point vert)
+        drawRect(rx - 2, ry + 2, rx + 3, ry + 7, (a << 24) | 0x44CC44);
+
+        // Nom du joueur
+        fontRendererObj.drawStringWithShadow(playerName, rx + 6, ry, (a << 24) | 0xFFFFFF);
+    }
+
+    /** Footer avec infos PvP et version Minecraft */
     private void renderFooter(float fade)
     {
-        // Ligne séparatrice horizontale
+        if (fade <= 0.01f) return;
+
+        // Fond du footer
+        int footBgA = (int)(30f * fade);
+        drawRect(0, height - 24, width, height, (footBgA << 24));
+
+        // Ligne separatrice avec gradient
         int lineA = (int)(30f * fade);
-        drawRect(0, height - 22, width, height - 21, (lineA << 24) | 0xFFFFFF);
+        GuiRenderUtils.drawGradientRect(0, height - 24, width / 2, height - 23,
+                0x00000000, (lineA << 24) | 0xFFFFFF);
+        GuiRenderUtils.drawGradientRect(width / 2, height - 24, width, height - 23,
+                (lineA << 24) | 0xFFFFFF, 0x00000000);
 
-        // ── Gauche : puce rouge + version ────────────────────────────────
-        int a  = (int)(140f * fade);
-        int py = height - 15;
-        // Puce carrée 4×4
-        drawRect(10, py + 2, 14, py + 6, (0xFF << 24) | RED);
-        fontRendererObj.drawStringWithShadow(
-                " §8REDCONFLICT  §7v1.0.0",
-                18, py, (a << 24) | 0xFFFFFF
-        );
+        int py = height - 16;
+        int a  = (int)(150f * fade);
+        int dimA = (int)(70f * fade);
 
-        // ── Droite ────────────────────────────────────────────
-        int ac = (int)(70f * fade);
-        String copy = "";
-        int tw = fontRendererObj.getStringWidth(copy);
-        fontRendererObj.drawString(copy, width - tw - 10, py, (ac << 24) | 0xFFFFFF);
+        // ── Gauche : puce rouge + version + edition ──────────────────────
+        // Puce animee
+        float time = (float)(System.currentTimeMillis() % 2000L) / 2000f;
+        float pulse = (float)(Math.sin(time * Math.PI * 2.0) * 0.3 + 0.7);
+        int pulseA = (int)(255f * pulse * fade);
+        drawRect(10, py + 1, 14, py + 5, (pulseA << 24) | RED);
+
+        String leftText = "\u00a78" + CLIENT_NAME + "  \u00a77" + CLIENT_VERSION + "  \u00a78| \u00a77" + CLIENT_EDITION;
+        fontRendererObj.drawStringWithShadow(leftText, 18, py - 1, (a << 24) | 0xFFFFFF);
+
+        // ── Droite : version Minecraft ───────────────────────────────────
+        String mcVer = "Minecraft 1.8.9";
+        int mcW = fontRendererObj.getStringWidth(mcVer);
+        fontRendererObj.drawString(mcVer, width - mcW - 10, py - 1, (dimA << 24) | 0x666666, false);
     }
 
     // =========================================================================
-    //   RENDU PANORAMA (logique vanilla, inchangée)
+    //   RENDU PANORAMA (logique vanilla)
     // =========================================================================
 
     private void renderSkybox(int mx, int my, float pt)
@@ -565,7 +669,7 @@ public class GuiMainMenu extends GuiScreen
         mc.getFramebuffer().unbindFramebuffer();
         GlStateManager.viewport(0, 0, 256, 256);
         drawPanorama(mx, my, pt);
-        for (int i = 0; i < 4; i++) blurSkybox(pt); // réduit pour perf et latence
+        for (int i = 0; i < 4; i++) blurSkybox(pt);
         mc.getFramebuffer().bindFramebuffer(true);
         GlStateManager.viewport(0, 0, mc.displayWidth, mc.displayHeight);
 
@@ -593,7 +697,7 @@ public class GuiMainMenu extends GuiScreen
         GlStateManager.enableBlend(); GlStateManager.disableAlpha();
         GlStateManager.disableCull(); GlStateManager.depthMask(false);
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-        int n = 6; // réduit pour performance (avant 8)
+        int n = 6;
         for (int j = 0; j < n * n; ++j)
         {
             GlStateManager.pushMatrix();
@@ -660,7 +764,6 @@ public class GuiMainMenu extends GuiScreen
     //   EASING
     // =========================================================================
 
-    /** Accélère vite, décélère progressivement — sensation de légèreté */
     private static float easeOutQuart(float t)
     {
         t = MathHelper.clamp_float(t, 0f, 1f);
@@ -668,36 +771,45 @@ public class GuiMainMenu extends GuiScreen
         return 1f - u * u * u * u;
     }
 
+    private static float easeOutCubic(float t)
+    {
+        t = MathHelper.clamp_float(t, 0f, 1f);
+        float u = 1f - t;
+        return 1f - u * u * u;
+    }
+
     @Override
     public void onGuiClosed() {}
 
     // =========================================================================
     //   CLASSE : AmbientParticle
-    //   Petits points qui dérivent vers le haut avec un léger mouvement horizontal.
-    //   Taille variable, vitesse et alpha aléatoires.
     // =========================================================================
     private static class AmbientParticle
     {
         float x, y;
         float prevX, prevY;
         float vx, vy;
-        float alpha;     // 0→1
+        float alpha;
         float size;
         int color;
-        int age;         // ticks lived
-        int life;        // ticks total life
-        float seed;      // phase for noise
+        int age;
+        int life;
+        float seed;
 
         AmbientParticle(float x, float y, Random rng)
         {
             this.prevX = this.x = x; this.prevY = this.y = y;
-            // velocity
-            this.vy = - (0.06f + rng.nextFloat() * 0.28f);
-            this.vx = (rng.nextFloat() - 0.5f) * 0.18f;
-            this.size   = 1.0f + rng.nextFloat() * 2.4f;
-            this.color = (rng.nextInt(6) == 0) ? 0xFFFFFF33 : 0xFFDD2222; // rare bright
+            this.vy = - (0.05f + rng.nextFloat() * 0.25f);
+            this.vx = (rng.nextFloat() - 0.5f) * 0.15f;
+            this.size   = 0.8f + rng.nextFloat() * 2.6f;
+            // Palette de couleurs variee : rouge, orange, blanc
+            int colorChoice = rng.nextInt(10);
+            if (colorChoice < 5) this.color = 0xFFE63946;       // rouge
+            else if (colorChoice < 7) this.color = 0xFFFF6633;  // orange
+            else if (colorChoice < 9) this.color = 0xFFB22D38;  // rouge sombre
+            else this.color = 0xFFFFFFAA;                        // blanc chaud
             this.age = 0;
-            this.life = 80 + rng.nextInt(160); // 4s → 12s approx at 20tps
+            this.life = 100 + rng.nextInt(180);
             this.seed = rng.nextFloat() * 6.2831f;
             this.alpha = 1f;
         }
@@ -705,39 +817,45 @@ public class GuiMainMenu extends GuiScreen
         void reset(float x, float y, Random rng)
         {
             this.prevX = this.x = x; this.prevY = this.y = y;
-            this.vy = - (0.06f + rng.nextFloat() * 0.28f);
-            this.vx = (rng.nextFloat() - 0.5f) * 0.18f;
-            this.size   = 1.0f + rng.nextFloat() * 2.4f;
-            this.color = (rng.nextInt(6) == 0) ? 0xFFFFFF33 : 0xFFDD2222;
+            this.vy = - (0.05f + rng.nextFloat() * 0.25f);
+            this.vx = (rng.nextFloat() - 0.5f) * 0.15f;
+            this.size   = 0.8f + rng.nextFloat() * 2.6f;
+            int colorChoice = rng.nextInt(10);
+            if (colorChoice < 5) this.color = 0xFFE63946;
+            else if (colorChoice < 7) this.color = 0xFFFF6633;
+            else if (colorChoice < 9) this.color = 0xFFB22D38;
+            else this.color = 0xFFFFFFAA;
             this.age = 0;
-            this.life = 80 + rng.nextInt(160);
+            this.life = 100 + rng.nextInt(180);
             this.seed = rng.nextFloat() * 6.2831f;
             this.alpha = 1f;
         }
 
         void tick()
         {
-            // store prev
             prevX = x; prevY = y;
-            // subtle horizontal drift using age+seed for per-particle coherence
-            float drift = MathHelper.sin(age * 0.12f + seed) * 0.006f;
-            vx = vx * 0.985f + drift;
+            // Mouvement plus fluide et organique
+            float wave = MathHelper.sin((float)age * 0.05f + seed);
+            vx = vx * 0.99f + wave * 0.02f;
+            
+            // Pulsation legere de la taille
+            size += MathHelper.sin((float)age * 0.1f) * 0.01f;
+            
             x += vx;
             y += vy;
             age++;
-            float lifeNorm = MathHelper.clamp_float((float)age / (float)life, 0f, 1f);
-            // smooth fade-out (ease out)
-            alpha = (1f - lifeNorm);
-            alpha = alpha * alpha; // nicer curve
+            
+            float lifeNorm = (float)age / (float)life;
+            // Fade in/out en cloche pour plus de douceur
+            alpha = MathHelper.sin(lifeNorm * (float)Math.PI);
+            alpha *= alpha;
         }
 
-        boolean isDead() { return age >= life || alpha <= 0f || y < -6f; }
+        boolean isDead() { return age >= life || alpha <= 0f || y < -10f; }
     }
 
     // =========================================================================
     //   CLASSE : IconButton
-    //   Bouton icône (top-right) — Discord.
-    //   Hover delta-time, couleur d'accent personnalisée.
     // =========================================================================
     static class IconButton extends GuiButton
     {
@@ -746,7 +864,7 @@ public class GuiMainMenu extends GuiScreen
         private float hover = 0f;
         private long  lastTime = -1L;
 
-        private static final float TRANS_MS = 100f; // allongé pour un hover plus doux
+        private static final float TRANS_MS = 120f;
 
         IconButton(int id, int x, int y, int w, String text, int accent, String tooltip)
         {
@@ -760,7 +878,6 @@ public class GuiMainMenu extends GuiScreen
         {
             if (!this.visible) return;
 
-            // utilise FRAME_TIME global pour synchronisation
             long  now = GuiMainMenu.FRAME_TIME;
             float dt  = (lastTime < 0L) ? 0f : (float)(now - lastTime);
             lastTime  = now;
@@ -770,30 +887,38 @@ public class GuiMainMenu extends GuiScreen
 
             float step = dt / TRANS_MS;
             hover = MathHelper.clamp_float(hover + (hovered ? step : -step), 0f, 1f);
-            float t = hover * hover * (3 - 2 * hover); // cubic smoothstep
+            float t = hover * hover * (3 - 2 * hover);
 
-            // Fond
-            int bgA = (int)((hovered ? 60 : 28) * t + 18);
-            drawRect(xPosition, yPosition, xPosition + width, yPosition + height,
-                    (bgA << 24));
+            // Fond avec transition
+            int bgA = (int)(GuiRenderUtils.lerp(18, 65, t));
+            drawRect(xPosition, yPosition, xPosition + width, yPosition + height, (bgA << 24));
 
-            // Bordure — gris → couleur accent
+            // Bordure
             int border = GuiRenderUtils.colorLerp(0x28FFFFFF, 0xFF000000 | accent, t);
             GuiRenderUtils.drawRectOutline(xPosition, yPosition, width, height, border);
 
-            // Texte centré
+            // Shimmer au hover
+            if (t > 0f) {
+                int shimA = (int)(15f * t);
+                GuiRenderUtils.drawGradientRect(xPosition + 1, yPosition,
+                        xPosition + width - 1, yPosition + 2,
+                        (shimA << 24) | 0xFFFFFF, 0x00FFFFFF);
+            }
+
+            // Texte
             int txtCol = GuiRenderUtils.colorLerp(0xFF888888, 0xFFFFFFFF, t);
             drawCenteredString(mc.fontRendererObj, displayString,
                     xPosition + width / 2, yPosition + (height - 8) / 2, txtCol);
 
-            // Tooltip au survol
+            // Tooltip
             if (hovered && !tooltip.isEmpty())
             {
                 int tw = mc.fontRendererObj.getStringWidth(tooltip);
                 int tx = xPosition + width / 2 - tw / 2;
-                int ty = yPosition + height + 3;
-                drawRect(tx - 3, ty - 1, tx + tw + 3, ty + 10, 0xCC000000);
-                mc.fontRendererObj.drawString(tooltip, tx, ty, 0xFFCCCCCC);
+                int ty = yPosition + height + 4;
+                drawRect(tx - 4, ty - 2, tx + tw + 4, ty + 11, 0xDD000000);
+                GuiRenderUtils.drawRectOutline(tx - 4, ty - 2, tw + 8, 13, 0x33FFFFFF);
+                mc.fontRendererObj.drawStringWithShadow(tooltip, tx, ty, 0xFFCCCCCC);
             }
         }
 
@@ -802,7 +927,6 @@ public class GuiMainMenu extends GuiScreen
         {
             boolean res = super.mousePressed(mc, mouseX, mouseY);
             if (res) {
-                // force hover state immediately on click for instant feedback
                 this.hover = 1f;
                 this.lastTime = GuiMainMenu.FRAME_TIME;
             }
@@ -812,34 +936,36 @@ public class GuiMainMenu extends GuiScreen
 
     // =========================================================================
     //   CLASSE : MenuButton
-    //   Bouton principal avec hover delta-time, accent latéral (PRIMARY),
-    //   fond verre, bordure animée rouge.
     // =========================================================================
     static class MenuButton extends GuiButton
     {
-        enum Style { PRIMARY, SECONDARY }
+        enum Style { PRIMARY, SECONDARY, QUIT }
 
         private final Style style;
+        private final int index;
         private float hover = 0f;
         private long  lastTime = -1L;
 
-        /** Durée de transition hover (ms) */
-        private static final float TRANS_MS = 100f; // allongé pour rendre le hover plus fluide
+        private static final float TRANS_MS = 130f;
 
         // Palette
-        private static final int BG_IDLE     = 0x12FFFFFF;
-        private static final int BG_HOV      = 0x28FFFFFF;
-        private static final int BORDER_IDLE = 0x22FFFFFF;
-        private static final int BORDER_HOV  = 0xFFCC2020;
-        private static final int ACCENT_COL  = 0xFFDD2020;
+        private static final int BG_IDLE     = 0x14FFFFFF;
+        private static final int BG_HOV      = 0x2CFFFFFF;
+        private static final int BORDER_IDLE = 0x20FFFFFF;
+        private static final int BORDER_HOV  = 0xFFE63946;
+        private static final int ACCENT_COL  = 0xFFE63946;
         private static final int TXT_IDLE    = 0xFF909090;
         private static final int TXT_HOV     = 0xFFFFFFFF;
-        private static final int ACCENT_W    = 1; // Corrigé : épaisseur 1 pour être uniforme avec la bordure droite
 
-        MenuButton(int id, int x, int y, int w, int h, String text, Style style)
+        // Quit button colors
+        private static final int QUIT_BORDER_HOV = 0xFF882222;
+        private static final int QUIT_BG_HOV     = 0x30FF2020;
+
+        MenuButton(int id, int x, int y, int w, int h, String text, Style style, int index)
         {
             super(id, x, y, w, h, text);
             this.style = style;
+            this.index = index;
         }
 
         @Override
@@ -847,7 +973,6 @@ public class GuiMainMenu extends GuiScreen
         {
             if (!this.visible) return;
 
-            // ── Delta-time ────────────────────────────────────────────────
             long  now = GuiMainMenu.FRAME_TIME;
             float dt  = (lastTime < 0L) ? 0f : (float)(now - lastTime);
             lastTime  = now;
@@ -857,34 +982,45 @@ public class GuiMainMenu extends GuiScreen
 
             float step = dt / TRANS_MS;
             hover = MathHelper.clamp_float(hover + (hovered ? step : -step), 0f, 1f);
-
-            // Easing pour l'affichage
             float t = hover * hover * (3 - 2 * hover); // cubic smoothstep
 
-            // ── FOND (coins simulés, 1px coupés) ─────────────────────────
-            int bg = GuiRenderUtils.colorLerp(BG_IDLE, BG_HOV, t);
+            // ── Choix des couleurs selon le style ────────────────────────
+            int borderHov = (style == Style.QUIT) ? QUIT_BORDER_HOV : BORDER_HOV;
+            int bgHov     = (style == Style.QUIT) ? QUIT_BG_HOV : BG_HOV;
+
+            // ── FOND (coins coupes 1px) ──────────────────────────────────
+            int bg = GuiRenderUtils.colorLerp(BG_IDLE, bgHov, t);
             drawRect(xPosition + 1, yPosition,     xPosition + width - 1, yPosition + height,     bg);
             drawRect(xPosition,     yPosition + 1, xPosition + 1,          yPosition + height - 1, bg);
             drawRect(xPosition + width - 1, yPosition + 1, xPosition + width, yPosition + height - 1, bg);
 
-            // ── BORDURE ───────────────────────────────────────────────────
-            GuiRenderUtils.drawRectOutline(xPosition, yPosition, width, height,
-                    GuiRenderUtils.colorLerp(BORDER_IDLE, BORDER_HOV, t));
+            // ── BORDURE ──────────────────────────────────────────────────
+            int borderCol = GuiRenderUtils.colorLerp(BORDER_IDLE, borderHov, t);
+            GuiRenderUtils.drawRectOutline(xPosition, yPosition, width, height, borderCol);
 
-            // ── ACCENT LATÉRAL GAUCHE (PRIMARY) ──────────────────────────
+            // ── ACCENT LATERAL GAUCHE (PRIMARY) ──────────────────────────
             if (style == Style.PRIMARY && t > 0f)
             {
                 int aA = (int)(255f * t);
-                drawRect(xPosition, yPosition + 1,
-                        xPosition + ACCENT_W, yPosition + height - 1,
-                        (aA << 24) | (ACCENT_COL & 0xFFFFFF));
+                // Accent avec gradient vertical
+                GuiRenderUtils.drawGradientRect(xPosition, yPosition + 1,
+                        xPosition + 2, yPosition + height - 1,
+                        (aA << 24) | RED_BRIGHT, (aA << 24) | RED_DIM);
             }
 
-            // ── REFLET SUBTIL EN HAUT DU BOUTON (shimmer) ────────────────
-            // Fine ligne dégradée de blanc translucide → transparent sur 1px de haut
+            // ── ACCENT LATERAL GAUCHE (QUIT) ────────────────────────────
+            if (style == Style.QUIT && t > 0f)
+            {
+                int aA = (int)(180f * t);
+                drawRect(xPosition, yPosition + 1,
+                        xPosition + 2, yPosition + height - 1,
+                        (aA << 24) | 0x882222);
+            }
+
+            // ── SHIMMER EN HAUT DU BOUTON ────────────────────────────────
             if (t > 0f)
             {
-                int shimA = (int)(12f * t);
+                int shimA = (int)(14f * t);
                 drawGradientRect(
                         xPosition + 1, yPosition,
                         xPosition + width - 1, yPosition + 2,
@@ -892,11 +1028,27 @@ public class GuiMainMenu extends GuiScreen
                 );
             }
 
-            // ── TEXTE ─────────────────────────────────────────────────────
+            // ── GLOW SOUS LE BOUTON (hover) ──────────────────────────────
+            if (t > 0.3f && style == Style.PRIMARY)
+            {
+                int glowA = (int)(6f * t);
+                drawRect(xPosition + 2, yPosition + height,
+                         xPosition + width - 2, yPosition + height + 2,
+                         (glowA << 24) | RED_DIM);
+            }
+
+            // ── TEXTE ────────────────────────────────────────────────────
+            int txtColor;
+            if (style == Style.QUIT) {
+                txtColor = GuiRenderUtils.colorLerp(TXT_IDLE, 0xFFFF6666, t);
+            } else {
+                txtColor = GuiRenderUtils.colorLerp(TXT_IDLE, TXT_HOV, t);
+            }
+
             drawCenteredString(mc.fontRendererObj, displayString,
                     xPosition + width / 2,
                     yPosition + (height - 8) / 2,
-                    GuiRenderUtils.colorLerp(TXT_IDLE, TXT_HOV, t));
+                    txtColor);
         }
 
         @Override
