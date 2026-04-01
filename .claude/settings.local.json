@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(mvn compile:*)",
-      "Bash(cmd /c \"cd /d \\\\\"C:\\\\Users\\\\Valentin\\\\Desktop\\\\JAVA MC\\\\Project\\\\IntelliJ\\\\MavenMCP-1.8.9-master\\\\\" && mvn compile -q 2>&1\")"
+      "Bash(cmd /c \"cd /d \\\\\"C:\\\\Users\\\\Valentin\\\\Desktop\\\\JAVA MC\\\\Project\\\\IntelliJ\\\\MavenMCP-1.8.9-master\\\\\" && mvn compile -q 2>&1\")",
+      "Bash(find /c/Users/Valentin/Desktop/JAVA MC/Project/IntelliJ/MavenMCP-1.8.9-master -type f -name *.java -path */org/* -o -path */com/*)",
+      "Bash(echo \"EXIT:$?\")"
     ]
   }
 }
