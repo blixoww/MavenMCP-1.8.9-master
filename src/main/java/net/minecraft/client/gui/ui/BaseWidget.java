@@ -1,10 +1,14 @@
 package net.minecraft.client.gui.ui;
 
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.GuiRenderUtils;
+import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.item.ItemStack;
+import org.lwjgl.opengl.GL11;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -216,6 +220,65 @@ public abstract class BaseWidget implements UIElement {
         
         GlStateManager.popMatrix();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+    }
+
+    /**
+     * Rend un ItemStack dans la GUI en s'assurant que l'effet de brillance
+     * des enchantements (glint) reste bien confiné à la zone 16×16 de l'icône.
+     *
+     * Problème sans cette méthode : le glint utilise le cube 3D entier du modèle
+     * baked, et sans depth buffer correctement initialisé en contexte GUI, il déborde
+     * visuellement en dehors de la pièce d'armure.
+     *
+     * Solution :
+     *   1. GL_SCISSOR_TEST — clip OpenGL strict à la zone écran de l'item (16×16 px réels)
+     *   2. enableDepth + clear local du depth buffer — le glint est masqué par les pixels
+     *      déjà dessinés de l'item, pas par le cube entier
+     *
+     * @param ri   le RenderItem de Minecraft
+     * @param mc   l'instance Minecraft (pour la ScaledResolution)
+     * @param stack l'ItemStack à rendre
+     * @param localX position X locale dans le widget (après translation BaseWidget)
+     * @param localY position Y locale dans le widget (après translation BaseWidget)
+     */
+    protected void renderItemSafe(RenderItem ri, Minecraft mc, ItemStack stack, int localX, int localY) {
+        if (stack == null || ri == null) return;
+        try {
+            // ── Calcul de la zone écran réelle (16×16 en coordonnées scaled) ──
+            ScaledResolution sr = new ScaledResolution(mc);
+            int scaleFactor = sr.getScaleFactor();
+            int screenH     = mc.displayHeight;
+
+            // Position absolue écran = position absolue du widget + offset local
+            int absX = this.renderAbsX + localX;
+            int absY = this.renderAbsY + localY;
+
+            // Conversion coordonnées Minecraft GUI → coordonnées OpenGL (origine bas-gauche)
+            int scissorX = absX * scaleFactor;
+            int scissorY = screenH - (absY + 16) * scaleFactor;
+            int scissorW = 16 * scaleFactor;
+            int scissorH = 16 * scaleFactor;
+
+            // ── 1. Activer le scissor pour clipper le glint à la zone de l'item ──
+            GL11.glEnable(GL11.GL_SCISSOR_TEST);
+            GL11.glScissor(scissorX, scissorY, scissorW, scissorH);
+
+            // ── 2. Depth buffer : vider la zone puis activer le test ──
+            GlStateManager.enableDepth();
+            GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
+
+            // ── 3. Rendu de l'item avec effet ──
+            GlStateManager.pushMatrix();
+            RenderHelper.enableGUIStandardItemLighting();
+            ri.renderItemAndEffectIntoGUI(stack, localX, localY);
+            RenderHelper.disableStandardItemLighting();
+            GlStateManager.popMatrix();
+
+            // ── 4. Restaurer l'état GL ──
+            GlStateManager.disableDepth();
+            GL11.glDisable(GL11.GL_SCISSOR_TEST);
+
+        } catch (Throwable ignored) {}
     }
 
     protected abstract void draw();

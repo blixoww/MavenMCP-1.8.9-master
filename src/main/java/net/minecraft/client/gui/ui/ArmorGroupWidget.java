@@ -1,8 +1,6 @@
 package net.minecraft.client.gui.ui;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.client.gui.FontRenderer;
@@ -66,18 +64,13 @@ public class ArmorGroupWidget extends BaseWidget {
             if (stack == null) continue;
             any = true;
             
-            GlStateManager.pushMatrix();
-            RenderHelper.enableGUIStandardItemLighting();
-            try {
-                if (vertical) {
-                    ri.renderItemAndEffectIntoGUI(stack, startX, curY);
-                } else {
-                    ri.renderItemAndEffectIntoGUI(stack, curX, startY);
-                }
-            } catch (Throwable ignored) {}
-            RenderHelper.disableStandardItemLighting();
-            GlStateManager.popMatrix();
-            
+            // Rendu de l'icône — renderItemSafe() confine le glint enchantement à la zone 16×16
+            if (vertical) {
+                renderItemSafe(ri, mc, stack, startX, curY);
+            } else {
+                renderItemSafe(ri, mc, stack, curX, startY);
+            }
+
             String txt = "";
             try {
                 if (stack.isItemStackDamageable()) {

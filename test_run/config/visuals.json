@@ -39,7 +39,7 @@
   "particleFilter": 2,
   "heartsEnabled": true,
   "heartsColor": -52429,
-  "heartsShowDamage": false,
+  "heartsShowDamage": true,
   "heartsQuantity": 3,
   "heartsFilter": 2
 }

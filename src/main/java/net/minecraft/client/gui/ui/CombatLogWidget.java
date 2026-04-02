@@ -21,6 +21,17 @@ public class CombatLogWidget extends BaseWidget {
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc != null && mc.thePlayer != null) {
+            float currentHealth = mc.thePlayer.getHealth();
+            if (lastHealth < 0f) lastHealth = currentHealth;
+            // Prise de dégâts détectée → déclenche le timer local de 30s
+            if (currentHealth < lastHealth || mc.thePlayer.hurtTime > 0) {
+                this.localCombatExpire = System.currentTimeMillis() + 30000L;
+            }
+            lastHealth = currentHealth;
+        }
+
         boolean serverInCombat = CombatLogManager.INSTANCE.isInCombat();
         boolean editor = UIManager.getInstance().isEditorActive();
         boolean localInCombat = localCombatExpire > System.currentTimeMillis();
@@ -38,17 +49,7 @@ public class CombatLogWidget extends BaseWidget {
         boolean original = Boolean.TRUE.equals(getPropOrDefault("originalDesign", false));
         long serverRemaining = CombatLogManager.INSTANCE.getRemainingMillis();
 
-        // Détection locale : si le joueur local vient d'être touché (comparaison santé) ou hurtTime > 0
-        if (mc.thePlayer != null) {
-            float currentHealth = mc.thePlayer.getHealth();
-            if (lastHealth < 0f) lastHealth = currentHealth;
-            // Si la santé a diminué -> on a pris un coup
-            if (currentHealth < lastHealth || mc.thePlayer.hurtTime > 0) {
-                this.localCombatExpire = System.currentTimeMillis() + 30000L;
-            }
-            lastHealth = currentHealth;
-        }
-
+        // La détection locale est gérée dans render() — on lit juste le résultat ici
         long localRemaining = Math.max(0L, this.localCombatExpire - System.currentTimeMillis());
 
         // On prend la valeur maximale (serveur prioritaire si présent)

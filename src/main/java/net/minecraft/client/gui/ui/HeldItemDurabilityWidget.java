@@ -2,8 +2,6 @@ package net.minecraft.client.gui.ui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 
@@ -76,16 +74,8 @@ public class HeldItemDurabilityWidget extends BaseWidget {
         // Draw from 0,0 because BaseWidget handles translation
         int sX = 0, sY = 0;
 
-        try {
-            GlStateManager.pushMatrix();
-            // Enable depth testing to ensure the enchantment glint is masked to the item model
-            GlStateManager.enableDepth();
-            RenderHelper.enableGUIStandardItemLighting();
-            mc.getRenderItem().renderItemAndEffectIntoGUI(stack, sX, sY);
-            RenderHelper.disableStandardItemLighting();
-            GlStateManager.disableDepth();
-            GlStateManager.popMatrix();
-        } catch (Throwable ignored) {}
+        // Rendu de l'icône — renderItemSafe() confine le glint enchantement à la zone 16×16
+        renderItemSafe(mc.getRenderItem(), mc, stack, sX, sY);
 
         int col = getColor();
         fr.drawStringWithShadow(text, sX + 18, sY + 4, col);

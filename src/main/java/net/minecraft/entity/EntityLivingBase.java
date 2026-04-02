@@ -1235,7 +1235,7 @@ public abstract class EntityLivingBase extends Entity
         {
             this.damageArmor(damage);
 
-            final float ARMOR_PER_POINT = 0.045F;  // ← Monter = plus résistant | Baisser = plus de dégâts
+            final float ARMOR_PER_POINT = 0.048F;  // ← Monter = plus résistant | Baisser = plus de dégâts
             final float MAX_PROTECTION  = 0.90F;   // ← Cap max absolu (0.0 à 1.0)
 
             int armorPoints = Math.max(0, this.getTotalArmorValue());

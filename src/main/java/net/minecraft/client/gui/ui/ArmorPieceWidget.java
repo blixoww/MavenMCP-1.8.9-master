@@ -1,8 +1,6 @@
 package net.minecraft.client.gui.ui;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.client.gui.FontRenderer;
@@ -67,12 +65,8 @@ public class ArmorPieceWidget extends BaseWidget
             }
         }
 
-        // draw item icon
-        GlStateManager.pushMatrix();
-        RenderHelper.enableGUIStandardItemLighting();
-        ri.renderItemAndEffectIntoGUI(stack, x, y);
-        RenderHelper.disableStandardItemLighting();
-        GlStateManager.popMatrix();
+        // Rendu de l'icône — renderItemSafe() confine le glint enchantement à la zone 16×16
+        renderItemSafe(ri, mc, stack, x, y);
         contentW = 18 + 4 + fr.getStringWidth(txt);
         this.width = Math.max(40, contentW + 6);
         this.height = 18;
