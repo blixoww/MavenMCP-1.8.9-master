@@ -986,10 +986,10 @@ public class Item {
         IRON(2, 250, 6.0F, 2.0F, 14),
         DIAMOND(3, 1561, 8.0F, 3.0F, 10),
         GOLD(0, 32, 12.0F, 0.0F, 22),
-        STEEL(4, 2200, 8.0F, 3.5F, 24),
-        EMERALD(5, 1800, 8.5F, 3.75F, 26),
-        RUBY(5, 1900, 9.0F, 4.0F, 28),
-        COBALT(6, 2500, 11.0F, 5.0F, 30);
+        STEEL(4, 2200, 9.0F, 3.5F, 24),
+        EMERALD(5, 1800, 10.0F, 4F, 26),
+        RUBY(5, 1900, 12.0F, 4.5F, 28),
+        COBALT(6, 2500, 14.0F, 5.0F, 30);
 
         private final int harvestLevel;
         private final int maxUses;

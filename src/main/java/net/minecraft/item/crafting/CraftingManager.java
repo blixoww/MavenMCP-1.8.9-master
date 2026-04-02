@@ -230,9 +230,9 @@ public class CraftingManager {
 
         // Pumpkie Pie : tarte à la citrouille entourée de 4 émeraudes
         this.addRecipe(new ItemStack(Items.green_pumpkin_pie, 1), new Object[]{
-                "E E",
-                " P ",
-                "E E",
+                "EEE",
+                "EPE",
+                "EEE",
                 'E', Items.emerald,
                 'P', Items.pumpkin_pie
         });
