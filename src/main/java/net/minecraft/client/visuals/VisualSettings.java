@@ -22,7 +22,7 @@ public class VisualSettings {
     public int comboColor = 0xFFFFFFFF;
     public float comboPosX = 0.12f;
     public float comboPosY = 0.12f;
-    public int comboResetDelayMs = 2000;
+    public int comboResetDelayMs = 800;
     public boolean comboAnimScale = true;
     public boolean comboAnimFade = true;
     public boolean comboShowLabel = true;

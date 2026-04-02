@@ -86,6 +86,15 @@ public class VisualManager {
     }
 
     /**
+     * Appelé quand le joueur clique dans le vide (miss) — reset le combo.
+     */
+    public void onMiss() {
+        if (settings.comboEnabled) {
+            combo.reset();
+        }
+    }
+
+    /**
      * Appelé depuis EntityArrow ou PlayerControllerMP quand une flèche touche.
      */
     public void onArrowHit() {
