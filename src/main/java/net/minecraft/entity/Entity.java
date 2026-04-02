@@ -2041,7 +2041,7 @@ public abstract class Entity implements ICommandSender
 
     public float getCollisionBorderSize()
     {
-        return net.minecraft.client.pvp.PvPSettings.get().collisionBorderSize;
+        return 0.1F;
     }
 
     /**

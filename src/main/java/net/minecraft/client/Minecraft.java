@@ -1667,11 +1667,10 @@ public class Minecraft implements IThreadListener, IPlayerUsage
             if (this.objectMouseOver == null)
             {
                 logger.error("Null returned as \'hitResult\', this shouldn\'t happen!");
-                net.minecraft.client.visuals.VisualManager.getInstance().onMiss();
 
                 if (this.playerController.isNotCreative())
                 {
-                    this.leftClickCounter = net.minecraft.client.pvp.PvPSettings.get().missCooldownTicks;
+                    this.leftClickCounter = 10;
                 }
             }
             else
@@ -1693,11 +1692,9 @@ public class Minecraft implements IThreadListener, IPlayerUsage
 
                     case MISS:
                     default:
-                        net.minecraft.client.visuals.VisualManager.getInstance().onMiss();
-
                         if (this.playerController.isNotCreative())
                         {
-                            this.leftClickCounter = net.minecraft.client.pvp.PvPSettings.get().missCooldownTicks;
+                            this.leftClickCounter = 10;
                         }
                 }
             }

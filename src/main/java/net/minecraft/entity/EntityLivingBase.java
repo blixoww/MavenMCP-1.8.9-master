@@ -92,7 +92,7 @@ public abstract class EntityLivingBase extends Entity
      * are.
      */
     public float limbSwing;
-    public int maxHurtResistantTime = net.minecraft.client.pvp.PvPSettings.get().maxHurtResistantTime;
+    public int maxHurtResistantTime = 20;
     public float prevCameraPitch;
     public float cameraPitch;
     public float randomUnused2;
@@ -1077,26 +1077,19 @@ public abstract class EntityLivingBase extends Entity
     {
         if (this.rand.nextDouble() >= this.getEntityAttribute(SharedMonsterAttributes.knockbackResistance).getAttributeValue())
         {
-            net.minecraft.client.pvp.PvPSettings pvp = net.minecraft.client.pvp.PvPSettings.get();
             this.isAirBorne = true;
             float f = MathHelper.sqrt_double(p_70653_3_ * p_70653_3_ + p_70653_5_ * p_70653_5_);
+            float f1 = 0.4F;
+            this.motionX /= 2.0D;
+            this.motionY /= 2.0D;
+            this.motionZ /= 2.0D;
+            this.motionX -= p_70653_3_ / (double)f * (double)f1;
+            this.motionY += (double)f1;
+            this.motionZ -= p_70653_5_ / (double)f * (double)f1;
 
-            // Friction : réduit la vélocité existante pour un KB plus consistant.
-            // Vanilla divise par 2 (x0.5). Une valeur plus haute (0.6) rend le KB
-            // moins dépendant du mouvement actuel → plus prévisible et skill-based.
-            double friction = 1.0 - pvp.kbFriction;
-            this.motionX *= friction;
-            this.motionY *= friction;
-            this.motionZ *= friction;
-
-            // Application du knockback directionnel
-            this.motionX -= p_70653_3_ / (double)f * pvp.kbHorizontal;
-            this.motionY += pvp.kbVertical;
-            this.motionZ -= p_70653_5_ / (double)f * pvp.kbHorizontal;
-
-            if (this.motionY > pvp.kbVerticalCap)
+            if (this.motionY > 0.4000000059604645D)
             {
-                this.motionY = pvp.kbVerticalCap;
+                this.motionY = 0.4000000059604645D;
             }
         }
     }
@@ -1236,21 +1229,14 @@ public abstract class EntityLivingBase extends Entity
     {
     }
 
-    /**
-     * Reduces damage, depending on armor.
-     * Custom formula : linear reduction capped at 75 % to prevent near-invincibility.
-     *   ARMOR_PER_POINT = 0.025  →  every armor point gives 2.5 % reduction
-     *   MAX_PROTECTION  = 0.75   →  hard cap at 75 % no matter how many points
-     * Full Cobalt (21 pts client-side): 21 × 0.025 = 52.5 % — well below the cap.
-     */
     protected float applyArmorCalculations(DamageSource source, float damage)
     {
         if (!source.isUnblockable())
         {
             this.damageArmor(damage);
 
-            final float ARMOR_PER_POINT = 0.025F;
-            final float MAX_PROTECTION  = 0.75F;
+            final float ARMOR_PER_POINT = 0.045F;  // ← Monter = plus résistant | Baisser = plus de dégâts
+            final float MAX_PROTECTION  = 0.90F;   // ← Cap max absolu (0.0 à 1.0)
 
             int armorPoints = Math.max(0, this.getTotalArmorValue());
             float protection = Math.min(armorPoints * ARMOR_PER_POINT, MAX_PROTECTION);
@@ -1287,18 +1273,17 @@ public abstract class EntityLivingBase extends Entity
             {
                 int k = EnchantmentHelper.getEnchantmentModifierDamage(this.getInventory(), source);
 
-                // ── Custom balance ────────────────────────────────────────────
-                // Cap lowered from vanilla 20 → 10 so that full Prot IV
-                // gives at most 40 % magic reduction (10/25) instead of 80 %.
-                // Combined with the 75 % armor cap this means full Cobalt Prot IV
-                // still lets ~15 % of damage through — a few hearts visible.
+                // ── Cap Protection magique ────────────────────────────────────
+                // → Plus résistant : augmenter le cap  (ex: 16 → 18)
+                // → Moins résistant : baisser le cap   (ex: 16 → 12)
+                // Réduction = cap / 25  →  cap 16 = 64 % de réduction magique max
                 // ─────────────────────────────────────────────────────────────
-                if (k > 10)
+                if (k > 16)  // ← Changer ce chiffre (et celui du if ci-dessous aussi)
                 {
-                    k = 10;
+                    k = 16;
                 }
 
-                if (k > 0 && k <= 10)
+                if (k > 0 && k <= 16)
                 {
                     int l = 25 - k;
                     float f1 = damage * (float)l;

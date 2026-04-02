@@ -42,10 +42,8 @@ public class GuiIngameMenu extends GuiScreen {
         this.buttonList.add(new GuiMenuButton(8, px - bWidth / 2, py - 19, halfW, bHeight, "HUD"));
         this.buttonList.add(new GuiMenuButton(9, px + 2, py - 19, halfW, bHeight, "VISUALS"));
 
-        this.buttonList.add(new GuiMenuButton(10, px - bWidth / 2, py + 7, bWidth, bHeight, "\u00A7cPVP CONFIG"));
-
-        this.buttonList.add(new GuiMenuButton(0, px - bWidth / 2, py + 33, bWidth, bHeight, "SETTINGS"));
-        this.buttonList.add(new GuiMenuButton(1, px - bWidth / 2, py + 59, bWidth, bHeight, "§cDISCONNECT"));
+        this.buttonList.add(new GuiMenuButton(0, px - bWidth / 2, py + 7, bWidth, bHeight, "SETTINGS"));
+        this.buttonList.add(new GuiMenuButton(1, px - bWidth / 2, py + 33, bWidth, bHeight, "§cDISCONNECT"));
 
         this.btnYCache = new int[this.buttonList.size()];
     }
@@ -65,7 +63,6 @@ public class GuiIngameMenu extends GuiScreen {
             case 4: this.mc.displayGuiScreen(null); this.mc.setIngameFocus(); break;
             case 8: this.mc.displayGuiScreen(new GuiUISettings(this)); break;
             case 9: this.mc.displayGuiScreen(new net.minecraft.client.visuals.GuiVisualSettings(this)); break;
-            case 10: this.mc.displayGuiScreen(new net.minecraft.client.pvp.GuiPvPSettings(this)); break;
         }
     }
 
@@ -86,7 +83,7 @@ public class GuiIngameMenu extends GuiScreen {
         GlStateManager.translate(0, (1.0f - easedAnim) * 10, 0);
 
         int pW = 180;
-        int pH = 210;
+        int pH = 185;
         int px = this.width / 2 - pW / 2;
         int py = this.height / 2 - pH / 2 - 10;
 
