@@ -187,6 +187,14 @@ public class CraftingManager {
         this.addRecipe(new ItemStack(Items.armor_stand, 1), new Object[]{"///", " / ", "/_/", '/', Items.stick, '_', new ItemStack(Blocks.stone_slab, 1, BlockStoneSlab.EnumType.STONE.getMetadata())});
 
         // ── Recettes custom ───────────────────────────────────────────────────────
+
+        this.addRecipe(new ItemStack(Items.steel_ingot, 1), new Object[]{
+                "XXX",
+                "XOX",
+                "XXX",
+                'X', Items.iron_ingot,
+                'O', Blocks.coal_block});
+
         this.addRecipe(new ItemStack(Items.multi_tool, 1), new Object[]{
                 "CCC",
                 "I I",

@@ -88,6 +88,12 @@ public class VisualManager {
     /**
      * Appelé depuis EntityArrow ou PlayerControllerMP quand une flèche touche.
      */
+    public void onMiss() {
+        if (settings.comboEnabled) {
+            combo.reset();
+        }
+    }
+
     public void onArrowHit() {
         if (settings.hitMarkerEnabled) {
             hitMarker.onHit();

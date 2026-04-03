@@ -1692,6 +1692,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
 
                     case MISS:
                     default:
+                        net.minecraft.client.visuals.VisualManager.getInstance().onMiss();
                         if (this.playerController.isNotCreative())
                         {
                             this.leftClickCounter = 10;
