@@ -447,8 +447,9 @@ public class GuiUIEditor extends GuiScreen {
                 String disp = label;
                 if (fontRendererObj.getStringWidth(disp) > half - 45) disp = fontRendererObj.trimStringToWidth(disp, half - 50) + "..";
                 fontRendererObj.drawStringWithShadow(disp, ox + 12, curY + 3, hov ? TEXT_PRIMARY : TEXT_SECONDARY);
-                drawToggle(ox + half - 38, curY + 2, val, "sb_" + i);
-                setHB(hbKeyToggle[i], ox + half - 38, curY + 2, 28, 12);
+                // Position alignée sur la convention ToggleItem : (largeur_colonne - 42)
+                drawToggle(ox + half - 42, curY + 2, val, "sb_" + i);
+                setHB(hbKeyToggle[i], ox + half - 42, curY + 2, 28, 12);
                 if (col == 1) curY += 18;
             }
             if (ks.getKeyCount() % 2 != 0) curY += 18;
