@@ -393,15 +393,6 @@ public class GuiCraftGuide extends GuiScreen {
                     (inside(mx,my,sbX,sbY,SBW,sbH) || draggingSB) ? C_SCR_ACTIVE : C_SCR_THUMB);
         }
 
-        if (filtered.isEmpty()) {
-            drawCenteredString(fontRendererObj, "\u00a78Aucun item trouve",
-                    panelX + panelW/2, gridY + sbH/2 - 4, C_TXT_DIM);
-            // Footer
-            fontRendererObj.drawStringWithShadow("\u00a78Clic gauche = Voir recette  \nClic droit = Retour",
-                    panelX + pad, footerY + 4, 0xFF1A2030);
-            return;
-        }
-
         // ── SCISSOR: clip item rendering strictly inside the grid zone ──────
         // Extend by 1 GUI-pixel on each side to avoid sub-pixel rounding artifacts
         // at the edges (items appearing as 1-pixel slivers).
@@ -442,9 +433,6 @@ public class GuiCraftGuide extends GuiScreen {
 
         if (hov != null) renderToolTip(hov, mx, my);
 
-        // Footer hint
-        fontRendererObj.drawStringWithShadow("\u00a78Clic gauche = recette  |  Clic droit = retour",
-                panelX + pad, footerY + 4, 0xFF1A2030);
     }
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -591,11 +579,12 @@ public class GuiCraftGuide extends GuiScreen {
         itemRender.renderItemAndEffectIntoGUI(out, rx+1, ry+1);
         if (inside(mx,my,rx,ry,SZ,SZ)) { drawSlotHover(rx,ry); hov = out; }
 
-        // Quantity badge (bottom-right corner of output slot)
+        // Quantity badge: moved below the output slot (centered)
         if (out.stackSize > 1) {
             String qty = "x" + out.stackSize;
-            fontRendererObj.drawStringWithShadow("\u00a7e" + qty,
-                    rx + SZ - fontRendererObj.getStringWidth(qty) - 1, ry + SZ - 8, C_GOLD);
+            int qx = rx + SZ / 2 - fontRendererObj.getStringWidth(qty) / 2;
+            int qy = ry + SZ + 2; // a bit below the slot
+            fontRendererObj.drawStringWithShadow("\u00a7e" + qty, qx, qy, C_GOLD);
         }
 
         // Labels BELOW the recipe area — safe, cannot overlap anything above

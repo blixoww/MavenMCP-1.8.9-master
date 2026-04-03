@@ -150,12 +150,14 @@ public final class ShopPacketHandler {
         private final String minecraftItem;
         private final long   buyPrice;
         private final long   sellPrice;
-        private final long   volume; // volume cumulatif
+        private final long   volume;   // quantité sur 24h
+        private final long   avgPrice; // prix moyen de la transaction sur 24h
 
         public MarketEntry(int id, String displayName, String minecraftItem,
-                           long buyPrice, long sellPrice, long volume) {
+                           long buyPrice, long sellPrice, long volume, long avgPrice) {
             this.id = id; this.displayName = displayName; this.minecraftItem = minecraftItem;
-            this.buyPrice = buyPrice; this.sellPrice = sellPrice; this.volume = volume;
+            this.buyPrice = buyPrice; this.sellPrice = sellPrice;
+            this.volume = volume; this.avgPrice = avgPrice;
         }
 
         public static MarketEntry readFrom(PacketBuffer buf) {
@@ -165,7 +167,8 @@ public final class ShopPacketHandler {
                     buf.readStringFromBuffer(64),
                     buf.readLong(),
                     buf.readLong(),
-                    buf.readLong());
+                    buf.readLong(),
+                    buf.readLong()); // avgPrice
         }
 
         public int    getId()           { return id; }
@@ -174,6 +177,7 @@ public final class ShopPacketHandler {
         public long   getBuyPrice()     { return buyPrice; }
         public long   getSellPrice()    { return sellPrice; }
         public long   getVolume()       { return volume; }
+        public long   getAvgPrice()     { return avgPrice; }
     }
 
     // ── Cache ─────────────────────────────────────────────────────────────────

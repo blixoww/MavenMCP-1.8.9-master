@@ -207,7 +207,14 @@ public class GuiShop extends GuiScreen {
                             // Don't refresh the full list view logic if we are just updating details
                             return;
                         }
-                        
+
+                        // Ne pas vider les items si le serveur renvoie une liste vide
+                        // (peut arriver si la DB est en cours de simulation)
+                        if (its.isEmpty() && !staticAllItemsCache.isEmpty()) {
+                            loadingItems = false;
+                            return;
+                        }
+
                         items.clear();
                         items.addAll(its);
                         
@@ -384,92 +391,73 @@ public class GuiShop extends GuiScreen {
         drawRect(px, y, px + w, y + 16, 0xFF020509);
         drawRect(px, y, px + w, y + 1, 0xFF152535);
 
-        // Filtrage : uniquement les items avec volume d'échange > 0 ou gelés
-        List<ShopPacketHandler.ShopItem> source = staticAllItemsCache.isEmpty() ? items : staticAllItemsCache;
-        List<ShopPacketHandler.ShopItem> activeItems = new ArrayList<>();
-        
-        for (ShopPacketHandler.ShopItem it : source) {
-            long vol = it.getTotalBuyVolume() + it.getTotalSellVolume();
-            if (vol > 0 || it.isFrozen()) activeItems.add(it);
-        }
+        // Ticker basé uniquement sur les top achats/ventes des 24 dernières heures
+        List<ShopPacketHandler.MarketEntry> boughtList = new ArrayList<>(topBought);
+        List<ShopPacketHandler.MarketEntry> soldList   = new ArrayList<>(topSold);
 
-        // Tri par volume
-        Collections.sort(activeItems, (a, b) -> Long.compare(
-                b.getTotalBuyVolume() + b.getTotalSellVolume(),
-                a.getTotalBuyVolume() + a.getTotalSellVolume()));
-
-        if (activeItems.isEmpty()) {
-            fontRendererObj.drawString("§8En attente de mouvements boursiers...", px + 35, y + 5, C_GRAY);
+        if (boughtList.isEmpty() && soldList.isEmpty()) {
+            fontRendererObj.drawString("§8En attente de mouvements boursiers (24h)...", px + 35, y + 5, C_GRAY);
             drawRect(px, y, px + 30, y + 16, 0xFFCC2222);
             fontRendererObj.drawString("§fLIVE", px + 4, y + 4, C_WHITE);
             return;
         }
 
         StringBuilder tickerText = new StringBuilder();
-        int limit = 0;
-        final double EPS = 0.001;
 
-        for (ShopPacketHandler.ShopItem it : activeItems) {
-            if (limit++ > 30) break;
-            
-            String name = fixString(getItemName(it));
-            String priceStr = fmtC(it.getBuyPrice());
-            String arrow = "§7-";
-
-            List<Double> hist = it.getBuyHistory();
-            if (hist != null && hist.size() >= 2) {
-                double currentPrice = hist.get(hist.size() - 1);
-                double prevPrice = hist.get(hist.size() - 2);
-                
-                if (currentPrice > prevPrice + EPS) {
-                    arrow = "§a▲";
-                } else if (currentPrice < prevPrice - EPS) {
-                    arrow = "§c▼";
-                }
-            }
-
-            tickerText.append("   §f").append(name).append(" §6").append(priceStr).append("$ ").append(arrow).append("   §8|");
+        // Top 3 achats
+        for (int i = 0; i < Math.min(3, boughtList.size()); i++) {
+            ShopPacketHandler.MarketEntry e = boughtList.get(i);
+            String name = fixString(useEnglish ? formatEnglish(e.getMinecraftItem()) : e.getDisplayName());
+            tickerText.append("   §6[ACHAT] §f").append(name)
+                      .append(" §7x").append(e.getVolume())
+                      .append(" §6@").append(fmtC(e.getAvgPrice())).append("$ §a▲");
         }
+
+        // Séparateur
+        if (!boughtList.isEmpty() && !soldList.isEmpty()) tickerText.append("   §8───");
+
+        // Top 3 ventes
+        for (int i = 0; i < Math.min(3, soldList.size()); i++) {
+            ShopPacketHandler.MarketEntry e = soldList.get(i);
+            String name = fixString(useEnglish ? formatEnglish(e.getMinecraftItem()) : e.getDisplayName());
+            tickerText.append("   §c[VENTE] §f").append(name)
+                      .append(" §7x").append(e.getVolume())
+                      .append(" §c@").append(fmtC(e.getAvgPrice())).append("$ §c▼");
+        }
+
+        tickerText.append("      ");
 
         String fullText = tickerText.toString();
         int textW = fontRendererObj.getStringWidth(fullText);
-        
-        // --- Correction Scissor Clipping ---
+
         int scale = new ScaledResolution(mc).getScaleFactor();
         int sx = (px + 30) * scale;
         int sy = (mc.displayHeight - (y + 16) * scale);
         int sw = (w - 30) * scale;
         int sh = 16 * scale;
-        
+
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         GL11.glScissor(sx, sy, sw, sh);
 
-        // Update offset
         long now = System.currentTimeMillis();
-        long dt = now - lastTickTime;
+        long dt  = now - lastTickTime;
         lastTickTime = now;
         tickerOffset += (dt * 0.03f);
 
         if (textW > 0) {
-            int currentX = (int) -tickerOffset + 35; // +35 pour commencer après le label
-            // Reset offset pour boucle infinie propre
-            if (currentX < -textW) {
-                tickerOffset -= textW;
-                currentX += textW;
-            }
-
+            int currentX = (int) -tickerOffset + 35;
+            if (currentX < -textW) { tickerOffset -= textW; currentX += textW; }
             int renderX = currentX;
             while (renderX < w) {
-                if (renderX + textW > 30) {
+                if (renderX + textW > 30)
                     fontRendererObj.drawStringWithShadow(fullText, px + renderX, y + 4, C_WHITE);
-                }
                 renderX += textW;
             }
         }
-        
+
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
-        
-        // Label LIVE dessiné par-dessus
+
+        // Label LIVE
         drawRect(px, y, px + 30, y + 16, 0xFFCC2222);
         drawGradientRect(px + 30, y, px + 40, y + 16, 0xFF020509, 0x00020509);
         fontRendererObj.drawString("§fLIVE", px + 4, y + 4, C_WHITE);
@@ -731,11 +719,20 @@ public class GuiShop extends GuiScreen {
             fontRendererObj.drawString("§a" + fmtC(it.getSellPrice()) + "$", tx + tw - 180, ry + 9, C_GREEN);
 
             String chart = it.getAsciiChart();
-            if (chart != null) {
-                if (chart.contains("stable") || chart.length() < 3) chart = "§8━━━━";
-                else if (chart.length() > 10) chart = chart.substring(0, 10);
-                fontRendererObj.drawString(chart, tx + tw - 105, ry + 9, C_WHITE);
+            // Afficher une flèche de tendance basée sur l'historique (pas l'ASCII brut)
+            String trend = "§8─";
+            List<Double> hist = it.getBuyHistory();
+            if (hist != null && hist.size() >= 2) {
+                double last = hist.get(hist.size() - 1);
+                double prev = hist.get(hist.size() - 2);
+                if (last > prev * 1.001) trend = "§a▲";
+                else if (last < prev * 0.999) trend = "§c▼";
+                else trend = "§7═";
+            } else if (chart != null && !chart.isEmpty() && !chart.contains("\n") && !chart.contains("|")) {
+                // chart texte simple (ex: "stable") — afficher tel quel
+                trend = "§8" + (chart.length() > 6 ? chart.substring(0, 6) : chart);
             }
+            fontRendererObj.drawString(trend, tx + tw - 105, ry + 9, C_WHITE);
 
             String status = "§a●";
             if (it.isFrozen()) status = "§b❄";
@@ -822,7 +819,7 @@ public class GuiShop extends GuiScreen {
             drawTop3Panel(rightX, top3Y, rightW, top3H, mx, my, true);
         } else {
             drawChart(rightX, infoY, rightW, graphH, mx, my,
-                    selectedItem.getSellHistory(), "§aHISTORIQUE VENTE",
+                    selectedItem.getSellHistory(), "§aCOURS VENTE (7J)",
                     selectedItem.getSellPrice(), C_GREEN, 0xFF2266AA, 0, 0);
             drawTop3Panel(rightX, top3Y, rightW, top3H, mx, my, false);
         }
@@ -949,81 +946,137 @@ public class GuiShop extends GuiScreen {
     private void drawChart(int gx, int gy, int gw, int gh, int mx, int my,
                            List<Double> hist, String title, long currentVal, int lineColor, int fillColor,
                            long floor, long ceil) {
-        drawRect(gx, gy, gx + gw, gy + gh, 0xFF080C12);
-        drawRect(gx, gy, gx + gw, gy + 1, lineColor);
-        
+        // ── Fond et cadre ────────────────────────────────────────────────────
+        drawRect(gx, gy, gx + gw, gy + gh, 0xFF070B10);
+        drawRect(gx, gy, gx + gw, gy + 1,      lineColor);
+        drawRect(gx, gy, gx + 1,  gy + gh,     0xFF1A2535);
+        drawRect(gx, gy + gh - 1, gx + gw, gy + gh, 0xFF1A2535);
+        drawRect(gx + gw - 1, gy, gx + gw, gy + gh, 0xFF1A2535);
+
+        // ── Titre + variation globale en % ───────────────────────────────────
         fontRendererObj.drawString(title, gx + 6, gy + 5, C_WHITE);
-        String price = fmtC(currentVal) + "$";
-        fontRendererObj.drawString(price, gx + gw - fontRendererObj.getStringWidth(price) - 5, gy + 5, lineColor);
+        String priceLabel = fmtC(currentVal) + " $";
+        if (hist != null && hist.size() >= 2) {
+            double fst = hist.get(0), lst = hist.get(hist.size() - 1);
+            if (fst > 0) {
+                double pct = (lst - fst) / fst * 100.0;
+                priceLabel += "  " + (pct >= 0 ? "§a▲ +" : "§c▼ ") + String.format("%.1f%%", Math.abs(pct));
+            }
+        }
+        int rawW = fontRendererObj.getStringWidth(
+            net.minecraft.util.EnumChatFormatting.getTextWithoutFormattingCodes(priceLabel));
+        fontRendererObj.drawStringWithShadow(priceLabel, gx + gw - rawW - 5, gy + 5, lineColor);
 
-        int cx = gx + 5, cy = gy + 20, cw = gw - 10, ch = gh - 25;
+        // ── Zone graphique avec marges pour axes ─────────────────────────────
+        int yAxisW = 44, xAxisH = 12;
+        int cx = gx + yAxisW, cy = gy + 18;
+        int cw = gw - yAxisW - 6, ch = gh - 18 - xAxisH - 3;
         drawRect(cx, cy, cx + cw, cy + ch, 0xFF020406);
+        // Bordure intérieure
+        drawRect(cx - 1, cy - 1, cx + cw + 1, cy, 0xFF1A2535);
+        drawRect(cx - 1, cy + ch, cx + cw + 1, cy + ch + 1, 0xFF1A2535);
+        drawRect(cx - 1, cy - 1, cx, cy + ch + 1, 0xFF1A2535);
 
-        if (hist == null || hist.size() < 2) {
-            drawCtrAt("§8Données insuffisantes", cx + cw / 2, cy + ch / 2 - 4);
+        if (hist == null || hist.isEmpty()) {
+            drawCtrAt("§8En attente du 1er rééquilibrage...", cx + cw / 2, cy + ch / 2 - 4);
+            drawCtrAt("§7(/shopdebug tick all)", cx + cw / 2, cy + ch / 2 + 6);
             return;
         }
 
-        double minV = hist.stream().mapToDouble(d->d).min().orElse(0);
-        double maxV = hist.stream().mapToDouble(d->d).max().orElse(1);
-        if (maxV == minV) maxV = minV * 1.1 + 0.01;
-        double drange = maxV - minV; if (drange==0) drange=1;
+        // Avec 1 seul point : dupliquer pour ligne horizontale
+        List<Double> dh = hist;
+        if (hist.size() == 1) { dh = new ArrayList<>(hist); dh.add(hist.get(0)); }
 
-        for(int i=1; i<4; i++) {
-            int ly = cy + (ch * i / 4);
-            drawRect(cx, ly, cx + cw, ly + 1, 0x11FFFFFF);
+        int n = dh.size();
+        double minV = dh.stream().mapToDouble(d -> d).min().orElse(0);
+        double maxV = dh.stream().mapToDouble(d -> d).max().orElse(1);
+        double mg = (maxV - minV) * 0.15; if (mg == 0) mg = maxV * 0.10 + 0.01;
+        minV = Math.max(0, minV - mg); maxV += mg;
+        double dr = maxV - minV; if (dr == 0) dr = 1;
+
+        // ── Grille + labels axe Y ────────────────────────────────────────────
+        for (int gi = 0; gi <= 4; gi++) {
+            int ly = cy + ch * gi / 4;
+            for (int dx = 0; dx < cw; dx += 4) drawRect(cx + dx, ly, cx + dx + 2, ly + 1, 0x14FFFFFF);
+            double lv = maxV - (maxV - minV) * gi / 4;
+            String lbl = fmtC((long)(lv)) + "$";
+            fontRendererObj.drawString("§8" + lbl, cx - fontRendererObj.getStringWidth(lbl) - 3, ly - 3, C_GRAY);
         }
 
-        int n = hist.size();
+        // ── Coordonnées des points ────────────────────────────────────────────
         int[] xs = new int[n], ys = new int[n];
         for (int i = 0; i < n; i++) {
-            xs[i] = cx + (int) ((double) i / (n - 1) * (cw - 2)) + 1;
-            ys[i] = cy + ch - (int) (((hist.get(i) - minV) / drange) * (ch - 4)) - 2;
+            xs[i] = cx + (n == 1 ? cw / 2 : (int)((double) i / (n - 1) * (cw - 2))) + 1;
+            ys[i] = cy + ch - (int)(((dh.get(i) - minV) / dr) * (ch - 2)) - 1;
+            ys[i] = Math.max(cy + 1, Math.min(cy + ch - 2, ys[i]));
         }
 
-        int fill = (lineColor & 0x00FFFFFF) | 0x22000000;
+        // ── Remplissage dégradé sous la courbe ───────────────────────────────
+        int rc = (lineColor >> 16) & 0xFF, gc = (lineColor >> 8) & 0xFF, bc = lineColor & 0xFF;
         for (int i = 0; i < n - 1; i++) {
-            int x1 = xs[i], x2 = xs[i+1];
-            int y1 = ys[i];
-            if (x2 > x1) {
-                drawRect(x1, y1, x1 + (x2-x1)+1, cy + ch, fill);
+            int x1 = xs[i], x2 = xs[i + 1], y1 = ys[i], y2 = ys[i + 1], bot = cy + ch;
+            for (int px2 = x1; px2 < x2 && px2 < cx + cw; px2++) {
+                int interpY = y1 + (x2 > x1 ? (y2 - y1) * (px2 - x1) / (x2 - x1) : 0);
+                for (int py2 = interpY; py2 < bot; py2++) {
+                    float t = bot > interpY ? (float)(py2 - interpY) / (bot - interpY) : 1f;
+                    int alpha = (int)(0x28 * (1f - t * t));
+                    if (alpha > 1) drawRect(px2, py2, px2 + 1, py2 + 1, (alpha << 24) | (rc << 16) | (gc << 8) | bc);
+                }
             }
         }
 
-        for (int i = 0; i < n - 1; i++)
-            drawLine(xs[i], ys[i], xs[i + 1], ys[i + 1], lineColor, 1);
+        // ── Ligne (2 passes pour épaisseur 2px) ──────────────────────────────
+        for (int i = 0; i < n - 1; i++) {
+            drawLine(xs[i], ys[i],     xs[i+1], ys[i+1],     lineColor,                          1);
+            drawLine(xs[i], ys[i] + 1, xs[i+1], ys[i+1] + 1, (lineColor & 0x00FFFFFF)|0x77000000, 1);
+        }
 
-        drawRect(xs[n-1]-1, ys[n-1]-1, xs[n-1]+2, ys[n-1]+2, C_WHITE);
+        // ── Pastilles sur chaque point ────────────────────────────────────────
+        for (int i = 0; i < n; i++) {
+            boolean last = (i == n - 1);
+            drawRect(xs[i]-2, ys[i]-2, xs[i]+3, ys[i]+3, last ? C_WHITE   : lineColor);
+            drawRect(xs[i]-1, ys[i]-1, xs[i]+2, ys[i]+2, last ? lineColor : 0xFF020406);
+        }
 
-        // Interaction souris sur le graphique (Crosshair)
+        // ── Labels axe X ─────────────────────────────────────────────────────
+        for (int i = 0; i < n; i++) {
+            int ago = (n - 1) - i;
+            String dl = ago == 0 ? "§fAuj." : "§8J-" + ago;
+            int dw = fontRendererObj.getStringWidth(
+                net.minecraft.util.EnumChatFormatting.getTextWithoutFormattingCodes(dl));
+            int dlx = Math.max(cx, Math.min(cx + cw - dw, xs[i] - dw / 2));
+            fontRendererObj.drawString(dl, dlx, cy + ch + 3, C_GRAY);
+        }
+
+        // ── Réticule interactif ───────────────────────────────────────────────
         if (inR(mx, my, cx, cy, cw, ch)) {
-            int closest = -1;
-            int dist = 999;
-            for (int i = 0; i < n; i++) {
-                int d = Math.abs(mx - xs[i]);
-                if (d < dist) { dist = d; closest = i; }
-            }
-            
-            if (closest != -1) {
-                int px = xs[closest];
-                int py = ys[closest];
-                
-                // Ligne verticale réticule
-                drawRect(px, cy, px + 1, cy + ch, 0x44FFFFFF);
-                drawRect(px - 2, py - 2, px + 3, py + 3, lineColor);
-                
-                // Tooltip dynamique
-                List<String> chartTip = new ArrayList<>();
-                chartTip.add("§6" + FMT.format(hist.get(closest)) + " $");
-                if (closest > 0) {
-                    double delta = hist.get(closest) - hist.get(closest-1);
-                    chartTip.add((delta >= 0 ? "§a+" : "§c") + FMT.format(delta) + " $");
+            int cl = -1, cd = 9999;
+            for (int i = 0; i < n; i++) { int d = Math.abs(mx - xs[i]); if (d < cd) { cd = d; cl = i; } }
+            if (cl != -1) {
+                // Lignes pointillées du réticule
+                for (int py2 = cy; py2 < cy + ch; py2 += 3) drawRect(xs[cl], py2, xs[cl]+1, py2+2, 0x55FFFFFF);
+                for (int px2 = cx; px2 < cx + cw; px2 += 3) drawRect(px2, ys[cl], px2+2, ys[cl]+1, 0x33FFFFFF);
+                // Point surligné
+                drawRect(xs[cl]-3, ys[cl]-3, xs[cl]+4, ys[cl]+4, C_WHITE);
+                drawRect(xs[cl]-2, ys[cl]-2, xs[cl]+3, ys[cl]+3, lineColor);
+
+                // Tooltip
+                List<String> tip = new ArrayList<>();
+                int ago = (n - 1) - cl;
+                tip.add(ago == 0 ? "§fAujourd'hui" : "§7J-" + ago);
+                tip.add("§f" + FMT.format(dh.get(cl)) + " $");
+                if (cl > 0) {
+                    double prev = dh.get(cl-1), cur = dh.get(cl);
+                    double delta = cur - prev;
+                    double pct = prev > 0 ? delta / prev * 100.0 : 0;
+                    tip.add((delta >= 0 ? "§a+" : "§c") + FMT.format(delta) + " $ ("
+                        + (delta >= 0 ? "§a+" : "§c") + String.format("%.1f%%", Math.abs(pct)) + "§r)");
                 } else {
-                    chartTip.add("§7Début historique");
+                    tip.add("§8Référence initiale");
                 }
-                tooltipLines = chartTip;
-                tooltipX = mx;
-                tooltipY = my;
+                tooltipLines = tip;
+                tooltipX = mx + 6;
+                tooltipY = my - 10;
             }
         }
     }
@@ -1032,29 +1085,52 @@ public class GuiShop extends GuiScreen {
         drawRect(gx, gy, gx + gw, gy + gh, 0xFF080C12);
         int col = showBought ? C_GOLD : C_RED;
         drawRect(gx, gy, gx + gw, gy + 1, col);
-        
-        fontRendererObj.drawString(showBought ? "Top Achats" : "Top Ventes", gx + 6, gy + 5, C_WHITE);
+
+        String panelTitle = showBought ? "§6Top Achats §824h" : "§cTop Ventes §824h";
+        fontRendererObj.drawString(panelTitle, gx + 6, gy + 5, C_WHITE);
 
         List<ShopPacketHandler.MarketEntry> entries = showBought ? topBought : topSold;
         if (entries.isEmpty()) {
-            drawCtrAt("§8Vide", gx + gw/2, gy + 20);
+            drawCtrAt("§8Aucune transaction sur 24h", gx + gw/2, gy + gh/2 - 4);
             return;
         }
 
-        int rowH = 22;
+        int rowH = 24;
         int y = gy + 18;
+        int rank = 1;
         for (int i = 0; i < Math.min(3, entries.size()); i++) {
             ShopPacketHandler.MarketEntry e = entries.get(i);
-            drawRect(gx + 2, y, gx + gw - 2, y + rowH, 0xFF0E1620);
-            
-            renderIconSafe(resolveIcon(e.getMinecraftItem()), gx + 4, y + 3);
-            fontRendererObj.drawString(fixString(useEnglish ? formatEnglish(e.getMinecraftItem()) : e.getDisplayName()), gx + 22, y + 3, C_WHITE);
-            fontRendererObj.drawString("§7x" + e.getVolume(), gx + 22, y + 12, C_GRAY);
-            
-            String p = fmtC(showBought ? e.getBuyPrice() : e.getSellPrice()) + "$";
-            fontRendererObj.drawString(p, gx + gw - fontRendererObj.getStringWidth(p) - 4, y + 8, col);
-            
+
+            // Fond de la ligne avec couleur dégradée selon le rang
+            int rowBg = i == 0 ? 0xFF14200A : (i == 1 ? 0xFF0E1A08 : 0xFF0A1206);
+            drawRect(gx + 2, y, gx + gw - 2, y + rowH, rowBg);
+
+            // Médaille de rang
+            String medal = i == 0 ? "§6#1" : (i == 1 ? "§7#2" : "§c#3");
+            fontRendererObj.drawString(medal, gx + 4, y + 8, C_WHITE);
+
+            // Icône de l'item
+            renderIconSafe(resolveIcon(e.getMinecraftItem()), gx + 18, y + 4);
+
+            // Nom de l'item
+            String name = fixString(useEnglish ? formatEnglish(e.getMinecraftItem()) : e.getDisplayName());
+            if (fontRendererObj.getStringWidth(name) > gw - 90) {
+                while (fontRendererObj.getStringWidth(name + "…") > gw - 90 && name.length() > 2)
+                    name = name.substring(0, name.length() - 1);
+                name += "…";
+            }
+            fontRendererObj.drawString("§f" + name, gx + 36, y + 3, C_WHITE);
+
+            // Quantité sur 24h
+            fontRendererObj.drawString("§7x" + e.getVolume() + " §8(24h)", gx + 36, y + 13, C_GRAY);
+
+            // Prix moyen de la transaction
+            String avgStr = fmtC(e.getAvgPrice()) + "$";
+            fontRendererObj.drawString((showBought ? "§6" : "§a") + avgStr,
+                    gx + gw - fontRendererObj.getStringWidth(avgStr) - 6, y + 8, col);
+
             y += rowH + 2;
+            rank++;
         }
     }
 
@@ -1090,40 +1166,246 @@ public class GuiShop extends GuiScreen {
      }
      
      private String getItemName(ShopPacketHandler.ShopItem it) {
-         if (useEnglish) return formatEnglish(it.getMinecraftItem());
-         return it.getDisplayName();
+         if (useEnglish) return resolveMetaName(it.getMinecraftItem());
+         // En FR : utilise le displayName du YAML, mais si c'est générique, on résout via meta
+         String dn = fixString(it.getDisplayName());
+         if (dn.isEmpty()) return resolveMetaName(it.getMinecraftItem());
+         return dn;
      }
-     
-     private String formatEnglish(String s) {
+
+     /**
+      * Retourne le vrai nom d'un item en fonction de son identifiant + meta.
+      * Ex: "stone:1" → "Granite", "planks:1" → "Spruce Planks", "log:2" → "Birch Log"
+      */
+     private String resolveMetaName(String s) {
          if (s == null) return "";
-         if (s.contains(":")) s = s.split(":")[0];
-         s = s.replace("_", " ");
+         if (s.startsWith("minecraft:")) s = s.substring("minecraft:".length());
+         int meta = 0;
+         String base = s;
+         if (s.contains(":")) {
+             int idx = s.lastIndexOf(':');
+             String after = s.substring(idx + 1);
+             try { meta = Integer.parseInt(after); base = s.substring(0, idx); }
+             catch (NumberFormatException ignored) {}
+         }
+
+         // ── Stone variants ──────────────────────────────────────────────────
+         if (base.equals("stone")) {
+             switch (meta) {
+                 case 1: return "Granite";
+                 case 2: return "Polished Granite";
+                 case 3: return "Diorite";
+                 case 4: return "Polished Diorite";
+                 case 5: return "Andesite";
+                 case 6: return "Polished Andesite";
+                 default: return "Stone";
+             }
+         }
+         // ── Planks ─────────────────────────────────────────────────────────
+         if (base.equals("planks")) {
+             switch (meta) {
+                 case 1: return "Spruce Planks";
+                 case 2: return "Birch Planks";
+                 case 3: return "Jungle Planks";
+                 case 4: return "Acacia Planks";
+                 case 5: return "Dark Oak Planks";
+                 default: return "Oak Planks";
+             }
+         }
+         // ── Logs ───────────────────────────────────────────────────────────
+         if (base.equals("log")) {
+             switch (meta & 3) {
+                 case 1: return "Spruce Log";
+                 case 2: return "Birch Log";
+                 case 3: return "Jungle Log";
+                 default: return "Oak Log";
+             }
+         }
+         if (base.equals("log2")) {
+             switch (meta & 3) {
+                 case 1: return "Dark Oak Log";
+                 default: return "Acacia Log";
+             }
+         }
+         // ── Saplings ───────────────────────────────────────────────────────
+         if (base.equals("sapling")) {
+             switch (meta & 7) {
+                 case 1: return "Spruce Sapling";
+                 case 2: return "Birch Sapling";
+                 case 3: return "Jungle Sapling";
+                 case 4: return "Acacia Sapling";
+                 case 5: return "Dark Oak Sapling";
+                 default: return "Oak Sapling";
+             }
+         }
+         // ── Sand ───────────────────────────────────────────────────────────
+         if (base.equals("sand")) {
+             return meta == 1 ? "Red Sand" : "Sand";
+         }
+         // ── Dirt ───────────────────────────────────────────────────────────
+         if (base.equals("dirt")) {
+             switch (meta) {
+                 case 1: return "Coarse Dirt";
+                 case 2: return "Podzol";
+                 default: return "Dirt";
+             }
+         }
+         // ── Stone Slabs ────────────────────────────────────────────────────
+         if (base.equals("stone_slab") || base.equals("step")) {
+             switch (meta & 7) {
+                 case 1: return "Sandstone Slab";
+                 case 2: return "Wooden Slab";
+                 case 3: return "Cobblestone Slab";
+                 case 4: return "Brick Slab";
+                 case 5: return "Stone Brick Slab";
+                 case 6: return "Nether Brick Slab";
+                 case 7: return "Quartz Slab";
+                 default: return "Stone Slab";
+             }
+         }
+         // ── Wooden Slabs ───────────────────────────────────────────────────
+         if (base.equals("wooden_slab") || base.equals("wood_step")) {
+             switch (meta & 7) {
+                 case 1: return "Spruce Slab";
+                 case 2: return "Birch Slab";
+                 case 3: return "Jungle Slab";
+                 case 4: return "Acacia Slab";
+                 case 5: return "Dark Oak Slab";
+                 default: return "Oak Slab";
+             }
+         }
+         // ── Stone Bricks ───────────────────────────────────────────────────
+         if (base.equals("stonebrick") || base.equals("stone_brick")) {
+             switch (meta) {
+                 case 1: return "Mossy Stone Bricks";
+                 case 2: return "Cracked Stone Bricks";
+                 case 3: return "Chiseled Stone Bricks";
+                 default: return "Stone Bricks";
+             }
+         }
+         // ── Sandstone ──────────────────────────────────────────────────────
+         if (base.equals("sandstone")) {
+             switch (meta) {
+                 case 1: return "Chiseled Sandstone";
+                 case 2: return "Smooth Sandstone";
+                 default: return "Sandstone";
+             }
+         }
+         if (base.equals("red_sandstone")) {
+             switch (meta) {
+                 case 1: return "Chiseled Red Sandstone";
+                 case 2: return "Smooth Red Sandstone";
+                 default: return "Red Sandstone";
+             }
+         }
+         // ── Quartz ─────────────────────────────────────────────────────────
+         if (base.equals("quartz_block")) {
+             switch (meta) {
+                 case 1: return "Chiseled Quartz Block";
+                 case 2: return "Pillar Quartz Block";
+                 default: return "Quartz Block";
+             }
+         }
+         // ── Prismarine ─────────────────────────────────────────────────────
+         if (base.equals("prismarine")) {
+             switch (meta) {
+                 case 1: return "Prismarine Bricks";
+                 case 2: return "Dark Prismarine";
+                 default: return "Prismarine";
+             }
+         }
+         // ── Wool ───────────────────────────────────────────────────────────
+         if (base.equals("wool")) return COLOR_NAMES[Math.min(meta, 15)] + " Wool";
+         // ── Carpet ─────────────────────────────────────────────────────────
+         if (base.equals("carpet")) return COLOR_NAMES[Math.min(meta, 15)] + " Carpet";
+         // ── Stained Glass ──────────────────────────────────────────────────
+         if (base.equals("stained_glass")) return COLOR_NAMES[Math.min(meta, 15)] + " Stained Glass";
+         if (base.equals("stained_glass_pane")) return COLOR_NAMES[Math.min(meta, 15)] + " Stained Glass Pane";
+         // ── Stained Clay ───────────────────────────────────────────────────
+         if (base.equals("stained_hardened_clay")) return COLOR_NAMES[Math.min(meta, 15)] + " Terracotta";
+         // ── Dye ────────────────────────────────────────────────────────────
+         if (base.equals("dye")) {
+             // dye meta : inversé (0=noir encre = Ink Sac, 15=blanc = Bone Meal)
+             String[] dyeNames = {"Ink Sac","Rose Red","Cactus Green","Cocoa Beans","Lapis Lazuli",
+                 "Purple Dye","Cyan Dye","Light Gray Dye","Gray Dye","Pink Dye","Lime Dye",
+                 "Dandelion Yellow","Light Blue Dye","Magenta Dye","Orange Dye","Bone Meal"};
+             return dyeNames[Math.min(meta, 15)];
+         }
+         // ── Golden Apple ───────────────────────────────────────────────────
+         if (base.equals("golden_apple")) return meta == 1 ? "Enchanted Golden Apple" : "Golden Apple";
+         // ── Coal ───────────────────────────────────────────────────────────
+         if (base.equals("coal")) return meta == 1 ? "Charcoal" : "Coal";
+         // ── Fish ───────────────────────────────────────────────────────────
+         if (base.equals("fish")) {
+             switch (meta) { case 1: return "Salmon"; case 2: return "Clownfish"; case 3: return "Pufferfish"; default: return "Raw Fish"; }
+         }
+         if (base.equals("cooked_fish")) {
+             return meta == 1 ? "Cooked Salmon" : "Cooked Fish";
+         }
+         // ── Sponge ─────────────────────────────────────────────────────────
+         if (base.equals("sponge")) return meta == 1 ? "Wet Sponge" : "Sponge";
+         // ── Skull ──────────────────────────────────────────────────────────
+         if (base.equals("skull")) {
+             switch (meta) { case 1: return "Wither Skeleton Skull"; case 2: return "Zombie Head"; case 4: return "Creeper Head"; default: return "Skeleton Skull"; }
+         }
+         // ── Anvil ──────────────────────────────────────────────────────────
+         if (base.equals("anvil")) {
+             switch (meta & 12) { case 4: return "Slightly Damaged Anvil"; case 8: return "Very Damaged Anvil"; default: return "Anvil"; }
+         }
+         // ── Banner ─────────────────────────────────────────────────────────
+         if (base.equals("banner")) return COLOR_NAMES[Math.min(15 - meta, 15)] + " Banner";
+
+         // Fallback générique
+         return formatGenericName(base);
+     }
+
+     private static final String[] COLOR_NAMES = {
+         "White","Orange","Magenta","Light Blue","Yellow","Lime","Pink","Gray",
+         "Light Gray","Cyan","Purple","Blue","Brown","Green","Red","Black"
+     };
+
+     private String formatGenericName(String base) {
+         String s = base.replace("_", " ");
          StringBuilder sb = new StringBuilder();
          boolean up = true;
          for (char c : s.toCharArray()) {
-             if (up) { sb.append(Character.toUpperCase(c)); up = false; }
-             else sb.append(c);
-             if (c == ' ') up = true;
+             sb.append(up ? Character.toUpperCase(c) : c);
+             up = (c == ' ');
          }
          return sb.toString();
      }
 
+     private String formatEnglish(String s) {
+         return resolveMetaName(s);
+     }
+
      private String normalizeCatName(String cat) {
          if (cat == null) return "";
+         // fixString répare l'encodage UTF-8 mal interprété en ISO-8859-1
          String c = fixString(cat).toLowerCase().trim();
-         if (c.contains("minera") || c.contains("minéra")) return "Minerais";
-         if (c.contains("elevage") || c.contains("élevage")) return "Élevage";
-         if (c.contains("deco") || c.contains("déco")) return "Décoration";
-         if (c.contains("modd")) return "Moddé";
+         if (c.contains("minera") || c.contains("min\u00e9ra")) return "Minerais";
+         if (c.contains("elev") || c.contains("\u00e9lev")) return "\u00c9levage";   // É
+         if (c.contains("deco") || c.contains("d\u00e9co")) return "D\u00e9coration";
+         if (c.contains("modd")) return "Modd\u00e9";
          if (c.contains("agri")) return "Agriculture";
+         if (c.contains("bois")) return "Bois";
+         if (c.contains("nourr")) return "Nourriture";
+         if (c.contains("redst")) return "Redstone";
+         if (c.contains("nether")) return "Nether";
+         if (c.contains("terrain")) return "Terrains";
+         if (c.contains("divers")) return "Divers";
+         if (c.contains("verre")) return "Verre";
+         if (c.contains("bloc")) return "Blocs";
          return fixString(cat);
      }
 
      private ItemStack resolveIcon(String name) {
          if (name == null || name.isEmpty()) return null;
          try {
-             // MAPPING DE NOM -> ID NUMERIQUE (1.8.9 Legacy IDs)
              String n = name.toLowerCase().replace(" ", "_");
+             // Retirer le préfixe minecraft: s'il est présent avant le parsing
+             if (n.startsWith("minecraft:")) n = n.substring("minecraft:".length());
+
              String metaStr = null;
              if (n.contains(":")) {
                  String[] split = n.split(":");
@@ -1132,81 +1414,252 @@ public class GuiShop extends GuiScreen {
              }
              int meta = (metaStr != null) ? parseMeta(metaStr) : 0;
 
-             // Charbon de bois (263:1)
+             // ── Items moddés (custom) — vrais items/blocs enregistrés ─────────
+             if (n.equals("ruby_ore"))           return new ItemStack(Blocks.ruby_ore);
+             if (n.equals("ruby_block"))         return new ItemStack(Blocks.ruby_block);
+             if (n.equals("ruby"))               return new ItemStack(Items.ruby);
+             if (n.equals("cobalt_ore"))         return new ItemStack(Blocks.cobalt_ore);
+             if (n.equals("cobalt_block"))       return new ItemStack(Blocks.cobalt_block);
+             if (n.equals("cobalt_ingot"))       return new ItemStack(Items.cobalt_ingot);
+             if (n.equals("steel_ingot"))        return new ItemStack(Items.steel_ingot);
+             if (n.equals("steel_block"))        return new ItemStack(Blocks.steel_block);
+             if (n.equals("random_ore"))         return new ItemStack(Blocks.random_ore);
+             if (n.equals("cobalt_apple"))       return new ItemStack(Items.cobalt_apple);
+             if (n.equals("green_pumpkin_pie"))  return new ItemStack(Items.green_pumpkin_pie);
+             if (n.equals("obsidian_door"))      return new ItemStack(Items.obsidian_door);
+             if (n.equals("obsidian_trapdoor"))  return new ItemStack(Items.obsidian_trapdoor);
+             if (n.equals("obsidian_slab"))      return new ItemStack(Blocks.obsidian_slab);
+             if (n.equals("obsidian_stairs"))    return new ItemStack(Blocks.obsidian_stairs);
+             if (n.equals("steel_ladder"))       return new ItemStack(Blocks.steel_ladder);
+             if (n.equals("steel_chest"))        return new ItemStack(Blocks.steel_chest);
+             if (n.equals("transparent_block"))  return new ItemStack(Blocks.transparent_block);
+
+             // ── Charbon de bois ────────────────────────────────────────────────
+             if (n.equals("coal") && meta == 1) return new ItemStack(Items.coal, 1, 1);
              if (n.contains("charcoal") || n.contains("charbon_de_bois")) return new ItemStack(Items.coal, 1, 1);
 
-             // Saumon cuit (350:1)
+             // ── Poissons ───────────────────────────────────────────────────────
+             if (n.equals("cooked_fish") && meta > 0) return new ItemStack(Items.cooked_fish, 1, meta);
+             if (n.equals("fish") && meta > 0) return new ItemStack(Items.fish, 1, meta);
              if (n.contains("cooked_salmon") || (n.contains("salmon") && n.contains("cooked"))) return new ItemStack(Items.cooked_fish, 1, 1);
 
-             // Stone Bricks (98)
+             // ── Stone Bricks ───────────────────────────────────────────────────
              if (n.contains("stonebrick") || n.contains("stone_brick")) {
-                 if (n.contains("mossy")) return new ItemStack(Blocks.stonebrick, 1, 1);
-                 if (n.contains("crack")) return new ItemStack(Blocks.stonebrick, 1, 2);
-                 if (n.contains("chisel")) return new ItemStack(Blocks.stonebrick, 1, 3);
-                 return new ItemStack(Blocks.stonebrick);
+                 return new ItemStack(Blocks.stonebrick, 1, meta);
              }
 
-             // Cobble Stairs (67)
+             // ── Dalles ─────────────────────────────────────────────────────────
+             if (n.equals("stone_slab") || n.equals("step")) {
+                 return new ItemStack(Blocks.stone_slab, 1, meta);
+             }
+             if (n.equals("wooden_slab") || n.equals("wood_step")) {
+                 return new ItemStack(Blocks.wooden_slab, 1, meta);
+             }
+
+             // ── Escaliers ──────────────────────────────────────────────────────
+             if (n.contains("oak_stair")) return new ItemStack(Blocks.oak_stairs);
+             if (n.contains("spruce_stair")) return new ItemStack(Blocks.spruce_stairs);
+             if (n.contains("birch_stair")) return new ItemStack(Blocks.birch_stairs);
+             if (n.contains("jungle_stair")) return new ItemStack(Blocks.jungle_stairs);
+             if (n.contains("acacia_stair")) return new ItemStack(Blocks.acacia_stairs);
+             if (n.contains("dark_oak_stair")) return new ItemStack(Blocks.dark_oak_stairs);
+             if (n.contains("stone_brick_stair") || n.contains("smooth_stair")) return new ItemStack(Blocks.stone_brick_stairs);
+             if (n.contains("brick_stair")) return new ItemStack(Blocks.brick_stairs);
+             if (n.contains("sandstone_stair")) return new ItemStack(Blocks.sandstone_stairs);
+             if (n.contains("quartz_stair")) return new ItemStack(Blocks.quartz_stairs);
              if (n.contains("cobble") && n.contains("stair")) return new ItemStack(Blocks.stone_stairs);
 
-             // Terracotta / Stained Clay (159)
-             if (n.contains("stained_hardened_clay") || n.contains("terracotta") || n.contains("terre_cuite")) {
-                 if (meta == 0) meta = findColorMeta(n);
+             // ── Terre cuite / Clay ─────────────────────────────────────────────
+             if (n.contains("stained_hardened_clay")) {
+                 // meta toujours envoyé par le serveur (0=blanc ... 15=noir)
                  return new ItemStack(Blocks.stained_hardened_clay, 1, meta);
              }
+             if (n.equals("hardened_clay") || n.equals("hard_clay")) return new ItemStack(Blocks.hardened_clay);
 
-             // Hardened Clay (172)
-             if (n.equals("hardened_clay")) return new ItemStack(Blocks.hardened_clay);
+             // ── Verre coloré ──────────────────────────────────────────────────
+             if (n.equals("stained_glass_pane")) {
+                 return new ItemStack(Blocks.stained_glass_pane, 1, meta);
+             }
+             if (n.equals("stained_glass")) {
+                 return new ItemStack(Blocks.stained_glass, 1, meta);
+             }
+             // Verre et vitre simple
+             if (n.equals("glass_pane")) return new ItemStack(Blocks.glass_pane);
+             if (n.equals("glass"))      return new ItemStack(Blocks.glass);
 
-             // Verre (20 ou 95)
-             // Correction spécifique pour 1.8.9 : "glass_pane" (102) vs "stained_glass_pane" (160)
-             if (n.contains("glass") || n.contains("verre")) {
-                 if (meta == 0) meta = findColorMeta(n);
-                 boolean pane = n.contains("pane") || n.contains("vitre");
-
-                 boolean wantStained = meta != 0 || n.contains("stained") || n.contains("teinte") || containsColorWord(n);
-                 if (pane) {
-                     if (wantStained) return new ItemStack(Blocks.stained_glass_pane, 1, meta);
-                     return new ItemStack(Blocks.glass_pane);
-                 } else {
-                     if (wantStained) return new ItemStack(Blocks.stained_glass, 1, meta);
-                     return new ItemStack(Blocks.glass);
-                 }
+             // ── Laine ──────────────────────────────────────────────────────────
+             if (n.equals("wool")) {
+                 return new ItemStack(Blocks.wool, 1, meta);
              }
 
-             // Quartz (155)
+             // ── Tapis ──────────────────────────────────────────────────────────
+             if (n.equals("carpet")) return new ItemStack(Blocks.carpet, 1, meta);
+
+             // ── Teintures ──────────────────────────────────────────────────────
+             if (n.equals("dye")) return new ItemStack(Items.dye, 1, meta);
+
+             // ── Quartz ─────────────────────────────────────────────────────────
              if (n.contains("quartz")) {
                  if (n.contains("ore")) return new ItemStack(Blocks.quartz_ore);
-                 if (n.contains("pillar")) return new ItemStack(Blocks.quartz_block, 1, 2);
-                 if (n.contains("chisel")) return new ItemStack(Blocks.quartz_block, 1, 1);
-                 return new ItemStack(Blocks.quartz_block);
+                 if (n.contains("pillar") || meta == 2) return new ItemStack(Blocks.quartz_block, 1, 2);
+                 if (n.contains("chisel") || meta == 1) return new ItemStack(Blocks.quartz_block, 1, 1);
+                 if (n.contains("block")) return new ItemStack(Blocks.quartz_block, 1, meta);
+                 return new ItemStack(Items.quartz);
              }
 
-             // Bois (Logs: 17/162, Planks: 5)
-             if (n.contains("log") || n.contains("plank") || n.contains("planks") || n.contains("wood") || n.contains("bois")) {
-                 boolean isLog = n.contains("log") || n.contains("buche");
-                 // Si une meta explicite a été fournie via name:meta, on la respecte
-                 int woodMeta = (metaStr != null) ? meta : 0;
+             // ── Grès ───────────────────────────────────────────────────────────
+             if (n.contains("red_sandstone")) return new ItemStack(Blocks.red_sandstone, 1, meta);
+             if (n.contains("sandstone")) return new ItemStack(Blocks.sandstone, 1, meta);
 
-                 // Détection stricte uniquement si aucune méta explicite
+             // ── Pierre ─────────────────────────────────────────────────────────
+             if (n.equals("stone")) return new ItemStack(Blocks.stone, 1, meta);
+
+             // ── Prismarine ─────────────────────────────────────────────────────
+             if (n.contains("prismarine") && !n.contains("shard") && !n.contains("crystal")) {
+                 return new ItemStack(Blocks.prismarine, 1, meta);
+             }
+
+             // ── Bois (Logs + Planks) ───────────────────────────────────────────
+             if (n.equals("log") || n.equals("log2")) {
+                 if (n.equals("log2")) return new ItemStack(Blocks.log2, 1, meta);
+                 return new ItemStack(Blocks.log, 1, meta);
+             }
+             if (n.equals("planks")) return new ItemStack(Blocks.planks, 1, meta);
+             if (n.contains("log") || n.contains("plank") || n.contains("wood") || n.contains("bois")) {
+                 boolean isLog = n.contains("log") || n.contains("buche");
+                 int woodMeta = (metaStr != null) ? meta : 0;
                  if (woodMeta == 0) {
-                     if (n.contains("dark_oak") || n.contains("sombre") || n.contains("darkoak") || n.contains("chene_sombre")) woodMeta = 5;
+                     if (n.contains("dark_oak") || n.contains("sombre") || n.contains("darkoak")) woodMeta = 5;
                      else if (n.contains("acacia")) woodMeta = 4;
                      else if (n.contains("jungle") || n.contains("acajou")) woodMeta = 3;
                      else if (n.contains("birch") || n.contains("bouleau")) woodMeta = 2;
                      else if (n.contains("spruce") || n.contains("sapin")) woodMeta = 1;
-                     else if (n.contains("oak") || n.contains("chene")) woodMeta = 0;
                  }
-
                  if (isLog) {
-                     if (woodMeta >= 4) return new ItemStack(Blocks.log2, 1, Math.max(0, woodMeta - 4)); // Acacia/DarkOak
+                     if (woodMeta >= 4) return new ItemStack(Blocks.log2, 1, Math.max(0, woodMeta - 4));
                      return new ItemStack(Blocks.log, 1, woodMeta);
                  } else {
                      return new ItemStack(Blocks.planks, 1, Math.max(0, woodMeta));
                  }
              }
 
-             // Fallback générique
+             // ── Saplings ───────────────────────────────────────────────────────
+             if (n.equals("sapling")) return new ItemStack(Blocks.sapling, 1, meta);
+
+             // ── Fleurs ─────────────────────────────────────────────────────────
+             if (n.equals("yellow_flower")) return new ItemStack(Blocks.yellow_flower);
+             if (n.equals("red_flower")) return new ItemStack(Blocks.red_flower, 1, meta);
+
+             // ── Crânes ─────────────────────────────────────────────────────────
+             if (n.equals("skull")) return new ItemStack(Items.skull, 1, meta);
+
+             // ── Blocs spéciaux ──────────────────────────────────────────────────
+             if (n.equals("lit_pumpkin")) return new ItemStack(Blocks.lit_pumpkin);
+             if (n.equals("melon_block")) return new ItemStack(Blocks.melon_block);
+             if (n.equals("sea_lantern")) return new ItemStack(Blocks.sea_lantern);
+             if (n.equals("packed_ice")) return new ItemStack(Blocks.packed_ice);
+             if (n.equals("snow")) return new ItemStack(Blocks.snow);
+             if (n.equals("sponge")) return new ItemStack(Blocks.sponge, 1, meta); // meta=1 = éponge mouillée
+             if (n.equals("nether_brick")) return new ItemStack(Blocks.nether_brick);
+             if (n.equals("nether_brick_fence")) return new ItemStack(Blocks.nether_brick_fence);
+             if (n.equals("brick_block")) return new ItemStack(Blocks.brick_block);
+             if (n.equals("mycelium")) return new ItemStack(Blocks.mycelium);
+             if (n.equals("end_stone")) return new ItemStack(Blocks.end_stone);
+             if (n.equals("obsidian")) return new ItemStack(Blocks.obsidian);
+             if (n.equals("ice")) return new ItemStack(Blocks.ice);
+             if (n.equals("dirt")) return new ItemStack(Blocks.dirt, 1, meta); // meta=2 = podzol
+             if (n.equals("grass")) return new ItemStack(Blocks.grass);
+             if (n.equals("hardened_clay")) return new ItemStack(Blocks.hardened_clay);
+             if (n.equals("clay")) return new ItemStack(Blocks.clay);
+             if (n.equals("anvil")) return new ItemStack(Blocks.anvil, 1, meta);
+             if (n.equals("cobblestone")) return new ItemStack(Blocks.cobblestone);
+             if (n.equals("mossy_cobblestone")) return new ItemStack(Blocks.mossy_cobblestone);
+             if (n.equals("netherrack")) return new ItemStack(Blocks.netherrack);
+             if (n.equals("soul_sand")) return new ItemStack(Blocks.soul_sand);
+             if (n.equals("glowstone")) return new ItemStack(Blocks.glowstone);
+             if (n.equals("iron_ore")) return new ItemStack(Blocks.iron_ore);
+             if (n.equals("gold_ore")) return new ItemStack(Blocks.gold_ore);
+             if (n.equals("diamond_ore")) return new ItemStack(Blocks.diamond_ore);
+             if (n.equals("coal_ore")) return new ItemStack(Blocks.coal_ore);
+             if (n.equals("emerald_ore")) return new ItemStack(Blocks.emerald_ore);
+             if (n.equals("lapis_ore")) return new ItemStack(Blocks.lapis_ore);
+             if (n.equals("redstone_ore")) return new ItemStack(Blocks.redstone_ore);
+             if (n.equals("iron_block")) return new ItemStack(Blocks.iron_block);
+             if (n.equals("gold_block")) return new ItemStack(Blocks.gold_block);
+             if (n.equals("diamond_block")) return new ItemStack(Blocks.diamond_block);
+             if (n.equals("emerald_block")) return new ItemStack(Blocks.emerald_block);
+             if (n.equals("lapis_block")) return new ItemStack(Blocks.lapis_block);
+             if (n.equals("redstone_block")) return new ItemStack(Blocks.redstone_block);
+             if (n.equals("coal_block")) return new ItemStack(Blocks.coal_block);
+             if (n.equals("cactus")) return new ItemStack(Blocks.cactus);
+             if (n.equals("reeds")) return new ItemStack(Items.reeds);
+             if (n.equals("waterlily")) return new ItemStack(Blocks.waterlily);
+             if (n.equals("vine")) return new ItemStack(Blocks.vine);
+             if (n.equals("pumpkin")) return new ItemStack(Blocks.pumpkin);
+             if (n.equals("melon")) return new ItemStack(Items.melon);
+             if (n.equals("red_mushroom")) return new ItemStack(Blocks.red_mushroom);
+             if (n.equals("brown_mushroom")) return new ItemStack(Blocks.brown_mushroom);
+             if (n.equals("nether_wart")) return new ItemStack(Items.nether_wart);
+
+             // ── Plaques de pression ────────────────────────────────────────────
+             if (n.equals("stone_pressure_plate")) return new ItemStack(Blocks.stone_pressure_plate);
+             if (n.equals("wooden_pressure_plate")) return new ItemStack(Blocks.wooden_pressure_plate);
+             if (n.equals("stone_button")) return new ItemStack(Blocks.stone_button);
+             if (n.equals("wooden_button")) return new ItemStack(Blocks.wooden_button);
+             if (n.equals("lever")) return new ItemStack(Blocks.lever);
+
+             // ── Redstone ───────────────────────────────────────────────────────
+             if (n.equals("redstone_torch")) return new ItemStack(Blocks.redstone_torch);
+             if (n.equals("repeater")) return new ItemStack(Items.repeater);
+             if (n.equals("comparator")) return new ItemStack(Items.comparator);
+             if (n.equals("redstone_lamp")) return new ItemStack(Blocks.redstone_lamp);
+             if (n.equals("daylight_detector")) return new ItemStack(Blocks.daylight_detector);
+             if (n.equals("noteblock")) return new ItemStack(Blocks.noteblock);
+             if (n.equals("piston")) return new ItemStack(Blocks.piston);
+             if (n.equals("sticky_piston")) return new ItemStack(Blocks.sticky_piston);
+             if (n.equals("dispenser")) return new ItemStack(Blocks.dispenser);
+             if (n.equals("dropper")) return new ItemStack(Blocks.dropper);
+             if (n.equals("hopper")) return new ItemStack(Blocks.hopper);
+             if (n.equals("rail")) return new ItemStack(Blocks.rail);
+             if (n.equals("golden_rail")) return new ItemStack(Blocks.golden_rail);
+             if (n.equals("detector_rail")) return new ItemStack(Blocks.detector_rail);
+             if (n.equals("activator_rail")) return new ItemStack(Blocks.activator_rail);
+
+             // ── Divers ─────────────────────────────────────────────────────────
+             if (n.equals("golden_apple")) return new ItemStack(Items.golden_apple, 1, meta); // meta=0 normal, meta=1 enchanté
+             if (n.equals("banner")) return new ItemStack(Items.banner, 1, meta);
+             if (n.equals("iron_door")) return new ItemStack(Items.iron_door);
+             if (n.equals("iron_trapdoor")) return new ItemStack(Blocks.iron_trapdoor);
+             if (n.equals("trapdoor")) return new ItemStack(Blocks.trapdoor);
+             if (n.equals("netherbrick")) return new ItemStack(Items.netherbrick);
+             if (n.equals("writable_book")) return new ItemStack(Items.writable_book);
+             if (n.equals("enchanting_table")) return new ItemStack(Blocks.enchanting_table);
+             if (n.equals("brewing_stand")) return new ItemStack(Items.brewing_stand);
+             if (n.equals("cauldron")) return new ItemStack(Items.cauldron);
+             if (n.equals("ender_eye")) return new ItemStack(Items.ender_eye);
+             if (n.equals("flower_pot")) return new ItemStack(Items.flower_pot);
+             if (n.equals("item_frame")) return new ItemStack(Items.item_frame);
+             if (n.equals("painting")) return new ItemStack(Items.painting);
+             if (n.equals("firework_charge")) return new ItemStack(Items.firework_charge);
+             if (n.equals("fireworks")) return new ItemStack(Items.fireworks);
+             if (n.equals("nether_star")) return new ItemStack(Items.nether_star);
+             if (n.equals("beacon")) return new ItemStack(Blocks.beacon);
+             if (n.equals("tnt")) return new ItemStack(Blocks.tnt);
+             if (n.equals("chest")) return new ItemStack(Blocks.chest);
+             if (n.equals("trapped_chest")) return new ItemStack(Blocks.trapped_chest);
+             if (n.equals("crafting_table")) return new ItemStack(Blocks.crafting_table);
+             if (n.equals("bookshelf")) return new ItemStack(Blocks.bookshelf);
+             if (n.equals("ladder")) return new ItemStack(Blocks.ladder);
+             if (n.equals("sign")) return new ItemStack(Items.sign);
+             if (n.equals("torch")) return new ItemStack(Blocks.torch);
+             if (n.equals("bed")) return new ItemStack(Items.bed);
+             if (n.equals("minecart")) return new ItemStack(Items.minecart);
+             if (n.equals("chest_minecart")) return new ItemStack(Items.chest_minecart);
+             if (n.equals("tnt_minecart")) return new ItemStack(Items.tnt_minecart);
+             if (n.equals("hopper_minecart")) return new ItemStack(Items.hopper_minecart);
+             if (n.equals("boat")) return new ItemStack(Items.boat);
+
+             // ── Fallback générique ─────────────────────────────────────────────
              Item it = Item.getByNameOrId(n);
              if (it != null) return new ItemStack(it, 1, meta);
              Block b = Block.getBlockFromName(n);
@@ -1251,15 +1704,18 @@ public class GuiShop extends GuiScreen {
          if (cat == null) return 0xFF445566;
          String c = fixString(cat).toLowerCase();
          if (c.contains("agri")) return 0xFF3DB35E;
-         if (c.contains("elevage") || c.contains("élevage")) return 0xFFCC8833;
+         if (c.contains("elev")) return 0xFFCC8833;  // élevage — "elev" couvre tous les encodages
          if (c.contains("bois")) return 0xFF8B5E3C;
          if (c.contains("terrain")) return 0xFF888888;
-         if (c.contains("minera") || c.contains("minéra")) return 0xFF4488CC;
+         if (c.contains("minera")) return 0xFF4488CC;
          if (c.contains("nether")) return 0xFFCC4422;
-         if (c.contains("redstone")) return 0xFFCC2222;
-         if (c.contains("deco") || c.contains("déco")) return 0xFF8866AA;
+         if (c.contains("redst")) return 0xFFCC2222;
+         if (c.contains("deco")) return 0xFF8866AA;
+         if (c.contains("verre")) return 0xFF88CCDD;
          if (c.contains("divers")) return 0xFF5588AA;
          if (c.contains("modd")) return 0xFFE0AA22;
+         if (c.contains("nourr")) return 0xFFDD8844;
+         if (c.contains("bloc")) return 0xFF999999;
          return 0xFF445566;
      }
 
@@ -1352,3 +1808,4 @@ public class GuiShop extends GuiScreen {
         return false;
     }
 }
+
