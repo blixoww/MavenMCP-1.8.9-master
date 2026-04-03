@@ -269,6 +269,18 @@ public class EntityPlayerSP extends AbstractClientPlayer {
      * Sends a chat message from the player. Args: chatMessage
      */
     public void sendChatMessage(String message) {
+        if (message.startsWith("/hdvexpire ")) {
+            try {
+                int id = Integer.parseInt(message.substring("/hdvexpire ".length()).trim());
+                net.minecraft.client.custompackets.handler.HdvPacketHandler.expireItem(id);
+                this.addChatMessage(new net.minecraft.util.ChatComponentText(
+                    "\u00a77[HDV] Expiration forc\u00e9e envoy\u00e9e pour l'annonce \u00a7f#" + id + "\u00a77."));
+            } catch (NumberFormatException e) {
+                this.addChatMessage(new net.minecraft.util.ChatComponentText(
+                    "\u00a7cUtilisation : /hdvexpire <id_annonce>"));
+            }
+            return;
+        }
         this.sendQueue.addToSendQueue(new C01PacketChatMessage(message));
     }
 

@@ -194,6 +194,9 @@ public class CraftingManager {
                 "XXX",
                 'X', Items.iron_ingot,
                 'O', Blocks.coal_block});
+        // Compression / décompression du bloc d'acier
+        this.addRecipe(new ItemStack(Blocks.steel_block, 1), new Object[]{"###", "###", "###", '#', Items.steel_ingot});
+        this.addRecipe(new ItemStack(Items.steel_ingot, 9), new Object[]{"#", '#', Blocks.steel_block});
 
         this.addRecipe(new ItemStack(Items.multi_tool, 1), new Object[]{
                 "CCC",

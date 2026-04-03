@@ -71,6 +71,9 @@ public class HdvListing {
     public long getExpiresAt()    { return expiresAt; }
     public boolean isSold()       { return sold; }
 
+    /** Vrai si l'annonce n'a pas été vendue et que sa date d'expiration est dépassée (récupérable par le vendeur). */
+    public boolean isExpired()    { return !sold && expiresAt > 0 && System.currentTimeMillis() / 1000L > expiresAt; }
+
     /** Calcule le prix unitaire approximatif. */
     public long getPricePerUnit() {
         return quantity > 0 ? totalPrice / quantity : 0;

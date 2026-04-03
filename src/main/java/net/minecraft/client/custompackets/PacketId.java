@@ -39,6 +39,8 @@ public final class PacketId {
     public static final int HDV_COLLECT       = 0x15;
     /** Demander ses propres annonces (actives + vendues) */
     public static final int HDV_MY_LISTINGS_REQUEST = 0x16;
+    /** Forcer l'expiration d'un listing (admin) */
+    public static final int HDV_ADMIN_EXPIRE        = 0x17;
 
     // ════════════════════════════════════════════════════════════════════════
     //  HDV – Serveur → Client
@@ -56,6 +58,8 @@ public final class PacketId {
     public static final int HDV_MY_LISTINGS_RESPONSE = 0x24;
     /** Demande au client d'ouvrir l'interface HDV */
     public static final int HDV_OPEN = 0x25;
+    /** Notification temps-réel : un item du joueur vient d'être vendu */
+    public static final int HDV_SOLD_NOTIFICATION = 0x26;
 
 
     // ════════════════════════════════════════════════════════════════════════

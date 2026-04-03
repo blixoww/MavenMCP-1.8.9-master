@@ -105,12 +105,12 @@ public class PotionStatusWidget extends BaseWidget {
                     GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                     mc.ingameGUI.drawTexturedModalRect(sX, drawY, u, v, 18, 18);
                     GlStateManager.disableBlend();
-                    mc.fontRendererObj.drawStringWithShadow(text, sX + 20, drawY + 4, 0xFFFFFF);
+                    mc.fontRendererObj.drawStringWithShadow(text, sX + 20, drawY + 4, getColor());
                 } else {
-                    mc.fontRendererObj.drawStringWithShadow(text, sX, drawY + 4, 0xFFFFFF);
+                    mc.fontRendererObj.drawStringWithShadow(text, sX, drawY + 4, getColor());
                 }
             } else {
-                mc.fontRendererObj.drawStringWithShadow(text, sX, drawY + 4, 0xFFFFFF);
+                mc.fontRendererObj.drawStringWithShadow(text, sX, drawY + 4, getColor());
             }
             line++;
         }

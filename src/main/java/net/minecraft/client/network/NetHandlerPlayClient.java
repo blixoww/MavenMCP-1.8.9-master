@@ -289,6 +289,7 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
         this.netManager.sendPacket(new C17PacketCustomPayload("MC|Brand", (new PacketBuffer(Unpooled.buffer())).writeString(ClientBrandRetriever.getClientModName())));
         // Enregistrer les canaux custom auprès du serveur
         net.minecraft.client.custompackets.CustomPacketSystem.sendRegisterPacket();
+        net.minecraft.client.custompackets.handler.HdvPacketHandler.resetSession();
     }
 
     /**

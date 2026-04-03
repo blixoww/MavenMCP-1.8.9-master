@@ -12,6 +12,11 @@ public class CombatLogWidget extends BaseWidget {
     private long localCombatExpire = 0L;
     private float lastHealth = -1f;
 
+    // Détection de dégâts de chute — pour ne pas déclencher le combat sur une chute
+    private boolean wasOnGround = true;
+    private float prevFallDistance = 0f;
+    private long lastLandedWithFallTime = 0L;
+
     public CombatLogWidget(String id, int x, int y) {
         super(id, x, y);
         this.width = 80;
@@ -25,8 +30,20 @@ public class CombatLogWidget extends BaseWidget {
         if (mc != null && mc.thePlayer != null) {
             float currentHealth = mc.thePlayer.getHealth();
             if (lastHealth < 0f) lastHealth = currentHealth;
-            // Prise de dégâts détectée → déclenche le timer local de 30s
-            if (currentHealth < lastHealth || mc.thePlayer.hurtTime > 0) {
+
+            boolean onGround = mc.thePlayer.onGround;
+            float fallDist = mc.thePlayer.fallDistance;
+
+            // Détecter un atterrissage depuis une chute significative
+            if (!wasOnGround && onGround && prevFallDistance > 2.5f) {
+                lastLandedWithFallTime = System.currentTimeMillis();
+            }
+            wasOnGround = onGround;
+            prevFallDistance = fallDist;
+
+            // Déclenche le timer local uniquement si ce n'est pas une chute récente
+            boolean recentFall = (System.currentTimeMillis() - lastLandedWithFallTime) < 1500L;
+            if (!recentFall && (currentHealth < lastHealth || mc.thePlayer.hurtTime > 0)) {
                 this.localCombatExpire = System.currentTimeMillis() + 30000L;
             }
             lastHealth = currentHealth;

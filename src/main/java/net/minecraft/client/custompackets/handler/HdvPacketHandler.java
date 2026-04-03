@@ -26,6 +26,13 @@ public final class HdvPacketHandler {
     private static final List<HdvListing> cachedMyListings = new ArrayList<>();
     private static long cachedPendingEarnings = 0L;
 
+    /** Nb d'items vendus lors de la dernière réponse. -1 = non initialisé (première co). */
+    private static int previousSoldCount = -1;
+
+    /** Barre de séparation utilisée dans les messages chat HDV. */
+    private static final String HDV_BAR =
+        "\u00a78\u00a7m                                                            \u00a7r";
+
     private static ListListener      listListener;
     private static ActionListener    actionListener;
     private static MyListingsListener myListingsListener;
@@ -82,24 +89,52 @@ public final class HdvPacketHandler {
         // Mes annonces (actives + vendues) + gains en attente
         PacketDispatcher.register(PacketChannel.HDV_S2C, PacketId.HDV_MY_LISTINGS_RESPONSE, buf -> {
             try {
-                int count           = buf.readVarIntFromBuffer();
+                int count            = buf.readVarIntFromBuffer();
                 long pendingEarnings = buf.readLong();
                 List<HdvListing> mine = new ArrayList<>(count);
                 for (int i = 0; i < count; i++) {
                     HdvListing l = HdvListing.readMyListing(buf);
                     if (l != null) mine.add(l);
                 }
-                // Mise à jour du cache
                 cachedMyListings.clear();
                 cachedMyListings.addAll(mine);
                 if (pendingEarnings >= 0) cachedPendingEarnings = pendingEarnings;
                 final List<HdvListing> snapshot = Collections.unmodifiableList(new ArrayList<>(cachedMyListings));
                 final long ep = cachedPendingEarnings;
+                int sc = 0;
+                for (HdvListing l : mine) { if (l.isSold()) sc++; }
+                final int soldCount = sc;
                 net.minecraft.client.Minecraft.getMinecraft().addScheduledTask(() -> {
                     if (myListingsListener != null) myListingsListener.onMyListingsReceived(snapshot, ep);
                     net.minecraft.client.gui.GuiScreen cur = net.minecraft.client.Minecraft.getMinecraft().currentScreen;
                     if (cur instanceof net.minecraft.client.gui.GuiHDV)
                         ((net.minecraft.client.gui.GuiHDV) cur).onMyListingsReceived(snapshot, ep);
+                    // Notification connexion : items vendus pendant la déconnexion
+                    if (!(cur instanceof net.minecraft.client.gui.GuiHDV)
+                            && previousSoldCount < 0 && soldCount > 0) {
+                        chat(HDV_BAR);
+                        chat("\u00a7f  \u00a76[HDV] \u00a7e" + soldCount + " vente(s) en attente !");
+                        chat("\u00a77  Ouvrez l'HDV pour collecter \u00a76+" + fmtPrice(ep) + " $");
+                        chat(HDV_BAR);
+                    }
+                    previousSoldCount = soldCount;
+                });
+            } catch (Exception ignored) {}
+        });
+
+        // Notification temps-réel : un item vient d'être vendu
+        PacketDispatcher.register(PacketChannel.HDV_S2C, PacketId.HDV_SOLD_NOTIFICATION, buf -> {
+            try {
+                String itemName = buf.readStringFromBuffer(64);
+                int    qty      = buf.readVarIntFromBuffer();
+                long   price    = buf.readLong();
+                final String n = itemName; final int q = qty; final long p = price;
+                net.minecraft.client.Minecraft.getMinecraft().addScheduledTask(() -> {
+                    chat(HDV_BAR);
+                    chat("\u00a7f  \u00a76[HDV] \u00a7aItem vendu !");
+                    chat("\u00a77  \u00a7f" + n + " \u00a77x" + q + "  \u00bb  \u00a76+" + fmtPrice(p) + " $");
+                    chat(HDV_BAR);
+                    previousSoldCount = Math.max(0, previousSoldCount) + 1;
                 });
             } catch (Exception ignored) {}
         });
@@ -157,6 +192,27 @@ public final class HdvPacketHandler {
         PacketSender.sendSimple(PacketChannel.HDV_C2S, PacketId.HDV_COLLECT);
     }
 
+    /** Demande au serveur de forcer l'expiration d'un listing (commande admin). */
+    public static void expireItem(int listingId) {
+        PacketBuffer buf = PacketSender.newBuffer();
+        buf.writeVarIntToBuffer(PacketId.HDV_ADMIN_EXPIRE);
+        buf.writeVarIntToBuffer(listingId);
+        PacketSender.send(PacketChannel.HDV_C2S, buf);
+    }
+
+    /** Affiche le message de collecte réussie dans le chat avec des barres alignées. */
+    public static void showCollectMessage(long amount) {
+        chat(HDV_BAR);
+        chat("\u00a7f  \u00a76[HDV] \u00a7aCollecte r\u00e9ussie !");
+        chat("\u00a77  Gains r\u00e9cup\u00e9r\u00e9s : \u00a76+" + fmtPrice(amount) + " $");
+        chat(HDV_BAR);
+    }
+
+    /** Réinitialise l'état de session (à appeler à chaque connexion). */
+    public static void resetSession() {
+        previousSoldCount = -1;
+    }
+
     // ── Listeners ────────────────────────────────────────────────────────────
 
     public static void setListListener(ListListener l)           { listListener = l; }
@@ -166,4 +222,19 @@ public final class HdvPacketHandler {
     public static List<HdvListing> getCachedListings()   { return Collections.unmodifiableList(cachedListings); }
     public static List<HdvListing> getCachedMyListings() { return Collections.unmodifiableList(cachedMyListings); }
     public static long getCachedPendingEarnings()         { return cachedPendingEarnings; }
+
+    // ── Helpers privés ────────────────────────────────────────────────────────
+
+    private static void chat(String msg) {
+        net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getMinecraft();
+        if (mc != null && mc.thePlayer != null) {
+            mc.thePlayer.addChatMessage(new net.minecraft.util.ChatComponentText(msg));
+        }
+    }
+
+    private static String fmtPrice(long v) {
+        if (v >= 1_000_000L) return String.format("%.1fM", v / 1_000_000.0);
+        if (v >= 1_000L)     return String.format("%.1fK", v / 1_000.0);
+        return String.valueOf(v);
+    }
 }

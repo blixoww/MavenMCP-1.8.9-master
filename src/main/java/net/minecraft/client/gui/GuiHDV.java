@@ -149,6 +149,10 @@ public class GuiHDV extends GuiScreen {
                     if (action == PendingAction.CANCEL) {
                         listings.clear(); loading = true;
                         HdvPacketHandler.requestList(0, "");
+                    } else { // COLLECT
+                        HdvPacketHandler.showCollectMessage(pendingEarnings);
+                        myListings.clear(); loadingMine = true;
+                        HdvPacketHandler.requestMyListings();
                     }
                 } else {
                     listings.clear(); loading = true;

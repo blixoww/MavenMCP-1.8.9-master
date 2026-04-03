@@ -1686,6 +1686,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
 
                         if (this.theWorld.getBlockState(blockpos).getBlock().getMaterial() != Material.air)
                         {
+                            net.minecraft.client.visuals.VisualManager.getInstance().onMiss();
                             this.playerController.clickBlock(blockpos, this.objectMouseOver.sideHit);
                             break;
                         }

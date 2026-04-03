@@ -32,9 +32,6 @@ public class RecipesArmor
         craftManager.addRecipe(new ItemStack(Items.steel_leggings),   new Object[]{"XXX", "X X", "X X", 'X', Items.steel_ingot});
         craftManager.addRecipe(new ItemStack(Items.steel_boots),      new Object[]{"X X", "X X",        'X', Items.steel_ingot});
 
-        // ── Lingot d'acier : 9 lingots de fer → 1 lingot d'acier ─────────────
-        craftManager.addRecipe(new ItemStack(Items.steel_ingot), new Object[]{"XXX", "XXX", "XXX", 'X', Items.iron_ingot});
-
         // ── Armures Émeraude ───────────────────────────────────────────────────
         craftManager.addRecipe(new ItemStack(Items.emerald_helmet),     new Object[]{"XXX", "X X",        'X', Items.emerald});
         craftManager.addRecipe(new ItemStack(Items.emerald_chestplate), new Object[]{"X X", "XXX", "XXX", 'X', Items.emerald});
