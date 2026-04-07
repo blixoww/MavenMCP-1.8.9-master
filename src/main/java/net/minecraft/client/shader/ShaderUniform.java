@@ -124,7 +124,7 @@ public class ShaderUniform
         this.uniformFloatBuffer.put(p_148081_2_);
         this.uniformFloatBuffer.put(p_148081_3_);
         this.uniformFloatBuffer.put(p_148081_4_);
-        ((java.nio.Buffer)this.uniformFloatBuffer).flip();
+        this.uniformFloatBuffer.flip();
         this.markDirty();
     }
 

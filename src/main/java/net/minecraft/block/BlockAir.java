@@ -14,6 +14,31 @@ public class BlockAir extends Block
     }
 
     /**
+     * Allow external code (OptiFine) to set the light opacity of any block.
+     * This delegates to the protected instance method in Block; placing it here
+     * keeps access control while providing a stable static helper.
+     */
+    public static void setLightOpacity(Block block, int opacity)
+    {
+        if (block != null)
+        {
+            block.setLightOpacity(opacity);
+        }
+    }
+
+    /**
+     * Alternative static helper to set light opacity on a block. Named differently
+     * to avoid ambiguity with the instance protected method in Block.
+     */
+    public static void setBlockLightOpacity(Block block, int opacity)
+    {
+        if (block != null)
+        {
+            block.setLightOpacity(opacity);
+        }
+    }
+
+    /**
      * The type of render function called. 3 for standard block models, 2 for TESR's, 1 for liquids, -1 is no render
      */
     public int getRenderType()

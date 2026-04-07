@@ -152,7 +152,7 @@ public class GuiShop extends GuiScreen {
         Tessellator tess = Tessellator.getInstance();
         net.minecraft.client.renderer.WorldRenderer wr = tess.getWorldRenderer();
         try {
-            if (wr.isDrawing) tess.draw();
+            if (wr.isDrawing()) tess.draw();
             GlStateManager.pushMatrix();
             GlStateManager.enableDepth();
             RenderHelper.enableGUIStandardItemLighting();
@@ -162,7 +162,7 @@ public class GuiShop extends GuiScreen {
             RenderHelper.disableStandardItemLighting();
             GlStateManager.disableDepth();
             GlStateManager.popMatrix();
-            if (wr.isDrawing) tess.draw();
+            if (wr.isDrawing()) tess.draw();
             return true;
         } catch (Exception e) {
             return false;

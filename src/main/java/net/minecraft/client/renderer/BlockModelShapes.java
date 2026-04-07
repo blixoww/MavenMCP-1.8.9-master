@@ -85,11 +85,6 @@ public class BlockModelShapes
                 return this.modelManager.getTextureMap().getAtlasSprite("minecraft:blocks/planks_oak");
             }
 
-            if (block == Blocks.steel_chest)
-            {
-                return this.modelManager.getTextureMap().getAtlasSprite("minecraft:blocks/steel_block");
-            }
-
             if (block == Blocks.ender_chest)
             {
                 return this.modelManager.getTextureMap().getAtlasSprite("minecraft:blocks/obsidian");
@@ -163,7 +158,7 @@ public class BlockModelShapes
 
     private void registerAllBlocks()
     {
-        this.registerBuiltInBlocks(new Block[] {Blocks.air, Blocks.flowing_water, Blocks.water, Blocks.flowing_lava, Blocks.lava, Blocks.piston_extension, Blocks.chest, Blocks.ender_chest, Blocks.trapped_chest, Blocks.standing_sign, Blocks.skull, Blocks.end_portal, Blocks.barrier, Blocks.wall_sign, Blocks.wall_banner, Blocks.standing_banner, Blocks.steel_chest});
+        this.registerBuiltInBlocks(new Block[] {Blocks.air, Blocks.flowing_water, Blocks.water, Blocks.flowing_lava, Blocks.lava, Blocks.piston_extension, Blocks.chest, Blocks.ender_chest, Blocks.trapped_chest, Blocks.standing_sign, Blocks.skull, Blocks.end_portal, Blocks.barrier, Blocks.wall_sign, Blocks.wall_banner, Blocks.standing_banner});
         this.registerBlockWithStateMapper(Blocks.stone, (new StateMap.Builder()).withName(BlockStone.VARIANT).build());
         this.registerBlockWithStateMapper(Blocks.prismarine, (new StateMap.Builder()).withName(BlockPrismarine.VARIANT).build());
         this.registerBlockWithStateMapper(Blocks.leaves, (new StateMap.Builder()).withName(BlockOldLeaf.VARIANT).withSuffix("_leaves").ignore(new IProperty[] {BlockLeaves.CHECK_DECAY, BlockLeaves.DECAYABLE}).build());
@@ -315,6 +310,5 @@ public class BlockModelShapes
                 return new ModelResourceLocation(s + "_double_slab", s1);
             }
         });
-        this.registerBlockWithStateMapper(Blocks.obsidian_door, (new StateMap.Builder()).ignore(new IProperty[] {BlockDoor.POWERED}).build());
     }
 }

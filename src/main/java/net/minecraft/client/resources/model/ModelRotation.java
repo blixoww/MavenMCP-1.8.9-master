@@ -4,10 +4,11 @@ import com.google.common.collect.Maps;
 import java.util.Map;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
+import net.minecraftforge.client.model.ITransformation;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
-public enum ModelRotation
+public enum ModelRotation implements ITransformation
 {
     X0_Y0(0, 0),
     X0_Y90(0, 90),
@@ -57,7 +58,14 @@ public enum ModelRotation
         return this.matrix4d;
     }
 
-    public EnumFacing rotateFace(EnumFacing p_177523_1_)
+    @Override
+    public javax.vecmath.Matrix4f getMatrix()
+    {
+        return new javax.vecmath.Matrix4f(matrix4d.m00, matrix4d.m01, matrix4d.m02, matrix4d.m03, matrix4d.m10, matrix4d.m11, matrix4d.m12, matrix4d.m13, matrix4d.m20, matrix4d.m21, matrix4d.m22, matrix4d.m23, matrix4d.m30, matrix4d.m31, matrix4d.m32, matrix4d.m33);
+    }
+
+    @Override
+    public EnumFacing rotate(EnumFacing p_177523_1_)
     {
         EnumFacing enumfacing = p_177523_1_;
 
@@ -77,7 +85,8 @@ public enum ModelRotation
         return enumfacing;
     }
 
-    public int rotateVertex(EnumFacing facing, int vertexIndex)
+    @Override
+    public int rotate(EnumFacing facing, int vertexIndex)
     {
         int i = vertexIndex;
 
@@ -99,6 +108,16 @@ public enum ModelRotation
         }
 
         return i;
+    }
+
+    public EnumFacing rotateFace(EnumFacing p_177523_1_)
+    {
+        return rotate(p_177523_1_);
+    }
+
+    public int rotateVertex(EnumFacing facing, int vertexIndex)
+    {
+        return rotate(facing, vertexIndex);
     }
 
     public static ModelRotation getModelRotation(int p_177524_0_, int p_177524_1_)

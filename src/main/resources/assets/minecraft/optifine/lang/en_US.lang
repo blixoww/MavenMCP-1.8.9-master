@@ -1,0 +1,202 @@
+# OptiFine Language File - English (US)
+
+# Video Settings categories
+of.options.shaders=Shaders...
+of.options.quality=Quality...
+of.options.details=Details...
+of.options.performance=Performance...
+of.options.animations=Animations...
+of.options.other=Other...
+
+# Screen titles
+of.options.shadersTitle=Shader Settings
+of.options.qualityTitle=Quality Settings
+of.options.detailsTitle=Detail Settings
+of.options.performanceTitle=Performance Settings
+of.options.animationsTitle=Animation Settings
+of.options.otherTitle=Other Settings
+of.options.shaderOptionsTitle=Shader Options
+
+# Shaders buttons
+of.options.shaders.shadersFolder=Shaders Folder
+of.options.shaders.shaderOptions=Shader Options
+of.options.shaders.DOWNLOAD=Download Shaders
+of.options.shaders.packNone=(none)
+of.options.shaders.packDefault=(default)
+of.options.shaders.SHADER_PACK=Shader Pack
+
+# Shader option names
+of.options.shaders.ANTIALIASING=Antialiasing
+of.options.shaders.NORMAL_MAP=Normal Map
+of.options.shaders.SPECULAR_MAP=Specular Map
+of.options.shaders.RENDER_RES_MUL=Render Quality
+of.options.shaders.SHADOW_RES_MUL=Shadow Quality
+of.options.shaders.HAND_DEPTH_MUL=Hand Depth
+of.options.shaders.OLD_HAND_LIGHT=Old Hand Light
+of.options.shaders.OLD_LIGHTING=Old Lighting
+of.options.shaders.TWEAK_BLOCK_DAMAGE=Tweak Block Damage
+of.options.shaders.CLOUD_SHADOW=Cloud Shadow
+of.options.shaders.TEX_MIN_FIL_B=Tex Min Filter
+of.options.shaders.TEX_MIN_FIL_N=Tex_n Min Filter
+of.options.shaders.TEX_MIN_FIL_S=Tex_s Min Filter
+of.options.shaders.TEX_MAG_FIL_N=Tex_n Mag Filter
+of.options.shaders.TEX_MAG_FIL_S=Tex_s Mag Filter
+of.options.shaders.SHADOW_CLIP_FRUSTRUM=Shadow Clip
+
+# Shader incompatibility messages
+of.message.shaders.aa1=Cannot use Shaders
+of.message.shaders.aa2=Antialiasing must be disabled.
+of.message.shaders.af1=Cannot use Shaders
+of.message.shaders.af2=Anisotropic Filtering must be disabled.
+of.message.shaders.fr1=Cannot use Shaders
+of.message.shaders.fr2=Fast Render must be disabled.
+of.message.shaders.an1=Cannot use Shaders
+of.message.shaders.an2=3D Anaglyph must be disabled.
+of.message.shaders.nv1=Shader pack requires OptiFine %s or newer.
+of.message.shaders.nv2=Load this shader pack anyway?
+
+of.message.aa.shaders1=Cannot enable Antialiasing
+of.message.aa.shaders2=Shaders must be disabled first.
+of.message.af.shaders1=Cannot enable Anisotropic Filtering
+of.message.af.shaders2=Shaders must be disabled first.
+of.message.an.shaders1=Cannot enable 3D Anaglyph
+of.message.an.shaders2=Shaders must be disabled first.
+of.message.fr.shaders1=Cannot enable Fast Render
+of.message.fr.shaders2=Shaders must be disabled first.
+
+# Other messages
+of.message.other.reset=Reset all video settings to default?
+of.message.openglError=OpenGL Error: %s
+
+# OptiFine Cape
+of.options.capeOF.title=OptiFine Cape
+of.options.capeOF.openEditor=Open Editor
+of.options.capeOF.copyEditorLink=Copy Editor Link
+of.options.capeOF.reloadCape=Reload Cape
+of.message.capeOF.openEditor=Opening Cape Editor...
+of.message.capeOF.openEditorError=Error opening editor!
+of.message.capeOF.reloadCape=Reloading Cape...
+of.message.capeOF.error1=OptiFine Cape
+of.message.capeOF.error2=Error loading cape!
+
+# General labels
+of.general.ambiguous=Ambiguous
+of.general.custom=Custom
+of.general.from=From
+of.general.id=ID
+of.general.max=Max
+of.general.restart=* Requires restart
+of.general.smart=Smart
+
+# Framerate
+of.options.framerateLimit.vsync=VSync
+
+# Mipmap
+of.options.mipmap.nearest=Nearest
+of.options.mipmap.linear=Linear
+of.options.mipmap.bilinear=Bilinear
+of.options.mipmap.trilinear=Trilinear
+
+# Render distance
+of.options.renderDistance.extreme=Extreme (16)
+of.options.renderDistance.insane=Insane (20)
+of.options.renderDistance.ludicrous=Ludicrous (24)
+
+# Time
+of.options.time.dayOnly=Day Only
+of.options.time.nightOnly=Night Only
+
+# Animation
+of.options.animation.allOn=All ON
+of.options.animation.allOff=All OFF
+of.options.animation.dynamic=Dynamic
+
+# Other
+of.options.other.reset=Reset Video Settings
+of.message.other.reset=Reset all video settings to default?
+
+# Autosave
+of.options.save.45s=45 sec
+of.options.save.90s=90 sec
+of.options.save.3min=3 min
+of.options.save.6min=6 min
+of.options.save.12min=12 min
+of.options.save.24min=24 min
+
+# Shaders profile
+of.shaders.profile=Profile
+
+# ── Option labels (used in GameSettings.Options enum) ─────────────────────────
+of.options.FOG_FANCY=Fog
+of.options.FOG_START=Fog Start
+of.options.MIPMAP_TYPE=Mipmap Type
+of.options.SMOOTH_FPS=Smooth FPS
+of.options.CLOUDS=Clouds
+of.options.CLOUD_HEIGHT=Cloud Height
+of.options.TREES=Trees
+of.options.RAIN=Rain
+of.options.ANIMATED_WATER=Animated Water
+of.options.ANIMATED_LAVA=Animated Lava
+of.options.ANIMATED_FIRE=Animated Fire
+of.options.ANIMATED_PORTAL=Animated Portal
+of.options.AO_LEVEL=Smooth Lighting Level
+of.options.LAGOMETER=Lagometer
+of.options.SHOW_FPS=Show FPS
+of.options.AUTOSAVE_TICKS=Autosave
+of.options.BETTER_GRASS=Better Grass
+of.options.ANIMATED_REDSTONE=Animated Redstone
+of.options.ANIMATED_EXPLOSION=Animated Explosion
+of.options.ANIMATED_FLAME=Animated Flame
+of.options.ANIMATED_SMOKE=Animated Smoke
+of.options.WEATHER=Weather
+of.options.SKY=Sky
+of.options.STARS=Stars
+of.options.SUN_MOON=Sun & Moon
+of.options.VIGNETTE=Vignette
+of.options.CHUNK_UPDATES=Chunk Updates
+of.options.CHUNK_UPDATES_DYNAMIC=Dynamic Updates
+of.options.TIME=Time
+of.options.CLEAR_WATER=Clear Water
+of.options.SMOOTH_WORLD=Smooth World
+of.options.VOID_PARTICLES=Void Particles
+of.options.WATER_PARTICLES=Water Particles
+of.options.RAIN_SPLASH=Rain Splash
+of.options.PORTAL_PARTICLES=Portal Particles
+of.options.POTION_PARTICLES=Potion Particles
+of.options.FIREWORK_PARTICLES=Firework Particles
+of.options.PROFILER=Debug Profiler
+of.options.DRIPPING_WATER_LAVA=Dripping Water/Lava
+of.options.BETTER_SNOW=Better Snow
+of.options.FULLSCREEN_MODE=Fullscreen Mode
+of.options.ANIMATED_TERRAIN=Animated Terrain
+of.options.SWAMP_COLORS=Swamp Colors
+of.options.RANDOM_ENTITIES=Random Entities
+of.options.SMOOTH_BIOMES=Smooth Biomes
+of.options.CUSTOM_FONTS=Custom Fonts
+of.options.CUSTOM_COLORS=Custom Colors
+of.options.SHOW_CAPES=Show Capes
+of.options.CONNECTED_TEXTURES=Connected Textures
+of.options.CUSTOM_ITEMS=Custom Items
+of.options.AA_LEVEL=Antialiasing
+of.options.AF_LEVEL=Anisotropic Filtering
+of.options.ANIMATED_TEXTURES=Animated Textures
+of.options.NATURAL_TEXTURES=Natural Textures
+of.options.EMISSIVE_TEXTURES=Emissive Textures
+of.options.HELD_ITEM_TOOLTIPS=Held Item Tooltips
+of.options.DROPPED_ITEMS=Dropped Items
+of.options.LAZY_CHUNK_LOADING=Lazy Chunk Loading
+of.options.CUSTOM_SKY=Custom Sky
+of.options.FAST_MATH=Fast Math
+of.options.FAST_RENDER=Fast Render
+of.options.TRANSLUCENT_BLOCKS=Translucent Blocks
+of.options.DYNAMIC_FOV=Dynamic FOV
+of.options.DYNAMIC_LIGHTS=Dynamic Lights
+of.options.ALTERNATE_BLOCKS=Alternate Blocks
+of.options.CUSTOM_ENTITY_MODELS=Custom Entity Models
+of.options.ADVANCED_TOOLTIPS=Advanced Tooltips
+of.options.SCREENSHOT_SIZE=Screenshot Size
+of.options.CUSTOM_GUIS=Custom GUIs
+of.options.RENDER_REGIONS=Render Regions
+of.options.SHOW_GL_ERRORS=Show GL Errors
+of.options.SMART_ANIMATIONS=Smart Animations
+
