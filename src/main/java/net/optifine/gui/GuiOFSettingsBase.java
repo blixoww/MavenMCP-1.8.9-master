@@ -51,6 +51,9 @@ public abstract class GuiOFSettingsBase extends GuiScreen {
     /** Actions spécifiques à la sous-classe (appelé après les options génériques). */
     protected void onActionPerformed(GuiButton btn) throws IOException {}
 
+    /** Nombre de lignes de boutons supplémentaires au-dessus du Done (défaut 0). */
+    protected int extraButtonRows() { return 0; }
+
     /** Boutons supplémentaires ajoutés sous le Done (ex: All On / All Off). */
     protected void addExtraButtons(int doneX, int doneY, int doneW) {}
 
@@ -63,10 +66,15 @@ public abstract class GuiOFSettingsBase extends GuiScreen {
         this.lastTime = Minecraft.getSystemTime();
 
         GameSettings.Options[] opts = getOptions();
-        int cx      = this.width  / 2;
+        int cx       = this.width  / 2;
         int colLeft  = cx - BTN_W - COL_GAP / 2;
         int colRight = cx + COL_GAP / 2;
-        int startY  = HEADER_H + 18;   // sous le header + section label
+
+        // pY : haut du panel de contenu
+        // section label : 8px texte + 4px top-pad + 6px gap bas = 18px
+        // startY : premier bouton situé 18px sous le haut du panel
+        int pY     = HEADER_H + 8;
+        int startY = pY + 18 + 4;          // panel top + label height + small gap
 
         for (int i = 0; i < opts.length; i++) {
             GameSettings.Options opt = opts[i];
@@ -82,10 +90,14 @@ public abstract class GuiOFSettingsBase extends GuiScreen {
                         this.settings.getKeyBinding(opt)));
         }
 
-        int rows   = (opts.length + 1) / 2;
-        int doneY  = startY + rows * (BTN_H + BTN_GAP) + 8;
-        int doneW  = BTN_W * 2 + COL_GAP;
+        int rows      = (opts.length + 1) / 2;
+        int gridEndY  = startY + rows * (BTN_H + BTN_GAP);
+        // Espace pour les extra-boutons : chaque ligne occupe BTN_H + BTN_GAP
+        int extraRows = extraButtonRows();
+        int doneY     = gridEndY + 8 + extraRows * (BTN_H + BTN_GAP);
+        int doneW     = BTN_W * 2 + COL_GAP;
 
+        // Les extra-boutons se placent entre la fin de grille et le Done
         addExtraButtons(colLeft, doneY, doneW);
 
         this.buttonList.add(new GuiMenuButton(BTN_DONE, colLeft, doneY, doneW, BTN_H,
@@ -124,37 +136,51 @@ public abstract class GuiOFSettingsBase extends GuiScreen {
         lastTime = now;
         float e = animation * animation * (3.0f - 2.0f * animation);
 
-        // Fond
+        // Fond : gradient du monde visible derrière, puis léger overlay sombre
         this.drawDefaultBackground();
-        Gui.drawRect(0, 0, this.width, this.height, (int)(e * 60) << 24);
+        Gui.drawRect(0, 0, this.width, this.height, (int)(e * 140) << 24 | 0x050505);
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(0, (1.0f - e) * 10, 0);
 
         int textAlpha = (int)(e * 255) << 24;
+        int cx = this.width / 2;
 
-        // ── Header ──────────────────────────────────────────────────────────
-        int hW = this.width - 8, hX = 4, hY = 2;
-        GuiRenderUtils.drawShadow(hX, hY, hW, HEADER_H, 5, (int)(e * 90));
-        Gui.drawRect(hX, hY, hX + hW, hY + HEADER_H, (int)(e * 210) << 24 | 0x0C0C0C);
-        Gui.drawRect(hX, hY, hX + hW, hY + 1, textAlpha | (ACCENT & 0xFFFFFF));
-        GuiRenderUtils.drawRectOutline(hX, hY, hW, HEADER_H, (int)(e * 30) << 24 | 0xFFFFFF);
+        // ── Header bar (full width) ──────────────────────────────────────────
+        Gui.drawRect(0, 0, this.width, HEADER_H, (int)(e * 220) << 24 | 0x0C0C0C);
+        Gui.drawRect(0, 0, this.width, 1, textAlpha | (ACCENT & 0xFFFFFF));
+        Gui.drawRect(0, HEADER_H - 1, this.width, HEADER_H, (int)(e * 40) << 24 | 0xFFFFFF);
 
         // Titre "RED CONFLICT | <sous-titre>"
         String t1  = "§c§lRED ", t2 = "§f§lCONFLICT", sep = " §8| §7";
         int w1 = fr(t1), w2 = fr(t2), w3 = fr(sep);
-        int tX = this.width / 2 - (w1 + w2 + w3 + fr(title)) / 2;
-        int tY = hY + (HEADER_H - 8) / 2;
-        this.fontRendererObj.drawStringWithShadow(t1,   tX,                 tY, textAlpha | 0xFFFFFF);
-        this.fontRendererObj.drawStringWithShadow(t2,   tX + w1,            tY, textAlpha | 0xFFFFFF);
-        this.fontRendererObj.drawStringWithShadow(sep,  tX + w1 + w2,       tY, textAlpha | 0xFFFFFF);
-        this.fontRendererObj.drawStringWithShadow(title,tX + w1 + w2 + w3,  tY, textAlpha | 0xFFFFFF);
+        int tX = cx - (w1 + w2 + w3 + fr(title)) / 2;
+        int tY = (HEADER_H - 8) / 2;
+        this.fontRendererObj.drawStringWithShadow(t1,   tX,                tY, textAlpha | 0xFFFFFF);
+        this.fontRendererObj.drawStringWithShadow(t2,   tX + w1,           tY, textAlpha | 0xFFFFFF);
+        this.fontRendererObj.drawStringWithShadow(sep,  tX + w1 + w2,      tY, textAlpha | 0xFFFFFF);
+        this.fontRendererObj.drawStringWithShadow(title,tX + w1 + w2 + w3, tY, textAlpha | 0xFFFFFF);
 
-        // ── Section header sous le titre ─────────────────────────────────────
-        int secY = HEADER_H + 4;
-        GuiRenderUtils.drawSectionHeader(this.fontRendererObj,
-                this.width / 2 - (BTN_W + COL_GAP / 2 + BTN_W) / 2 - 5,
-                secY, BTN_W * 2 + COL_GAP + 10, title, ACCENT);
+        // ── Content panel ────────────────────────────────────────────────────
+        GameSettings.Options[] opts = getOptions();
+        int rows      = (opts.length + 1) / 2;
+        int extraRows = extraButtonRows();
+        int pX = cx - BTN_W - COL_GAP / 2 - 6;
+        int pW = BTN_W * 2 + COL_GAP + 12;
+        int pY = HEADER_H + 8;   // doit correspondre à initGui
+        // label (18px) + gap (4px) + grille + gap (8px) + extra rows + done + padding bas (8px)
+        int pH = 18 + 4
+               + rows * (BTN_H + BTN_GAP)
+               + 8
+               + extraRows * (BTN_H + BTN_GAP)
+               + BTN_H + 8;
+        GuiRenderUtils.drawShadow(pX, pY, pW, pH, 5, (int)(e * 80));
+        Gui.drawRect(pX, pY, pX + pW, pY + pH, (int)(e * 190) << 24 | 0x080808);
+        Gui.drawRect(pX, pY, pX + pW, pY + 1, textAlpha | (ACCENT & 0xFFFFFF));
+        GuiRenderUtils.drawRectOutline(pX, pY, pW, pH, (int)(e * 30) << 24 | 0xFFFFFF);
+
+        // Section header inside panel
+        GuiRenderUtils.drawSectionHeader(this.fontRendererObj, pX + 6, pY + 4, pW - 12, title, ACCENT);
 
         // ── Boutons ───────────────────────────────────────────────────────────
         super.drawScreen(mouseX, mouseY, partialTicks);

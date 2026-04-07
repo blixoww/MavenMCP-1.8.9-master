@@ -66,7 +66,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
     public boolean allowUserInput;
 
     /** The FontRenderer used by GuiScreen */
-    protected FontRenderer fontRendererObj;
+    public FontRenderer fontRendererObj;
 
     /** The button that was just pressed. */
     private GuiButton selectedButton;

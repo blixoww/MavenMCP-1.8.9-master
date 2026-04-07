@@ -1,8 +1,11 @@
 package net.optifine.shaders.gui;
 
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiRenderUtils;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.src.Config;
@@ -29,6 +32,13 @@ public class GuiShaderOptions extends GuiScreenOF
     public static final String OPTION_EMPTY = "<empty>";
     public static final String OPTION_REST = "*";
 
+    // Style animé
+    private float animation = 0.0f;
+    private long lastTime = -1L;
+    private static final int ACCENT = new java.awt.Color(220, 30, 30).getRGB();
+    private static final int HDR_H = 32;
+    private static final int BTN_ROW_H = 28; // hauteur réservée en bas pour Done/Reset
+
     public GuiShaderOptions(GuiScreen guiscreen, GameSettings gamesettings)
     {
         this.tooltipManager = new TooltipManager(this, new TooltipProviderShaderOptions());
@@ -44,67 +54,57 @@ public class GuiShaderOptions extends GuiScreenOF
     {
         this(guiscreen, gamesettings);
         this.screenName = screenName;
-
         if (screenName != null)
-        {
             this.screenText = Shaders.translate("screen." + screenName, screenName);
-        }
     }
 
     public void initGui()
     {
-        this.title = I18n.format("of.options.shaderOptionsTitle", new Object[0]);
-        int i = 100;
-        int j = 0;
-        int k = 30;
-        int l = 20;
-        int i1 = 120;
-        int j1 = 20;
+        this.title = I18n.format("of.options.shaderOptionsTitle");
+        this.lastTime = -1L;
+        this.animation = 0.0f;
+
+        int btnH = 20;
+        int btnW = 120;
+        int k = HDR_H + 10; // startY options
+        int l = 20;          // row height for options
         int k1 = Shaders.getShaderPackColumns(this.screenName, 2);
         ShaderOption[] ashaderoption = Shaders.getShaderPackOptions(this.screenName);
 
         if (ashaderoption != null)
         {
             int l1 = MathHelper.ceiling_double_int((double)ashaderoption.length / 9.0D);
-
-            if (k1 < l1)
-            {
-                k1 = l1;
-            }
+            if (k1 < l1) k1 = l1;
 
             for (int i2 = 0; i2 < ashaderoption.length; ++i2)
             {
                 ShaderOption shaderoption = ashaderoption[i2];
-
                 if (shaderoption != null && shaderoption.isVisible())
                 {
                     int j2 = i2 % k1;
                     int k2 = i2 / k1;
                     int l2 = Math.min(this.width / k1, 200);
-                    j = (this.width - l2 * k1) / 2;
+                    int j = (this.width - l2 * k1) / 2;
                     int i3 = j2 * l2 + 5 + j;
                     int j3 = k + k2 * l;
                     int k3 = l2 - 10;
                     String s = getButtonText(shaderoption, k3);
                     GuiButtonShaderOption guibuttonshaderoption;
-
                     if (Shaders.isShaderPackOptionSlider(shaderoption.getName()))
-                    {
-                        guibuttonshaderoption = new GuiSliderShaderOption(i + i2, i3, j3, k3, j1, shaderoption, s);
-                    }
+                        guibuttonshaderoption = new GuiSliderShaderOption(100 + i2, i3, j3, k3, btnH, shaderoption, s);
                     else
-                    {
-                        guibuttonshaderoption = new GuiButtonShaderOption(i + i2, i3, j3, k3, j1, shaderoption, s);
-                    }
-
+                        guibuttonshaderoption = new GuiButtonShaderOption(100 + i2, i3, j3, k3, btnH, shaderoption, s);
                     guibuttonshaderoption.enabled = shaderoption.isEnabled();
                     this.buttonList.add(guibuttonshaderoption);
                 }
             }
         }
 
-        this.buttonList.add(new GuiButton(201, this.width / 2 - i1 - 20, this.height / 6 + 168 + 11, i1, j1, I18n.format("controls.reset", new Object[0])));
-        this.buttonList.add(new GuiButton(200, this.width / 2 + 20, this.height / 6 + 168 + 11, i1, j1, I18n.format("gui.done", new Object[0])));
+        // Boutons Reset et Done centrés en bas, dans la zone BTN_ROW_H
+        int botY = this.height - BTN_ROW_H + 4;
+        int cx   = this.width / 2;
+        this.buttonList.add(new GuiButton(201, cx - btnW - 5,  botY, btnW, btnH, I18n.format("controls.reset")));
+        this.buttonList.add(new GuiButton(200, cx + 5,         botY, btnW, btnH, I18n.format("gui.done")));
     }
 
     public static String getButtonText(ShaderOption so, int btnWidth)
@@ -245,18 +245,41 @@ public class GuiShaderOptions extends GuiScreenOF
 
     public void drawScreen(int x, int y, float f)
     {
-        this.drawDefaultBackground();
+        // Animation
+        long now = net.minecraft.client.Minecraft.getSystemTime();
+        if (lastTime >= 0)
+            animation = MathHelper.clamp_float(animation + (now - lastTime) / 1000.0f * 5.0f, 0.0f, 1.0f);
+        lastTime = now;
+        float e = animation * animation * (3.0f - 2.0f * animation);
 
-        if (this.screenText != null)
-        {
-            this.drawCenteredString(this.fontRendererObj, this.screenText, this.width / 2, 15, 16777215);
-        }
-        else
-        {
-            this.drawCenteredString(this.fontRendererObj, this.title, this.width / 2, 15, 16777215);
-        }
+        // Fond : gradient monde derrière + léger overlay sombre
+        this.drawDefaultBackground();
+        Gui.drawRect(0, 0, this.width, this.height, (int)(e * 140) << 24 | 0x050505);
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(0, (1.0f - e) * 8, 0);
+
+        int ta = (int)(e * 255) << 24;
+
+        // Header bar
+        Gui.drawRect(0, 0, this.width, HDR_H, (int)(e * 220) << 24 | 0x0C0C0C);
+        Gui.drawRect(0, 0, this.width, 1, ta | (ACCENT & 0xFFFFFF));
+        Gui.drawRect(0, HDR_H - 1, this.width, HDR_H, (int)(e * 40) << 24 | 0xFFFFFF);
+
+        // Titre centré dans le header
+        String displayTitle = (this.screenText != null) ? this.screenText : this.title;
+        int tw = this.fontRendererObj.getStringWidth(displayTitle);
+        this.fontRendererObj.drawStringWithShadow(displayTitle,
+                this.width / 2 - tw / 2, (HDR_H - 8) / 2, ta | 0xFFFFFF);
+
+        // Footer bar pour les boutons Done/Reset
+        int footY = this.height - BTN_ROW_H;
+        Gui.drawRect(0, footY, this.width, this.height, (int)(e * 180) << 24 | 0x0A0A0A);
+        Gui.drawRect(0, footY, this.width, footY + 1, (int)(e * 50) << 24 | 0xFFFFFF);
 
         super.drawScreen(x, y, f);
+        GlStateManager.popMatrix();
+
         this.tooltipManager.drawTooltips(x, y, this.buttonList);
     }
 }

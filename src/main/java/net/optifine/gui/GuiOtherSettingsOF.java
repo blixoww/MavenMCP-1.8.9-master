@@ -34,8 +34,11 @@ public class GuiOtherSettingsOF extends GuiOFSettingsBase implements GuiYesNoCal
     protected String buildTitle() { return I18n.format("of.options.otherTitle"); }
 
     @Override
+    protected int extraButtonRows() { return 1; }
+
+    @Override
     protected void addExtraButtons(int doneX, int doneY, int doneW) {
-        // Bouton Reset au-dessus du Done
+        // Bouton Reset juste au-dessus du Done
         this.buttonList.add(new GuiMenuButton(BTN_RESET, doneX, doneY - BTN_H - BTN_GAP, doneW, BTN_H,
                 I18n.format("of.options.other.reset")));
     }

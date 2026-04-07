@@ -29,6 +29,10 @@ class GuiSlotShaders extends GuiSlot
     {
         super(par1GuiShaders.getMc(), width, height, top, bottom, slotHeight);
         this.shadersGui = par1GuiShaders;
+        // Désactive le fond dirt natif de GuiSlot
+        this.renderBackground = false;
+        // Désactive le rectangle de sélection natif (blanc/gris) — on dessine le nôtre
+        this.showSelectionBox = false;
         this.updateList();
         this.amountScrolled = 0.0F;
         int i = this.selectedIndex * slotHeight;
@@ -166,7 +170,22 @@ class GuiSlotShaders extends GuiSlot
 
     protected void drawBackground()
     {
-        // Pas de fond par défaut, le panneau est dessiné par GuiShaders
+        // Pas de fond dirt — le panneau est dessiné par GuiShaders
+    }
+
+    /**
+     * Vide : on ne dessine pas le fond dirt dans les zones hors-liste.
+     */
+    @Override
+    protected void overlayBackground(int startY, int endY, int startAlpha, int endAlpha)
+    {
+        // Ne rien faire — les zones au-dessus/en-dessous sont gérées par GuiShaders
+    }
+
+    @Override
+    public void drawScreen(int mouseXIn, int mouseYIn, float p_148128_3_)
+    {
+        super.drawScreen(mouseXIn, mouseYIn, p_148128_3_);
     }
 
     protected void drawSlot(int index, int posX, int posY, int contentY, int mouseX, int mouseY)
@@ -176,20 +195,20 @@ class GuiSlotShaders extends GuiSlot
         boolean hovered = mouseX >= posX && mouseX < posX + this.getListWidth()
                 && mouseY >= posY && mouseY < posY + contentY;
 
-        // Fond de la ligne
+        int listW = this.getListWidth();
+
+        // Rectangle de sélection rouge — même coordonnées exactes que GuiSlot.drawSelectionBox
         if (selected)
         {
-            // Fond rouge accent avec transparence
-            Gui.drawRect(posX + 2, posY, posX + this.getListWidth() - 2, posY + contentY - 1,
-                    0xCC000000 | (ACCENT_COLOR & 0xFFFFFF));
-            // Barre latérale gauche
-            Gui.drawRect(posX + 2, posY, posX + 4, posY + contentY - 1, 0xFFDC1E1E);
-            // Contour subtil
-            GuiRenderUtils.drawRectOutline(posX + 2, posY, this.getListWidth() - 4, contentY - 1, 0x55FFFFFF);
+            // Fond rouge semi-transparent pleine largeur
+            Gui.drawRect(posX, posY, posX + listW, posY + contentY,
+                    0xBB000000 | (ACCENT_COLOR & 0xFFFFFF));
+            // Barre latérale gauche (accent)
+            Gui.drawRect(posX, posY, posX + 3, posY + contentY, 0xFFDC1E1E);
         }
         else if (hovered)
         {
-            Gui.drawRect(posX + 2, posY, posX + this.getListWidth() - 2, posY + contentY - 1, 0x44FFFFFF);
+            Gui.drawRect(posX, posY, posX + listW, posY + contentY, 0x18FFFFFF);
         }
 
         // Nom du shader
@@ -200,7 +219,15 @@ class GuiSlotShaders extends GuiSlot
 
         int textColor = selected ? 0xFFFFFF : (hovered ? 0xDDDDDD : 0xAAAAAA);
         int textY = posY + (contentY - 8) / 2;
-        this.shadersGui.drawCenteredString(s, (posX + this.getListWidth()) / 2, textY, textColor);
+
+        // Troncature si trop long
+        int maxTextW = listW - 12;
+        String display = s;
+        while (display.length() > 0 && this.shadersGui.fontRendererObj.getStringWidth(display) > maxTextW)
+            display = display.substring(0, display.length() - 1);
+        if (!display.equals(s)) display += "…";
+
+        this.shadersGui.drawCenteredString(display, posX + listW / 2, textY, textColor);
     }
 
     public int getSelectedIndex()

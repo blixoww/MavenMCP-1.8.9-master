@@ -37,11 +37,14 @@ public class GuiAnimationSettingsOF extends GuiOFSettingsBase
     protected String buildTitle() { return I18n.format("of.options.animationsTitle"); }
 
     @Override
+    protected int extraButtonRows() { return 1; }
+
+    @Override
     protected void addExtraButtons(int doneX, int doneY, int doneW) {
-        // Boutons All On / All Off au-dessus du Done
+        // Boutons All On / All Off juste au-dessus du Done
         int halfW = (doneW - COL_GAP) / 2;
-        this.buttonList.add(new GuiMenuButton(BTN_ALL_ON,  doneX,            doneY - BTN_H - BTN_GAP, halfW, BTN_H, Lang.get("of.options.animation.allOn")));
-        this.buttonList.add(new GuiMenuButton(BTN_ALL_OFF, doneX + halfW + COL_GAP, doneY - BTN_H - BTN_GAP, halfW, BTN_H, Lang.get("of.options.animation.allOff")));
+        this.buttonList.add(new GuiMenuButton(BTN_ALL_ON,  doneX,                       doneY - BTN_H - BTN_GAP, halfW, BTN_H, Lang.get("of.options.animation.allOn")));
+        this.buttonList.add(new GuiMenuButton(BTN_ALL_OFF, doneX + halfW + COL_GAP,     doneY - BTN_H - BTN_GAP, halfW, BTN_H, Lang.get("of.options.animation.allOff")));
     }
 
     @Override

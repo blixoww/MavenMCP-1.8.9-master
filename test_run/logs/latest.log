@@ -1,58 +1,58 @@
-[02:41:01] [Client thread/INFO]: Setting user: leziink
-[02:41:01] [Client thread/INFO]: (Session ID is token:0:leziink)
-[02:41:01] [Client thread/INFO]: [OptiFine] *** Reflector Forge ***
-[02:41:01] [Client thread/INFO]: [OptiFine] *** Reflector Vanilla ***
-[02:41:01] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.eventhandler.Event$Result
-[02:41:01] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraft.launchwrapper.Launch
-[02:41:01] [Client thread/INFO]: LWJGL Version: 2.9.4
-[02:41:02] [Client thread/INFO]: [OptiFine] 
-[02:41:02] [Client thread/INFO]: [OptiFine] OptiFine_1.8.9_HD_U_M6_pre2
-[02:41:02] [Client thread/INFO]: [OptiFine] Build: null
-[02:41:02] [Client thread/INFO]: [OptiFine] OS: Windows 10 (amd64) version 10.0
-[02:41:02] [Client thread/INFO]: [OptiFine] Java: 1.8.0_181, Oracle Corporation
-[02:41:02] [Client thread/INFO]: [OptiFine] VM: Java HotSpot(TM) 64-Bit Server VM (mixed mode), Oracle Corporation
-[02:41:02] [Client thread/INFO]: [OptiFine] LWJGL: 2.9.4
-[02:41:02] [Client thread/INFO]: [OptiFine] OpenGL: AMD Radeon RX 7800 XT, version 4.6.0 Compatibility Profile Context 26.3.1.260309, ATI Technologies Inc.
-[02:41:02] [Client thread/INFO]: [OptiFine] OpenGL Version: 4.6.0
-[02:41:02] [Client thread/INFO]: [OptiFine] OpenGL Fancy fog: Not available (GL_NV_fog_distance)
-[02:41:02] [Client thread/INFO]: [OptiFine] Maximum texture size: 16384x16384
-[02:41:02] [VersionCheck/INFO]: [OptiFine] Checking for new version
-[02:41:02] [Client thread/INFO]: [Shaders] OpenGL Version: 4.6.0 Compatibility Profile Context 26.3.1.260309
-[02:41:02] [Client thread/INFO]: [Shaders] Vendor:  ATI Technologies Inc.
-[02:41:02] [Client thread/INFO]: [Shaders] Renderer: AMD Radeon RX 7800 XT
-[02:41:02] [Client thread/INFO]: [Shaders] Capabilities:  2.0  2.1  3.0  3.2  4.0 
-[02:41:02] [Client thread/INFO]: [Shaders] GL_MAX_DRAW_BUFFERS: 8
-[02:41:02] [Client thread/INFO]: [Shaders] GL_MAX_COLOR_ATTACHMENTS_EXT: 8
-[02:41:02] [Client thread/INFO]: [Shaders] GL_MAX_TEXTURE_IMAGE_UNITS: 32
-[02:41:02] [Client thread/INFO]: [Shaders] Load shaders configuration.
-[02:41:02] [Client thread/INFO]: [Shaders] Loaded shaderpack: kuda-shaders-v6.5.26.zip
-[02:41:02] [Client thread/INFO]: [OptiFine] [Shaders] Worlds: -1, 1
-[02:41:02] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.Loader
-[02:41:02] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.Attributes
-[02:41:02] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.pipeline.LightUtil
-[02:41:02] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.client.SplashProgress
-[02:41:02] [Client thread/INFO]: Reloading ResourceManager: Default
-[02:41:02] [Client thread/INFO]: [OptiFine] *** Reloading textures ***
-[02:41:02] [Client thread/INFO]: [OptiFine] Resource packs: Default
-[02:41:02] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.client.renderer.vertex.VertexFormatElement$EnumUsage.preDraw
-[02:41:02] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.client.renderer.vertex.VertexFormatElement$EnumUsage.postDraw
-[02:41:02] [Sound Library Loader/INFO]: Starting up SoundSystem...
-[02:41:02] [VersionCheck/INFO]: [OptiFine] Version found: M5
-[02:41:02] [Thread-7/INFO]: Initializing LWJGL OpenAL
-[02:41:02] [Thread-7/INFO]: (The LWJGL binding of OpenAL.  For more information, see http://www.lwjgl.org)
-[02:41:02] [Thread-7/INFO]: OpenAL initialized.
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=east,half=upper,hinge=left,open=true,powered=true from minecraft:obsidian_door#facing=east,half=upper,hinge=left,open=true,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: half=bottom,variant=nether_brick from minecraft:obsidian_slab#half=bottom,variant=nether_brick
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=east,half=lower,hinge=left,open=false,powered=true from minecraft:obsidian_door#facing=east,half=lower,hinge=left,open=false,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: half=top,variant=wood_old from minecraft:obsidian_slab#half=top,variant=wood_old
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=east,half=lower,hinge=right,open=true,powered=true from minecraft:obsidian_door#facing=east,half=lower,hinge=right,open=true,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=south,half=lower,hinge=left,open=true,powered=false from minecraft:obsidian_door#facing=south,half=lower,hinge=left,open=true,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: seamless=false,variant=sandstone from minecraft:double_obsidian_slab#seamless=false,variant=sandstone
-[02:41:02] [Client thread/WARN]: Unable to load variant: half=bottom,variant=cobblestone from minecraft:obsidian_slab#half=bottom,variant=cobblestone
-[02:41:02] [Client thread/WARN]: Unable to load variant: half=top,variant=sandstone from minecraft:obsidian_slab#half=top,variant=sandstone
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=north,half=lower,hinge=left,open=true,powered=true from minecraft:obsidian_door#facing=north,half=lower,hinge=left,open=true,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=south,half=lower,hinge=right,open=false,powered=true from minecraft:obsidian_door#facing=south,half=lower,hinge=right,open=false,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load definition minecraft:steel_chest#facing=east
+[21:25:30] [Client thread/INFO]: Setting user: leziink
+[21:25:30] [Client thread/INFO]: (Session ID is token:0:leziink)
+[21:25:30] [Client thread/INFO]: [OptiFine] *** Reflector Forge ***
+[21:25:30] [Client thread/INFO]: [OptiFine] *** Reflector Vanilla ***
+[21:25:30] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.eventhandler.Event$Result
+[21:25:30] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraft.launchwrapper.Launch
+[21:25:30] [Client thread/INFO]: LWJGL Version: 2.9.4
+[21:25:30] [Client thread/INFO]: [OptiFine] 
+[21:25:30] [Client thread/INFO]: [OptiFine] OptiFine_1.8.9_HD_U_M6_pre2
+[21:25:30] [Client thread/INFO]: [OptiFine] Build: null
+[21:25:30] [Client thread/INFO]: [OptiFine] OS: Windows 10 (amd64) version 10.0
+[21:25:30] [Client thread/INFO]: [OptiFine] Java: 1.8.0_181, Oracle Corporation
+[21:25:30] [Client thread/INFO]: [OptiFine] VM: Java HotSpot(TM) 64-Bit Server VM (mixed mode), Oracle Corporation
+[21:25:30] [Client thread/INFO]: [OptiFine] LWJGL: 2.9.4
+[21:25:30] [Client thread/INFO]: [OptiFine] OpenGL: AMD Radeon RX 7800 XT, version 4.6.0 Compatibility Profile Context 26.3.1.260309, ATI Technologies Inc.
+[21:25:30] [Client thread/INFO]: [OptiFine] OpenGL Version: 4.6.0
+[21:25:30] [Client thread/INFO]: [OptiFine] OpenGL Fancy fog: Not available (GL_NV_fog_distance)
+[21:25:30] [Client thread/INFO]: [OptiFine] Maximum texture size: 16384x16384
+[21:25:30] [VersionCheck/INFO]: [OptiFine] Checking for new version
+[21:25:30] [Client thread/INFO]: [Shaders] OpenGL Version: 4.6.0 Compatibility Profile Context 26.3.1.260309
+[21:25:30] [Client thread/INFO]: [Shaders] Vendor:  ATI Technologies Inc.
+[21:25:30] [Client thread/INFO]: [Shaders] Renderer: AMD Radeon RX 7800 XT
+[21:25:30] [Client thread/INFO]: [Shaders] Capabilities:  2.0  2.1  3.0  3.2  4.0 
+[21:25:30] [Client thread/INFO]: [Shaders] GL_MAX_DRAW_BUFFERS: 8
+[21:25:30] [Client thread/INFO]: [Shaders] GL_MAX_COLOR_ATTACHMENTS_EXT: 8
+[21:25:30] [Client thread/INFO]: [Shaders] GL_MAX_TEXTURE_IMAGE_UNITS: 32
+[21:25:30] [Client thread/INFO]: [Shaders] Load shaders configuration.
+[21:25:30] [Client thread/INFO]: [Shaders] Loaded shaderpack: kuda-shaders-v6.5.26.zip
+[21:25:30] [Client thread/INFO]: [OptiFine] [Shaders] Worlds: -1, 1
+[21:25:31] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.Loader
+[21:25:31] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.Attributes
+[21:25:31] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.pipeline.LightUtil
+[21:25:31] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.client.SplashProgress
+[21:25:31] [Client thread/INFO]: Reloading ResourceManager: Default
+[21:25:31] [Client thread/INFO]: [OptiFine] *** Reloading textures ***
+[21:25:31] [Client thread/INFO]: [OptiFine] Resource packs: Default
+[21:25:31] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.client.renderer.vertex.VertexFormatElement$EnumUsage.preDraw
+[21:25:31] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.client.renderer.vertex.VertexFormatElement$EnumUsage.postDraw
+[21:25:31] [Sound Library Loader/INFO]: Starting up SoundSystem...
+[21:25:31] [VersionCheck/INFO]: [OptiFine] Version found: M5
+[21:25:31] [Thread-7/INFO]: Initializing LWJGL OpenAL
+[21:25:31] [Thread-7/INFO]: (The LWJGL binding of OpenAL.  For more information, see http://www.lwjgl.org)
+[21:25:31] [Thread-7/INFO]: OpenAL initialized.
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=east,half=upper,hinge=left,open=true,powered=true from minecraft:obsidian_door#facing=east,half=upper,hinge=left,open=true,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: half=bottom,variant=nether_brick from minecraft:obsidian_slab#half=bottom,variant=nether_brick
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=east,half=lower,hinge=left,open=false,powered=true from minecraft:obsidian_door#facing=east,half=lower,hinge=left,open=false,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: half=top,variant=wood_old from minecraft:obsidian_slab#half=top,variant=wood_old
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=east,half=lower,hinge=right,open=true,powered=true from minecraft:obsidian_door#facing=east,half=lower,hinge=right,open=true,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=south,half=lower,hinge=left,open=true,powered=false from minecraft:obsidian_door#facing=south,half=lower,hinge=left,open=true,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: seamless=false,variant=sandstone from minecraft:double_obsidian_slab#seamless=false,variant=sandstone
+[21:25:31] [Client thread/WARN]: Unable to load variant: half=bottom,variant=cobblestone from minecraft:obsidian_slab#half=bottom,variant=cobblestone
+[21:25:31] [Client thread/WARN]: Unable to load variant: half=top,variant=sandstone from minecraft:obsidian_slab#half=top,variant=sandstone
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=north,half=lower,hinge=left,open=true,powered=true from minecraft:obsidian_door#facing=north,half=lower,hinge=left,open=true,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=south,half=lower,hinge=right,open=false,powered=true from minecraft:obsidian_door#facing=south,half=lower,hinge=right,open=false,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load definition minecraft:steel_chest#facing=east
 java.lang.RuntimeException: Encountered an exception when loading model definition of model minecraft:blockstates/steel_chest.json
 	at net.minecraft.client.resources.model.ModelBakery.getModelBlockDefinition(ModelBakery.java:162) ~[classes/:?]
 	at net.minecraft.client.resources.model.ModelBakery.loadVariants(ModelBakery.java:106) [classes/:?]
@@ -69,11 +69,11 @@ Caused by: java.io.FileNotFoundException: minecraft:blockstates/steel_chest.json
 	at net.minecraft.client.resources.SimpleReloadableResourceManager.getAllResources(SimpleReloadableResourceManager.java:75) ~[classes/:?]
 	at net.minecraft.client.resources.model.ModelBakery.getModelBlockDefinition(ModelBakery.java:140) ~[classes/:?]
 	... 9 more
-[02:41:02] [Client thread/WARN]: Unable to load variant: seamless=true,variant=cobblestone from minecraft:double_obsidian_slab#seamless=true,variant=cobblestone
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=north,half=lower,hinge=right,open=false,powered=false from minecraft:obsidian_door#facing=north,half=lower,hinge=right,open=false,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=south,half=upper,hinge=left,open=true,powered=false from minecraft:obsidian_door#facing=south,half=upper,hinge=left,open=true,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=north,half=upper,hinge=right,open=false,powered=false from minecraft:obsidian_door#facing=north,half=upper,hinge=right,open=false,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load definition minecraft:steel_chest#facing=west
+[21:25:31] [Client thread/WARN]: Unable to load variant: seamless=true,variant=cobblestone from minecraft:double_obsidian_slab#seamless=true,variant=cobblestone
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=north,half=lower,hinge=right,open=false,powered=false from minecraft:obsidian_door#facing=north,half=lower,hinge=right,open=false,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=south,half=upper,hinge=left,open=true,powered=false from minecraft:obsidian_door#facing=south,half=upper,hinge=left,open=true,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=north,half=upper,hinge=right,open=false,powered=false from minecraft:obsidian_door#facing=north,half=upper,hinge=right,open=false,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load definition minecraft:steel_chest#facing=west
 java.lang.RuntimeException: Encountered an exception when loading model definition of model minecraft:blockstates/steel_chest.json
 	at net.minecraft.client.resources.model.ModelBakery.getModelBlockDefinition(ModelBakery.java:162) ~[classes/:?]
 	at net.minecraft.client.resources.model.ModelBakery.loadVariants(ModelBakery.java:106) [classes/:?]
@@ -90,34 +90,34 @@ Caused by: java.io.FileNotFoundException: minecraft:blockstates/steel_chest.json
 	at net.minecraft.client.resources.SimpleReloadableResourceManager.getAllResources(SimpleReloadableResourceManager.java:75) ~[classes/:?]
 	at net.minecraft.client.resources.model.ModelBakery.getModelBlockDefinition(ModelBakery.java:140) ~[classes/:?]
 	... 9 more
-[02:41:02] [Client thread/WARN]: Unable to load variant: seamless=false,variant=wood_old from minecraft:double_obsidian_slab#seamless=false,variant=wood_old
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=north,half=upper,hinge=left,open=true,powered=true from minecraft:obsidian_door#facing=north,half=upper,hinge=left,open=true,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: seamless=false,variant=nether_brick from minecraft:double_obsidian_slab#seamless=false,variant=nether_brick
-[02:41:02] [Client thread/WARN]: Unable to load variant: half=bottom,variant=brick from minecraft:obsidian_slab#half=bottom,variant=brick
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=north,half=upper,hinge=left,open=false,powered=false from minecraft:obsidian_door#facing=north,half=upper,hinge=left,open=false,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=west,half=upper,hinge=right,open=false,powered=true from minecraft:obsidian_door#facing=west,half=upper,hinge=right,open=false,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=south,half=upper,hinge=right,open=false,powered=true from minecraft:obsidian_door#facing=south,half=upper,hinge=right,open=false,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: half=bottom,variant=wood_old from minecraft:obsidian_slab#half=bottom,variant=wood_old
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=south,half=upper,hinge=left,open=false,powered=false from minecraft:obsidian_door#facing=south,half=upper,hinge=left,open=false,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=west,half=lower,hinge=left,open=false,powered=false from minecraft:obsidian_door#facing=west,half=lower,hinge=left,open=false,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: seamless=true,variant=wood_old from minecraft:double_obsidian_slab#seamless=true,variant=wood_old
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=east,half=lower,hinge=left,open=true,powered=true from minecraft:obsidian_door#facing=east,half=lower,hinge=left,open=true,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=south,half=lower,hinge=right,open=false,powered=false from minecraft:obsidian_door#facing=south,half=lower,hinge=right,open=false,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: half=top,variant=nether_brick from minecraft:obsidian_slab#half=top,variant=nether_brick
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=west,half=upper,hinge=right,open=true,powered=false from minecraft:obsidian_door#facing=west,half=upper,hinge=right,open=true,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: half=top,variant=quartz from minecraft:obsidian_slab#half=top,variant=quartz
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=north,half=lower,hinge=left,open=false,powered=false from minecraft:obsidian_door#facing=north,half=lower,hinge=left,open=false,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=north,half=upper,hinge=right,open=false,powered=true from minecraft:obsidian_door#facing=north,half=upper,hinge=right,open=false,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=south,half=lower,hinge=left,open=true,powered=true from minecraft:obsidian_door#facing=south,half=lower,hinge=left,open=true,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: seamless=false,variant=stone_brick from minecraft:double_obsidian_slab#seamless=false,variant=stone_brick
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=south,half=lower,hinge=left,open=false,powered=true from minecraft:obsidian_door#facing=south,half=lower,hinge=left,open=false,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: half=top,variant=stone_brick from minecraft:obsidian_slab#half=top,variant=stone_brick
-[02:41:02] [Client thread/WARN]: Unable to load variant: seamless=false,variant=quartz from minecraft:double_obsidian_slab#seamless=false,variant=quartz
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=north,half=lower,hinge=right,open=true,powered=true from minecraft:obsidian_door#facing=north,half=lower,hinge=right,open=true,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: seamless=true,variant=quartz from minecraft:double_obsidian_slab#seamless=true,variant=quartz
-[02:41:02] [Client thread/WARN]: Unable to load variant: seamless=true,variant=stone_brick from minecraft:double_obsidian_slab#seamless=true,variant=stone_brick
-[02:41:02] [Client thread/WARN]: Unable to load variant: half=bottom,variant=sandstone from minecraft:obsidian_slab#half=bottom,variant=sandstone
-[02:41:02] [Client thread/WARN]: Unable to load definition minecraft:steel_chest#facing=north
+[21:25:31] [Client thread/WARN]: Unable to load variant: seamless=false,variant=wood_old from minecraft:double_obsidian_slab#seamless=false,variant=wood_old
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=north,half=upper,hinge=left,open=true,powered=true from minecraft:obsidian_door#facing=north,half=upper,hinge=left,open=true,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: seamless=false,variant=nether_brick from minecraft:double_obsidian_slab#seamless=false,variant=nether_brick
+[21:25:31] [Client thread/WARN]: Unable to load variant: half=bottom,variant=brick from minecraft:obsidian_slab#half=bottom,variant=brick
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=north,half=upper,hinge=left,open=false,powered=false from minecraft:obsidian_door#facing=north,half=upper,hinge=left,open=false,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=west,half=upper,hinge=right,open=false,powered=true from minecraft:obsidian_door#facing=west,half=upper,hinge=right,open=false,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=south,half=upper,hinge=right,open=false,powered=true from minecraft:obsidian_door#facing=south,half=upper,hinge=right,open=false,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: half=bottom,variant=wood_old from minecraft:obsidian_slab#half=bottom,variant=wood_old
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=south,half=upper,hinge=left,open=false,powered=false from minecraft:obsidian_door#facing=south,half=upper,hinge=left,open=false,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=west,half=lower,hinge=left,open=false,powered=false from minecraft:obsidian_door#facing=west,half=lower,hinge=left,open=false,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: seamless=true,variant=wood_old from minecraft:double_obsidian_slab#seamless=true,variant=wood_old
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=east,half=lower,hinge=left,open=true,powered=true from minecraft:obsidian_door#facing=east,half=lower,hinge=left,open=true,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=south,half=lower,hinge=right,open=false,powered=false from minecraft:obsidian_door#facing=south,half=lower,hinge=right,open=false,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: half=top,variant=nether_brick from minecraft:obsidian_slab#half=top,variant=nether_brick
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=west,half=upper,hinge=right,open=true,powered=false from minecraft:obsidian_door#facing=west,half=upper,hinge=right,open=true,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: half=top,variant=quartz from minecraft:obsidian_slab#half=top,variant=quartz
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=north,half=lower,hinge=left,open=false,powered=false from minecraft:obsidian_door#facing=north,half=lower,hinge=left,open=false,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=north,half=upper,hinge=right,open=false,powered=true from minecraft:obsidian_door#facing=north,half=upper,hinge=right,open=false,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=south,half=lower,hinge=left,open=true,powered=true from minecraft:obsidian_door#facing=south,half=lower,hinge=left,open=true,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: seamless=false,variant=stone_brick from minecraft:double_obsidian_slab#seamless=false,variant=stone_brick
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=south,half=lower,hinge=left,open=false,powered=true from minecraft:obsidian_door#facing=south,half=lower,hinge=left,open=false,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: half=top,variant=stone_brick from minecraft:obsidian_slab#half=top,variant=stone_brick
+[21:25:31] [Client thread/WARN]: Unable to load variant: seamless=false,variant=quartz from minecraft:double_obsidian_slab#seamless=false,variant=quartz
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=north,half=lower,hinge=right,open=true,powered=true from minecraft:obsidian_door#facing=north,half=lower,hinge=right,open=true,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: seamless=true,variant=quartz from minecraft:double_obsidian_slab#seamless=true,variant=quartz
+[21:25:31] [Client thread/WARN]: Unable to load variant: seamless=true,variant=stone_brick from minecraft:double_obsidian_slab#seamless=true,variant=stone_brick
+[21:25:31] [Client thread/WARN]: Unable to load variant: half=bottom,variant=sandstone from minecraft:obsidian_slab#half=bottom,variant=sandstone
+[21:25:31] [Client thread/WARN]: Unable to load definition minecraft:steel_chest#facing=north
 java.lang.RuntimeException: Encountered an exception when loading model definition of model minecraft:blockstates/steel_chest.json
 	at net.minecraft.client.resources.model.ModelBakery.getModelBlockDefinition(ModelBakery.java:162) ~[classes/:?]
 	at net.minecraft.client.resources.model.ModelBakery.loadVariants(ModelBakery.java:106) [classes/:?]
@@ -134,27 +134,27 @@ Caused by: java.io.FileNotFoundException: minecraft:blockstates/steel_chest.json
 	at net.minecraft.client.resources.SimpleReloadableResourceManager.getAllResources(SimpleReloadableResourceManager.java:75) ~[classes/:?]
 	at net.minecraft.client.resources.model.ModelBakery.getModelBlockDefinition(ModelBakery.java:140) ~[classes/:?]
 	... 9 more
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=east,half=upper,hinge=right,open=false,powered=false from minecraft:obsidian_door#facing=east,half=upper,hinge=right,open=false,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=west,half=lower,hinge=left,open=false,powered=true from minecraft:obsidian_door#facing=west,half=lower,hinge=left,open=false,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=east,half=lower,hinge=right,open=true,powered=false from minecraft:obsidian_door#facing=east,half=lower,hinge=right,open=true,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=south,half=upper,hinge=right,open=true,powered=false from minecraft:obsidian_door#facing=south,half=upper,hinge=right,open=true,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=south,half=upper,hinge=left,open=false,powered=true from minecraft:obsidian_door#facing=south,half=upper,hinge=left,open=false,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=west,half=upper,hinge=left,open=false,powered=true from minecraft:obsidian_door#facing=west,half=upper,hinge=left,open=false,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=north,half=lower,hinge=left,open=true,powered=false from minecraft:obsidian_door#facing=north,half=lower,hinge=left,open=true,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=south,half=upper,hinge=right,open=true,powered=true from minecraft:obsidian_door#facing=south,half=upper,hinge=right,open=true,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=north,half=upper,hinge=left,open=true,powered=false from minecraft:obsidian_door#facing=north,half=upper,hinge=left,open=true,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=north,half=lower,hinge=right,open=true,powered=false from minecraft:obsidian_door#facing=north,half=lower,hinge=right,open=true,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=west,half=lower,hinge=left,open=true,powered=false from minecraft:obsidian_door#facing=west,half=lower,hinge=left,open=true,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=south,half=upper,hinge=right,open=false,powered=false from minecraft:obsidian_door#facing=south,half=upper,hinge=right,open=false,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: seamless=false,variant=cobblestone from minecraft:double_obsidian_slab#seamless=false,variant=cobblestone
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=west,half=upper,hinge=right,open=false,powered=false from minecraft:obsidian_door#facing=west,half=upper,hinge=right,open=false,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=east,half=upper,hinge=left,open=true,powered=false from minecraft:obsidian_door#facing=east,half=upper,hinge=left,open=true,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=west,half=lower,hinge=left,open=true,powered=true from minecraft:obsidian_door#facing=west,half=lower,hinge=left,open=true,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=north,half=upper,hinge=left,open=false,powered=true from minecraft:obsidian_door#facing=north,half=upper,hinge=left,open=false,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=east,half=upper,hinge=left,open=false,powered=false from minecraft:obsidian_door#facing=east,half=upper,hinge=left,open=false,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: seamless=true,variant=sandstone from minecraft:double_obsidian_slab#seamless=true,variant=sandstone
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=west,half=upper,hinge=right,open=true,powered=true from minecraft:obsidian_door#facing=west,half=upper,hinge=right,open=true,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load definition minecraft:steel_chest#facing=south
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=east,half=upper,hinge=right,open=false,powered=false from minecraft:obsidian_door#facing=east,half=upper,hinge=right,open=false,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=west,half=lower,hinge=left,open=false,powered=true from minecraft:obsidian_door#facing=west,half=lower,hinge=left,open=false,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=east,half=lower,hinge=right,open=true,powered=false from minecraft:obsidian_door#facing=east,half=lower,hinge=right,open=true,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=south,half=upper,hinge=right,open=true,powered=false from minecraft:obsidian_door#facing=south,half=upper,hinge=right,open=true,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=south,half=upper,hinge=left,open=false,powered=true from minecraft:obsidian_door#facing=south,half=upper,hinge=left,open=false,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=west,half=upper,hinge=left,open=false,powered=true from minecraft:obsidian_door#facing=west,half=upper,hinge=left,open=false,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=north,half=lower,hinge=left,open=true,powered=false from minecraft:obsidian_door#facing=north,half=lower,hinge=left,open=true,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=south,half=upper,hinge=right,open=true,powered=true from minecraft:obsidian_door#facing=south,half=upper,hinge=right,open=true,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=north,half=upper,hinge=left,open=true,powered=false from minecraft:obsidian_door#facing=north,half=upper,hinge=left,open=true,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=north,half=lower,hinge=right,open=true,powered=false from minecraft:obsidian_door#facing=north,half=lower,hinge=right,open=true,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=west,half=lower,hinge=left,open=true,powered=false from minecraft:obsidian_door#facing=west,half=lower,hinge=left,open=true,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=south,half=upper,hinge=right,open=false,powered=false from minecraft:obsidian_door#facing=south,half=upper,hinge=right,open=false,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: seamless=false,variant=cobblestone from minecraft:double_obsidian_slab#seamless=false,variant=cobblestone
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=west,half=upper,hinge=right,open=false,powered=false from minecraft:obsidian_door#facing=west,half=upper,hinge=right,open=false,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=east,half=upper,hinge=left,open=true,powered=false from minecraft:obsidian_door#facing=east,half=upper,hinge=left,open=true,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=west,half=lower,hinge=left,open=true,powered=true from minecraft:obsidian_door#facing=west,half=lower,hinge=left,open=true,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=north,half=upper,hinge=left,open=false,powered=true from minecraft:obsidian_door#facing=north,half=upper,hinge=left,open=false,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=east,half=upper,hinge=left,open=false,powered=false from minecraft:obsidian_door#facing=east,half=upper,hinge=left,open=false,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: seamless=true,variant=sandstone from minecraft:double_obsidian_slab#seamless=true,variant=sandstone
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=west,half=upper,hinge=right,open=true,powered=true from minecraft:obsidian_door#facing=west,half=upper,hinge=right,open=true,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load definition minecraft:steel_chest#facing=south
 java.lang.RuntimeException: Encountered an exception when loading model definition of model minecraft:blockstates/steel_chest.json
 	at net.minecraft.client.resources.model.ModelBakery.getModelBlockDefinition(ModelBakery.java:162) ~[classes/:?]
 	at net.minecraft.client.resources.model.ModelBakery.loadVariants(ModelBakery.java:106) [classes/:?]
@@ -171,237 +171,124 @@ Caused by: java.io.FileNotFoundException: minecraft:blockstates/steel_chest.json
 	at net.minecraft.client.resources.SimpleReloadableResourceManager.getAllResources(SimpleReloadableResourceManager.java:75) ~[classes/:?]
 	at net.minecraft.client.resources.model.ModelBakery.getModelBlockDefinition(ModelBakery.java:140) ~[classes/:?]
 	... 9 more
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=east,half=upper,hinge=right,open=true,powered=false from minecraft:obsidian_door#facing=east,half=upper,hinge=right,open=true,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=west,half=upper,hinge=left,open=true,powered=true from minecraft:obsidian_door#facing=west,half=upper,hinge=left,open=true,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=south,half=lower,hinge=left,open=false,powered=false from minecraft:obsidian_door#facing=south,half=lower,hinge=left,open=false,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: half=top,variant=cobblestone from minecraft:obsidian_slab#half=top,variant=cobblestone
-[02:41:02] [Client thread/WARN]: Unable to load variant: half=bottom,variant=stone_brick from minecraft:obsidian_slab#half=bottom,variant=stone_brick
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=south,half=upper,hinge=left,open=true,powered=true from minecraft:obsidian_door#facing=south,half=upper,hinge=left,open=true,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: seamless=false,variant=brick from minecraft:double_obsidian_slab#seamless=false,variant=brick
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=east,half=lower,hinge=right,open=false,powered=false from minecraft:obsidian_door#facing=east,half=lower,hinge=right,open=false,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: half=top,variant=brick from minecraft:obsidian_slab#half=top,variant=brick
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=west,half=lower,hinge=right,open=true,powered=false from minecraft:obsidian_door#facing=west,half=lower,hinge=right,open=true,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=west,half=lower,hinge=right,open=false,powered=true from minecraft:obsidian_door#facing=west,half=lower,hinge=right,open=false,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=north,half=upper,hinge=right,open=true,powered=false from minecraft:obsidian_door#facing=north,half=upper,hinge=right,open=true,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=north,half=lower,hinge=left,open=false,powered=true from minecraft:obsidian_door#facing=north,half=lower,hinge=left,open=false,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=north,half=upper,hinge=right,open=true,powered=true from minecraft:obsidian_door#facing=north,half=upper,hinge=right,open=true,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=east,half=lower,hinge=right,open=false,powered=true from minecraft:obsidian_door#facing=east,half=lower,hinge=right,open=false,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: seamless=true,variant=brick from minecraft:double_obsidian_slab#seamless=true,variant=brick
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=east,half=upper,hinge=right,open=false,powered=true from minecraft:obsidian_door#facing=east,half=upper,hinge=right,open=false,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=south,half=lower,hinge=right,open=true,powered=true from minecraft:obsidian_door#facing=south,half=lower,hinge=right,open=true,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=east,half=upper,hinge=right,open=true,powered=true from minecraft:obsidian_door#facing=east,half=upper,hinge=right,open=true,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: half=bottom,variant=quartz from minecraft:obsidian_slab#half=bottom,variant=quartz
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=west,half=lower,hinge=right,open=false,powered=false from minecraft:obsidian_door#facing=west,half=lower,hinge=right,open=false,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=west,half=lower,hinge=right,open=true,powered=true from minecraft:obsidian_door#facing=west,half=lower,hinge=right,open=true,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=east,half=lower,hinge=left,open=true,powered=false from minecraft:obsidian_door#facing=east,half=lower,hinge=left,open=true,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=north,half=lower,hinge=right,open=false,powered=true from minecraft:obsidian_door#facing=north,half=lower,hinge=right,open=false,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=east,half=lower,hinge=left,open=false,powered=false from minecraft:obsidian_door#facing=east,half=lower,hinge=left,open=false,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: seamless=true,variant=nether_brick from minecraft:double_obsidian_slab#seamless=true,variant=nether_brick
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=south,half=lower,hinge=right,open=true,powered=false from minecraft:obsidian_door#facing=south,half=lower,hinge=right,open=true,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=west,half=upper,hinge=left,open=true,powered=false from minecraft:obsidian_door#facing=west,half=upper,hinge=left,open=true,powered=false
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=east,half=upper,hinge=left,open=false,powered=true from minecraft:obsidian_door#facing=east,half=upper,hinge=left,open=false,powered=true
-[02:41:02] [Client thread/WARN]: Unable to load variant: facing=west,half=upper,hinge=left,open=false,powered=false from minecraft:obsidian_door#facing=west,half=upper,hinge=left,open=false,powered=false
-[02:41:02] [Sound Library Loader/INFO]: Sound engine started
-[02:41:04] [Client thread/INFO]: [OptiFine] Sprite size: 32
-[02:41:04] [Client thread/INFO]: [OptiFine] Mipmap levels: 5
-[02:41:04] [Client thread/INFO]: [OptiFine] Multitexture: false
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.ForgeHooksClient
-[02:41:04] [Client thread/INFO]: [OptiFine] Scaled too small texture: minecraft:blocks/redstone_dust_cross_overlay, 16 -> 32
-[02:41:04] [Client thread/INFO]: [OptiFine] Scaled too small texture: minecraft:blocks/redstone_dust_line_overlay, 16 -> 32
-[02:41:04] [Client thread/INFO]: Created: 1024x1024 textures-atlas
-[02:41:04] [Client thread/INFO]: [Shaders] allocateTextureMap 5 1024 1024 
-[02:41:04] [Client thread/INFO]: [OptiFine] Animated sprites: 11
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.ItemModelMesherForge
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.ModelLoader
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.client.registry.RenderingRegistry
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.ForgeModContainer
-[02:41:04] [Client thread/INFO]: [CustomPackets] ✓ Initialisation du système de packets custom...
-[02:41:04] [Client thread/INFO]: [CustomPackets] ✓ HdvPacketHandler enregistré
-[02:41:04] [Client thread/INFO]: [CustomPackets] ✓ CombatLogManager initialisé
-[02:41:04] [Client thread/INFO]: [CustomPackets] ✓ Système initialisé avec succès.
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: mods.betterfoliage.client.BetterFoliageClient
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.asm.transformers.BlamingTransformer
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.event.world.ChunkWatchEvent$UnWatch
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.relauncher.CoreModManager
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.DimensionManager
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.GuiScreenEvent$DrawScreenEvent$Pre
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.GuiScreenEvent$DrawScreenEvent$Post
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.EntityViewRenderEvent$CameraSetup
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.EntityViewRenderEvent$FogColors
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.eventhandler.Event
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.eventhandler.EventBus
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.property.ExtendedBlockState
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.client.FMLClientHandler
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.FMLCommonHandler
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.biome.BiomeGenBase.getWaterColorMultiplier
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.addDestroyEffects
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.addHitEffects
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.canCreatureSpawn
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.canRenderInLayer
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.doesSideBlockRendering
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.getBedDirection
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.getExtendedState
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.getLightOpacity
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.getLightValue
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.hasTileEntity
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.isAir
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.isBed
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.isBedFoot
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.isSideSolid
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.ChunkCache.isSideSolid
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.entity.Entity.canRiderInteract
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Field not present: net.minecraft.entity.Entity.captureDrops
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Field not present: net.minecraft.entity.Entity.capturedDrops
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.entity.Entity.shouldRenderInPass
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.entity.Entity.shouldRiderSit
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.event.ForgeEventFactory
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.ForgeHooks
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Field not present: net.minecraft.item.Item.delegate
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.getDurabilityForDisplay
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.getModel
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.onEntitySwing
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.shouldCauseReequipAnimation
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.showDurabilityBar
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.potion.PotionEffect.isCurativeItem
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.tileentity.TileEntity.canRenderBreaking
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.tileentity.TileEntity.getRenderBoundingBox
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.tileentity.TileEntity.hasFastRenderer
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.tileentity.TileEntity.shouldRenderInPass
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.World.countEntities
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.World.getPerWorldStorage
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.WorldProvider.getCloudRenderer
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.WorldProvider.getSkyRenderer
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.WorldProvider.getWeatherRenderer
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.WorldProvider.getSaveFolder
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.client.GuiModList
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.IColoredBakedQuad
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.property.IExtendedBlockState
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.IModel
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.IRenderHandler
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.MinecraftForge
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.MinecraftForgeClient
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.ModContainer
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.ModelLoader$VanillaLoader
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderBlockOverlayEvent$OverlayType
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderItemInFrameEvent
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderLivingEvent$Pre
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderLivingEvent$Post
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderLivingEvent$Specials$Pre
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderLivingEvent$Specials$Post
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.event.world.WorldEvent$Load
-[02:41:04] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: optifine.OptiFineClassTransformer
-[02:41:04] [Client thread/INFO]: [OptiFine] *** Reloading custom textures ***
-[02:41:04] [Client thread/INFO]: [OptiFine] Enable face culling: acacia_leaves, birch_leaves, dark_oak_leaves, jungle_leaves, oak_leaves, spruce_leaves
-[02:41:27] [Server thread/INFO]: Starting integrated minecraft server version 1.8.9
-[02:41:27] [Server thread/INFO]: Generating keypair
-[02:41:27] [Server thread/INFO]: Preparing start region for level 0
-[02:41:27] [Server thread/INFO]: Changing view distance to 16, from 10
-[02:41:27] [Server thread/INFO]: leziink[local:E:9152e25b] logged in with entity id 220 at (-419.13618000439135, 70.77882202468746, 232.82730893082388)
-[02:41:27] [Server thread/INFO]: leziink joined the game
-[02:41:28] [Client thread/INFO]: [CustomPackets] ✓ Packet REGISTER envoyé pour : CUSTOM:HDV_S2C CUSTOM:HDV_C2S CUSTOM:SHOP_S2C CUSTOM:SHOP_C2S CUSTOM:PDATA_S2C CUSTOM:PDATA_C2S CUSTOM:C2S CUSTOM:S2C OF_COMBAT
-[02:41:28] [Client thread/INFO]: [Shaders] Program loaded: shadow
-[02:41:28] [Client thread/INFO]: [Shaders] Program loaded: gbuffers_basic
-[02:41:28] [Client thread/INFO]: [Shaders] Program loaded: gbuffers_textured
-[02:41:28] [Client thread/INFO]: [Shaders] Program loaded: gbuffers_textured_lit
-[02:41:28] [Client thread/INFO]: [Shaders] Program loaded: gbuffers_skybasic
-[02:41:28] [Client thread/INFO]: [Shaders] Program loaded: gbuffers_skytextured
-[02:41:28] [Client thread/INFO]: [Shaders] Program loaded: gbuffers_clouds
-[02:41:28] [Client thread/INFO]: [Shaders] Program loaded: gbuffers_terrain
-[02:41:28] [Client thread/INFO]: [Shaders] Program loaded: gbuffers_block
-[02:41:28] [Client thread/INFO]: [Shaders] Program loaded: gbuffers_entities
-[02:41:28] [Client thread/INFO]: [Shaders] Program loaded: gbuffers_armor_glint
-[02:41:28] [Client thread/INFO]: [Shaders] Program loaded: gbuffers_spidereyes
-[02:41:28] [Client thread/INFO]: [Shaders] Program loaded: gbuffers_hand
-[02:41:28] [Client thread/INFO]: [Shaders] Program loaded: gbuffers_weather
-[02:41:28] [Client thread/INFO]: [Shaders] Program loaded: gbuffers_water
-[02:41:28] [Client thread/INFO]: [Shaders] composite format: RGBA16
-[02:41:28] [Client thread/INFO]: [Shaders] gcolor format: RGBA16
-[02:41:28] [Client thread/INFO]: [Shaders] gaux4 format: RGBA16
-[02:41:28] [Client thread/INFO]: [Shaders] gaux2 format: RGB16
-[02:41:28] [Client thread/INFO]: [Shaders] gnormal format: RGB16
-[02:41:28] [Client thread/INFO]: [Shaders] Sun path rotation: -35.0
-[02:41:28] [Client thread/INFO]: [Shaders] Shadow map resolution: 2048
-[02:41:28] [Client thread/INFO]: [Shaders] Shadow map distance: 120.0
-[02:41:28] [Client thread/INFO]: [Shaders] Shadow map interval size: 4.0
-[02:41:28] [Client thread/INFO]: [Shaders] shadowHardwareFiltering0
-[02:41:28] [Client thread/INFO]: [Shaders] Eye brightness halflife: 7.5
-[02:41:28] [Client thread/INFO]: [Shaders] AO Level: 0.7
-[02:41:28] [Client thread/INFO]: [Shaders] Wetness halflife: 600.0
-[02:41:28] [Client thread/INFO]: [Shaders] Dryness halflife: 200.0
-[02:41:28] [Client thread/INFO]: [Shaders] Noise texture enabled
-[02:41:28] [Client thread/INFO]: [Shaders] Noise texture resolution: 128
-[02:41:28] [Client thread/INFO]: [Shaders] Program loaded: composite
-[02:41:28] [Client thread/INFO]: [Shaders] composite mipmap enabled
-[02:41:28] [Client thread/INFO]: [Shaders] Program loaded: composite1
-[02:41:28] [Client thread/INFO]: [Shaders] Program loaded: composite2
-[02:41:28] [Client thread/INFO]: [Shaders] composite mipmap enabled
-[02:41:28] [Client thread/INFO]: [Shaders] Program loaded: composite3
-[02:41:28] [Client thread/INFO]: [Shaders] composite mipmap enabled
-[02:41:28] [Client thread/INFO]: [Shaders] gaux4 mipmap enabled
-[02:41:28] [Client thread/INFO]: [Shaders] Program loaded: final
-[02:41:28] [Client thread/INFO]: [Shaders] usedColorBuffers: 8
-[02:41:28] [Client thread/INFO]: [Shaders] usedDepthBuffers: 3
-[02:41:28] [Client thread/INFO]: [Shaders] usedShadowColorBuffers: 0
-[02:41:28] [Client thread/INFO]: [Shaders] usedShadowDepthBuffers: 1
-[02:41:28] [Client thread/INFO]: [Shaders] usedColorAttachs: 8
-[02:41:28] [Client thread/INFO]: [Shaders] usedDrawBuffers: 4
-[02:41:28] [Client thread/INFO]: [Shaders] Framebuffer created.
-[02:41:28] [Client thread/INFO]: [Shaders] Shadow framebuffer created.
-[02:41:28] [Client thread/INFO]: [Shaders] Reset model renderers
-[02:41:28] [Client thread/INFO]: [Shaders] Reset world renderers
-[02:41:28] [Chunk Batcher 8/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[02:41:28] [Chunk Batcher 3/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[02:41:29] [Chunk Batcher 7/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[02:41:29] [Server thread/INFO]: Saving and pausing game...
-[02:41:29] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[02:41:29] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[02:41:29] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[02:41:35] [Client thread/WARN]: Failed to load texture: minecraft:optifine/textures/icons.png
-java.io.FileNotFoundException: minecraft:optifine/textures/icons.png
-	at net.minecraft.client.resources.FallbackResourceManager.getResource(FallbackResourceManager.java:64) ~[classes/:?]
-	at net.minecraft.client.resources.SimpleReloadableResourceManager.getResource(SimpleReloadableResourceManager.java:61) ~[classes/:?]
-	at net.minecraft.client.renderer.texture.SimpleTexture.loadTexture(SimpleTexture.java:35) ~[classes/:?]
-	at net.minecraft.client.renderer.texture.TextureManager.loadTexture(TextureManager.java:98) [classes/:?]
-	at net.minecraft.client.renderer.texture.TextureManager.bindTexture(TextureManager.java:63) [classes/:?]
-	at net.optifine.shaders.gui.GuiButtonDownloadShaders.drawButton(GuiButtonDownloadShaders.java:21) [classes/:?]
-	at net.minecraft.client.gui.GuiScreen.drawScreen(GuiScreen.java:89) [classes/:?]
-	at net.optifine.shaders.gui.GuiShaders.drawScreen(GuiShaders.java:507) [classes/:?]
-	at net.minecraft.client.renderer.EntityRenderer.updateCameraAndRender(EntityRenderer.java:1314) [classes/:?]
-	at net.minecraft.client.Minecraft.runGameLoop(Minecraft.java:1295) [classes/:?]
-	at net.minecraft.client.Minecraft.run(Minecraft.java:415) [classes/:?]
-	at net.minecraft.client.main.Main.main(Main.java:113) [classes/:?]
-	at StartDev.main(StartDev.java:22) [test-classes/:?]
-[02:41:36] [Client thread/INFO]: [Shaders] Save shaders configuration.
-[02:42:18] [Chunk Batcher 10/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[02:42:18] [Chunk Batcher 13/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[02:42:19] [Server thread/INFO]: Saving and pausing game...
-[02:42:19] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[02:42:19] [Chunk Batcher 2/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[02:42:19] [Chunk Batcher 2/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[02:42:19] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[02:42:19] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[02:42:37] [Client thread/INFO]: [Shaders] Save shaders configuration.
-[02:42:41] [Client thread/INFO]: [Shaders] Save shaders configuration.
-[02:42:43] [Chunk Batcher 4/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[02:42:43] [Chunk Batcher 7/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[02:42:43] [Chunk Batcher 10/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[02:42:43] [Server thread/INFO]: Saving and pausing game...
-[02:42:43] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[02:42:43] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[02:42:43] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[02:42:43] [Chunk Batcher 3/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[02:42:43] [Chunk Batcher 8/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[02:42:43] [Chunk Batcher 2/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[02:42:43] [Chunk Batcher 8/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[02:42:43] [Chunk Batcher 1/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[02:42:43] [Chunk Batcher 7/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[02:42:43] [Chunk Batcher 7/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[02:42:44] [Server thread/INFO]: Stopping server
-[02:42:44] [Server thread/INFO]: Saving players
-[02:42:44] [Server thread/INFO]: Saving worlds
-[02:42:44] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[02:42:44] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[02:42:44] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[02:42:45] [Client thread/INFO]: Stopping!
-[02:42:45] [Client thread/INFO]: SoundSystem shutting down...
-[02:42:45] [Client thread/WARN]: Author: Paul Lamb, www.paulscode.com
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=east,half=upper,hinge=right,open=true,powered=false from minecraft:obsidian_door#facing=east,half=upper,hinge=right,open=true,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=west,half=upper,hinge=left,open=true,powered=true from minecraft:obsidian_door#facing=west,half=upper,hinge=left,open=true,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=south,half=lower,hinge=left,open=false,powered=false from minecraft:obsidian_door#facing=south,half=lower,hinge=left,open=false,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: half=top,variant=cobblestone from minecraft:obsidian_slab#half=top,variant=cobblestone
+[21:25:31] [Client thread/WARN]: Unable to load variant: half=bottom,variant=stone_brick from minecraft:obsidian_slab#half=bottom,variant=stone_brick
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=south,half=upper,hinge=left,open=true,powered=true from minecraft:obsidian_door#facing=south,half=upper,hinge=left,open=true,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: seamless=false,variant=brick from minecraft:double_obsidian_slab#seamless=false,variant=brick
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=east,half=lower,hinge=right,open=false,powered=false from minecraft:obsidian_door#facing=east,half=lower,hinge=right,open=false,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: half=top,variant=brick from minecraft:obsidian_slab#half=top,variant=brick
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=west,half=lower,hinge=right,open=true,powered=false from minecraft:obsidian_door#facing=west,half=lower,hinge=right,open=true,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=west,half=lower,hinge=right,open=false,powered=true from minecraft:obsidian_door#facing=west,half=lower,hinge=right,open=false,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=north,half=upper,hinge=right,open=true,powered=false from minecraft:obsidian_door#facing=north,half=upper,hinge=right,open=true,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=north,half=lower,hinge=left,open=false,powered=true from minecraft:obsidian_door#facing=north,half=lower,hinge=left,open=false,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=north,half=upper,hinge=right,open=true,powered=true from minecraft:obsidian_door#facing=north,half=upper,hinge=right,open=true,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=east,half=lower,hinge=right,open=false,powered=true from minecraft:obsidian_door#facing=east,half=lower,hinge=right,open=false,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: seamless=true,variant=brick from minecraft:double_obsidian_slab#seamless=true,variant=brick
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=east,half=upper,hinge=right,open=false,powered=true from minecraft:obsidian_door#facing=east,half=upper,hinge=right,open=false,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=south,half=lower,hinge=right,open=true,powered=true from minecraft:obsidian_door#facing=south,half=lower,hinge=right,open=true,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=east,half=upper,hinge=right,open=true,powered=true from minecraft:obsidian_door#facing=east,half=upper,hinge=right,open=true,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: half=bottom,variant=quartz from minecraft:obsidian_slab#half=bottom,variant=quartz
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=west,half=lower,hinge=right,open=false,powered=false from minecraft:obsidian_door#facing=west,half=lower,hinge=right,open=false,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=west,half=lower,hinge=right,open=true,powered=true from minecraft:obsidian_door#facing=west,half=lower,hinge=right,open=true,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=east,half=lower,hinge=left,open=true,powered=false from minecraft:obsidian_door#facing=east,half=lower,hinge=left,open=true,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=north,half=lower,hinge=right,open=false,powered=true from minecraft:obsidian_door#facing=north,half=lower,hinge=right,open=false,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=east,half=lower,hinge=left,open=false,powered=false from minecraft:obsidian_door#facing=east,half=lower,hinge=left,open=false,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: seamless=true,variant=nether_brick from minecraft:double_obsidian_slab#seamless=true,variant=nether_brick
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=south,half=lower,hinge=right,open=true,powered=false from minecraft:obsidian_door#facing=south,half=lower,hinge=right,open=true,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=west,half=upper,hinge=left,open=true,powered=false from minecraft:obsidian_door#facing=west,half=upper,hinge=left,open=true,powered=false
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=east,half=upper,hinge=left,open=false,powered=true from minecraft:obsidian_door#facing=east,half=upper,hinge=left,open=false,powered=true
+[21:25:31] [Client thread/WARN]: Unable to load variant: facing=west,half=upper,hinge=left,open=false,powered=false from minecraft:obsidian_door#facing=west,half=upper,hinge=left,open=false,powered=false
+[21:25:31] [Sound Library Loader/INFO]: Sound engine started
+[21:25:32] [Client thread/INFO]: [OptiFine] Sprite size: 32
+[21:25:32] [Client thread/INFO]: [OptiFine] Mipmap levels: 5
+[21:25:32] [Client thread/INFO]: [OptiFine] Multitexture: false
+[21:25:32] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.ForgeHooksClient
+[21:25:32] [Client thread/INFO]: [OptiFine] Scaled too small texture: minecraft:blocks/redstone_dust_cross_overlay, 16 -> 32
+[21:25:33] [Client thread/INFO]: [OptiFine] Scaled too small texture: minecraft:blocks/redstone_dust_line_overlay, 16 -> 32
+[21:25:33] [Client thread/INFO]: Created: 1024x1024 textures-atlas
+[21:25:33] [Client thread/INFO]: [Shaders] allocateTextureMap 5 1024 1024 
+[21:25:33] [Client thread/INFO]: [OptiFine] Animated sprites: 11
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.ItemModelMesherForge
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.ModelLoader
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.client.registry.RenderingRegistry
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.ForgeModContainer
+[21:25:33] [Client thread/INFO]: [CustomPackets] ✓ Initialisation du système de packets custom...
+[21:25:33] [Client thread/INFO]: [CustomPackets] ✓ HdvPacketHandler enregistré
+[21:25:33] [Client thread/INFO]: [CustomPackets] ✓ CombatLogManager initialisé
+[21:25:33] [Client thread/INFO]: [CustomPackets] ✓ Système initialisé avec succès.
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: mods.betterfoliage.client.BetterFoliageClient
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.asm.transformers.BlamingTransformer
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.event.world.ChunkWatchEvent$UnWatch
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.relauncher.CoreModManager
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.DimensionManager
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.GuiScreenEvent$DrawScreenEvent$Pre
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.GuiScreenEvent$DrawScreenEvent$Post
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.EntityViewRenderEvent$CameraSetup
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.EntityViewRenderEvent$FogColors
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.eventhandler.Event
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.eventhandler.EventBus
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.property.ExtendedBlockState
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.client.FMLClientHandler
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.FMLCommonHandler
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.biome.BiomeGenBase.getWaterColorMultiplier
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.addDestroyEffects
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.addHitEffects
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.canCreatureSpawn
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.canRenderInLayer
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.doesSideBlockRendering
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.getBedDirection
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.getExtendedState
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.getLightOpacity
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.getLightValue
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.hasTileEntity
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.isAir
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.isBed
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.isBedFoot
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.isSideSolid
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.ChunkCache.isSideSolid
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.entity.Entity.canRiderInteract
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Field not present: net.minecraft.entity.Entity.captureDrops
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Field not present: net.minecraft.entity.Entity.capturedDrops
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.entity.Entity.shouldRenderInPass
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.entity.Entity.shouldRiderSit
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.event.ForgeEventFactory
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.ForgeHooks
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Field not present: net.minecraft.item.Item.delegate
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.getDurabilityForDisplay
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.getModel
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.onEntitySwing
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.shouldCauseReequipAnimation
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.showDurabilityBar
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.potion.PotionEffect.isCurativeItem
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.tileentity.TileEntity.canRenderBreaking
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.tileentity.TileEntity.getRenderBoundingBox
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.tileentity.TileEntity.hasFastRenderer
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.tileentity.TileEntity.shouldRenderInPass
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.World.countEntities
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.World.getPerWorldStorage
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.WorldProvider.getCloudRenderer
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.WorldProvider.getSkyRenderer
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.WorldProvider.getWeatherRenderer
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.WorldProvider.getSaveFolder
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.client.GuiModList
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.IColoredBakedQuad
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.property.IExtendedBlockState
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.IModel
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.IRenderHandler
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.MinecraftForge
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.MinecraftForgeClient
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.ModContainer
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.ModelLoader$VanillaLoader
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderBlockOverlayEvent$OverlayType
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderItemInFrameEvent
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderLivingEvent$Pre
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderLivingEvent$Post
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderLivingEvent$Specials$Pre
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderLivingEvent$Specials$Post
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.event.world.WorldEvent$Load
+[21:25:33] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: optifine.OptiFineClassTransformer
+[21:25:33] [Client thread/INFO]: [OptiFine] *** Reloading custom textures ***
+[21:25:33] [Client thread/INFO]: [OptiFine] Enable face culling: acacia_leaves, birch_leaves, dark_oak_leaves, jungle_leaves, oak_leaves, spruce_leaves
