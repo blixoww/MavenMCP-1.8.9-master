@@ -335,6 +335,12 @@ public class UIManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        // Marquer toutes les positions comme à recalculer (résolution peut être inconnue lors du chargement)
+        for (UIElement e : widgets.values()) {
+            if (e instanceof BaseWidget) {
+                ((BaseWidget) e).markPositionDirty();
+            }
+        }
         needsPositionRecalc = true;
         return true;
     }

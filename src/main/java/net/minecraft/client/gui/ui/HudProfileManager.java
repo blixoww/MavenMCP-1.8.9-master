@@ -76,12 +76,20 @@ public class HudProfileManager {
     public void saveToSlot(int slot) {
         if (slot < 0 || slot >= MAX_PROFILES) return;
         UIManager ui = UIManager.getInstance();
+        int[] screen = getScreenSize();
+        int sw = screen[0], sh = screen[1];
+
+        // Construire un nouveau profil COMPLET : tous les widgets connus sont inclus.
+        // Cela garantit que lorsqu'on charge ce profil, les anciens éléments sont bien
+        // remis à leur état correct (désactivés s'ils n'étaient pas visibles).
         Map<String, Map<String, Object>> profileData = new LinkedHashMap<>();
 
         for (UIElement e : ui.all()) {
             Map<String, Object> widgetData = new LinkedHashMap<>();
-            widgetData.put("x", e.getX());
-            widgetData.put("y", e.getY());
+            int px = e.getX();
+            int py = e.getY();
+            widgetData.put("x", px);
+            widgetData.put("y", py);
             widgetData.put("enabled", e.isEnabled());
             widgetData.put("color", e.getColor());
             widgetData.put("rgb", e.isRGBMode());
@@ -89,10 +97,21 @@ public class HudProfileManager {
 
             if (e instanceof BaseWidget) {
                 BaseWidget bw = (BaseWidget) e;
-                widgetData.put("relX", bw.relX);
-                widgetData.put("relY", bw.relY);
-                widgetData.put("refW", bw.refW);
-                widgetData.put("refH", bw.refH);
+                int w = bw.getWidth();
+                int h = bw.getHeight();
+                double rx = bw.relX;
+                double ry = bw.relY;
+                // Recalculer relX/relY s'ils ne sont pas encore définis
+                if (rx < 0 || ry < 0) {
+                    int maxX = Math.max(1, sw - w);
+                    int maxY = Math.max(1, sh - h);
+                    rx = Math.max(0.0, Math.min(1.0, (double) px / maxX));
+                    ry = Math.max(0.0, Math.min(1.0, (double) py / maxY));
+                }
+                widgetData.put("relX", rx);
+                widgetData.put("relY", ry);
+                widgetData.put("refW", sw);
+                widgetData.put("refH", sh);
                 widgetData.put("width", bw.width);
                 widgetData.put("height", bw.height);
 
@@ -118,6 +137,14 @@ public class HudProfileManager {
         if (profileData == null) return;
 
         UIManager ui = UIManager.getInstance();
+
+        // Étape 1 : désactiver TOUS les widgets pour partir d'une ardoise vierge.
+        // Ainsi, les widgets qui n'étaient pas dans le profil sauvegardé seront cachés.
+        for (UIElement e : ui.all()) {
+            e.setEnabled(false);
+        }
+
+        // Étape 2 : appliquer les données du profil
         for (Map.Entry<String, Map<String, Object>> en : profileData.entrySet()) {
             UIElement e = ui.get(en.getKey());
             if (e == null) continue;
@@ -153,6 +180,8 @@ public class HudProfileManager {
                         }
                     } catch (Throwable ignored) {}
                 }
+                // Forcer le recalcul de la position absolue au prochain render
+                bw.markPositionDirty();
                 bw.updateAbsolutePosition();
             }
         }
@@ -209,31 +238,60 @@ public class HudProfileManager {
         int[] screen = getScreenSize();
         int sw = screen[0], sh = screen[1];
 
+        // Widgets actifs dans le profil PvP (sans CPS ni SNEAK)
         Set<String> pvpWidgets = new HashSet<>(Arrays.asList(
             "combatlog", "fps", "armor_group", "potions", "helditem",
-            "cps", "ping", "dir", "toggle_sprint", "Reach", "Keystrokes"
+            "ping", "dir", "toggle_sprint", "Reach", "Keystrokes"
         ));
 
+        // ── Disposition sans chevauchement ──
+        // Colonne gauche : stats texte empilées
+        int leftX = 5;
+        int topY  = 5;
+        int lineH = 12; // hauteur d'une ligne de texte
+
         Map<String, int[]> positions = new LinkedHashMap<>();
-        int leftX = 5, topY = 5, lineH = 12; // Reduced lineH for tighter grouping
-        positions.put("fps",    new int[]{leftX, topY});
-        positions.put("ping",   new int[]{leftX, topY + lineH});
-        positions.put("cps",    new int[]{leftX, topY + lineH * 2});
-        positions.put("Reach",  new int[]{leftX, topY + lineH * 3}); 
-        positions.put("dir",    new int[]{leftX, topY + lineH * 4});
-        
-        positions.put("Keystrokes", new int[]{sw - 93, topY});
-        positions.put("armor_group", new int[]{sw - 85, sh - 90});
 
-        // Sword bottom-left center
-        positions.put("helditem",    new int[]{sw / 4, sh - 20});
-        
-        // Potions centered vertically on the left
-        positions.put("potions", new int[]{leftX, sh / 2 - 30});
+        // Colonne gauche haut : fps / ping / reach / dir
+        positions.put("fps",   new int[]{leftX, topY});
+        positions.put("ping",  new int[]{leftX, topY + lineH});
+        positions.put("Reach", new int[]{leftX, topY + lineH * 2});
+        positions.put("dir",   new int[]{leftX, topY + lineH * 3});
 
-        // Combat Tag above toggle sprint bottom-left
-        positions.put("combatlog",     new int[]{leftX, sh - 32});
-        positions.put("toggle_sprint", new int[]{leftX, sh - 14});
+        // Potions : milieu-gauche (sous les stats du haut, légèrement plus bas)
+        positions.put("potions", new int[]{leftX, topY + lineH * 5 + 8});
+
+        // Combat log en bas à gauche en mode circulaire
+        // La taille d'un CombatLogWidget circulaire est ~48×48
+        int combatlogSize = 48;
+        positions.put("combatlog", new int[]{leftX, sh - combatlogSize - 5});
+
+        // Toggle sprint juste au-dessus du combat log (hauteur ~10)
+        positions.put("toggle_sprint", new int[]{leftX, sh - combatlogSize - 20});
+
+        // Keystrokes en haut à droite (demande utilisateur)
+        // Taille typique Keystrokes : ~60×52
+        int ksW = 62, ksH = 54;
+        positions.put("Keystrokes", new int[]{sw - ksW - 5, topY});
+
+        // Armor group à droite, positionné en bas mais relevé légèrement (réhausser)
+        // ArmorGroupWidget vertical : ~50×88 (4 armures × 22px)
+        int armorH = 88;
+        int armorX = sw - 55; // aligné vers la droite
+        int armorY = Math.max(5, sh - armorH - 5 - 12); // remonter de 12px
+        positions.put("armor_group", new int[]{armorX, armorY});
+
+        // Item tenu : juste en dessous de l'armor_group, aligné à droite
+        // HeldItemDurabilityWidget : ~80×10
+        int heldW = 80;
+        int heldH = 12; // estimation hauteur
+        int heldX = sw - heldW - 5;
+        int heldY = armorY + armorH + 4; // 4px d'espacement sous l'armure
+        if (heldY + heldH > sh - 5) {
+            // si dépasser, place le held item légèrement au-dessus du bas (fallback)
+            heldY = Math.max(5, sh - heldH - 5);
+        }
+        positions.put("helditem", new int[]{heldX, heldY});
 
         Map<String, Map<String, Object>> profileData = new LinkedHashMap<>();
         for (UIElement e : ui.all()) {
@@ -241,7 +299,18 @@ public class HudProfileManager {
             int px = pos != null ? pos[0] : e.getX();
             int py = pos != null ? pos[1] : e.getY();
             boolean enabled = pvpWidgets.contains(e.getId());
-            profileData.put(e.getId(), buildWidgetData(e, px, py, enabled, sw, sh));
+
+            Map<String, Object> data = buildWidgetData(e, px, py, enabled, sw, sh);
+
+            // Activer le mode circulaire (originalDesign) pour combatlog
+            if ("combatlog".equals(e.getId())) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> props = (Map<String, Object>) data.get("props");
+                if (props == null) { props = new LinkedHashMap<>(); data.put("props", props); }
+                props.put("originalDesign", Boolean.TRUE);
+            }
+
+            profileData.put(e.getId(), data);
         }
 
         profiles.set(0, profileData);

@@ -40,6 +40,9 @@ public abstract class BaseWidget implements UIElement {
     protected int renderAbsX = 0;
     protected int renderAbsY = 0;
 
+    /** Lorsque true, updateAbsolutePosition sera forcé au prochain render même si la résolution n'a pas changé. */
+    private boolean forcePositionUpdate = false;
+
     public BaseWidget(String id, int x, int y) {
         this.id = id;
         this.x = x;
@@ -156,10 +159,11 @@ public abstract class BaseWidget implements UIElement {
                 int sw = sr.getScaledWidth();
                 int sh = sr.getScaledHeight();
                 if (sw > 0 && sh > 0) {
-                    // Only recalculate when the screen resolution has changed since last save/positioning.
-                    if (this.refW == sw && this.refH == sh) {
+                    // Ne recalculer que si la résolution a changé OU si une mise à jour forcée est demandée
+                    if (!forcePositionUpdate && this.refW == sw && this.refH == sh) {
                         return;
                     }
+                    forcePositionUpdate = false;
                     int curW = this.getWidth();
                     int curH = this.getHeight();
                     int newMaxX = Math.max(1, sw - curW);
@@ -168,15 +172,20 @@ public abstract class BaseWidget implements UIElement {
                     int ny = (int) Math.round(this.relY * newMaxY);
                     this.x = Math.max(0, Math.min(sw - curW, nx));
                     this.y = Math.max(0, Math.min(sh - curH, ny));
-                    // Update screen reference and record the widget size at time of recalculation
+                    // Mettre à jour la résolution de référence après recalcul
                     this.refW = sw;
                     this.refH = sh;
                     this.refWidgetW = curW;
                     this.refWidgetH = curH;
-                 }
-             } catch (Throwable ignored) {}
-         }
-     }
+                }
+            } catch (Throwable ignored) {}
+        }
+    }
+
+    /** Force le recalcul de la position absolue lors du prochain render (ex: après chargement de profil). */
+    public void markPositionDirty() {
+        this.forcePositionUpdate = true;
+    }
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
