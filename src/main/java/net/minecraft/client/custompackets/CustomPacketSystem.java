@@ -45,7 +45,8 @@ public final class CustomPacketSystem {
                 typeOrdinal = buf.readByte();
             } catch (Exception ignored) {}
             String sender = buf.readStringFromBuffer(64);
-            PingManager.INSTANCE.addRemotePing(x, y, z, sender, (int) typeOrdinal);
+            LOGGER.debug("[CustomPackets] Ping reçu de {} type {} @{},{},{}", sender, typeOrdinal, x, y, z);
+            PingManager.INSTANCE.addRemotePing(x, y, z, sender, typeOrdinal);
         });
         // Appliquer les keybinds persistés maintenant que GameSettings est prêt
         PingManager.INSTANCE.applyStoredKeyBinding();

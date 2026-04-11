@@ -702,7 +702,7 @@ public class GuiVisualSettings extends GuiScreen {
         }
         // Touche Ping (row 15)
         if (row == 15) { awaitingKeyBind = 0; }
-        handleColorClick(row, mx, x, w, 12, 9);
+        handleColorClick(row, mx, x, w, 14, 9);
     }
 
     private boolean isOverToggle(int mx, int x, int w) {
@@ -838,11 +838,11 @@ public class GuiVisualSettings extends GuiScreen {
                 break;
             case 4:
                 switch (row) {
-                    case 6:  pingSettings.scale        = 0.5f + ratio * 2.5f; break;
-                    case 7:  pingSettings.ringThickness = 0.5f + ratio * 4.5f; break;
-                    case 8:  pingSettings.maxRange     = 16.0 + ratio * 240.0; break;
-                    case 9:  pingSettings.durationMs   = (long)(1000 + ratio * 14000); break;
-                    case 10: pingSettings.cooldownMs   = (long)(500  + ratio * 9500); break;
+                    case 8:  pingSettings.scale        = 0.5f + ratio * 2.5f; break;
+                    case 9:  pingSettings.ringThickness = 0.5f + ratio * 4.5f; break;
+                    case 10: pingSettings.maxRange     = 16.0 + ratio * 240.0; break;
+                    case 11: pingSettings.durationMs   = (long)(1000 + ratio * 14000); break;
+                    case 12: pingSettings.cooldownMs   = (long)(500  + ratio * 9500); break;
                 }
                 break;
         }

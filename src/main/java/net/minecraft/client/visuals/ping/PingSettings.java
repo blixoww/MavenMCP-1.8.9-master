@@ -21,8 +21,10 @@ public final class PingSettings {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     // ── Activation / comportement ─────────────────────────────────────────────
+    /** Version du schéma de config — incrémenté à chaque ajout de champ. */
+    public int    configVersion           = 2;
     public boolean enabled                = true;
-    public double  maxRange               = 128.0;
+    public double  maxRange               = 50.0;
     public long    durationMs             = 5000L;
     public long    cooldownMs             = 2000L;
     public boolean soundEnabled           = true;
@@ -65,7 +67,10 @@ public final class PingSettings {
         if (FILE.exists()) {
             try (Reader r = new InputStreamReader(new FileInputStream(FILE), StandardCharsets.UTF_8)) {
                 PingSettings s = GSON.fromJson(r, PingSettings.class);
-                if (s != null) return s;
+                if (s != null) {
+                    s.applyDefaults();
+                    return s;
+                }
             } catch (Exception e) {
                 LOGGER.warn("[PingSystem] Impossible de lire ping_settings.json – valeurs par défaut.", e);
             }
@@ -73,6 +78,27 @@ public final class PingSettings {
         PingSettings d = new PingSettings();
         d.save();
         return d;
+    }
+
+    /**
+     * Applique les valeurs par défaut pour les champs qui n'existaient pas
+     * dans un ancien fichier JSON (Gson via Unsafe ne passe pas par l'initialiseur).
+     */
+    private void applyDefaults() {
+        boolean changed = false;
+        if (configVersion < 2) {
+            // Champs ajoutés en v2 : showAllyPings, showFriendPings
+            showAllyPings = true;
+            showFriendPings = true;
+            showTeamPings = true;
+            showOffScreenIndicator = true;
+            showSenderName = true;
+            soundEnabled = true;
+            enabled = true;
+            configVersion = 2;
+            changed = true;
+        }
+        if (changed) save();
     }
 
     /**

@@ -308,3 +308,94 @@ Caused by: java.io.FileNotFoundException: minecraft:blockstates/steel_chest.json
 [23:35:13] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
 [23:35:13] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
 [23:35:13] [Server thread/INFO]: Saving chunks for level 'New World'/The End
+[23:38:21] [Server thread/INFO]: Starting integrated minecraft server version 1.8.9
+[23:38:21] [Server thread/INFO]: Generating keypair
+[23:38:21] [Server thread/INFO]: Preparing start region for level 0
+[23:38:21] [Server thread/INFO]: Changing view distance to 16, from 10
+[23:38:22] [Server thread/INFO]: leziink[local:E:2bcf5d88] logged in with entity id 957 at (-314.21813890974295, 71.52936763998764, 281.46127406663834)
+[23:38:22] [Server thread/INFO]: leziink joined the game
+[23:38:22] [Client thread/INFO]: [CustomPackets] ✓ Packet REGISTER envoyé pour : CUSTOM:HDV_S2C CUSTOM:HDV_C2S CUSTOM:SHOP_S2C CUSTOM:SHOP_C2S CUSTOM:PDATA_S2C CUSTOM:PDATA_C2S CUSTOM:C2S CUSTOM:S2C CUSTOM:PING_C2S CUSTOM:PING_S2C OF_COMBAT
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 72386, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 11/WARN]: Biome ID is out of bounds: 2049, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 7/WARN]: Biome ID is out of bounds: 2049, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 7/WARN]: Biome ID is out of bounds: 2049, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 7/WARN]: Biome ID is out of bounds: 2049, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 7/WARN]: Biome ID is out of bounds: 2049, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:22] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 165762, defaulting to 0 (Ocean)
+[23:38:23] [Server thread/INFO]: Saving and pausing game...
+[23:38:23] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
+[23:38:23] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
+[23:38:23] [Server thread/INFO]: Saving chunks for level 'New World'/The End
+[23:38:24] [Server thread/INFO]: Stopping server
+[23:38:24] [Server thread/INFO]: Saving players
+[23:38:24] [Server thread/INFO]: Saving worlds
+[23:38:24] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
+[23:38:24] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
+[23:38:24] [Server thread/INFO]: Saving chunks for level 'New World'/The End
+[23:38:26] [Client thread/INFO]: Connecting to 127.0.0.1, 7777
+[23:38:26] [Client thread/INFO]: [CustomPackets] ✓ Packet REGISTER envoyé pour : CUSTOM:HDV_S2C CUSTOM:HDV_C2S CUSTOM:SHOP_S2C CUSTOM:SHOP_C2S CUSTOM:PDATA_S2C CUSTOM:PDATA_C2S CUSTOM:C2S CUSTOM:S2C CUSTOM:PING_C2S CUSTOM:PING_S2C OF_COMBAT
+[23:38:26] [Client thread/INFO]: [CHAT] [+] leziink a rejoint RedConflict.
+[23:38:26] [Client thread/INFO]: [CHAT] --------------------------------
+[23:38:26] [Client thread/INFO]: [CHAT]   Bienvenue sur RedConflict !
+[23:38:26] [Client thread/INFO]: [CHAT]   Serveur 1.8.9 | PvP / Survie
+[23:38:26] [Client thread/INFO]: [CHAT]   Discord : discord.gg/UMJUnfQq
+[23:38:26] [Client thread/INFO]: [CHAT]   Tapez /commands pour voir les commandes.
+[23:38:26] [Client thread/INFO]: [CHAT] --------------------------------
+[23:38:29] [Client thread/INFO]: [CHAT] [+] Arkhan a rejoint RedConflict.
+[23:40:32] [Client thread/INFO]: [CHAT] [Server: Stopping the server]
+[23:40:36] [Client thread/INFO]: Stopping!
+[23:40:36] [Client thread/INFO]: SoundSystem shutting down...
+[23:40:36] [Client thread/WARN]: Author: Paul Lamb, www.paulscode.com
