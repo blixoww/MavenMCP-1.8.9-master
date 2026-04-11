@@ -66,14 +66,22 @@ public final class PingManager {
         if (!settings.enabled) return false;
         if (System.currentTimeMillis() - lastPingTime < settings.cooldownMs) return false;
         lastPingTime = System.currentTimeMillis();
-        acquire(x, y, z, localName());
+        acquire(x, y, z, localName(), -1);
         return true;
     }
 
     // ── Création distante (packet S2C reçu du serveur) ────────────────────────
 
-    public void addRemotePing(double x, double y, double z, String sender) {
-        if (!settings.showTeamPings) return;
+    /**
+     * Ajoute un ping distant reçu du serveur.
+     * @param relation type envoyé par le serveur : 0=faction,1=ally,2=friend
+     */
+    public void addRemotePing(double x, double y, double z, String sender, int relation) {
+        // Filtrage selon les préférences du viewer
+        if (relation == 0 && !settings.showTeamPings) return;
+        if (relation == 1 && !settings.showAllyPings) return;
+        if (relation == 2 && !settings.showFriendPings) return;
+
         Minecraft mc = Minecraft.getMinecraft();
         if (mc.thePlayer != null) {
             double dx = x - mc.thePlayer.posX;
@@ -81,7 +89,7 @@ public final class PingManager {
             double dz = z - mc.thePlayer.posZ;
             if (dx * dx + dy * dy + dz * dz > settings.maxRange * settings.maxRange) return;
         }
-        acquire(x, y, z, sender);
+        acquire(x, y, z, sender, relation);
         pushNotif("\u00A7b" + sender + " \u00BB Ping");
     }
 
@@ -132,10 +140,11 @@ public final class PingManager {
 
     // ── Internes ─────────────────────────────────────────────────────────────
 
-    private void acquire(double x, double y, double z, String sender) {
+    private void acquire(double x, double y, double z, String sender, int relation) {
         for (int i = 0; i < MAX_PINGS; i++) {
             if (!pool[i].inUse) {
                 pool[i].init(x, y, z, sender, settings.durationMs);
+                pool[i].relation = relation;
                 return;
             }
         }
@@ -145,6 +154,7 @@ public final class PingManager {
             if (pool[i].createdAt < pool[oldest].createdAt) oldest = i;
         }
         pool[oldest].init(x, y, z, sender, settings.durationMs);
+        pool[oldest].relation = relation;
     }
 
     private void pushNotif(String text) {

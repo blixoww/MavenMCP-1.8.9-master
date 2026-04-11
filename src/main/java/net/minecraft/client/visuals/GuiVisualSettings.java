@@ -231,6 +231,8 @@ public class GuiVisualSettings extends GuiScreen {
     private int drawPingSettings(int x, int y, int w, int mx, int my, int ct, int cb) {
         y = drawToggle(x, y, w, "Activ\u00e9", pingSettings.enabled, mx, my, ct, cb);
         y = drawToggle(x, y, w, "Pings \u00e9quipe visibles", pingSettings.showTeamPings, mx, my, ct, cb);
+        y = drawToggle(x, y, w, "Pings alli\u00e9s visibles", pingSettings.showAllyPings, mx, my, ct, cb);
+        y = drawToggle(x, y, w, "Pings amis visibles", pingSettings.showFriendPings, mx, my, ct, cb);
         y = drawToggle(x, y, w, "Indicateur hors-\u00e9cran", pingSettings.showOffScreenIndicator, mx, my, ct, cb);
         y = drawToggle(x, y, w, "Nom exp\u00e9diteur", pingSettings.showSenderName, mx, my, ct, cb);
         y = drawToggle(x, y, w, "Distance", pingSettings.showDistance, mx, my, ct, cb);
@@ -688,16 +690,18 @@ public class GuiVisualSettings extends GuiScreen {
         if (isOverToggle(mx, x, w)) {
             if (row == 0) { pingSettings.enabled = !pingSettings.enabled; pingSettings.save(); }
             if (row == 1) { pingSettings.showTeamPings = !pingSettings.showTeamPings; pingSettings.save(); }
-            if (row == 2) { pingSettings.showOffScreenIndicator = !pingSettings.showOffScreenIndicator; pingSettings.save(); }
-            if (row == 3) { pingSettings.showSenderName = !pingSettings.showSenderName; pingSettings.save(); }
-            if (row == 4) { pingSettings.showDistance = !pingSettings.showDistance; pingSettings.save(); }
-            if (row == 5) { pingSettings.soundEnabled = !pingSettings.soundEnabled; pingSettings.save(); }
+            if (row == 2) { pingSettings.showAllyPings = !pingSettings.showAllyPings; pingSettings.save(); }
+            if (row == 3) { pingSettings.showFriendPings = !pingSettings.showFriendPings; pingSettings.save(); }
+            if (row == 4) { pingSettings.showOffScreenIndicator = !pingSettings.showOffScreenIndicator; pingSettings.save(); }
+            if (row == 5) { pingSettings.showSenderName = !pingSettings.showSenderName; pingSettings.save(); }
+            if (row == 6) { pingSettings.showDistance = !pingSettings.showDistance; pingSettings.save(); }
+            if (row == 7) { pingSettings.soundEnabled = !pingSettings.soundEnabled; pingSettings.save(); }
         }
         if (isOverEnum(mx, x, w)) {
-            if (row == 11) { pingSettings.markerStyle = (pingSettings.markerStyle + 1) % 3; pingSettings.save(); }
+            if (row == 13) { pingSettings.markerStyle = (pingSettings.markerStyle + 1) % 3; pingSettings.save(); }
         }
-        // Touche Ping (row 13)
-        if (row == 13) { awaitingKeyBind = 0; }
+        // Touche Ping (row 15)
+        if (row == 15) { awaitingKeyBind = 0; }
         handleColorClick(row, mx, x, w, 12, 9);
     }
 

@@ -27,6 +27,8 @@ public final class PingSettings {
     public long    cooldownMs             = 2000L;
     public boolean soundEnabled           = true;
     public boolean showTeamPings          = true;
+    public boolean showAllyPings          = true;
+    public boolean showFriendPings        = true;
     public boolean showOffScreenIndicator = true;
 
     // ── Visuel (paramètres du VIEWER – chaque joueur voit selon SES réglages) ──

@@ -15,6 +15,8 @@ public final class Ping {
     public String senderName = "";
     public long   createdAt;
     public long   durationMs;
+    /** Relation envoyée par le serveur : 0=faction,1=ally,2=friend, -1 local */
+    public int    relation = -1;
 
     /** Géré uniquement par PingManager. */
     boolean inUse;
@@ -39,11 +41,13 @@ public final class Ping {
         this.durationMs  = duration;
         this.inUse       = true;
         this.visibleLastFrame = false;
+        this.relation = -1;
     }
 
     void recycle() {
         inUse = false;
         senderName = "";
+        relation = -1;
     }
 
     // ── Helpers animés ────────────────────────────────────────────────────────
