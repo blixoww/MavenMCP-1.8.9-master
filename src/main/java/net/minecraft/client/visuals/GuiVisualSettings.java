@@ -229,21 +229,46 @@ public class GuiVisualSettings extends GuiScreen {
     }
 
     private int drawPingSettings(int x, int y, int w, int mx, int my, int ct, int cb) {
+        // row 0
         y = drawToggle(x, y, w, "Activ\u00e9", pingSettings.enabled, mx, my, ct, cb);
+        // row 1
         y = drawToggle(x, y, w, "Pings \u00e9quipe visibles", pingSettings.showTeamPings, mx, my, ct, cb);
+        // row 2
         y = drawToggle(x, y, w, "Pings alli\u00e9s visibles", pingSettings.showAllyPings, mx, my, ct, cb);
+        // row 3
         y = drawToggle(x, y, w, "Pings amis visibles", pingSettings.showFriendPings, mx, my, ct, cb);
+        // row 4
         y = drawToggle(x, y, w, "Indicateur hors-\u00e9cran", pingSettings.showOffScreenIndicator, mx, my, ct, cb);
+        // row 5
         y = drawToggle(x, y, w, "Nom exp\u00e9diteur", pingSettings.showSenderName, mx, my, ct, cb);
+        // row 6
         y = drawToggle(x, y, w, "Distance", pingSettings.showDistance, mx, my, ct, cb);
+        // row 7
         y = drawToggle(x, y, w, "Son", pingSettings.soundEnabled, mx, my, ct, cb);
+        // row 8
         y = drawSlider(x, y, w, "Taille", pingSettings.scale, 0.5f, 3.0f, mx, my, ct, cb);
-        y = drawSlider(x, y, w, "\u00c9paisseur anneau", pingSettings.ringThickness, 0.5f, 5.0f, mx, my, ct, cb);
+        // row 9
+        y = drawSlider(x, y, w, "\u00c9paisseur anneau", pingSettings.ringThickness, 0.5f, 6.0f, mx, my, ct, cb);
+        // row 10
         y = drawSlider(x, y, w, "Port\u00e9e (blocs)", (float) pingSettings.maxRange, 16f, 256f, mx, my, ct, cb);
+        // row 11
         y = drawSlider(x, y, w, "Dur\u00e9e (s)", pingSettings.durationMs / 1000.0f, 1f, 15f, mx, my, ct, cb);
+        // row 12
         y = drawSlider(x, y, w, "Cooldown (s)", pingSettings.cooldownMs / 1000.0f, 0.5f, 10f, mx, my, ct, cb);
+        // row 13
         y = drawEnum(x, y, w, "Style", new String[]{"Anneau", "Point", "Losange"}, pingSettings.markerStyle, mx, my, ct, cb);
+        // row 14
         y = drawColorSelector(x, y, w, "Couleur", pingSettings.color, mx, my, ct, cb, 9);
+        // ── Glow ─────────────────────────────────────────────────────────────
+        // row 15
+        y = drawToggle(x, y, w, "Surbrillance (Glow)", pingSettings.glowEnabled, mx, my, ct, cb);
+        // row 16
+        y = drawSlider(x, y, w, "Intensit\u00e9 glow", pingSettings.glowIntensity, 0.05f, 1.0f, mx, my, ct, cb);
+        // row 17
+        y = drawSlider(x, y, w, "Passes glow", pingSettings.glowLayers, 1, 4, mx, my, ct, cb);
+        // row 18
+        y = drawToggle(x, y, w, "Couleur glow auto", pingSettings.glowColorAuto, mx, my, ct, cb);
+        // row 19
         y = drawKeyBind(x, y, w, "Touche Ping", pingSettings.keyCode, 0, mx, my, ct, cb);
         return y;
     }
@@ -489,7 +514,6 @@ public class GuiVisualSettings extends GuiScreen {
         int cx = settingsX + pw / 2;
         int cy = areaY + areaH / 2;
 
-        // Couleur effective du viewer
         int baseColor = pingSettings.color != 0
             ? (pingSettings.color | 0xFF000000)
             : (net.minecraft.client.visuals.ping.PingType.PING.defaultColor | 0xFF000000);
@@ -499,47 +523,82 @@ public class GuiVisualSettings extends GuiScreen {
 
         float cycle = (elapsed % 2000) / 2000.0f;
         float alpha = cycle > 0.8f ? 1.0f - (cycle - 0.8f) / 0.2f : 1.0f;
-        float pulse = (float)(0.80 + 0.20 * Math.sin(elapsed / 350.0));
+        float pulse = (float)(0.82 + 0.18 * Math.sin(elapsed / 320.0));
         int ca = (int)(alpha * 220);
+        int ringR = (int)(20 * pingSettings.scale * pulse);
 
-        int ringR = (int)(18 * pingSettings.scale * pulse);
+        // ── Glow preview ─────────────────────────────────────────────────────
+        if (pingSettings.glowEnabled) {
+            int layers = Math.max(1, Math.min(pingSettings.glowLayers, 4));
+            for (int pass = layers; pass >= 1; pass--) {
+                int gr = (int)(ringR * (1.0f + pass * 0.28f));
+                int ga = (int)(alpha * pingSettings.glowIntensity * (50f / pass));
+                if (ga < 2) continue;
+                int gcol = ((ga << 24) & 0xFF000000) | (baseColor & 0x00FFFFFF);
+                for (int i = 0; i < 32; i++) {
+                    double angle = 2.0 * Math.PI * i / 32;
+                    int gpx = cx + (int)(Math.cos(angle) * gr);
+                    int gpy = cy + (int)(Math.sin(angle) * gr);
+                    Gui.drawRect(gpx, gpy, gpx + pass + 1, gpy + pass + 1, gcol);
+                }
+            }
+        }
 
-        // Style
+        // ── Marqueur selon style ──────────────────────────────────────────────
         if (pingSettings.markerStyle == 2) {
             // Losange
             int d = ringR;
-            GlStateManager.enableBlend();
-            for (int[] pt : new int[][]{{cx, cy - d}, {cx + d, cy}, {cx, cy + d}, {cx - d, cy}, {cx, cy - d}}) {
-                // Juste dessiner une ligne
-            }
-            Gui.drawRect(cx - 1, cy - d, cx + 1, cy + d, (ca << 24) | (baseColor & 0x00FFFFFF));
-            Gui.drawRect(cx - d, cy - 1, cx + d, cy + 1, (ca << 24) | (baseColor & 0x00FFFFFF));
+            Gui.drawRect(cx - 1, cy - d, cx + 2, cy + d, (ca << 24) | (baseColor & 0x00FFFFFF));
+            Gui.drawRect(cx - d, cy - 1, cx + d, cy + 2, (ca << 24) | (baseColor & 0x00FFFFFF));
+            // Centre blanc
+            Gui.drawRect(cx - 2, cy - 2, cx + 3, cy + 3, (ca << 24) | 0xFFFFFF);
         } else if (pingSettings.markerStyle == 1) {
-            // Point seul
-            int pr = (int)(6 * pingSettings.scale);
-            Gui.drawRect(cx - pr, cy - pr, cx + pr, cy + pr, (ca << 24) | (baseColor & 0x00FFFFFF));
+            // Point + rayons
+            int pr = (int)(5 * pingSettings.scale);
+            Gui.drawRect(cx - pr, cy - pr, cx + pr, cy + pr, ((int)(alpha * 200) << 24) | (baseColor & 0x00FFFFFF));
+            // Rayons
+            for (int i = 0; i < 4; i++) {
+                double angle = Math.PI * i / 2.0;
+                int r2 = (int)(ringR * 0.7f);
+                for (int j = pr; j < r2; j++) {
+                    int rpx = cx + (int)(Math.cos(angle) * j);
+                    int rpy = cy + (int)(Math.sin(angle) * j);
+                    int rAlpha = (int)(alpha * 200 * (1.0f - (float)(j - pr) / (r2 - pr)));
+                    Gui.drawRect(rpx, rpy, rpx + 1, rpy + 1, (rAlpha << 24) | (baseColor & 0x00FFFFFF));
+                }
+            }
         } else {
-            // Anneau
-            GlStateManager.enableBlend();
-            GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+            // Anneau + croix
             for (int i = 0; i < 32; i++) {
                 double angle = 2.0 * Math.PI * i / 32;
                 int px2 = cx + (int)(Math.cos(angle) * ringR);
                 int py2 = cy + (int)(Math.sin(angle) * ringR);
-                Gui.drawRect(px2, py2, px2 + 1, py2 + 1, (ca << 24) | (baseColor & 0x00FFFFFF));
+                Gui.drawRect(px2, py2, px2 + 2, py2 + 2, (ca << 24) | (baseColor & 0x00FFFFFF));
             }
-            // Point central
-            Gui.drawRect(cx - 1, cy - 1, cx + 2, cy + 2, (ca << 24) | (baseColor & 0x00FFFFFF));
+            // Croix intérieure
+            int cl = (int)(ringR * 0.55f);
+            int cg2 = (int)(ringR * 0.15f);
+            Gui.drawRect(cx + cg2, cy, cx + cl, cy + 1, ((int)(ca * 0.7f) << 24) | (baseColor & 0x00FFFFFF));
+            Gui.drawRect(cx - cl,  cy, cx - cg2, cy + 1, ((int)(ca * 0.7f) << 24) | (baseColor & 0x00FFFFFF));
+            Gui.drawRect(cx, cy + cg2, cx + 1, cy + cl, ((int)(ca * 0.7f) << 24) | (baseColor & 0x00FFFFFF));
+            Gui.drawRect(cx, cy - cl, cx + 1, cy - cg2, ((int)(ca * 0.7f) << 24) | (baseColor & 0x00FFFFFF));
+            // Centre blanc
+            Gui.drawRect(cx - 2, cy - 2, cx + 3, cy + 3, (ca << 24) | 0xFFFFFF);
         }
 
         // Ligne verticale
-        Gui.drawRect(cx, cy - 22, cx + 1, cy, (ca << 24) | (baseColor & 0x00FFFFFF));
+        int lineH = 22;
+        Gui.drawRect(cx, cy - lineH, cx + 1, cy, (ca << 24) | (baseColor & 0x00FFFFFF));
 
-        // Label style
-        String[] styleNames = {"Anneau", "Point", "Losange"};
+        // Labels style + glow
+        String[] styleNames = {"Anneau+Croix", "Point", "Losange"};
         String sn = styleNames[pingSettings.markerStyle];
-        int labelA = (int)(alpha * 140);
+        int labelA = (int)(alpha * 150);
         fontRendererObj.drawStringWithShadow("\u00A77" + sn, cx - fontRendererObj.getStringWidth(sn) / 2.0f, areaY + 2, (labelA << 24) | 0xAAAAAA);
+        if (pingSettings.glowEnabled) {
+            String glowStr = "\u00A7aGlow ON";
+            fontRendererObj.drawStringWithShadow(glowStr, settingsX + pw - fontRendererObj.getStringWidth(glowStr) - 6, areaY + 2, (labelA << 24) | 0x44FF44);
+        }
     }
 
     private int getPreviewComboColor() {
@@ -688,20 +747,22 @@ public class GuiVisualSettings extends GuiScreen {
 
     private void handlePingClick(int row, int mx, int x, int w, int rowY) {
         if (isOverToggle(mx, x, w)) {
-            if (row == 0) { pingSettings.enabled = !pingSettings.enabled; pingSettings.save(); }
-            if (row == 1) { pingSettings.showTeamPings = !pingSettings.showTeamPings; pingSettings.save(); }
-            if (row == 2) { pingSettings.showAllyPings = !pingSettings.showAllyPings; pingSettings.save(); }
-            if (row == 3) { pingSettings.showFriendPings = !pingSettings.showFriendPings; pingSettings.save(); }
-            if (row == 4) { pingSettings.showOffScreenIndicator = !pingSettings.showOffScreenIndicator; pingSettings.save(); }
-            if (row == 5) { pingSettings.showSenderName = !pingSettings.showSenderName; pingSettings.save(); }
-            if (row == 6) { pingSettings.showDistance = !pingSettings.showDistance; pingSettings.save(); }
-            if (row == 7) { pingSettings.soundEnabled = !pingSettings.soundEnabled; pingSettings.save(); }
+            if (row == 0)  { pingSettings.enabled = !pingSettings.enabled; pingSettings.save(); }
+            if (row == 1)  { pingSettings.showTeamPings = !pingSettings.showTeamPings; pingSettings.save(); }
+            if (row == 2)  { pingSettings.showAllyPings = !pingSettings.showAllyPings; pingSettings.save(); }
+            if (row == 3)  { pingSettings.showFriendPings = !pingSettings.showFriendPings; pingSettings.save(); }
+            if (row == 4)  { pingSettings.showOffScreenIndicator = !pingSettings.showOffScreenIndicator; pingSettings.save(); }
+            if (row == 5)  { pingSettings.showSenderName = !pingSettings.showSenderName; pingSettings.save(); }
+            if (row == 6)  { pingSettings.showDistance = !pingSettings.showDistance; pingSettings.save(); }
+            if (row == 7)  { pingSettings.soundEnabled = !pingSettings.soundEnabled; pingSettings.save(); }
+            if (row == 15) { pingSettings.glowEnabled = !pingSettings.glowEnabled; pingSettings.save(); }
+            if (row == 18) { pingSettings.glowColorAuto = !pingSettings.glowColorAuto; pingSettings.save(); }
         }
         if (isOverEnum(mx, x, w)) {
             if (row == 13) { pingSettings.markerStyle = (pingSettings.markerStyle + 1) % 3; pingSettings.save(); }
         }
-        // Touche Ping (row 15)
-        if (row == 15) { awaitingKeyBind = 0; }
+        // Touche Ping (row 19)
+        if (row == 19) { awaitingKeyBind = 0; }
         handleColorClick(row, mx, x, w, 14, 9);
     }
 
@@ -838,11 +899,13 @@ public class GuiVisualSettings extends GuiScreen {
                 break;
             case 4:
                 switch (row) {
-                    case 8:  pingSettings.scale        = 0.5f + ratio * 2.5f; break;
-                    case 9:  pingSettings.ringThickness = 0.5f + ratio * 4.5f; break;
-                    case 10: pingSettings.maxRange     = 16.0 + ratio * 240.0; break;
-                    case 11: pingSettings.durationMs   = (long)(1000 + ratio * 14000); break;
-                    case 12: pingSettings.cooldownMs   = (long)(500  + ratio * 9500); break;
+                    case 8:  pingSettings.scale         = 0.5f + ratio * 2.5f; break;
+                    case 9:  pingSettings.ringThickness = 0.5f + ratio * 5.5f; break;
+                    case 10: pingSettings.maxRange      = 16.0 + ratio * 240.0; break;
+                    case 11: pingSettings.durationMs    = (long)(1000 + ratio * 14000); break;
+                    case 12: pingSettings.cooldownMs    = (long)(500  + ratio * 9500); break;
+                    case 16: pingSettings.glowIntensity = 0.05f + ratio * 0.95f; break;
+                    case 17: pingSettings.glowLayers    = 1 + (int)(ratio * 3); break;
                 }
                 break;
         }

@@ -12,21 +12,25 @@ import net.minecraft.entity.player.EntityPlayer;
 import org.lwjgl.opengl.GL11;
 
 /**
- * Rendu visuel du système de ping.
+ * Rendu visuel du système de ping — version améliorée.
  *
- * <p>Tous les paramètres visuels (couleur, taille, style) proviennent des
- * {@link PingSettings} du <b>viewer local</b> — chaque joueur voit les pings
- * selon SES propres réglages.
- *
+ * <p>Améliorations visuelles :
  * <ul>
- *   <li>{@link #renderWorld(float)} – marqueurs 3D billboardés dans le monde</li>
- *   <li>{@link #renderHUD(ScaledResolution)} – indicateurs hors-écran + barre cooldown discrète</li>
+ *   <li>Style 0 : Anneau + croix intérieure + halo de glow multi-passes</li>
+ *   <li>Style 1 : Point avec rayons + glow</li>
+ *   <li>Style 2 : Losange plein semi-transparent + contour + glow</li>
+ *   <li>Glow adaptatif à la distance (plus fort = plus visible de loin)</li>
+ *   <li>Ligne verticale épaissie + dégradé</li>
+ *   <li>Billboard distance + nom : fond semi-transparent, plus lisible</li>
+ *   <li>Flèche HUD redessinée avec bordure et label de distance</li>
  * </ul>
+ *
+ * <p>Le glow peut être désactivé / réglé dans {@link PingSettings}.
  */
 public final class PingRenderer {
 
     // ── Géométrie pré-calculée ────────────────────────────────────────────────
-    private static final int     RING_SEGMENTS = 32;
+    private static final int     RING_SEGMENTS = 48;
     private static final float[] RING_COS      = new float[RING_SEGMENTS];
     private static final float[] RING_SIN      = new float[RING_SEGMENTS];
 
@@ -58,7 +62,6 @@ public final class PingRenderer {
         long now = System.currentTimeMillis();
         double rangeSq = s.maxRange * s.maxRange;
 
-        // Couleur effective du viewer
         int cr = s.getR(), cg = s.getG(), cb = s.getB();
 
         GlStateManager.pushMatrix();
@@ -66,6 +69,7 @@ public final class PingRenderer {
         GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         GlStateManager.disableDepth();
+        GlStateManager.disableTexture2D();
 
         Tessellator   tess = Tessellator.getInstance();
         WorldRenderer wr   = tess.getWorldRenderer();
@@ -77,17 +81,23 @@ public final class PingRenderer {
             double dx = p.x - mc.thePlayer.posX;
             double dy = p.y - mc.thePlayer.posY;
             double dz = p.z - mc.thePlayer.posZ;
-            if (dx*dx + dy*dy + dz*dz > rangeSq) { p.visibleLastFrame = false; continue; }
+            double distSq = dx*dx + dy*dy + dz*dz;
+            if (distSq > rangeSq) { p.visibleLastFrame = false; continue; }
             p.visibleLastFrame = true;
 
             float alpha = p.getAlpha();
             if (alpha <= 0.01f) continue;
 
+            // Distance réelle (pour scaling et glow)
+            float dist = (float) Math.sqrt(distSq);
+            // Facteur de visibilité : les pings lointains sont rendus plus grands
+            float distScale = 1.0f + Math.min(dist / 20.0f, 2.5f) * 0.4f;
+
             int ca = (int)(alpha * 255);
 
-            // ── Animation ─────────────────────────────────────────────────────
-            float pulse = (float)(0.80 + 0.20 * Math.sin(now / 350.0));
-            float bob   = (float)(0.08 * Math.sin(now / 600.0));
+            // Animation pulse + bob
+            float pulse  = (float)(0.82 + 0.18 * Math.sin(now / 320.0));
+            float bob    = (float)(0.10 * Math.sin(now / 550.0));
 
             double rx = p.x - rm.viewerPosX;
             double ry = p.y - rm.viewerPosY + bob;
@@ -97,115 +107,195 @@ public final class PingRenderer {
             p.renderY = (float) ry;
             p.renderZ = (float) rz;
 
-            float baseR = 0.30f * s.scale * pulse;
+            float baseR = 0.32f * s.scale * distScale * pulse;
 
-            // ── Style 0 : Anneau + point central ─────────────────────────────
-            // ── Style 2 : Losange (deux anneaux décalés à 45°) ────────────────
-            if (s.markerStyle == 0 || s.markerStyle == 2) {
-                GlStateManager.disableTexture2D();
-                int caGlow = (int)(alpha * 60);
+            // ── Glow multi-passes ─────────────────────────────────────────────
+            if (s.glowEnabled) {
+                int glowLayers = Math.max(1, Math.min(s.glowLayers, 6));
+                // Intensité glow boostée si distant (max ×2 à pleine portée)
+                float distGlowBoost = 1.0f + Math.min(dist / (float)s.maxRange, 1.0f) * 1.2f;
+                float glowBase = s.glowIntensity * distGlowBoost;
 
-                if (s.markerStyle == 2) {
-                    // Losange : 4 lignes en diagonale
-                    GL11.glLineWidth(s.ringThickness);
-                    wr.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION_COLOR);
-                    float d = baseR * 1.1f;
-                    wr.pos(rx,     ry, rz - d).color(cr, cg, cb, ca).endVertex();
-                    wr.pos(rx + d, ry, rz    ).color(cr, cg, cb, ca).endVertex();
-                    wr.pos(rx,     ry, rz + d).color(cr, cg, cb, ca).endVertex();
-                    wr.pos(rx - d, ry, rz    ).color(cr, cg, cb, ca).endVertex();
-                    tess.draw();
-                } else {
-                    // Anneau externe (glow)
-                    GL11.glLineWidth(s.ringThickness + 1.5f);
-                    wr.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION_COLOR);
-                    for (int i = 0; i < RING_SEGMENTS; i++) {
-                        wr.pos(rx + RING_COS[i] * baseR * 1.30f, ry, rz + RING_SIN[i] * baseR * 1.30f)
-                          .color(cr, cg, cb, caGlow).endVertex();
+                for (int pass = glowLayers; pass >= 1; pass--) {
+                    float glowR     = baseR * (1.0f + pass * 0.28f);
+                    int   glowAlpha = (int)(alpha * glowBase * (50f / pass));
+                    if (glowAlpha < 2) continue;
+
+                    // Couleur du glow : auto = blanc → couleur selon distance
+                    int gcr = cr, gcg = cg, gcb = cb;
+                    if (s.glowColorAuto) {
+                        float t = Math.min(dist / (float)(s.maxRange * 0.5f), 1.0f);
+                        gcr = (int)(255 * (1f - t) + cr * t);
+                        gcg = (int)(255 * (1f - t) + cg * t);
+                        gcb = (int)(255 * (1f - t) + cb * t);
                     }
-                    tess.draw();
-                    // Anneau principal
-                    GL11.glLineWidth(s.ringThickness);
+
+                    GL11.glLineWidth(s.ringThickness + pass * 2.0f);
                     wr.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION_COLOR);
                     for (int i = 0; i < RING_SEGMENTS; i++) {
-                        wr.pos(rx + RING_COS[i] * baseR, ry, rz + RING_SIN[i] * baseR)
-                          .color(cr, cg, cb, ca).endVertex();
+                        wr.pos(rx + RING_COS[i] * glowR, ry, rz + RING_SIN[i] * glowR)
+                          .color(gcr, gcg, gcb, glowAlpha).endVertex();
                     }
                     tess.draw();
                 }
+                GL11.glLineWidth(1.0f);
+            }
 
-                // Point central plein (commun styles 0 et 2)
-                float pr = 0.06f * s.scale;
-                wr.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_COLOR);
-                wr.pos(rx, ry, rz).color(cr, cg, cb, ca).endVertex();
-                for (int i = 0; i <= 12; i++) {
-                    double a = 2.0 * Math.PI * i / 12;
-                    wr.pos(rx + (float)Math.cos(a) * pr, ry, rz + (float)Math.sin(a) * pr)
-                      .color(cr, cg, cb, (int)(alpha * 180)).endVertex();
+            // ── Style 0 : Anneau + croix intérieure ──────────────────────────
+            if (s.markerStyle == 0) {
+                // Anneau principal
+                GL11.glLineWidth(s.ringThickness);
+                wr.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION_COLOR);
+                for (int i = 0; i < RING_SEGMENTS; i++) {
+                    wr.pos(rx + RING_COS[i] * baseR, ry, rz + RING_SIN[i] * baseR)
+                      .color(cr, cg, cb, ca).endVertex();
                 }
                 tess.draw();
 
+                // Croix intérieure (4 branches)
+                float cl = baseR * 0.55f;
+                float cg2 = baseR * 0.15f;
+                GL11.glLineWidth(s.ringThickness * 0.8f);
+                wr.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+                // +X
+                wr.pos(rx + cg2, ry, rz).color(cr, cg, cb, ca).endVertex();
+                wr.pos(rx + cl,  ry, rz).color(cr, cg, cb, (int)(ca * 0.3f)).endVertex();
+                // -X
+                wr.pos(rx - cg2, ry, rz).color(cr, cg, cb, ca).endVertex();
+                wr.pos(rx - cl,  ry, rz).color(cr, cg, cb, (int)(ca * 0.3f)).endVertex();
+                // +Z
+                wr.pos(rx, ry, rz + cg2).color(cr, cg, cb, ca).endVertex();
+                wr.pos(rx, ry, rz + cl ).color(cr, cg, cb, (int)(ca * 0.3f)).endVertex();
+                // -Z
+                wr.pos(rx, ry, rz - cg2).color(cr, cg, cb, ca).endVertex();
+                wr.pos(rx, ry, rz - cl ).color(cr, cg, cb, (int)(ca * 0.3f)).endVertex();
+                tess.draw();
                 GL11.glLineWidth(1.0f);
-                GlStateManager.enableTexture2D();
+
+                // Point central plein
+                float pr = 0.055f * s.scale * distScale;
+                wr.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_COLOR);
+                wr.pos(rx, ry, rz).color(255, 255, 255, ca).endVertex();
+                for (int i = 0; i <= 14; i++) {
+                    double a = 2.0 * Math.PI * i / 14;
+                    wr.pos(rx + (float)Math.cos(a) * pr, ry, rz + (float)Math.sin(a) * pr)
+                      .color(cr, cg, cb, (int)(alpha * 200)).endVertex();
+                }
+                tess.draw();
             }
 
-            // ── Ligne verticale (communes à tous les styles) ──────────────────
-            GlStateManager.disableTexture2D();
-            GL11.glLineWidth(1.5f);
-            wr.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
-            wr.pos(rx, ry,       rz).color(cr, cg, cb, ca).endVertex();
-            wr.pos(rx, ry + 2.4, rz).color(cr, cg, cb,  0).endVertex();
-            tess.draw();
-            GL11.glLineWidth(1.0f);
-            GlStateManager.enableTexture2D();
-
-            // ── Style 1 : Point seul (pas d'anneau, juste un gros point) ─────
-            if (s.markerStyle == 1) {
-                GlStateManager.disableTexture2D();
-                float pr2 = 0.12f * s.scale;
+            // ── Style 2 : Losange plein + contour ────────────────────────────
+            else if (s.markerStyle == 2) {
+                float d = baseR * 1.15f;
+                // Remplissage semi-transparent
                 wr.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_COLOR);
-                wr.pos(rx, ry, rz).color(cr, cg, cb, ca).endVertex();
+                wr.pos(rx, ry, rz).color(cr, cg, cb, (int)(alpha * 60)).endVertex();
+                wr.pos(rx,     ry, rz - d).color(cr, cg, cb, (int)(alpha * 40)).endVertex();
+                wr.pos(rx + d, ry, rz    ).color(cr, cg, cb, (int)(alpha * 40)).endVertex();
+                wr.pos(rx,     ry, rz + d).color(cr, cg, cb, (int)(alpha * 40)).endVertex();
+                wr.pos(rx - d, ry, rz    ).color(cr, cg, cb, (int)(alpha * 40)).endVertex();
+                wr.pos(rx,     ry, rz - d).color(cr, cg, cb, (int)(alpha * 40)).endVertex();
+                tess.draw();
+                // Contour
+                GL11.glLineWidth(s.ringThickness);
+                wr.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION_COLOR);
+                wr.pos(rx,     ry, rz - d).color(cr, cg, cb, ca).endVertex();
+                wr.pos(rx + d, ry, rz    ).color(cr, cg, cb, ca).endVertex();
+                wr.pos(rx,     ry, rz + d).color(cr, cg, cb, ca).endVertex();
+                wr.pos(rx - d, ry, rz    ).color(cr, cg, cb, ca).endVertex();
+                tess.draw();
+                GL11.glLineWidth(1.0f);
+                // Centre
+                float pr = 0.06f * s.scale * distScale;
+                wr.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_COLOR);
+                wr.pos(rx, ry, rz).color(255, 255, 255, ca).endVertex();
+                for (int i = 0; i <= 10; i++) {
+                    double a = 2.0 * Math.PI * i / 10;
+                    wr.pos(rx + (float)Math.cos(a) * pr, ry, rz + (float)Math.sin(a) * pr)
+                      .color(cr, cg, cb, (int)(alpha * 200)).endVertex();
+                }
+                tess.draw();
+            }
+
+            // ── Style 1 : Point avec rayons ───────────────────────────────────
+            else {
+                // Rayons
+                float rl = baseR * 0.7f;
+                GL11.glLineWidth(1.5f);
+                wr.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+                for (int i = 0; i < 4; i++) {
+                    double a = Math.PI * i / 2.0;
+                    float inner = 0.07f * s.scale;
+                    wr.pos(rx + (float)Math.cos(a) * inner, ry, rz + (float)Math.sin(a) * inner)
+                      .color(cr, cg, cb, ca).endVertex();
+                    wr.pos(rx + (float)Math.cos(a) * rl, ry, rz + (float)Math.sin(a) * rl)
+                      .color(cr, cg, cb, (int)(ca * 0.2f)).endVertex();
+                }
+                tess.draw();
+                GL11.glLineWidth(1.0f);
+                // Point central
+                float pr2 = 0.10f * s.scale * distScale;
+                wr.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_COLOR);
+                wr.pos(rx, ry, rz).color(255, 255, 255, ca).endVertex();
                 for (int i = 0; i <= 16; i++) {
                     double a = 2.0 * Math.PI * i / 16;
                     wr.pos(rx + (float)Math.cos(a) * pr2, ry, rz + (float)Math.sin(a) * pr2)
                       .color(cr, cg, cb, (int)(alpha * 200)).endVertex();
                 }
                 tess.draw();
-                GlStateManager.enableTexture2D();
             }
 
-            // ── Billboard : nom expéditeur + distance ─────────────────────────
+            // ── Ligne verticale avec dégradé ─────────────────────────────────
+            float lineH = 2.2f + Math.min(dist * 0.04f, 1.2f); // plus haute si lointain
+            GL11.glLineWidth(2.0f);
+            wr.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+            wr.pos(rx, ry,          rz).color(cr, cg, cb, ca).endVertex();
+            wr.pos(rx, ry + lineH,  rz).color(255, 255, 255, 0).endVertex();
+            tess.draw();
+            GL11.glLineWidth(1.0f);
+
+            GlStateManager.enableTexture2D();
+
+            // ── Billboard : distance + nom ────────────────────────────────────
             if (s.showSenderName || s.showDistance) {
                 GlStateManager.pushMatrix();
-                GlStateManager.translate((float) rx, (float)(ry + 0.55), (float) rz);
+                GlStateManager.translate((float) rx, (float)(ry + lineH + 0.12), (float) rz);
                 GlStateManager.rotate(-rm.playerViewY, 0f, 1f, 0f);
                 GlStateManager.rotate( rm.playerViewX, 1f, 0f, 0f);
-                float scl = 0.022f * s.scale;
+                float scl = 0.020f * s.scale * Math.min(1.0f + dist / 30.0f, 2.2f);
                 GlStateManager.scale(-scl, -scl, scl);
 
-                int nameAlpha = (int)(alpha * 220);
                 float lineY = 0f;
 
                 if (s.showDistance) {
-                    double dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
-                    String distStr = (int)dist + "m";
+                    double d2 = Math.sqrt(dx*dx + dy*dy + dz*dz);
+                    String distStr = (int)d2 + "m";
                     int dw = fr.getStringWidth(distStr);
-                    int dc = (nameAlpha << 24) | (s.getEffectiveColor() & 0x00FFFFFF);
+                    // Fond semi-transparent
+                    net.minecraft.client.gui.Gui.drawRect(-dw / 2 - 2, (int)lineY - 1,
+                        dw / 2 + 2, (int)lineY + fr.FONT_HEIGHT,
+                        (int)(alpha * 140) << 24);
+                    int dc = ((int)(alpha * 255) << 24) | (s.getEffectiveColor() & 0x00FFFFFF);
                     fr.drawStringWithShadow(distStr, -dw / 2.0f, lineY, dc);
-                    lineY += 10f;
+                    lineY += fr.FONT_HEIGHT + 2;
                 }
 
                 if (s.showSenderName) {
                     String name = p.senderName;
                     int nw = fr.getStringWidth(name);
-                    int nc = (nameAlpha << 24) | 0xFFFFFF;
+                    net.minecraft.client.gui.Gui.drawRect(-nw / 2 - 2, (int)lineY - 1,
+                        nw / 2 + 2, (int)lineY + fr.FONT_HEIGHT,
+                        (int)(alpha * 120) << 24);
+                    int nc = ((int)(alpha * 255) << 24) | 0xFFFFFF;
                     fr.drawStringWithShadow(name, -nw / 2.0f, lineY, nc);
                 }
 
                 GlStateManager.popMatrix();
+                GlStateManager.disableTexture2D();
             }
         }
 
+        GlStateManager.enableTexture2D();
         GlStateManager.enableDepth();
         GlStateManager.disableBlend();
         GlStateManager.enableLighting();
@@ -227,23 +317,29 @@ public final class PingRenderer {
         int sh = sr.getScaledHeight();
         long now = System.currentTimeMillis();
 
-        // ── Barre de cooldown discrète (2 px, sans texte) ────────────────────
+        // ── Barre de cooldown ─────────────────────────────────────────────────
         if (pm.isOnCooldown()) {
             float progress = pm.getCooldownProgress();
-            int barW = 40;
-            int barH = 2;
+            int barW = 44;
+            int barH = 3;
             int barX = sw / 2 - barW / 2;
-            int barY = sh - 32;
+            int barY = sh - 36;
 
-            drawRect(barX, barY, barX + barW, barY + barH, 0x55000000);
+            drawRect(barX - 1, barY - 1, barX + barW + 1, barY + barH + 1, 0x44000000);
+            drawRect(barX, barY, barX + barW, barY + barH, 0x33FFFFFF);
             int fill = (int)(barW * progress);
             if (fill > 0) {
-                int fc = (s.getEffectiveColor() & 0x00FFFFFF) | 0xBB000000;
+                int fc = (s.getEffectiveColor() & 0x00FFFFFF) | 0xCC000000;
                 drawRect(barX, barY, barX + fill, barY + barH, fc);
+                // Petite étincelle à l'extrémité
+                if (fill < barW) {
+                    drawRect(barX + fill - 1, barY - 1, barX + fill + 1, barY + barH + 1,
+                             (s.getEffectiveColor() & 0x00FFFFFF) | 0xFF000000);
+                }
             }
         }
 
-        // ── Indicateurs hors-écran (flèche triangulaire au bord) ─────────────
+        // ── Indicateurs hors-écran ────────────────────────────────────────────
         if (s.showOffScreenIndicator) {
             EntityPlayer player = mc.thePlayer;
             float yaw   = (float) Math.toRadians(player.rotationYaw);
@@ -260,6 +356,7 @@ public final class PingRenderer {
                 if (alpha <= 0.01f) continue;
 
                 double ddx = p.x - player.posX;
+                double ddy = p.y - player.posY;
                 double ddz = p.z - player.posZ;
 
                 double cRight   =  ddx * cosY + ddz * sinY;
@@ -273,7 +370,7 @@ public final class PingRenderer {
                 float sxN = (float)(cRight / mag);
                 float syN = (float)(-cForward / mag);
 
-                final int MARGIN = 22;
+                final int MARGIN = 20;
                 float hW = sw / 2.0f - MARGIN;
                 float hH = sh / 2.0f - MARGIN;
                 float t = (Math.abs(sxN) * hH > Math.abs(syN) * hW)
@@ -283,26 +380,28 @@ public final class PingRenderer {
                 float indX = sw / 2.0f + sxN * t;
                 float indY = sh / 2.0f + syN * t;
 
-                int ca = (int)(alpha * 220);
+                int ca = (int)(alpha * 235);
                 int cr = s.getR(), cg = s.getG(), cb = s.getB();
 
-                // Flèche triangulaire
-                double angle = Math.atan2(sxN, -syN);
-                drawArrow((int) indX, (int) indY, angle, 7, cr, cg, cb, ca);
+                // Ombre de la flèche pour la lisibilité
+                drawArrow((int) indX + 1, (int) indY + 1, Math.atan2(sxN, -syN), 9, 0, 0, 0, (int)(alpha * 120));
+                drawArrow((int) indX, (int) indY, Math.atan2(sxN, -syN), 9, cr, cg, cb, ca);
 
-                // Distance
-                double dist = Math.sqrt(ddx*ddx + (p.y - player.posY)*(p.y - player.posY) + ddz*ddz);
+                // Distance + fond
+                double dist = Math.sqrt(ddx*ddx + ddy*ddy + ddz*ddz);
                 String distStr = (int)dist + "m";
+                int dsw = fr.getStringWidth(distStr);
+                float dtx = indX - dsw / 2.0f;
+                float dty = indY + 12;
+                drawRect((int)dtx - 2, (int)dty - 1, (int)dtx + dsw + 2, (int)dty + fr.FONT_HEIGHT, 0x88000000);
                 int dc = (ca << 24) | (s.getEffectiveColor() & 0x00FFFFFF);
                 GlStateManager.enableBlend();
                 GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-                fr.drawStringWithShadow(distStr,
-                    indX - fr.getStringWidth(distStr) / 2.0f,
-                    indY + 9, dc);
+                fr.drawStringWithShadow(distStr, dtx, dty, dc);
             }
         }
 
-        // ── Notifications (haut-droite) ───────────────────────────────────────
+        // ── Notifications ─────────────────────────────────────────────────────
         int notifX = sw - 5;
         int notifY = 20;
         int nCount = pm.getNotifCount();
@@ -315,7 +414,11 @@ public final class PingRenderer {
             else                                                              fade = 1.0f;
             int a = (int)(fade * 255) & 0xFF;
             String text = pm.getNotifText(i);
-            fr.drawStringWithShadow(text, notifX - fr.getStringWidth(text), notifY + i * 10, (a << 24) | 0xFFFFFF);
+            int tw2 = fr.getStringWidth(text);
+            // Fond de la notif
+            drawRect(notifX - tw2 - 4, notifY + i * 10 - 1, notifX + 1, notifY + i * 10 + fr.FONT_HEIGHT - 1,
+                     ((int)(fade * 100) << 24) | 0x000000);
+            fr.drawStringWithShadow(text, notifX - tw2, notifY + i * 10, (a << 24) | 0xFFFFFF);
         }
     }
 
@@ -331,18 +434,25 @@ public final class PingRenderer {
 
         double cos = Math.cos(angle);
         double sin = Math.sin(angle);
-        float ax  = (float)(cx + cos * size);
-        float ay  = (float)(cy + sin * size);
-        float bx  = (float)(cx - cos * size * 0.5 - sin * size * 0.65);
-        float by  = (float)(cy - sin * size * 0.5 + cos * size * 0.65);
-        float cx2 = (float)(cx - cos * size * 0.5 + sin * size * 0.65);
-        float cy2 = (float)(cy - sin * size * 0.5 - cos * size * 0.65);
+        // Pointe allongée
+        float ax  = (float)(cx + cos * size * 1.1);
+        float ay  = (float)(cy + sin * size * 1.1);
+        float bx  = (float)(cx - cos * size * 0.55 - sin * size * 0.7);
+        float by  = (float)(cy - sin * size * 0.55 + cos * size * 0.7);
+        float cx2 = (float)(cx - cos * size * 0.55 + sin * size * 0.7);
+        float cy2 = (float)(cy - sin * size * 0.55 - cos * size * 0.7);
+        // Encoche
+        float nx  = (float)(cx - cos * size * 0.2);
+        float ny  = (float)(cy - sin * size * 0.2);
 
         Tessellator   tess = Tessellator.getInstance();
         WorldRenderer wr   = tess.getWorldRenderer();
         wr.begin(GL11.GL_TRIANGLES, DefaultVertexFormats.POSITION);
-        wr.pos(ax, ay, 0).endVertex();
-        wr.pos(bx, by, 0).endVertex();
+        wr.pos(ax,  ay,  0).endVertex();
+        wr.pos(bx,  by,  0).endVertex();
+        wr.pos(nx,  ny,  0).endVertex();
+        wr.pos(ax,  ay,  0).endVertex();
+        wr.pos(nx,  ny,  0).endVertex();
         wr.pos(cx2, cy2, 0).endVertex();
         tess.draw();
 

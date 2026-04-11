@@ -22,7 +22,7 @@ public final class PingSettings {
 
     // ── Activation / comportement ─────────────────────────────────────────────
     /** Version du schéma de config — incrémenté à chaque ajout de champ. */
-    public int    configVersion           = 2;
+    public int    configVersion           = 3;
     public boolean enabled                = true;
     public double  maxRange               = 50.0;
     public long    durationMs             = 5000L;
@@ -42,15 +42,25 @@ public final class PingSettings {
     public boolean showSenderName = true;
     /**
      * Style du marqueur :
-     *  0 = Anneau + point central
+     *  0 = Anneau + croix
      *  1 = Point seul (discret)
      *  2 = Losange / diamant
      */
     public int     markerStyle   = 0;
     /** Épaisseur du trait de l'anneau. */
-    public float   ringThickness = 2.0f;
+    public float   ringThickness = 2.5f;
     /** Afficher la distance en blocs sur le marqueur 3D. */
-    public boolean showDistance  = false;
+    public boolean showDistance  = true;
+
+    // ── Glow / surbrillance ───────────────────────────────────────────────────
+    /** Activer l'effet de surbrillance (halo lumineux autour du marqueur). */
+    public boolean glowEnabled   = true;
+    /** Intensité du glow (0.0 – 1.0). Plus fort = plus visible de loin. */
+    public float   glowIntensity = 0.65f;
+    /** Nombre de passes de glow (1–4). Plus = plus épais mais plus coûteux. */
+    public int     glowLayers    = 3;
+    /** Si true, la couleur du glow suit automatiquement la distance (blanc → couleur). */
+    public boolean glowColorAuto = true;
 
     // ── Touche ───────────────────────────────────────────────────────────────
     /**
@@ -87,7 +97,6 @@ public final class PingSettings {
     private void applyDefaults() {
         boolean changed = false;
         if (configVersion < 2) {
-            // Champs ajoutés en v2 : showAllyPings, showFriendPings
             showAllyPings = true;
             showFriendPings = true;
             showTeamPings = true;
@@ -96,6 +105,17 @@ public final class PingSettings {
             soundEnabled = true;
             enabled = true;
             configVersion = 2;
+            changed = true;
+        }
+        if (configVersion < 3) {
+            // Champs ajoutés en v3 : glow + showDistance par défaut true + ringThickness 2.5
+            glowEnabled   = true;
+            glowIntensity = 0.65f;
+            glowLayers    = 3;
+            glowColorAuto = true;
+            showDistance  = true;
+            ringThickness = 2.5f;
+            configVersion = 3;
             changed = true;
         }
         if (changed) save();
