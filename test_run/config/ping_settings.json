@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "maxRange": 160.0000057220459,
+  "durationMs": 11360,
+  "cooldownMs": 5725,
+  "soundEnabled": true,
+  "showTeamPings": true,
+  "showOffScreenIndicator": true,
+  "scale": 1.4749999,
+  "color": -52429,
+  "showSenderName": true,
+  "markerStyle": 0,
+  "ringThickness": 3.02,
+  "showDistance": true,
+  "keyCode": -98
+}

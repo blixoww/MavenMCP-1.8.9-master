@@ -102,6 +102,7 @@ import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.shader.Framebuffer;
+import net.minecraft.client.visuals.ping.PingInputHandler;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.Entity;
@@ -2327,6 +2328,11 @@ public class Minecraft implements IThreadListener, IPlayerUsage
                 while (this.gameSettings.keyBindPickBlock.isPressed())
                 {
                     this.middleClickMouse();
+                }
+
+                while (this.gameSettings.keyBindPing.isPressed())
+                {
+                    PingInputHandler.onPingKey(this);
                 }
             }
 

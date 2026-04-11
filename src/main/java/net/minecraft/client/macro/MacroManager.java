@@ -81,9 +81,14 @@ public class MacroManager {
             if (keyCode == 0) continue;
 
             boolean pressed;
-            if (keyCode < 0) {
-                // Bouton souris : keyCode = -(bouton+1), ex: bouton 0 → keyCode=-1
-                pressed = Mouse.isButtonDown(-(keyCode + 1));
+            if (keyCode <= -100) {
+                // Convention GameSettings : keyCode = mouseButton - 100  (ex: middle=2 -> -98)
+                int btn = keyCode + 100; // -98 -> 2
+                pressed = Mouse.isButtonDown(btn);
+            } else if (keyCode < 0) {
+                // Legacy MacroManager convention : keyCode = -(button+1) (ex: button0 -> -1)
+                int btn = -(keyCode + 1);
+                pressed = Mouse.isButtonDown(btn);
             } else {
                 pressed = Keyboard.isKeyDown(keyCode);
             }
@@ -153,7 +158,7 @@ public class MacroManager {
     // ── Classe interne Macro ────────────────────────────────────────────────────
 
     public static class Macro {
-        private int keyCode;   // 0 = non assigné, <0 = bouton souris, >0 = touche clavier
+        private int keyCode;   // 0 = non assigné, <= -100 = GameSettings mouse convention, <0 = legacy macro convention, >0 = clavier
         private String command;
         private transient boolean down; // état courant (non sauvegardé)
 
@@ -187,18 +192,32 @@ public class MacroManager {
         }
 
         /**
-         * Affichage lisible de la touche (même logique que GameSettings.getKeyDisplayString)
+         * Affichage lisible de la touche (compatible avec plusieurs encodages souris).
          */
         public String getKeyDisplayString() {
             if (keyCode == 0) return "---";
+            if (keyCode <= -100) {
+                // GameSettings convention: keyCode = mouseButton - 100
+                int btn = keyCode + 100; // -98 -> 2
+                switch (btn) {
+                    case 0: return "Clic Gauche";
+                    case 1: return "Clic Droit";
+                    case 2: return "Clic Molette";
+                    default: return "Souris " + btn;
+                }
+            }
             if (keyCode < 0) {
+                // Legacy macro convention: keyCode = -(button+1)
                 int btn = -(keyCode + 1);
                 return "Souris " + (btn + 1);
             }
-            String name = Keyboard.getKeyName(keyCode);
-            return name != null ? name : "Touche " + keyCode;
+            try {
+                String name = Keyboard.getKeyName(keyCode);
+                return (name != null && !name.isEmpty()) ? name : ("Touche " + keyCode);
+            } catch (Exception e) {
+                return "Touche " + keyCode;
+            }
         }
     }
 }
-
 

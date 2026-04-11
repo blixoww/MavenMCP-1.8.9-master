@@ -108,5 +108,14 @@ public final class PacketId {
 
     /** Drop d'un item custom (id 432-470) du client vers le serveur */
     public static final int CUSTOM_ITEM_DROP = 0x60;
+
+    // ════════════════════════════════════════════════════════════════════════
+    //  Système de Ping (style CS:GO)
+    // ════════════════════════════════════════════════════════════════════════
+
+    /** Client place un ping sur le serveur (x, y, z en double) */
+    public static final int PING_PLACE   = 0x70;
+    /** Serveur diffuse un ping reçu aux membres de la faction à portée */
+    public static final int PING_RECEIVE = 0x71;
 }
 

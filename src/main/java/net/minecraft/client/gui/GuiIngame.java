@@ -19,6 +19,8 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.visuals.ping.PingManager;
+import net.minecraft.client.visuals.ping.PingRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -486,6 +488,12 @@ public class GuiIngame extends Gui {
         // Render visual effects HUD (combo, hit marker)
         try {
             net.minecraft.client.visuals.VisualManager.getInstance().renderHUD(partialTicks);
+        } catch (Exception ignored) {
+        }
+
+        // Render ping HUD (cooldown + notifications)
+        try {
+            PingRenderer.renderHUD(scaledresolution);
         } catch (Exception ignored) {
         }
     }
@@ -1075,6 +1083,12 @@ public class GuiIngame extends Gui {
         // Tick visual effects (combo reset, heart cleanup)
         try {
             net.minecraft.client.visuals.VisualManager.getInstance().tick();
+        } catch (Exception ignored) {
+        }
+
+        // Tick ping manager (expiration des pings)
+        try {
+            PingManager.INSTANCE.tick();
         } catch (Exception ignored) {
         }
 

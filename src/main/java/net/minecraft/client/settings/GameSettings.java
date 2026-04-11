@@ -151,6 +151,7 @@ public class GameSettings {
     public KeyBinding keyBindShop = new KeyBinding("Shop", 48, "key.categories.misc"); // 48 = B par défaut
     public KeyBinding keyBindWaypoints = new KeyBinding("Waypoints", 25, "key.categories.misc");
     public KeyBinding keyBindOpenCraftGuide = new KeyBinding("Craft", 34, "key.categories.misc");
+    public KeyBinding keyBindPing = new KeyBinding("Ping", -98, "key.categories.gameplay"); // -98 = clic molette
 
     // Activation du mode Toggle Sneak/Sprint (option dans le menu)
     public boolean toggleSneakEnabled = false;
@@ -317,7 +318,8 @@ public class GameSettings {
         this.limitFramerate = (int) GameSettings.Options.FRAMERATE_LIMIT.getValueMax();
         this.ofKeyBindZoom = new KeyBinding("of.key.zoom", 46, "key.categories.misc");
         this.keyBindings = ArrayUtils.add(this.keyBindings, this.ofKeyBindZoom);
-        KeyUtils.fixKeyConflicts(this.keyBindings, new KeyBinding[]{this.ofKeyBindZoom});
+        this.keyBindings = ArrayUtils.add(this.keyBindings, this.keyBindPing);
+        KeyUtils.fixKeyConflicts(this.keyBindings, new KeyBinding[]{this.ofKeyBindZoom, this.keyBindPing});
         this.renderDistanceChunks = 8;
         this.loadOptions();
         Config.initGameSettings(this);

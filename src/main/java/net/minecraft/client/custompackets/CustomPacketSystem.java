@@ -3,6 +3,7 @@ package net.minecraft.client.custompackets;
 import net.minecraft.client.custompackets.handler.HdvPacketHandler;
 import net.minecraft.client.custompackets.handler.PlayerDataHandler;
 import net.minecraft.client.custompackets.handler.ShopPacketHandler;
+import net.minecraft.client.visuals.ping.PingManager;
 import net.minecraft.network.PacketBuffer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,6 +32,19 @@ public final class CustomPacketSystem {
 
         ShopPacketHandler.registerHandlers();
         PlayerDataHandler.registerHandlers();
+
+        // Système de ping : réception d'un ping S2C (faction/allié/ami proche)
+        // Format : double x | double y | double z | String sender (max 64)
+        PacketDispatcher.register(PacketChannel.PING_S2C, PacketId.PING_RECEIVE, buf -> {
+            double x      = buf.readDouble();
+            double y      = buf.readDouble();
+            double z      = buf.readDouble();
+            String sender = buf.readStringFromBuffer(64);
+            PingManager.INSTANCE.addRemotePing(x, y, z, sender);
+        });
+        // Appliquer les keybinds persistés maintenant que GameSettings est prêt
+        PingManager.INSTANCE.applyStoredKeyBinding();
+        LOGGER.info("[CustomPackets] ✓ PingSystem handler enregistré");
         
         // Initialiser le combat log
         net.minecraft.client.combatlog.CombatLogManager.INSTANCE.init();
@@ -59,6 +73,7 @@ public final class CustomPacketSystem {
                               PacketChannel.SHOP_S2C + "\0" + PacketChannel.SHOP_C2S + "\0" +
                               PacketChannel.PLAYER_DATA_S2C + "\0" + PacketChannel.PLAYER_DATA_C2S + "\0" +
                               PacketChannel.CLIENT_TO_SERVER + "\0" + PacketChannel.SERVER_TO_CLIENT + "\0" +
+                              PacketChannel.PING_C2S + "\0" + PacketChannel.PING_S2C + "\0" +
                               PacketChannel.COMBATLOG;
             buf.writeBytes(channels.getBytes(java.nio.charset.StandardCharsets.UTF_8));
             PacketSender.send("REGISTER", buf);

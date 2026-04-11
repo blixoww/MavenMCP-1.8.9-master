@@ -6,7 +6,11 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.visuals.ping.PingManager;
+import net.minecraft.client.visuals.ping.PingSettings;
+import net.minecraft.client.visuals.ping.PingType;
 import net.minecraft.util.MathHelper;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import java.io.IOException;
@@ -20,7 +24,7 @@ public class GuiVisualSettings extends GuiScreen {
     private VisualSettings settings;
     private int selectedCategory = 0;
 
-    private static final String[] CATEGORIES = {"Combo", "Hit Marker", "Particules", "Coeurs"};
+    private static final String[] CATEGORIES = {"Combo", "Hit Marker", "Particules", "Coeurs", "Ping"};
     private static final int ACCENT = 0xFFCC2222;
     private static final int BG_DARK = 0xF0101018;
     private static final int BG_HEADER = 0xFF1A1A24;
@@ -38,7 +42,12 @@ public class GuiVisualSettings extends GuiScreen {
     private int panelX, panelY, panelW, panelH;
     private int catW, settingsX, settingsW;
 
-    private final float[] catHover = new float[4];
+    private final float[] catHover = new float[5];
+
+    // ── État Ping ─────────────────────────────────────────────────────────────
+    private PingSettings pingSettings;
+    /** -1 = pas en attente d'une touche; 0 = attend touche ping; 1 = attend touche cycle */
+    private int awaitingKeyBind = -1;
     private float animation = 0.0f;
     private long lastTime = -1L;
 
@@ -53,6 +62,7 @@ public class GuiVisualSettings extends GuiScreen {
     public GuiVisualSettings(GuiScreen parent) {
         this.parent = parent;
         this.settings = VisualManager.getInstance().getSettings();
+        this.pingSettings = PingManager.INSTANCE.getSettings();
     }
 
     @Override
@@ -155,6 +165,7 @@ public class GuiVisualSettings extends GuiScreen {
             case 1: currentY = drawHitMarkerSettings(x, currentY, w, mx, my, y, y + availH); break;
             case 2: currentY = drawParticleSettings(x, currentY, w, mx, my, y, y + availH); break;
             case 3: currentY = drawHeartSettings(x, currentY, w, mx, my, y, y + availH); break;
+            case 4: currentY = drawPingSettings(x, currentY, w, mx, my, y, y + availH); break;
         }
         maxScroll = Math.max(0, (currentY + scrollOffset) - (y + availH));
     }
@@ -215,6 +226,65 @@ public class GuiVisualSettings extends GuiScreen {
         y = drawEnum(x, y, w, "Filtre", new String[]{"Joueurs", "Mobs", "Tous"}, settings.heartsFilter, mx, my, ct, cb);
         y = drawColorSelector(x, y, w, "Couleur", settings.heartsColor, mx, my, ct, cb, 8);
         return y;
+    }
+
+    private int drawPingSettings(int x, int y, int w, int mx, int my, int ct, int cb) {
+        y = drawToggle(x, y, w, "Activ\u00e9", pingSettings.enabled, mx, my, ct, cb);
+        y = drawToggle(x, y, w, "Pings \u00e9quipe visibles", pingSettings.showTeamPings, mx, my, ct, cb);
+        y = drawToggle(x, y, w, "Indicateur hors-\u00e9cran", pingSettings.showOffScreenIndicator, mx, my, ct, cb);
+        y = drawToggle(x, y, w, "Nom exp\u00e9diteur", pingSettings.showSenderName, mx, my, ct, cb);
+        y = drawToggle(x, y, w, "Distance", pingSettings.showDistance, mx, my, ct, cb);
+        y = drawToggle(x, y, w, "Son", pingSettings.soundEnabled, mx, my, ct, cb);
+        y = drawSlider(x, y, w, "Taille", pingSettings.scale, 0.5f, 3.0f, mx, my, ct, cb);
+        y = drawSlider(x, y, w, "\u00c9paisseur anneau", pingSettings.ringThickness, 0.5f, 5.0f, mx, my, ct, cb);
+        y = drawSlider(x, y, w, "Port\u00e9e (blocs)", (float) pingSettings.maxRange, 16f, 256f, mx, my, ct, cb);
+        y = drawSlider(x, y, w, "Dur\u00e9e (s)", pingSettings.durationMs / 1000.0f, 1f, 15f, mx, my, ct, cb);
+        y = drawSlider(x, y, w, "Cooldown (s)", pingSettings.cooldownMs / 1000.0f, 0.5f, 10f, mx, my, ct, cb);
+        y = drawEnum(x, y, w, "Style", new String[]{"Anneau", "Point", "Losange"}, pingSettings.markerStyle, mx, my, ct, cb);
+        y = drawColorSelector(x, y, w, "Couleur", pingSettings.color, mx, my, ct, cb, 9);
+        y = drawKeyBind(x, y, w, "Touche Ping", pingSettings.keyCode, 0, mx, my, ct, cb);
+        return y;
+    }
+
+
+    private int drawKeyBind(int x, int y, int w, String label, int keyCode, int bindId, int mx, int my, int ct, int cb) {
+        if (y + 16 < ct || y > cb) return y + 16;
+        fontRendererObj.drawStringWithShadow(label, x, y + 3, 0xFFCCCCCC);
+        boolean waiting = (awaitingKeyBind == bindId);
+        String keyName = waiting ? "[ ... ]" : getKeyDisplayName(keyCode);
+        int kw = fontRendererObj.getStringWidth(keyName);
+        int kx = x + w - kw - 2;
+        boolean hovered = mx >= kx && mx < kx + kw && my >= y && my < y + 14;
+        int keyColor = waiting ? 0xFFFFFF44 : (hovered ? 0xFFFFFFFF : 0xFFFF8888);
+        fontRendererObj.drawStringWithShadow(keyName, kx, y + 3, keyColor);
+        return y + 16;
+    }
+
+    /**
+     * Retourne le nom lisible d'un keyCode, qu'il soit clavier ou souris.
+     * Convention MC : bouton souris = (mouseButton - 100), donc valeurs < 0.
+     *  -100 = bouton 0 (gauche)
+     *  -99  = bouton 1 (droit)
+     *  -98  = bouton 2 (molette / milieu)
+     */
+    private static String getKeyDisplayName(int keyCode) {
+        if (keyCode < 0) {
+            // Bouton souris
+            int btn = keyCode + 100;
+            switch (btn) {
+                case 0:  return "Clic Gauche";
+                case 1:  return "Clic Droit";
+                case 2:  return "Clic Molette";
+                default: return "Souris " + btn;
+            }
+        }
+        if (keyCode == 0) return "---";
+        try {
+            String name = Keyboard.getKeyName(keyCode);
+            return (name != null && !name.isEmpty()) ? name : "Touche " + keyCode;
+        } catch (Exception e) {
+            return "Touche " + keyCode;
+        }
     }
 
     private int drawToggle(int x, int y, int w, String label, boolean value, int mx, int my, int ct, int cb) {
@@ -316,6 +386,7 @@ public class GuiVisualSettings extends GuiScreen {
             case 1: drawHitMarkerPreview(px, pw, areaY, areaH, elapsed); break;
             case 2: drawParticlesPreview(px + 4, areaY, pw - 8, areaH, elapsed); break;
             case 3: drawHeartsPreview(px, pw, areaY, areaH, elapsed); break;
+            case 4: drawPingPreview(px, pw, areaY, areaH, elapsed); break;
         }
     }
 
@@ -412,6 +483,63 @@ public class GuiVisualSettings extends GuiScreen {
         fontRendererObj.drawStringWithShadow(heartText, settingsX + pw / 2.0f - hw / 2.0f, floatY, color);
     }
 
+    private void drawPingPreview(int px, int pw, int areaY, int areaH, long elapsed) {
+        int cx = settingsX + pw / 2;
+        int cy = areaY + areaH / 2;
+
+        // Couleur effective du viewer
+        int baseColor = pingSettings.color != 0
+            ? (pingSettings.color | 0xFF000000)
+            : (net.minecraft.client.visuals.ping.PingType.PING.defaultColor | 0xFF000000);
+        int cr = (baseColor >> 16) & 0xFF;
+        int cg = (baseColor >>  8) & 0xFF;
+        int cb =  baseColor        & 0xFF;
+
+        float cycle = (elapsed % 2000) / 2000.0f;
+        float alpha = cycle > 0.8f ? 1.0f - (cycle - 0.8f) / 0.2f : 1.0f;
+        float pulse = (float)(0.80 + 0.20 * Math.sin(elapsed / 350.0));
+        int ca = (int)(alpha * 220);
+
+        int ringR = (int)(18 * pingSettings.scale * pulse);
+
+        // Style
+        if (pingSettings.markerStyle == 2) {
+            // Losange
+            int d = ringR;
+            GlStateManager.enableBlend();
+            for (int[] pt : new int[][]{{cx, cy - d}, {cx + d, cy}, {cx, cy + d}, {cx - d, cy}, {cx, cy - d}}) {
+                // Juste dessiner une ligne
+            }
+            Gui.drawRect(cx - 1, cy - d, cx + 1, cy + d, (ca << 24) | (baseColor & 0x00FFFFFF));
+            Gui.drawRect(cx - d, cy - 1, cx + d, cy + 1, (ca << 24) | (baseColor & 0x00FFFFFF));
+        } else if (pingSettings.markerStyle == 1) {
+            // Point seul
+            int pr = (int)(6 * pingSettings.scale);
+            Gui.drawRect(cx - pr, cy - pr, cx + pr, cy + pr, (ca << 24) | (baseColor & 0x00FFFFFF));
+        } else {
+            // Anneau
+            GlStateManager.enableBlend();
+            GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+            for (int i = 0; i < 32; i++) {
+                double angle = 2.0 * Math.PI * i / 32;
+                int px2 = cx + (int)(Math.cos(angle) * ringR);
+                int py2 = cy + (int)(Math.sin(angle) * ringR);
+                Gui.drawRect(px2, py2, px2 + 1, py2 + 1, (ca << 24) | (baseColor & 0x00FFFFFF));
+            }
+            // Point central
+            Gui.drawRect(cx - 1, cy - 1, cx + 2, cy + 2, (ca << 24) | (baseColor & 0x00FFFFFF));
+        }
+
+        // Ligne verticale
+        Gui.drawRect(cx, cy - 22, cx + 1, cy, (ca << 24) | (baseColor & 0x00FFFFFF));
+
+        // Label style
+        String[] styleNames = {"Anneau", "Point", "Losange"};
+        String sn = styleNames[pingSettings.markerStyle];
+        int labelA = (int)(alpha * 140);
+        fontRendererObj.drawStringWithShadow("\u00A77" + sn, cx - fontRendererObj.getStringWidth(sn) / 2.0f, areaY + 2, (labelA << 24) | 0xAAAAAA);
+    }
+
     private int getPreviewComboColor() {
         if (previewComboCount >= settings.comboThreshold3) return settings.comboColor3;
         if (previewComboCount >= settings.comboThreshold2) return settings.comboColor2;
@@ -422,6 +550,30 @@ public class GuiVisualSettings extends GuiScreen {
     @Override
     protected void mouseClicked(int mx, int my, int btn) throws IOException {
         super.mouseClicked(mx, my, btn);
+
+        // Si on attend une keybind pour le Ping, capturer les boutons souris ici
+        if (awaitingKeyBind == 0) {
+            if (btn == 1 || btn == 2 || btn == 0) {
+                // btn: 0=left,1=right,2=middle
+                if (btn == 0) {
+                    // clic gauche: annuler la capture et laisser le clic continuer à traiter l'UI
+                    awaitingKeyBind = -1;
+                    // ne pas return; laisser le traitement suivant
+                } else {
+                    // Clic droit ou molette -> enregistrer comme binding
+                    int keyCode = btn - 100; // convention GameSettings
+                    pingSettings.keyCode = keyCode;
+                    mc.gameSettings.keyBindPing.setKeyCode(keyCode);
+                    net.minecraft.client.settings.KeyBinding.resetKeyBindingArrayAndHash();
+                    pingSettings.save();
+                    PingManager.INSTANCE.applyStoredKeyBinding();
+                    awaitingKeyBind = -1;
+                    return;
+                }
+            }
+        }
+
+        // Si le clic n'est pas gauche, on ne gère pas la suite (UI principale n'utilise que le clic gauche)
         if (btn != 0) return;
 
         int rtw = fontRendererObj.getStringWidth("\u00A77[Reset]");
@@ -430,6 +582,13 @@ public class GuiVisualSettings extends GuiScreen {
             settings = new VisualSettings();
             settings.save();
             VisualManager.getInstance().setSettings(settings);
+            // Reset ping settings aussi
+            pingSettings = net.minecraft.client.visuals.ping.PingSettings.resetToDefaultAndSave();
+            PingManager.INSTANCE.setSettings(pingSettings);
+            // Mettre à jour la keyBind globale et appliquer
+            mc.gameSettings.keyBindPing.setKeyCode(pingSettings.keyCode);
+            net.minecraft.client.settings.KeyBinding.resetKeyBindingArrayAndHash();
+            PingManager.INSTANCE.applyStoredKeyBinding();
             previewComboCount = 0;
             return;
         }
@@ -476,6 +635,7 @@ public class GuiVisualSettings extends GuiScreen {
             case 1: handleHitMarkerClick(row, mx, x, w); break;
             case 2: handleParticleClick(row, mx, x, w); break;
             case 3: handleHeartClick(row, mx, x, w); break;
+            case 4: handlePingClick(row, mx, x, w, baseY + row * 16); break;
         }
         // settings.save() retiré d'ici pour éviter lag pendant drag
     }
@@ -524,6 +684,23 @@ public class GuiVisualSettings extends GuiScreen {
         handleColorClick(row, mx, x, w, 3, 8);
     }
 
+    private void handlePingClick(int row, int mx, int x, int w, int rowY) {
+        if (isOverToggle(mx, x, w)) {
+            if (row == 0) { pingSettings.enabled = !pingSettings.enabled; pingSettings.save(); }
+            if (row == 1) { pingSettings.showTeamPings = !pingSettings.showTeamPings; pingSettings.save(); }
+            if (row == 2) { pingSettings.showOffScreenIndicator = !pingSettings.showOffScreenIndicator; pingSettings.save(); }
+            if (row == 3) { pingSettings.showSenderName = !pingSettings.showSenderName; pingSettings.save(); }
+            if (row == 4) { pingSettings.showDistance = !pingSettings.showDistance; pingSettings.save(); }
+            if (row == 5) { pingSettings.soundEnabled = !pingSettings.soundEnabled; pingSettings.save(); }
+        }
+        if (isOverEnum(mx, x, w)) {
+            if (row == 11) { pingSettings.markerStyle = (pingSettings.markerStyle + 1) % 3; pingSettings.save(); }
+        }
+        // Touche Ping (row 13)
+        if (row == 13) { awaitingKeyBind = 0; }
+        handleColorClick(row, mx, x, w, 12, 9);
+    }
+
     private boolean isOverToggle(int mx, int x, int w) {
         int tw = 22;
         int tx = x + w - tw;
@@ -569,6 +746,7 @@ public class GuiVisualSettings extends GuiScreen {
             case 6: return settings.particleColor2;
             case 7: return settings.particleColor3;
             case 8: return settings.heartsColor;
+            case 9: return pingSettings.color;
             default: return 0xFFFFFFFF;
         }
     }
@@ -584,6 +762,7 @@ public class GuiVisualSettings extends GuiScreen {
             case 6: settings.particleColor2 = color; break;
             case 7: settings.particleColor3 = color; break;
             case 8: settings.heartsColor = color; break;
+            case 9: pingSettings.color = color; pingSettings.save(); break;
         }
     }
 
@@ -612,7 +791,8 @@ public class GuiVisualSettings extends GuiScreen {
     protected void mouseReleased(int mx, int my, int btn) {
         super.mouseReleased(mx, my, btn);
         if (draggingSlider != -1) {
-            settings.save();
+            if (selectedCategory == 4) pingSettings.save();
+            else settings.save();
             draggingSlider = -1;
         }
     }
@@ -652,11 +832,33 @@ public class GuiVisualSettings extends GuiScreen {
             case 3:
                 if (row == 2) settings.heartsQuantity = 1 + (int)(ratio * 9);
                 break;
+            case 4:
+                switch (row) {
+                    case 6:  pingSettings.scale        = 0.5f + ratio * 2.5f; break;
+                    case 7:  pingSettings.ringThickness = 0.5f + ratio * 4.5f; break;
+                    case 8:  pingSettings.maxRange     = 16.0 + ratio * 240.0; break;
+                    case 9:  pingSettings.durationMs   = (long)(1000 + ratio * 14000); break;
+                    case 10: pingSettings.cooldownMs   = (long)(500  + ratio * 9500); break;
+                }
+                break;
         }
     }
 
     @Override
     protected void keyTyped(char c, int keyCode) throws IOException {
+        // Capture d'une touche pour la keybind Ping
+        if (awaitingKeyBind == 0) {
+            if (keyCode == 1) { // Échap = annuler
+                awaitingKeyBind = -1;
+                return;
+            }
+            pingSettings.keyCode = keyCode;
+            mc.gameSettings.keyBindPing.setKeyCode(keyCode);
+            net.minecraft.client.settings.KeyBinding.resetKeyBindingArrayAndHash();
+            pingSettings.save();
+            awaitingKeyBind = -1;
+            return;
+        }
         if (keyCode == 1) {
             settings.save();
             this.mc.displayGuiScreen(parent);
@@ -675,7 +877,9 @@ public class GuiVisualSettings extends GuiScreen {
     @Override
     public void onGuiClosed() {
         settings.save();
+        pingSettings.save();
         VisualManager.getInstance().setSettings(settings);
+        PingManager.INSTANCE.setSettings(pingSettings);
     }
 
     private boolean isModuleEnabled(int cat) {
@@ -684,6 +888,7 @@ public class GuiVisualSettings extends GuiScreen {
             case 1: return settings.hitMarkerEnabled;
             case 2: return settings.particlesEnabled;
             case 3: return settings.heartsEnabled;
+            case 4: return pingSettings.enabled;
             default: return false;
         }
     }

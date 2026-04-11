@@ -41,4 +41,10 @@ public final class PacketChannel {
 
     // ── Canal dédié au CombatLog (nom court pour compatibilité Bukkit/Spigot)
     public static final String COMBATLOG = "OF_COMBAT";
+
+    // ── Canal dédié au système de Ping ──────────────────────────────────────
+    /** Ping – client → serveur (placement d'un ping) */
+    public static final String PING_C2S = "CUSTOM:PING_C2S";
+    /** Ping – serveur → client (diffusion aux membres de faction proches) */
+    public static final String PING_S2C = "CUSTOM:PING_S2C";
 }

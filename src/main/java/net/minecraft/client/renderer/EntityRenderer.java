@@ -37,6 +37,7 @@ import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.shader.ShaderGroup;
 import net.minecraft.client.shader.ShaderLinkHelper;
+import net.minecraft.client.visuals.ping.PingRenderer;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -1722,6 +1723,16 @@ public class EntityRenderer implements IResourceManagerReloadListener
 
             this.disableLightmap();
         }
+
+        // Rendu des marqueurs de ping (style CS:GO)
+        try {
+            PingRenderer.renderWorld(partialTicks);
+        } catch (Exception ignored) {}
+
+        // Rendu des effets visuels monde (damage hearts…)
+        try {
+            net.minecraft.client.visuals.VisualManager.getInstance().renderWorld(partialTicks);
+        } catch (Exception ignored) {}
 
         GlStateManager.depthMask(false);
 
