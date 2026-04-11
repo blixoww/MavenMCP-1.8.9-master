@@ -25,6 +25,7 @@ import net.minecraft.tileentity.TileEntityMobSpawner;
 import net.minecraft.tileentity.TileEntityPiston;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.tileentity.TileEntitySkull;
+import net.minecraft.tileentity.TileEntitySteelChest;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ReportedException;
 import net.minecraft.world.World;
@@ -63,6 +64,7 @@ public class TileEntityRendererDispatcher
         this.mapSpecialRenderers.put(TileEntityBeacon.class, new TileEntityBeaconRenderer());
         this.mapSpecialRenderers.put(TileEntitySkull.class, new TileEntitySkullRenderer());
         this.mapSpecialRenderers.put(TileEntityBanner.class, new TileEntityBannerRenderer());
+        this.mapSpecialRenderers.put(TileEntitySteelChest.class, new TileEntitySteelChestRenderer());
 
         for (TileEntitySpecialRenderer<?> tileentityspecialrenderer : this.mapSpecialRenderers.values())
         {

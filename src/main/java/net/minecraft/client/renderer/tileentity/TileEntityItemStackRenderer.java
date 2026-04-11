@@ -13,6 +13,7 @@ import net.minecraft.tileentity.TileEntityBanner;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityEnderChest;
 import net.minecraft.tileentity.TileEntitySkull;
+import net.minecraft.tileentity.TileEntitySteelChest;
 import net.minecraft.util.EnumFacing;
 
 public class TileEntityItemStackRenderer
@@ -23,6 +24,7 @@ public class TileEntityItemStackRenderer
     private TileEntityEnderChest enderChest = new TileEntityEnderChest();
     private TileEntityBanner banner = new TileEntityBanner();
     private TileEntitySkull skull = new TileEntitySkull();
+    private TileEntitySteelChest steelChest = new TileEntitySteelChest();
 
     public void renderByItem(ItemStack itemStackIn)
     {
@@ -70,6 +72,10 @@ public class TileEntityItemStackRenderer
             if (block == Blocks.ender_chest)
             {
                 TileEntityRendererDispatcher.instance.renderTileEntityAt(this.enderChest, 0.0D, 0.0D, 0.0D, 0.0F);
+            }
+            else if (block == Blocks.steel_chest)
+            {
+                TileEntityRendererDispatcher.instance.renderTileEntityAt(this.steelChest, 0.0D, 0.0D, 0.0D, 0.0F);
             }
             else if (block == Blocks.trapped_chest)
             {

@@ -12,7 +12,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemArmor;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.EnumFacing;
@@ -162,6 +165,62 @@ public class GuiOverlayDebug extends Gui
             {
                 BlockPos blockpos1 = this.mc.objectMouseOver.getBlockPos();
                 list.add(String.format("Looking at: %d %d %d", new Object[] {Integer.valueOf(blockpos1.getX()), Integer.valueOf(blockpos1.getY()), Integer.valueOf(blockpos1.getZ())}));
+            }
+
+            // ── Armures portées (matériaux custom + vanilla) ──────────────────────
+            if (this.mc.thePlayer != null)
+            {
+                EntityPlayer player = this.mc.thePlayer;
+                String[] slotNames = {"Boots", "Leggings", "Chestplate", "Helmet"};
+                boolean hasCustomArmor = false;
+
+                for (int armorSlot = 0; armorSlot < 4; armorSlot++)
+                {
+                    ItemStack armorStack = player.getCurrentArmor(armorSlot);
+                    if (armorStack != null && armorStack.getItem() instanceof ItemArmor)
+                    {
+                        ItemArmor armor = (ItemArmor) armorStack.getItem();
+                        ItemArmor.ArmorMaterial mat = armor.getArmorMaterial();
+                        // Afficher seulement les matériaux custom
+                        if (mat == ItemArmor.ArmorMaterial.STEEL
+                                || mat == ItemArmor.ArmorMaterial.EMERALD
+                                || mat == ItemArmor.ArmorMaterial.RUBY
+                                || mat == ItemArmor.ArmorMaterial.COBALT)
+                        {
+                            hasCustomArmor = true;
+                        }
+                    }
+                }
+
+                if (hasCustomArmor)
+                {
+                    list.add("");
+                    list.add(EnumChatFormatting.AQUA + "── Armures ──");
+                    for (int armorSlot = 0; armorSlot < 4; armorSlot++)
+                    {
+                        ItemStack armorStack = player.getCurrentArmor(armorSlot);
+                        if (armorStack != null && armorStack.getItem() instanceof ItemArmor)
+                        {
+                            ItemArmor armor = (ItemArmor) armorStack.getItem();
+                            ItemArmor.ArmorMaterial mat = armor.getArmorMaterial();
+                            int dmgReduction = mat.getDamageReductionAmount(armorSlot);
+                            int durLeft = armorStack.getMaxDamage() - armorStack.getItemDamage();
+                            int durMax = armorStack.getMaxDamage();
+                            String color = (mat == ItemArmor.ArmorMaterial.STEEL)   ? EnumChatFormatting.GRAY.toString()
+                                         : (mat == ItemArmor.ArmorMaterial.EMERALD) ? EnumChatFormatting.GREEN.toString()
+                                         : (mat == ItemArmor.ArmorMaterial.RUBY)    ? EnumChatFormatting.RED.toString()
+                                         : (mat == ItemArmor.ArmorMaterial.COBALT)  ? EnumChatFormatting.BLUE.toString()
+                                         : EnumChatFormatting.WHITE.toString();
+                            list.add(String.format("%s%s: %s+%d def | %d/%d dur",
+                                    color,
+                                    slotNames[armorSlot],
+                                    EnumChatFormatting.RESET,
+                                    dmgReduction,
+                                    durLeft,
+                                    durMax));
+                        }
+                    }
+                }
             }
 
             return list;
