@@ -1729,6 +1729,11 @@ public class EntityRenderer implements IResourceManagerReloadListener
             PingRenderer.renderWorld(partialTicks);
         } catch (Exception ignored) {}
 
+        // Rendu des waypoints
+        try {
+            net.minecraft.client.waypoint.WaypointRenderer.render(partialTicks);
+        } catch (Exception ignored) {}
+
         // Rendu des effets visuels monde (damage hearts…)
         try {
             net.minecraft.client.visuals.VisualManager.getInstance().renderWorld(partialTicks);

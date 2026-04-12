@@ -22,7 +22,7 @@ public final class PingSettings {
 
     // ── Activation / comportement ─────────────────────────────────────────────
     /** Version du schéma de config — incrémenté à chaque ajout de champ. */
-    public int    configVersion           = 3;
+    public int    configVersion           = 4;
     public boolean enabled                = true;
     public double  maxRange               = 50.0;
     public long    durationMs             = 5000L;
@@ -51,6 +51,20 @@ public final class PingSettings {
     public float   ringThickness = 2.5f;
     /** Afficher la distance en blocs sur le marqueur 3D. */
     public boolean showDistance  = true;
+
+    // ── Scale à distance ──────────────────────────────────────────────────────
+    /**
+     * Si true, plus le ping est loin, plus le marqueur 3D est grand
+     * (taille angulaire quasi-constante → toujours visible de loin).
+     * Si false, le marqueur garde une taille fixe.
+     */
+    public boolean distanceScaleEnabled = true;
+    /**
+     * Coefficient multiplicateur du scale à distance.
+     * La formule est : scale_total = scale * (1 + min(dist/20, 2.5) * distanceScaleFactor)
+     * Défaut = 0.4 (le marqueur double environ à 50 blocs).
+     */
+    public float   distanceScaleFactor  = 0.4f;
 
     // ── Glow / surbrillance ───────────────────────────────────────────────────
     /** Activer l'effet de surbrillance (halo lumineux autour du marqueur). */
@@ -116,6 +130,13 @@ public final class PingSettings {
             showDistance  = true;
             ringThickness = 2.5f;
             configVersion = 3;
+            changed = true;
+        }
+        if (configVersion < 4) {
+            // Champs ajoutés en v4 : scale à distance
+            distanceScaleEnabled = true;
+            distanceScaleFactor  = 0.4f;
+            configVersion = 4;
             changed = true;
         }
         if (changed) save();

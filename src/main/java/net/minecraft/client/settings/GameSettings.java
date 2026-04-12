@@ -146,12 +146,12 @@ public class GameSettings {
     public KeyBinding keyBindSmoothCamera = new KeyBinding("key.smoothCamera", 0, "key.categories.misc");
     public KeyBinding keyBindFullscreen = new KeyBinding("key.fullscreen", 87, "key.categories.misc");
     public KeyBinding keyBindSpectatorOutlines = new KeyBinding("key.spectatorOutlines", 0, "key.categories.misc");
-    public KeyBinding keyBindZoom = new KeyBinding("Zoom", 0, "key.categories.gameplay");
-    public KeyBinding keyBindHDV = new KeyBinding("HDV", 35, "key.categories.misc"); // 35 = H par défaut
-    public KeyBinding keyBindShop = new KeyBinding("Shop", 48, "key.categories.misc"); // 48 = B par défaut
+    public KeyBinding keyBindZoom = new KeyBinding("Zoom", 46, "key.categories.misc");
+    public KeyBinding keyBindHDV = new KeyBinding("HDV", 35, "key.categories.misc");
+    public KeyBinding keyBindShop = new KeyBinding("Shop", 48, "key.categories.misc");
     public KeyBinding keyBindWaypoints = new KeyBinding("Waypoints", 25, "key.categories.misc");
     public KeyBinding keyBindOpenCraftGuide = new KeyBinding("Craft", 34, "key.categories.misc");
-    public KeyBinding keyBindPing = new KeyBinding("Ping", -98, "key.categories.gameplay"); // -98 = clic molette
+    public KeyBinding keyBindPing = new KeyBinding("Ping", -98, "key.categories.gameplay");
 
     // Activation du mode Toggle Sneak/Sprint (option dans le menu)
     public boolean toggleSneakEnabled = false;
@@ -290,6 +290,10 @@ public class GameSettings {
 
     public GameSettings(Minecraft mcIn, File optionsFileIn) {
         this.keyBindings = ArrayUtils.addAll(new KeyBinding[]{this.keyBindAttack, this.keyBindUseItem, this.keyBindForward, this.keyBindLeft, this.keyBindBack, this.keyBindRight, this.keyBindJump, this.keyBindSneak, this.keyBindSprint, this.keyBindDrop, this.keyBindInventory, this.keyBindChat, this.keyBindPlayerList, this.keyBindPickBlock, this.keyBindCommand, this.keyBindScreenshot, this.keyBindTogglePerspective, this.keyBindSmoothCamera, this.keyBindFullscreen, this.keyBindSpectatorOutlines}, this.keyBindsHotbar);
+        this.keyBindings = ArrayUtils.add(this.keyBindings, this.keyBindHDV);
+        this.keyBindings = ArrayUtils.add(this.keyBindings, this.keyBindShop);
+        this.keyBindings = ArrayUtils.add(this.keyBindings, this.keyBindWaypoints);
+        this.keyBindings = ArrayUtils.add(this.keyBindings, this.keyBindOpenCraftGuide);
         this.difficulty = EnumDifficulty.NORMAL;
         this.lastServer = "";
         this.fovSetting = 70.0F;
@@ -316,10 +320,13 @@ public class GameSettings {
         this.renderDistanceChunks = mcIn.isJava64bit() ? 12 : 8;
         this.optionsFileOF = new File(optionsFileIn, "optionsof.txt");
         this.limitFramerate = (int) GameSettings.Options.FRAMERATE_LIMIT.getValueMax();
-        this.ofKeyBindZoom = new KeyBinding("of.key.zoom", 46, "key.categories.misc");
+        // "Zoom" comme description → une seule entrée dans les Controls (plus "of.key.zoom")
+        this.ofKeyBindZoom = new KeyBinding("Zoom", 46, "key.categories.misc");
+        // keyBindZoom est un alias vers la même instance pour la compatibilité du code existant
+        this.keyBindZoom = this.ofKeyBindZoom;
         this.keyBindings = ArrayUtils.add(this.keyBindings, this.ofKeyBindZoom);
         this.keyBindings = ArrayUtils.add(this.keyBindings, this.keyBindPing);
-        KeyUtils.fixKeyConflicts(this.keyBindings, new KeyBinding[]{this.ofKeyBindZoom, this.keyBindPing});
+        KeyUtils.fixKeyConflicts(this.keyBindings, new KeyBinding[]{this.ofKeyBindZoom, this.keyBindPing, this.keyBindHDV, this.keyBindShop, this.keyBindWaypoints, this.keyBindOpenCraftGuide});
         this.renderDistanceChunks = 8;
         this.loadOptions();
         Config.initGameSettings(this);
@@ -327,6 +334,10 @@ public class GameSettings {
 
     public GameSettings() {
         this.keyBindings = ArrayUtils.addAll(new KeyBinding[]{this.keyBindAttack, this.keyBindUseItem, this.keyBindForward, this.keyBindLeft, this.keyBindBack, this.keyBindRight, this.keyBindJump, this.keyBindSneak, this.keyBindSprint, this.keyBindDrop, this.keyBindInventory, this.keyBindChat, this.keyBindPlayerList, this.keyBindPickBlock, this.keyBindCommand, this.keyBindScreenshot, this.keyBindTogglePerspective, this.keyBindSmoothCamera, this.keyBindFullscreen, this.keyBindSpectatorOutlines}, this.keyBindsHotbar);
+        this.keyBindings = ArrayUtils.add(this.keyBindings, this.keyBindHDV);
+        this.keyBindings = ArrayUtils.add(this.keyBindings, this.keyBindShop);
+        this.keyBindings = ArrayUtils.add(this.keyBindings, this.keyBindWaypoints);
+        this.keyBindings = ArrayUtils.add(this.keyBindings, this.keyBindOpenCraftGuide);
         this.difficulty = EnumDifficulty.NORMAL;
         this.lastServer = "";
         this.fovSetting = 70.0F;
@@ -2181,7 +2192,8 @@ public class GameSettings {
                             break;
                     }
 
-                    if (astring[0].equals("key_" + this.ofKeyBindZoom.getKeyDescription())) {
+                    if (astring[0].equals("key_" + this.ofKeyBindZoom.getKeyDescription())
+                            || astring[0].equals("key_of.key.zoom")) {  // rétrocompatibilité ancien nom
                         this.ofKeyBindZoom.setKeyCode(Integer.parseInt(astring[1]));
                     }
                 } catch (Exception exception) {

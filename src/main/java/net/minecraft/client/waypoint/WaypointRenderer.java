@@ -2,10 +2,10 @@ package net.minecraft.client.waypoint;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.List;
@@ -30,10 +30,10 @@ public class WaypointRenderer {
         List<Waypoint> waypoints = WaypointManager.INSTANCE.getWaypoints();
         if (waypoints.isEmpty()) return;
 
-        Entity viewer = mc.getRenderViewEntity();
-        double viewX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks;
-        double viewY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks;
-        double viewZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks;
+        RenderManager rm = mc.getRenderManager();
+        double viewX = rm.viewerPosX;
+        double viewY = rm.viewerPosY;
+        double viewZ = rm.viewerPosZ;
 
         for (Waypoint wp : waypoints) {
             if (!wp.isEnabled()) continue;
@@ -51,7 +51,7 @@ public class WaypointRenderer {
             }
 
             // Nom et coordonnées
-            renderLabel(dx, dy, dz, wp, dist, mc);
+            renderLabel(dx, dy, dz, wp, dist, mc, rm);
         }
     }
 
@@ -71,7 +71,9 @@ public class WaypointRenderer {
         WorldRenderer wr = tess.getWorldRenderer();
 
         GlStateManager.disableCull();
+        GlStateManager.disableLighting();
         GlStateManager.enableBlend();
+        GlStateManager.enableAlpha();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         GlStateManager.depthMask(false);
 
@@ -95,6 +97,7 @@ public class WaypointRenderer {
         GlStateManager.depthMask(true);
         GlStateManager.disableBlend();
         GlStateManager.enableCull();
+        GlStateManager.enableLighting();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.popMatrix();
     }
@@ -134,41 +137,33 @@ public class WaypointRenderer {
     }
 
     private static void renderLabel(double x, double y, double z,
-                                    Waypoint wp, double dist, Minecraft mc) {
-        // Hauteur du label : au-dessus du waypoint
-        double labelY = y + 3.0;
+                                    Waypoint wp, double dist, Minecraft mc, RenderManager rm) {
+        // Hauteur du label : monte avec la distance pour rester visible au-dessus du terrain
+        double labelY = y + 2.5 + Math.min(dist * 0.015, 8.0);
 
         GlStateManager.pushMatrix();
         GlStateManager.translate((float) x, (float) labelY, (float) z);
 
         // Toujours face au joueur
-        GlStateManager.rotate(-mc.getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(mc.getRenderManager().playerViewX,  1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate(-rm.playerViewY, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate(rm.playerViewX,  1.0F, 0.0F, 0.0F);
 
         // ── Calcul du scale ────────────────────────────────────────────────────
-        // scale ∝ dist pour garder une taille angulaire constante.
-        // Coefficients réduits pour des labels moins envahissants.
-        final double NEAR_DIST = 5.0;
-        float scale;
+        WaypointManager.WaypointSettings ws = WaypointManager.INSTANCE.getSettings();
+        float sizeMult;
         switch (wp.getTextSize()) {
-            case SMALL: {
-                // ~0.7° angulaire — très discret, lisible seulement de près
-                double target = Math.max(NEAR_DIST, dist) * 0.006;
-                scale = (float) Math.min(target, 0.025);
-                break;
-            }
-            case LARGE: {
-                // ~1.5° angulaire — bien visible même de loin
-                double target = Math.max(NEAR_DIST, dist) * 0.013;
-                scale = (float) Math.min(target, 0.06);
-                break;
-            }
-            default: { // MEDIUM
-                // ~1.1° angulaire — intermédiaire confortable
-                double target = Math.max(NEAR_DIST, dist) * 0.009;
-                scale = (float) Math.min(target, 0.04);
-                break;
-            }
+            case SMALL:  sizeMult = 0.65f; break;
+            case LARGE:  sizeMult = 1.50f; break;
+            default:     sizeMult = 1.00f; break;
+        }
+
+        float scale;
+        if (ws.distanceScaleEnabled) {
+            // scale = baseScale * (dist / refDistance) → linéaire avec la distance
+            float raw = ws.baseScale * ((float) dist / Math.max(ws.refDistance, 1f));
+            scale = Math.max(ws.minScale, Math.min(ws.maxScale, raw)) * sizeMult;
+        } else {
+            scale = ws.fixedScale * sizeMult;
         }
         GlStateManager.scale(-scale, -scale, scale);
 
@@ -176,7 +171,6 @@ public class WaypointRenderer {
         GlStateManager.disableLighting();
         GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-        GlStateManager.disableTexture2D();
 
         String nameStr  = wp.getName();
         String distStr  = String.format("%.0fm", dist);
@@ -185,42 +179,58 @@ public class WaypointRenderer {
                 : null;
 
         int nameWidth  = mc.fontRendererObj.getStringWidth(nameStr);
-        int maxWidth   = nameWidth;
-        if (coordStr != null) {
+        int distWidth  = mc.fontRendererObj.getStringWidth(distStr);
+        int maxWidth   = Math.max(nameWidth, distWidth);
+        if (coordStr != null)
             maxWidth = Math.max(maxWidth, mc.fontRendererObj.getStringWidth(coordStr));
-        }
-        maxWidth = Math.max(maxWidth, mc.fontRendererObj.getStringWidth(distStr));
+
+        int   lines   = coordStr != null ? 3 : 2;
+        float pad     = 5f;
+        float lineH   = 11f;
+        float halfW   = maxWidth / 2.0F + pad;
+        float top     = -pad + 1;
+        float bottom  = top + lines * lineH + pad;
+
+        int wpColorR = wp.getColorR(), wpColorG = wp.getColorG(), wpColorB = wp.getColorB();
+        int wpColor  = 0xFF000000 | (wpColorR << 16) | (wpColorG << 8) | wpColorB;
 
         Tessellator tess = Tessellator.getInstance();
         WorldRenderer wr = tess.getWorldRenderer();
 
-        int   lines  = coordStr != null ? 3 : 2;
-        float halfW  = maxWidth / 2.0F + 4;
-        float top    = -2;
-        float bottom = top + lines * 11 + 2;
+        GlStateManager.disableTexture2D();
 
-        // Fond semi-transparent
+        // Fond semi-transparent foncé
         wr.begin(7, DefaultVertexFormats.POSITION_COLOR);
-        wr.pos(-halfW, top,    0).color(0, 0, 0, 120).endVertex();
-        wr.pos(-halfW, bottom, 0).color(0, 0, 0, 120).endVertex();
-        wr.pos( halfW, bottom, 0).color(0, 0, 0, 120).endVertex();
-        wr.pos( halfW, top,    0).color(0, 0, 0, 120).endVertex();
+        wr.pos(-halfW, top,    0).color(0, 0, 0, 160).endVertex();
+        wr.pos(-halfW, bottom, 0).color(0, 0, 0, 160).endVertex();
+        wr.pos( halfW, bottom, 0).color(0, 0, 0, 160).endVertex();
+        wr.pos( halfW, top,    0).color(0, 0, 0, 160).endVertex();
+        tess.draw();
+
+        // Bordure gauche colorée (couleur du waypoint)
+        float bw = 2f;
+        wr.begin(7, DefaultVertexFormats.POSITION_COLOR);
+        wr.pos(-halfW,      top,    0).color(wpColorR, wpColorG, wpColorB, 220).endVertex();
+        wr.pos(-halfW,      bottom, 0).color(wpColorR, wpColorG, wpColorB, 220).endVertex();
+        wr.pos(-halfW + bw, bottom, 0).color(wpColorR, wpColorG, wpColorB, 220).endVertex();
+        wr.pos(-halfW + bw, top,    0).color(wpColorR, wpColorG, wpColorB, 220).endVertex();
         tess.draw();
 
         GlStateManager.enableTexture2D();
 
         // Nom (couleur du waypoint)
-        int wpColor = 0xFF000000 | (wp.getColorR() << 16) | (wp.getColorG() << 8) | wp.getColorB();
-        mc.fontRendererObj.drawStringWithShadow(nameStr, -nameWidth / 2.0F, 0, wpColor);
+        mc.fontRendererObj.drawStringWithShadow(nameStr,
+                -nameWidth / 2.0F, top + 2, wpColor);
 
-        // Distance
+        // Distance en gris clair
         mc.fontRendererObj.drawStringWithShadow(distStr,
-                -mc.fontRendererObj.getStringWidth(distStr) / 2.0F, 11, 0xFFCCCCCC);
+                -distWidth / 2.0F, top + 2 + lineH, 0xFFCCCCCC);
 
-        // Coordonnées
+        // Coordonnées en gris foncé
         if (coordStr != null) {
+            int coordWidth = mc.fontRendererObj.getStringWidth(coordStr);
             mc.fontRendererObj.drawStringWithShadow(coordStr,
-                    -mc.fontRendererObj.getStringWidth(coordStr) / 2.0F, 22, 0xFFAAAAAA);
+                    -coordWidth / 2.0F, top + 2 + lineH * 2, 0xFFAAAAAA);
         }
 
         GlStateManager.enableDepth();

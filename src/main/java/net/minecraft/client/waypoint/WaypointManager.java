@@ -14,10 +14,57 @@ public class WaypointManager {
 
     public static final WaypointManager INSTANCE = new WaypointManager();
 
+    // ── Paramètres globaux ────────────────────────────────────────────────────
+
+    /**
+     * Paramètres globaux de rendu des waypoints.
+     * Sauvegardés dans waypoint_settings.json.
+     */
+    public static class WaypointSettings {
+        /**
+         * Si true : le label grossit proportionnellement à la distance.
+         * Si false : taille fixe (définie par fixedScale).
+         */
+        public boolean distanceScaleEnabled = true;
+
+        /**
+         * Distance de référence (blocs) : à cette distance, le label a la taille baseScale.
+         * Ex : refDistance=50 → à 50 blocs taille 100%, à 100 blocs taille 200%, etc.
+         */
+        public float refDistance = 50.0f;
+
+        /**
+         * Taille de base à la distance de référence.
+         * 0.02 = petite, 0.04 = normale, 0.08 = grande.
+         */
+        public float baseScale = 0.04f;
+
+        /**
+         * Taille minimum (évite labels microscopiques à très courte distance).
+         */
+        public float minScale = 0.015f;
+
+        /**
+         * Taille maximum (évite labels gigantesques à très longue distance).
+         */
+        public float maxScale = 0.35f;
+
+        /**
+         * Scale fixe utilisé quand distanceScaleEnabled = false.
+         */
+        public float fixedScale = 0.04f;
+    }
+
+    private WaypointSettings settings = new WaypointSettings();
     private final List<Waypoint> waypoints = new ArrayList<Waypoint>();
     private File saveFile;
+    private File settingsFile;
 
     private WaypointManager() {}
+
+    public WaypointSettings getSettings() {
+        return settings;
+    }
 
     /**
      * Initialise le fichier de sauvegarde et charge les waypoints.
@@ -25,6 +72,8 @@ public class WaypointManager {
     public void init() {
         File gameDir = Minecraft.getMinecraft().mcDataDir;
         this.saveFile = new File(gameDir, "waypoints.json");
+        this.settingsFile = new File(gameDir, "config/waypoint_settings.json");
+        loadSettings();
         load();
     }
 
@@ -112,5 +161,45 @@ public class WaypointManager {
             System.err.println("[Waypoints] Failed to load: " + e.getMessage());
         }
     }
-}
 
+    public void saveSettings() {
+        try {
+            if (settingsFile == null) return;
+            settingsFile.getParentFile().mkdirs();
+            FileWriter w = new FileWriter(settingsFile);
+            w.write(new GsonBuilder().setPrettyPrinting().create().toJson(settings));
+            w.close();
+        } catch (IOException e) {
+            System.err.println("[Waypoints] Failed to save settings: " + e.getMessage());
+        }
+    }
+
+    private void loadSettings() {
+        if (settingsFile == null || !settingsFile.exists()) {
+            saveSettings();
+            return;
+        }
+        try {
+            FileReader reader = new FileReader(settingsFile);
+            WaypointSettings loaded = new GsonBuilder().create().fromJson(reader, WaypointSettings.class);
+            reader.close();
+            if (loaded != null) {
+                // Migration : champs invalides (0 ou négatifs) → valeurs par défaut
+                if (loaded.refDistance   <= 0f) loaded.refDistance   = 50f;
+                if (loaded.baseScale     <= 0f) loaded.baseScale     = 0.04f;
+                if (loaded.minScale      <= 0f) loaded.minScale      = 0.015f;
+                if (loaded.maxScale      <= 0f) loaded.maxScale      = 0.35f;
+                if (loaded.fixedScale    <= 0f) loaded.fixedScale    = 0.04f;
+                // Migration v2 : anciens défauts trop petits → forcer les nouveaux
+                if (loaded.maxScale      < 0.15f) loaded.maxScale    = 0.35f;
+                if (loaded.baseScale     < 0.03f) loaded.baseScale   = 0.04f;
+                if (loaded.refDistance   > 80f)   loaded.refDistance = 50f;
+                settings = loaded;
+            }
+        } catch (Exception e) {
+            System.err.println("[Waypoints] Failed to load settings: " + e.getMessage());
+        }
+        // Sauvegarder pour mettre à jour le fichier avec les nouveaux champs
+        saveSettings();
+    }
+}

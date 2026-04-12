@@ -679,12 +679,20 @@ public class EntityPlayerSP extends AbstractClientPlayer {
         boolean flag2 = this.movementInput.moveForward >= f;
         this.movementInput.updatePlayerMoveState();
 
-        // Toggle Sprint : si actif et que le joueur avance, activer le sprint
+        // Toggle Sprint : si le mode toggle est actif et que le joueur avance → sprint automatique
         if (this.mc.gameSettings.toggleSprintEnabled && this.mc.gameSettings.isToggleSprintActive
                 && this.movementInput.moveForward > 0.0F
                 && !this.isUsingItem() && !this.isPotionActive(net.minecraft.potion.Potion.blindness)
                 && ((float) this.getFoodStats().getFoodLevel() > 6.0F || this.capabilities.allowFlying)) {
             this.setSprinting(true);
+        }
+        // Toggle Sprint : si on ne peut plus sprinter (faim, collision, item), désactiver le toggle
+        if (this.mc.gameSettings.toggleSprintEnabled && this.mc.gameSettings.isToggleSprintActive
+                && (this.isCollidedHorizontally
+                    || this.isUsingItem()
+                    || this.isPotionActive(net.minecraft.potion.Potion.blindness)
+                    || ((float) this.getFoodStats().getFoodLevel() <= 6.0F && !this.capabilities.allowFlying))) {
+            this.mc.gameSettings.isToggleSprintActive = false;
         }
 
         if (this.isUsingItem() && !this.isRiding()) {
@@ -698,17 +706,23 @@ public class EntityPlayerSP extends AbstractClientPlayer {
         this.pushOutOfBlocks(this.posX + (double) this.width * 0.35D, this.getEntityBoundingBox().minY + 0.5D, this.posZ - (double) this.width * 0.35D);
         this.pushOutOfBlocks(this.posX + (double) this.width * 0.35D, this.getEntityBoundingBox().minY + 0.5D, this.posZ + (double) this.width * 0.35D);
         boolean flag3 = (float) this.getFoodStats().getFoodLevel() > 6.0F || this.capabilities.allowFlying;
+        boolean sprintKeyDown = net.minecraft.client.settings.GameSettings.isKeyDown(this.mc.gameSettings.keyBindSprint);
 
-        if (this.onGround && !flag1 && !flag2 && this.movementInput.moveForward >= f && !this.isSprinting() && flag3 && !this.isUsingItem() && !this.isPotionActive(Potion.blindness)) {
-            if (this.sprintToggleTimer <= 0 && !this.mc.gameSettings.keyBindSprint.isKeyDown()) {
-                this.sprintToggleTimer = 7;
-            } else {
-                this.setSprinting(true);
-            }
+        // Sprint par touche directe (mode normal OU mode toggle)
+        if (!this.isSprinting() && this.movementInput.moveForward >= f && flag3 && !this.isUsingItem()
+                && !this.isPotionActive(Potion.blindness) && sprintKeyDown) {
+            this.setSprinting(true);
         }
 
-        if (!this.isSprinting() && this.movementInput.moveForward >= f && flag3 && !this.isUsingItem() && !this.isPotionActive(Potion.blindness) && this.mc.gameSettings.keyBindSprint.isKeyDown()) {
-            this.setSprinting(true);
+        // Sprint par double-tap (uniquement en mode non-toggle)
+        if (!this.mc.gameSettings.toggleSprintEnabled) {
+            if (this.onGround && !flag1 && !flag2 && this.movementInput.moveForward >= f && !this.isSprinting() && flag3 && !this.isUsingItem() && !this.isPotionActive(Potion.blindness)) {
+                if (this.sprintToggleTimer <= 0 && !sprintKeyDown) {
+                    this.sprintToggleTimer = 7;
+                } else {
+                    this.setSprinting(true);
+                }
+            }
         }
 
         if (this.isSprinting() && (this.movementInput.moveForward < f || this.isCollidedHorizontally || !flag3)) {

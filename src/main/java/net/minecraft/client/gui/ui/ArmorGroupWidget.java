@@ -123,6 +123,8 @@ public class ArmorGroupWidget extends BaseWidget {
     /**
      * Recalcule relX/relY depuis la position absolue actuelle et la résolution d'écran.
      * Appelé quand les dimensions changent pour éviter une dérive de position.
+     * Utilise renderAbsX/renderAbsY (position absolue réelle) car this.x/this.y sont
+     * temporairement remis à 0 pendant draw() par BaseWidget.render().
      */
     private void updateRelativeFromAbsolute() {
         Minecraft mc = Minecraft.getMinecraft();
@@ -131,11 +133,13 @@ public class ArmorGroupWidget extends BaseWidget {
             net.minecraft.client.gui.ScaledResolution sr = new net.minecraft.client.gui.ScaledResolution(mc);
             int sw = sr.getScaledWidth();
             int sh = sr.getScaledHeight();
-            if (sw > 0 && sh > 0 && this.x >= 0 && this.y >= 0) {
+            int absX = this.renderAbsX;
+            int absY = this.renderAbsY;
+            if (sw > 0 && sh > 0 && absX >= 0 && absY >= 0) {
                 int maxX = Math.max(1, sw - this.getWidth());
                 int maxY = Math.max(1, sh - this.getHeight());
-                this.relX = Math.max(0.0, Math.min(1.0, (double) this.x / maxX));
-                this.relY = Math.max(0.0, Math.min(1.0, (double) this.y / maxY));
+                this.relX = Math.max(0.0, Math.min(1.0, (double) absX / maxX));
+                this.relY = Math.max(0.0, Math.min(1.0, (double) absY / maxY));
                 this.refW = sw;
                 this.refH = sh;
             }

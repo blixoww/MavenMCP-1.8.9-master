@@ -90,8 +90,10 @@ public final class PingRenderer {
 
             // Distance réelle (pour scaling et glow)
             float dist = (float) Math.sqrt(distSq);
-            // Facteur de visibilité : les pings lointains sont rendus plus grands
-            float distScale = 1.0f + Math.min(dist / 20.0f, 2.5f) * 0.4f;
+            // Facteur de visibilité : configurable — les pings lointains sont rendus plus grands si activé
+            float distScale = s.distanceScaleEnabled
+                    ? 1.0f + Math.min(dist / 20.0f, 2.5f) * s.distanceScaleFactor
+                    : 1.0f;
 
             int ca = (int)(alpha * 255);
 

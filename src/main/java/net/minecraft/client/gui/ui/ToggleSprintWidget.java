@@ -21,10 +21,25 @@ public class ToggleSprintWidget extends BaseWidget {
         GameSettings gs = mc.gameSettings;
 
         boolean featureEnabled = gs.toggleSprintEnabled;
-        boolean sprinting = featureEnabled && gs.isToggleSprintActive;
+        boolean toggleActive   = featureEnabled && gs.isToggleSprintActive;
+        boolean actuallySprint = toggleActive && mc.thePlayer != null && mc.thePlayer.isSprinting();
 
-        String text = sprinting ? "Sprinting" : (featureEnabled ? "Sprint: ON" : "Sprint: OFF");
-        int col = featureEnabled ? getColor() : 0xFF888888;
+        String text;
+        int col;
+        if (!featureEnabled) {
+            text = "Sprint: OFF";
+            col  = 0xFF888888;
+        } else if (actuallySprint) {
+            text = "Sprinting";
+            col  = getColor();
+        } else if (toggleActive) {
+            // Toggle actif mais arrêté momentanément (va reprendre dès qu'on avance)
+            text = "Sprint: \u00a7aON";
+            col  = getColor();
+        } else {
+            text = "Sprint: \u00a77OFF";
+            col  = getColor();
+        }
         if ((col & 0x00FFFFFF) == 0) col = 0xFFFFFFFF;
         fr.drawStringWithShadow(text, 0, 0, col);
     }

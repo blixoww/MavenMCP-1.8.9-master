@@ -3,15 +3,12 @@ package net.minecraft.client.visuals;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.visuals.ping.PingManager;
 import net.minecraft.client.visuals.ping.PingSettings;
-import net.minecraft.client.visuals.ping.PingType;
 import net.minecraft.util.MathHelper;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
 
@@ -101,7 +98,7 @@ public class GuiVisualSettings extends GuiScreen {
         Gui.drawRect(panelX, panelY + 1, panelX + panelW, panelY + 18, BG_HEADER);
 
         String title = "\u00A7c\u00A7lPARAMETRES \u00A7f\u00A7lVISUELS";
-        fontRendererObj.drawStringWithShadow(title, panelX + panelW / 2 - fontRendererObj.getStringWidth(title) / 2, panelY + 5, 0xFFFFFFFF);
+        fontRendererObj.drawStringWithShadow(title, panelX + (float) panelW / 2 - (float) fontRendererObj.getStringWidth(title) / 2, panelY + 5, 0xFFFFFFFF);
 
         String resetText = "\u00A77[Reset]";
         int rtw = fontRendererObj.getStringWidth(resetText);
@@ -120,12 +117,12 @@ public class GuiVisualSettings extends GuiScreen {
         
         ScaledResolution sr = new ScaledResolution(mc);
         int factor = sr.getScaleFactor();
-        org.lwjgl.opengl.GL11.glEnable(org.lwjgl.opengl.GL11.GL_SCISSOR_TEST);
-        org.lwjgl.opengl.GL11.glScissor(settingsX * factor, (this.height - clipBottom) * factor, settingsW * factor, (clipBottom - clipTop) * factor);
+        GL11.glEnable(GL11.GL_SCISSOR_TEST);
+        GL11.glScissor(settingsX * factor, (this.height - clipBottom) * factor, settingsW * factor, (clipBottom - clipTop) * factor);
         
         drawSettings(mouseX, mouseY);
         
-        org.lwjgl.opengl.GL11.glDisable(org.lwjgl.opengl.GL11.GL_SCISSOR_TEST);
+        GL11.glDisable(GL11.GL_SCISSOR_TEST);
         
         drawPreview(mouseX, mouseY, partialTicks);
 
@@ -270,6 +267,11 @@ public class GuiVisualSettings extends GuiScreen {
         y = drawToggle(x, y, w, "Couleur glow auto", pingSettings.glowColorAuto, mx, my, ct, cb);
         // row 19
         y = drawKeyBind(x, y, w, "Touche Ping", pingSettings.keyCode, 0, mx, my, ct, cb);
+        // ── Scale à distance ──────────────────────────────────────────────────
+        // row 20
+        y = drawToggle(x, y, w, "Scale \u00e0 distance", pingSettings.distanceScaleEnabled, mx, my, ct, cb);
+        // row 21
+        y = drawSlider(x, y, w, "Facteur scale", pingSettings.distanceScaleFactor, 0.0f, 1.5f, mx, my, ct, cb);
         return y;
     }
 
@@ -757,6 +759,7 @@ public class GuiVisualSettings extends GuiScreen {
             if (row == 7)  { pingSettings.soundEnabled = !pingSettings.soundEnabled; pingSettings.save(); }
             if (row == 15) { pingSettings.glowEnabled = !pingSettings.glowEnabled; pingSettings.save(); }
             if (row == 18) { pingSettings.glowColorAuto = !pingSettings.glowColorAuto; pingSettings.save(); }
+            if (row == 20) { pingSettings.distanceScaleEnabled = !pingSettings.distanceScaleEnabled; pingSettings.save(); }
         }
         if (isOverEnum(mx, x, w)) {
             if (row == 13) { pingSettings.markerStyle = (pingSettings.markerStyle + 1) % 3; pingSettings.save(); }
@@ -899,13 +902,14 @@ public class GuiVisualSettings extends GuiScreen {
                 break;
             case 4:
                 switch (row) {
-                    case 8:  pingSettings.scale         = 0.5f + ratio * 2.5f; break;
-                    case 9:  pingSettings.ringThickness = 0.5f + ratio * 5.5f; break;
-                    case 10: pingSettings.maxRange      = 16.0 + ratio * 240.0; break;
-                    case 11: pingSettings.durationMs    = (long)(1000 + ratio * 14000); break;
-                    case 12: pingSettings.cooldownMs    = (long)(500  + ratio * 9500); break;
-                    case 16: pingSettings.glowIntensity = 0.05f + ratio * 0.95f; break;
-                    case 17: pingSettings.glowLayers    = 1 + (int)(ratio * 3); break;
+                    case 8:  pingSettings.scale               = 0.5f + ratio * 2.5f; break;
+                    case 9:  pingSettings.ringThickness       = 0.5f + ratio * 5.5f; break;
+                    case 10: pingSettings.maxRange            = 16.0 + ratio * 240.0; break;
+                    case 11: pingSettings.durationMs          = (long)(1000 + ratio * 14000); break;
+                    case 12: pingSettings.cooldownMs          = (long)(500  + ratio * 9500); break;
+                    case 16: pingSettings.glowIntensity       = 0.05f + ratio * 0.95f; break;
+                    case 17: pingSettings.glowLayers          = 1 + (int)(ratio * 3); break;
+                    case 21: pingSettings.distanceScaleFactor = ratio * 1.5f; break;
                 }
                 break;
         }
