@@ -866,6 +866,12 @@ public class GameSettings {
                                 case "realmsNotifications":
                                     this.realmsNotifications = astring[1].equals("true");
                                     break;
+                                case "toggleSneak":
+                                    this.toggleSneakEnabled = astring[1].equals("true");
+                                    break;
+                                case "toggleSprint":
+                                    this.toggleSprintEnabled = astring[1].equals("true");
+                                    break;
                             }
 
                             for (KeyBinding keybinding : this.keyBindings) {
@@ -983,6 +989,8 @@ public class GameSettings {
             printwriter.println("useNativeTransport:" + this.useNativeTransport);
             printwriter.println("entityShadows:" + this.entityShadows);
             printwriter.println("realmsNotifications:" + this.realmsNotifications);
+            printwriter.println("toggleSneak:" + this.toggleSneakEnabled);
+            printwriter.println("toggleSprint:" + this.toggleSprintEnabled);
 
             for (KeyBinding keybinding : this.keyBindings) {
                 printwriter.println("key_" + keybinding.getKeyDescription() + ":" + keybinding.getKeyCode());

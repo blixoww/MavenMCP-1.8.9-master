@@ -18,6 +18,7 @@ public class CPSWidget extends BaseWidget {
         this.height = 14;
         if (getPropOrDefault("initialized", null) == null) setProp("initialized", Boolean.FALSE);
         if (getPropOrDefault("showBackground", null) == null) setProp("showBackground", Boolean.FALSE);
+        if (getPropOrDefault("dynamicColor", null) == null) setProp("dynamicColor", Boolean.TRUE);
     }
 
     @Override
@@ -50,25 +51,30 @@ public class CPSWidget extends BaseWidget {
             this.width = fr.getStringWidth(s) + 8;
             this.height = 14;
         }
-        // compute color from widget props
-        int storedColor = getColor();
-        int storedAlpha = (storedColor >> 24) & 0xFF;
-        int baseRgb = storedColor & 0x00FFFFFF;
+
+        // Color logic
+        int drawCol;
+        if (Boolean.TRUE.equals(getPropOrDefault("dynamicColor", Boolean.FALSE))) {
+            if (cps < 5) drawCol = 0xFFFFFFFF; // Blanc
+            else if (cps < 7) drawCol = 0xFFFFFF55; // Jaune
+            else if (cps < 10) drawCol = 0xFFFFAA00; // Orange/Or
+            else if (cps < 15) drawCol = 0xFFFF5555; // Rouge
+            else drawCol = 0xFFAA00AA; // Violet
+        } else {
+            drawCol = getColor();
+        }
+
+        int baseRgb = drawCol & 0x00FFFFFF;
+        int alpha = (drawCol >> 24) & 0xFF;
+
         // background
         boolean showBg = Boolean.TRUE.equals(getPropOrDefault("showBackground", Boolean.FALSE));
         if (showBg) {
-            int bgAlpha = Math.max(40, storedAlpha / 2);
+            int bgAlpha = Math.max(40, alpha / 2);
             int bgCol = (bgAlpha << 24) | baseRgb;
             Gui.drawRect(0, 0, getWidth(), getHeight(), bgCol);
         }
-        // text color: support rainbow if rgbMode
-        int drawCol = (0xFF << 24) | baseRgb;
-        if (isRGBMode()) {
-            long t = System.currentTimeMillis();
-            float hue = (t % 10000L) / 10000.0f;
-            int c = java.awt.Color.HSBtoRGB(hue, 0.8f, 0.9f);
-            drawCol = (storedColor & 0xFF000000) | (c & 0x00FFFFFF);
-        }
+
         fr.drawStringWithShadow(s, 4, 3, drawCol);
     }
 }

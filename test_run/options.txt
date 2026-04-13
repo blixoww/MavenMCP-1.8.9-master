@@ -10,7 +10,7 @@ bobView:true
 anaglyph3d:false
 maxFps:260
 fboEnable:true
-difficulty:2
+difficulty:1
 fancyGraphics:true
 ao:2
 renderClouds:true
@@ -46,6 +46,8 @@ reducedDebugInfo:false
 useNativeTransport:true
 entityShadows:true
 realmsNotifications:true
+toggleSneak:false
+toggleSprint:false
 key_key.attack:-100
 key_key.use:-99
 key_key.forward:44
@@ -80,7 +82,7 @@ key_Shop:48
 key_Waypoints:17
 key_Craft:34
 key_Zoom:29
-key_Ping:-98
+key_Ping:46
 soundCategory_master:0.11589404
 soundCategory_music:0.0
 soundCategory_record:0.02112676

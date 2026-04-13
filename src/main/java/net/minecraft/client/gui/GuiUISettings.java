@@ -493,6 +493,10 @@ public class GuiUISettings extends GuiScreen {
                 gs.toggleSprintEnabled = !gs.toggleSprintEnabled;
                 if (!gs.toggleSprintEnabled) gs.isToggleSprintActive = false;
             }
+            try {
+                gs.saveOptions();
+            } catch (Exception ignored) {
+            }
         }
     }
 }

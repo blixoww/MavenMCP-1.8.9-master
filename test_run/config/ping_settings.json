@@ -2,8 +2,8 @@
   "configVersion": 4,
   "enabled": true,
   "maxRange": 121.59999942779541,
-  "durationMs": 7860,
-  "cooldownMs": 2780,
+  "durationMs": 5480,
+  "cooldownMs": 1640,
   "soundEnabled": true,
   "showTeamPings": true,
   "showAllyPings": true,
@@ -21,5 +21,5 @@
   "glowIntensity": 0.65,
   "glowLayers": 3,
   "glowColorAuto": true,
-  "keyCode": -98
+  "keyCode": 46
 }

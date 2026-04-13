@@ -2,6 +2,7 @@ package net.minecraft.client.gui.ui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.client.gui.FontRenderer;
 
@@ -47,10 +48,10 @@ public class ArmorGroupWidget extends BaseWidget {
 
         if (present == 0 && isEditor) {
             try {
-                displayArmor[3] = new ItemStack(net.minecraft.init.Items.diamond_helmet);
-                displayArmor[2] = new ItemStack(net.minecraft.init.Items.diamond_chestplate);
-                displayArmor[1] = new ItemStack(net.minecraft.init.Items.diamond_leggings);
-                displayArmor[0] = new ItemStack(net.minecraft.init.Items.diamond_boots);
+                displayArmor[3] = new ItemStack(Items.diamond_helmet);
+                displayArmor[2] = new ItemStack(Items.diamond_chestplate);
+                displayArmor[1] = new ItemStack(Items.diamond_leggings);
+                displayArmor[0] = new ItemStack(Items.diamond_boots);
                 present = 4;
             } catch (Throwable ignored) {}
         }

@@ -1,15 +1,1 @@
-[
-  {
-    "name": "Waypoint",
-    "x": -410,
-    "y": 69,
-    "z": 346,
-    "r": 80,
-    "g": 140,
-    "b": 255,
-    "beam": true,
-    "coords": true,
-    "enabled": true,
-    "textSize": "LARGE"
-  }
-]
+[]

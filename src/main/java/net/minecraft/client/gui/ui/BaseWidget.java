@@ -239,11 +239,6 @@ public abstract class BaseWidget implements UIElement {
      * baked, et sans depth buffer correctement initialisé en contexte GUI, il déborde
      * visuellement en dehors de la pièce d'armure.
      *
-     * Solution :
-     *   1. GL_SCISSOR_TEST — clip OpenGL strict à la zone écran de l'item (16×16 px réels)
-     *   2. enableDepth + clear local du depth buffer — le glint est masqué par les pixels
-     *      déjà dessinés de l'item, pas par le cube entier
-     *
      * @param ri   le RenderItem de Minecraft
      * @param mc   l'instance Minecraft (pour la ScaledResolution)
      * @param stack l'ItemStack à rendre
