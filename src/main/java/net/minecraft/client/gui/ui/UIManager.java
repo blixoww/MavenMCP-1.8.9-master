@@ -3,6 +3,7 @@ package net.minecraft.client.gui.ui;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiOverlayDebug;
 import net.minecraft.client.renderer.GlStateManager;
 
 import java.io.*;
@@ -212,7 +213,15 @@ public class UIManager {
             }
         } catch (Throwable t) { /* ignore */ }
 
+        // Déterminer si le panneau F3 est actif
+        Minecraft mc = Minecraft.getMinecraft();
+        boolean f3Active = mc != null && mc.gameSettings != null && mc.gameSettings.showDebugInfo;
+
         for (UIElement w : widgets.values()) {
+            // Masquer le widget s'il chevauche une ligne du panneau F3
+            if (f3Active && w.isEnabled() && overlapsF3(w)) {
+                continue;
+            }
             try {
                 w.render(mouseX, mouseY, partialTicks);
             } catch (Throwable t) { /* log minimal */
@@ -227,6 +236,24 @@ public class UIManager {
             } catch (Throwable ignored) {}
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         }
+    }
+
+    /**
+     * Retourne true si le widget chevauche au moins un rectangle du panneau F3.
+     * On compare les bounding boxes en AABB 2D (rectangle non rotaté).
+     */
+    private boolean overlapsF3(UIElement w) {
+        int wx1 = w.getX();
+        int wy1 = w.getY();
+        int wx2 = wx1 + w.getWidth();
+        int wy2 = wy1 + w.getHeight();
+        for (int[] r : GuiOverlayDebug.F3_RECTS) {
+            // AABB overlap : pas de séparation sur aucun axe
+            if (wx1 < r[2] && wx2 > r[0] && wy1 < r[3] && wy2 > r[1]) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void saveConfig() {

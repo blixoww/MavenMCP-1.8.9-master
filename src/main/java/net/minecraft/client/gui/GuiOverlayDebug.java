@@ -34,15 +34,49 @@ public class GuiOverlayDebug extends Gui
     private final Minecraft mc;
     private final FontRenderer fontRenderer;
 
+    // Animation
+    private long debugOpenTime = -1L;
+    private long lastDebugRenderTime = 0L;
+    private static final long ANIMATION_DURATION = 350L;
+
+    /**
+     * Bounding boxes (x1, y1, x2, y2) de chaque ligne F3 rendue ce frame.
+     * Mis à jour par renderDebugInfo(), lu par UIManager pour masquer les
+     * widgets qui se superposent au panneau F3.
+     */
+    public static final java.util.List<int[]> F3_RECTS = new java.util.ArrayList<>();
+
     public GuiOverlayDebug(Minecraft mc)
     {
         this.mc = mc;
         this.fontRenderer = mc.fontRendererObj;
     }
 
+    /** Retourne l'offset actuel de l'animation slide-in (décroît de 250 → 0). */
+    private float getAnimationOffset()
+    {
+        if (debugOpenTime < 0L) return 0.0f;
+        float t = Math.min(1.0f, (float)(System.currentTimeMillis() - debugOpenTime) / (float)ANIMATION_DURATION);
+        // ease-out quad
+        t = 1.0f - (1.0f - t) * (1.0f - t);
+        return (1.0f - t) * 250.0f;
+    }
+
     public void renderDebugInfo(ScaledResolution scaledResolutionIn)
     {
         this.mc.mcProfiler.startSection("debug");
+
+        // Détection de l'ouverture du F3 (gap > 500 ms = nouvel affichage)
+        long now = System.currentTimeMillis();
+        if (now - lastDebugRenderTime > 500L)
+        {
+            debugOpenTime = now;
+        }
+        lastDebugRenderTime = now;
+
+        // Réinitialiser les rects à chaque frame de debug
+        F3_RECTS.clear();
+
         GlStateManager.pushMatrix();
         this.renderDebugInfoLeft();
         this.renderDebugInfoRight(scaledResolutionIn);
@@ -65,29 +99,40 @@ public class GuiOverlayDebug extends Gui
     {
         List<String> list = this.call();
 
+        float offset = getAnimationOffset();
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(-offset, 0.0f, 0.0f);
+
         for (int i = 0; i < list.size(); ++i)
         {
-            String s = (String)list.get(i);
+            String s = list.get(i);
 
             if (!Strings.isNullOrEmpty(s))
             {
                 int j = this.fontRenderer.FONT_HEIGHT;
                 int k = this.fontRenderer.getStringWidth(s);
-                int l = 2;
                 int i1 = 2 + j * i;
                 drawRect(1, i1 - 1, 2 + k + 1, i1 + j - 1, -1873784752);
                 this.fontRenderer.drawString(s, 2, i1, 14737632);
+                // Enregistrer le rect (positions finales, sans offset animation)
+                F3_RECTS.add(new int[]{1, i1 - 1, 2 + k + 1, i1 + j - 1});
             }
         }
+
+        GlStateManager.popMatrix();
     }
 
     protected void renderDebugInfoRight(ScaledResolution scaledRes)
     {
         List<String> list = this.getDebugInfoRight();
 
+        float offset = getAnimationOffset();
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(offset, 0.0f, 0.0f);
+
         for (int i = 0; i < list.size(); ++i)
         {
-            String s = (String)list.get(i);
+            String s = list.get(i);
 
             if (!Strings.isNullOrEmpty(s))
             {
@@ -97,8 +142,12 @@ public class GuiOverlayDebug extends Gui
                 int i1 = 2 + j * i;
                 drawRect(l - 1, i1 - 1, l + k + 1, i1 + j - 1, -1873784752);
                 this.fontRenderer.drawString(s, l, i1, 14737632);
+                // Enregistrer le rect (positions finales, sans offset animation)
+                F3_RECTS.add(new int[]{l - 1, i1 - 1, l + k + 1, i1 + j - 1});
             }
         }
+
+        GlStateManager.popMatrix();
     }
 
     @SuppressWarnings("incomplete-switch")
@@ -106,9 +155,27 @@ public class GuiOverlayDebug extends Gui
     {
         BlockPos blockpos = new BlockPos(this.mc.getRenderViewEntity().posX, this.mc.getRenderViewEntity().getEntityBoundingBox().minY, this.mc.getRenderViewEntity().posZ);
 
+        // ── En-tête RedConflict ──────────────────────────────────────────────
+        String header = EnumChatFormatting.RED + "" + EnumChatFormatting.BOLD + "Red"
+                      + EnumChatFormatting.WHITE + "" + EnumChatFormatting.BOLD + "Conflict";
+
         if (this.isReducedDebug())
         {
-            return Lists.newArrayList(new String[] {"Minecraft 1.8.9 (" + this.mc.getVersion() + "/" + ClientBrandRetriever.getClientModName() + ")", this.mc.debug, this.mc.renderGlobal.getDebugInfoRenders(), this.mc.renderGlobal.getDebugInfoEntities(), "P: " + this.mc.effectRenderer.getStatistics() + ". T: " + this.mc.theWorld.getDebugLoadedEntities(), this.mc.theWorld.getProviderName(), "", String.format("Chunk-relative: %d %d %d", new Object[]{Integer.valueOf(blockpos.getX() & 15), Integer.valueOf(blockpos.getY() & 15), Integer.valueOf(blockpos.getZ() & 15)})});
+            return Lists.newArrayList(new String[] {
+                header,
+                "",
+                EnumChatFormatting.GOLD + "Minecraft 1.8.9 (" + this.mc.getVersion() + "/" + ClientBrandRetriever.getClientModName() + ")",
+                EnumChatFormatting.YELLOW + this.mc.debug,
+                EnumChatFormatting.GREEN + this.mc.renderGlobal.getDebugInfoRenders(),
+                EnumChatFormatting.GREEN + this.mc.renderGlobal.getDebugInfoEntities(),
+                EnumChatFormatting.AQUA + "P: " + this.mc.effectRenderer.getStatistics() + ". T: " + this.mc.theWorld.getDebugLoadedEntities(),
+                EnumChatFormatting.WHITE + this.mc.theWorld.getProviderName(),
+                "",
+                EnumChatFormatting.AQUA + String.format("Chunk-relative: %d %d %d",
+                        Integer.valueOf(blockpos.getX() & 15),
+                        Integer.valueOf(blockpos.getY() & 15),
+                        Integer.valueOf(blockpos.getZ() & 15))
+            });
         }
         else
         {
@@ -134,13 +201,44 @@ public class GuiOverlayDebug extends Gui
                     s = "Towards positive X";
             }
 
-            List<String> list = Lists.newArrayList(new String[] {"Minecraft 1.8.9 (" + this.mc.getVersion() + "/" + ClientBrandRetriever.getClientModName() + ")", this.mc.debug, this.mc.renderGlobal.getDebugInfoRenders(), this.mc.renderGlobal.getDebugInfoEntities(), "P: " + this.mc.effectRenderer.getStatistics() + ". T: " + this.mc.theWorld.getDebugLoadedEntities(), this.mc.theWorld.getProviderName(), "", String.format("XYZ: %.3f / %.5f / %.3f", new Object[]{Double.valueOf(this.mc.getRenderViewEntity().posX), Double.valueOf(this.mc.getRenderViewEntity().getEntityBoundingBox().minY), Double.valueOf(this.mc.getRenderViewEntity().posZ)}), String.format("Block: %d %d %d", new Object[]{Integer.valueOf(blockpos.getX()), Integer.valueOf(blockpos.getY()), Integer.valueOf(blockpos.getZ())}), String.format("Chunk: %d %d %d in %d %d %d", new Object[]{Integer.valueOf(blockpos.getX() & 15), Integer.valueOf(blockpos.getY() & 15), Integer.valueOf(blockpos.getZ() & 15), Integer.valueOf(blockpos.getX() >> 4), Integer.valueOf(blockpos.getY() >> 4), Integer.valueOf(blockpos.getZ() >> 4)}), String.format("Facing: %s (%s) (%.1f / %.1f)", new Object[]{enumfacing, s, Float.valueOf(MathHelper.wrapAngleTo180_float(entity.rotationYaw)), Float.valueOf(MathHelper.wrapAngleTo180_float(entity.rotationPitch))})});
+            List<String> list = Lists.newArrayList(new String[] {
+                header,
+                "",
+                EnumChatFormatting.GOLD + "Minecraft 1.8.9 (" + this.mc.getVersion() + "/" + ClientBrandRetriever.getClientModName() + ")",
+                EnumChatFormatting.YELLOW + this.mc.debug,
+                EnumChatFormatting.GREEN + this.mc.renderGlobal.getDebugInfoRenders(),
+                EnumChatFormatting.GREEN + this.mc.renderGlobal.getDebugInfoEntities(),
+                EnumChatFormatting.AQUA + "P: " + this.mc.effectRenderer.getStatistics() + ". T: " + this.mc.theWorld.getDebugLoadedEntities(),
+                EnumChatFormatting.WHITE + this.mc.theWorld.getProviderName(),
+                "",
+                EnumChatFormatting.YELLOW + String.format("XYZ: %.3f / %.5f / %.3f",
+                        Double.valueOf(this.mc.getRenderViewEntity().posX),
+                        Double.valueOf(this.mc.getRenderViewEntity().getEntityBoundingBox().minY),
+                        Double.valueOf(this.mc.getRenderViewEntity().posZ)),
+                EnumChatFormatting.AQUA + String.format("Block: %d %d %d",
+                        Integer.valueOf(blockpos.getX()),
+                        Integer.valueOf(blockpos.getY()),
+                        Integer.valueOf(blockpos.getZ())),
+                EnumChatFormatting.AQUA + String.format("Chunk: %d %d %d in %d %d %d",
+                        Integer.valueOf(blockpos.getX() & 15),
+                        Integer.valueOf(blockpos.getY() & 15),
+                        Integer.valueOf(blockpos.getZ() & 15),
+                        Integer.valueOf(blockpos.getX() >> 4),
+                        Integer.valueOf(blockpos.getY() >> 4),
+                        Integer.valueOf(blockpos.getZ() >> 4)),
+                EnumChatFormatting.GREEN + String.format("Facing: %s (%s) (%.1f / %.1f)",
+                        enumfacing, s,
+                        Float.valueOf(MathHelper.wrapAngleTo180_float(entity.rotationYaw)),
+                        Float.valueOf(MathHelper.wrapAngleTo180_float(entity.rotationPitch)))
+            });
 
             if (this.mc.theWorld != null && this.mc.theWorld.isBlockLoaded(blockpos))
             {
                 Chunk chunk = this.mc.theWorld.getChunkFromBlockCoords(blockpos);
-                list.add("Biome: " + chunk.getBiome(blockpos, this.mc.theWorld.getWorldChunkManager()).biomeName);
-                list.add("Light: " + chunk.getLightSubtracted(blockpos, 0) + " (" + chunk.getLightFor(EnumSkyBlock.SKY, blockpos) + " sky, " + chunk.getLightFor(EnumSkyBlock.BLOCK, blockpos) + " block)");
+                list.add(EnumChatFormatting.GREEN + "Biome: " + chunk.getBiome(blockpos, this.mc.theWorld.getWorldChunkManager()).biomeName);
+                list.add(EnumChatFormatting.YELLOW + "Light: " + chunk.getLightSubtracted(blockpos, 0)
+                        + " (" + chunk.getLightFor(EnumSkyBlock.SKY, blockpos) + " sky, "
+                        + chunk.getLightFor(EnumSkyBlock.BLOCK, blockpos) + " block)");
                 DifficultyInstance difficultyinstance = this.mc.theWorld.getDifficultyForLocation(blockpos);
 
                 if (this.mc.isIntegratedServerRunning() && this.mc.getIntegratedServer() != null)
@@ -153,18 +251,23 @@ public class GuiOverlayDebug extends Gui
                     }
                 }
 
-                list.add(String.format("Local Difficulty: %.2f (Day %d)", new Object[] {Float.valueOf(difficultyinstance.getAdditionalDifficulty()), Long.valueOf(this.mc.theWorld.getWorldTime() / 24000L)}));
+                list.add(EnumChatFormatting.RED + String.format("Local Difficulty: %.2f (Day %d)",
+                        Float.valueOf(difficultyinstance.getAdditionalDifficulty()),
+                        Long.valueOf(this.mc.theWorld.getWorldTime() / 24000L)));
             }
 
             if (this.mc.entityRenderer != null && this.mc.entityRenderer.isShaderActive())
             {
-                list.add("Shader: " + this.mc.entityRenderer.getShaderGroup().getShaderGroupName());
+                list.add(EnumChatFormatting.LIGHT_PURPLE + "Shader: " + this.mc.entityRenderer.getShaderGroup().getShaderGroupName());
             }
 
             if (this.mc.objectMouseOver != null && this.mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && this.mc.objectMouseOver.getBlockPos() != null)
             {
                 BlockPos blockpos1 = this.mc.objectMouseOver.getBlockPos();
-                list.add(String.format("Looking at: %d %d %d", new Object[] {Integer.valueOf(blockpos1.getX()), Integer.valueOf(blockpos1.getY()), Integer.valueOf(blockpos1.getZ())}));
+                list.add(EnumChatFormatting.WHITE + String.format("Looking at: %d %d %d",
+                        Integer.valueOf(blockpos1.getX()),
+                        Integer.valueOf(blockpos1.getY()),
+                        Integer.valueOf(blockpos1.getZ())));
             }
 
             // ── Armures portées (matériaux custom + vanilla) ──────────────────────
@@ -181,7 +284,6 @@ public class GuiOverlayDebug extends Gui
                     {
                         ItemArmor armor = (ItemArmor) armorStack.getItem();
                         ItemArmor.ArmorMaterial mat = armor.getArmorMaterial();
-                        // Afficher seulement les matériaux custom
                         if (mat == ItemArmor.ArmorMaterial.STEEL
                                 || mat == ItemArmor.ArmorMaterial.EMERALD
                                 || mat == ItemArmor.ArmorMaterial.RUBY
@@ -233,7 +335,32 @@ public class GuiOverlayDebug extends Gui
         long j = Runtime.getRuntime().totalMemory();
         long k = Runtime.getRuntime().freeMemory();
         long l = j - k;
-        List<String> list = Lists.newArrayList(new String[] {String.format("Java: %s %dbit", new Object[]{System.getProperty("java.version"), Integer.valueOf(this.mc.isJava64bit() ? 64 : 32)}), String.format("Mem: % 2d%% %03d/%03dMB", new Object[]{Long.valueOf(l * 100L / i), Long.valueOf(bytesToMb(l)), Long.valueOf(bytesToMb(i))}), String.format("Allocated: % 2d%% %03dMB", new Object[]{Long.valueOf(j * 100L / i), Long.valueOf(bytesToMb(j))}), "", String.format("CPU: %s", new Object[]{OpenGlHelper.getCpu()}), "", String.format("Display: %dx%d (%s)", new Object[]{Integer.valueOf(Display.getWidth()), Integer.valueOf(Display.getHeight()), GL11.glGetString(GL11.GL_VENDOR)}), GL11.glGetString(GL11.GL_RENDERER), GL11.glGetString(GL11.GL_VERSION)});
+        long memPercent = l * 100L / i;
+        String memColor = memPercent > 80L ? EnumChatFormatting.RED.toString()
+                        : memPercent > 50L ? EnumChatFormatting.YELLOW.toString()
+                        : EnumChatFormatting.GREEN.toString();
+
+        List<String> list = Lists.newArrayList(new String[] {
+            EnumChatFormatting.WHITE + String.format("Java: %s %dbit",
+                    System.getProperty("java.version"),
+                    Integer.valueOf(this.mc.isJava64bit() ? 64 : 32)),
+            memColor + String.format("Mem: % 2d%% %03d/%03dMB",
+                    Long.valueOf(memPercent),
+                    Long.valueOf(bytesToMb(l)),
+                    Long.valueOf(bytesToMb(i))),
+            EnumChatFormatting.AQUA + String.format("Allocated: % 2d%% %03dMB",
+                    Long.valueOf(j * 100L / i),
+                    Long.valueOf(bytesToMb(j))),
+            "",
+            EnumChatFormatting.YELLOW + String.format("CPU: %s", OpenGlHelper.getCpu()),
+            "",
+            EnumChatFormatting.WHITE + String.format("Display: %dx%d (%s)",
+                    Integer.valueOf(Display.getWidth()),
+                    Integer.valueOf(Display.getHeight()),
+                    GL11.glGetString(GL11.GL_VENDOR)),
+            EnumChatFormatting.GRAY + GL11.glGetString(GL11.GL_RENDERER),
+            EnumChatFormatting.GRAY + GL11.glGetString(GL11.GL_VERSION)
+        });
 
         if (this.isReducedDebug())
         {
@@ -252,7 +379,7 @@ public class GuiOverlayDebug extends Gui
                 }
 
                 list.add("");
-                list.add(String.valueOf(Block.blockRegistry.getNameForObject(iblockstate.getBlock())));
+                list.add(EnumChatFormatting.GOLD + String.valueOf(Block.blockRegistry.getNameForObject(iblockstate.getBlock())));
 
                 for (Entry<IProperty, Comparable> entry : iblockstate.getProperties().entrySet())
                 {
@@ -267,7 +394,7 @@ public class GuiOverlayDebug extends Gui
                         s = EnumChatFormatting.RED + s;
                     }
 
-                    list.add(((IProperty)entry.getKey()).getName() + ": " + s);
+                    list.add(EnumChatFormatting.WHITE + ((IProperty)entry.getKey()).getName() + ": " + s);
                 }
             }
 
