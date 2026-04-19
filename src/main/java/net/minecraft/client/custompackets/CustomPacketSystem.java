@@ -1,5 +1,6 @@
 package net.minecraft.client.custompackets;
 
+import net.minecraft.client.custompackets.handler.FactionDataCache;
 import net.minecraft.client.custompackets.handler.HdvPacketHandler;
 import net.minecraft.client.custompackets.handler.PlayerDataHandler;
 import net.minecraft.client.custompackets.handler.ShopPacketHandler;
@@ -51,7 +52,17 @@ public final class CustomPacketSystem {
         // Appliquer les keybinds persistés maintenant que GameSettings est prêt
         PingManager.INSTANCE.applyStoredKeyBinding();
         LOGGER.info("[CustomPackets] ✓ PingSystem handler enregistré");
-        
+
+        // Données de faction – tag et relation des joueurs proches
+        PacketDispatcher.register(PacketChannel.FACTION_S2C, PacketId.FACTION_DATA, buf -> {
+            String playerName = buf.readStringFromBuffer(32);
+            String factionTag = buf.readStringFromBuffer(32);
+            int    relation   = buf.readByte() & 0xFF; // unsigned
+            LOGGER.debug("[Faction] {} faction={} relation={}", playerName, factionTag, relation);
+            FactionDataCache.update(playerName, factionTag, relation);
+        });
+        LOGGER.info("[CustomPackets] ✓ FactionData handler enregistré");
+
         // Initialiser le combat log
         net.minecraft.client.combatlog.CombatLogManager.INSTANCE.init();
         LOGGER.info("[CustomPackets] ✓ CombatLogManager initialisé");
@@ -80,6 +91,7 @@ public final class CustomPacketSystem {
                               PacketChannel.PLAYER_DATA_S2C + "\0" + PacketChannel.PLAYER_DATA_C2S + "\0" +
                               PacketChannel.CLIENT_TO_SERVER + "\0" + PacketChannel.SERVER_TO_CLIENT + "\0" +
                               PacketChannel.PING_C2S + "\0" + PacketChannel.PING_S2C + "\0" +
+                              PacketChannel.FACTION_S2C + "\0" +
                               PacketChannel.COMBATLOG;
             buf.writeBytes(channels.getBytes(java.nio.charset.StandardCharsets.UTF_8));
             PacketSender.send("REGISTER", buf);

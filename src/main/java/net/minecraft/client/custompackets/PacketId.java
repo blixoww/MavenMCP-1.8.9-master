@@ -117,5 +117,16 @@ public final class PacketId {
     public static final int PING_PLACE   = 0x70;
     /** Serveur diffuse un ping reçu aux membres de la faction à portée */
     public static final int PING_RECEIVE = 0x71;
+
+    // ════════════════════════════════════════════════════════════════════════
+    //  Données de faction – Serveur → Client
+    // ════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Infos de faction d'un joueur proche.
+     * Format : String playerName | String factionTag | byte relation
+     * relation : 0=own, 1=ally, 2=enemy, 3=neutral
+     */
+    public static final int FACTION_DATA = 0x80;
 }
 

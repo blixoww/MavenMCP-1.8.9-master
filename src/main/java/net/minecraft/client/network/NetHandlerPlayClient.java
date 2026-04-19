@@ -794,6 +794,7 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
     public void onDisconnect(IChatComponent reason)
     {
         this.gameController.loadWorld((WorldClient)null);
+        net.minecraft.client.custompackets.handler.FactionDataCache.clear();
 
         if (this.guiScreenServer != null)
         {

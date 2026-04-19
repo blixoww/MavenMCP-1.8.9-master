@@ -47,4 +47,8 @@ public final class PacketChannel {
     public static final String PING_C2S = "CUSTOM:PING_C2S";
     /** Ping – serveur → client (diffusion aux membres de faction proches) */
     public static final String PING_S2C = "CUSTOM:PING_S2C";
+
+    // ── Canal dédié aux données de faction ──────────────────────────────────
+    /** Faction data – serveur → client (tags et relations des joueurs proches) */
+    public static final String FACTION_S2C = "CUSTOM:FACTION_S2C";
 }

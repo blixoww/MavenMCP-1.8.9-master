@@ -1,5 +1,7 @@
 package net.minecraft.client.renderer.entity;
 
+import net.minecraft.client.custompackets.data.FactionInfo;
+import net.minecraft.client.custompackets.handler.FactionDataCache;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.model.ModelPlayer;
@@ -136,6 +138,14 @@ public class RenderPlayer extends RendererLivingEntity<AbstractClientPlayer>
             {
                 Score score = scoreboard.getValueFromObjective(entityIn.getName(), scoreobjective);
                 this.renderLivingLabel(entityIn, score.getScorePoints() + " " + scoreobjective.getDisplayName(), x, y, z, 64);
+                y += (double)((float)this.getFontRendererFromRenderManager().FONT_HEIGHT * 1.15F * p_177069_9_);
+            }
+
+            // Tag de faction coloré entre la barre de vie et le pseudo
+            FactionInfo factionInfo = FactionDataCache.get(entityIn.getName());
+            if (factionInfo != null && !factionInfo.tag.isEmpty())
+            {
+                this.renderLivingLabel(entityIn, factionInfo.getColoredTag(), x, y, z, 64);
                 y += (double)((float)this.getFontRendererFromRenderManager().FONT_HEIGHT * 1.15F * p_177069_9_);
             }
         }
