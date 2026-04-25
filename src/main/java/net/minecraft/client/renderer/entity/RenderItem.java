@@ -386,21 +386,27 @@ public class RenderItem implements IResourceManagerReloadListener
                 {
                     modelresourcelocation = new ModelResourceLocation("fishing_rod_cast", "inventory");
                 }
-                else if (item == Items.bow && entityplayer.getItemInUse() != null)
+                else if (item instanceof net.minecraft.item.ItemBow && entityplayer.getItemInUse() != null)
                 {
                     int i = stack.getMaxItemUseDuration() - entityplayer.getItemInUseCount();
+                    String prefix;
+                    if (item == Items.steel_bow)        prefix = "steel_bow";
+                    else if (item == Items.emerald_bow) prefix = "emerald_bow";
+                    else if (item == Items.ruby_bow)    prefix = "ruby_bow";
+                    else if (item == Items.cobalt_bow)  prefix = "cobalt_bow";
+                    else                                prefix = "bow";
 
                     if (i >= 18)
                     {
-                        modelresourcelocation = new ModelResourceLocation("bow_pulling_2", "inventory");
+                        modelresourcelocation = new ModelResourceLocation(prefix + "_pulling_2", "inventory");
                     }
                     else if (i > 13)
                     {
-                        modelresourcelocation = new ModelResourceLocation("bow_pulling_1", "inventory");
+                        modelresourcelocation = new ModelResourceLocation(prefix + "_pulling_1", "inventory");
                     }
                     else if (i > 0)
                     {
-                        modelresourcelocation = new ModelResourceLocation("bow_pulling_0", "inventory");
+                        modelresourcelocation = new ModelResourceLocation(prefix + "_pulling_0", "inventory");
                     }
                 }
                 else if (Reflector.ForgeItem_getModel.exists())
