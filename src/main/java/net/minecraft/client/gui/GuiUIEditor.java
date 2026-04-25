@@ -110,6 +110,8 @@ public class GuiUIEditor extends GuiScreen {
     private final int[] hbPotionIcons = new int[4];
     private final int[] hbArmorLayout = new int[4];
     private final int[] hbArmorPercent = new int[4];
+    private final int[] hbCompassWaypoints = new int[4];
+    private final int[] hbCompassWpLabels  = new int[4];
     private final int[][] hbKeyToggle = new int[9][4];
     private final int[] hbDoneBtn = new int[4];
     private final int[] hbResetSize = new int[4];
@@ -388,6 +390,9 @@ public class GuiUIEditor extends GuiScreen {
                 items.add(new HeaderItem("Armure", ACCENT_ORANGE));
                 items.add(new ToggleItem("Disposition Verticale", "vertical".equals(bw.getProps().getOrDefault("layout", "horizontal")), hbArmorLayout, v -> bw.getProps().put("layout", v ? "vertical" : "horizontal")));
                 items.add(new ToggleItem("Afficher en %", Boolean.TRUE.equals(bw.getProps().getOrDefault("displayPercent", true)), hbArmorPercent, v -> bw.getProps().put("displayPercent", v)));
+            } else if (bw instanceof CompassWidget) {
+                items.add(new HeaderItem("Boussole", ACCENT_GREEN));
+                items.add(new ToggleItem("Afficher waypoints", !Boolean.FALSE.equals(bw.getProps().getOrDefault("showWaypoints", Boolean.TRUE)), hbCompassWaypoints, v -> bw.getProps().put("showWaypoints", v)));
             }
             items.add(new HeaderItem("Taille", ACCENT_ORANGE));
             items.add(new ScaleItem(bw));
@@ -573,6 +578,8 @@ public class GuiUIEditor extends GuiScreen {
             } else if (bw instanceof ArmorGroupWidget) {
                 if(clickHB(mx, my + sY, hbArmorLayout)) { bw.getProps().put("layout", "vertical".equals(bw.getProps().getOrDefault("layout", "horizontal")) ? "horizontal" : "vertical"); ui.saveConfig(); return true; }
                 if(clickHB(mx, my + sY, hbArmorPercent)) { bw.getProps().put("displayPercent", !Boolean.TRUE.equals(bw.getProps().getOrDefault("displayPercent", true))); ui.saveConfig(); return true; }
+            } else if (bw instanceof CompassWidget) {
+                if(clickHB(mx, my + sY, hbCompassWaypoints)) { bw.getProps().put("showWaypoints", Boolean.FALSE.equals(bw.getProps().getOrDefault("showWaypoints", Boolean.TRUE))); ui.saveConfig(); return true; }
             }
             if(clickHB(mx, my + sY, hbScaleSlider)) { draggingSlider=100; updateScaleFromSlider(mx); return true; }
             if(clickHB(mx, my + sY, hbResetSize)) { bw.setScale(1.0f); ui.saveConfig(); return true; }

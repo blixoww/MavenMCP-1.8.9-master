@@ -50,8 +50,10 @@ public class WaypointRenderer {
                 renderBeam(dx, dy, dz, wp.getColorRf(), wp.getColorGf(), wp.getColorBf(), partialTicks, wp.getY());
             }
 
-            // Nom et coordonnées
-            renderLabel(dx, dy, dz, wp, dist, mc, rm);
+            // Nom et coordonnées (carré de texte)
+            if (wp.isLabelVisible()) {
+                renderLabel(dx, dy, dz, wp, dist, mc, rm);
+            }
         }
     }
 

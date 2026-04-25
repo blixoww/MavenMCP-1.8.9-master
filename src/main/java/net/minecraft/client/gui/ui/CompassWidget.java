@@ -7,6 +7,10 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.waypoint.Waypoint;
+import net.minecraft.client.waypoint.WaypointManager;
+
+import java.util.List;
 
 public class CompassWidget extends BaseWidget {
 
@@ -127,13 +131,84 @@ public class CompassWidget extends BaseWidget {
             }
         }
 
-        // ── 3. Marqueur central (triangle pointant vers le bas, 3px de large) ──
+        // ── 3. Waypoints sur la barre ──
+        boolean showWaypoints      = !Boolean.FALSE.equals(getPropOrDefault("showWaypoints", Boolean.TRUE));
+        boolean showWaypointLabels = !Boolean.FALSE.equals(getPropOrDefault("showWaypointLabels", Boolean.TRUE));
+        if (showWaypoints && mc.thePlayer != null) {
+            List<Waypoint> waypoints = WaypointManager.INSTANCE.getWaypoints();
+            double px = mc.thePlayer.posX;
+            double pz = mc.thePlayer.posZ;
+
+            for (Waypoint wp : waypoints) {
+                if (!wp.isEnabled()) continue;
+
+                // Angle horizontal du waypoint depuis le joueur (0=N, 90=E, 180=S, 270=O)
+                double dx = wp.getX() - px;
+                double dz = wp.getZ() - pz;
+                double dist = Math.sqrt(dx * dx + dz * dz);
+                if (dist < 1.0) continue; // trop proche, pas d'angle fiable
+
+                // atan2 standard → azimut en degrés (N=0, E=90...)
+                double wpYaw = Math.toDegrees(Math.atan2(dx, -dz));
+                double wpDeg = ((wpYaw % 360.0) + 360.0) % 360.0;
+
+                // Différence angulaire (plus court chemin)
+                double delta = wpDeg - compassDeg;
+                while (delta > 180)  delta -= 360;
+                while (delta < -180) delta += 360;
+
+                float sx = centerX + (float)(delta * ppd);
+                if (sx < fadeW || sx >= w - fadeW) continue; // hors zone visible
+
+                int isx = Math.round(sx);
+                int wpColor = 0xFF000000 | (wp.getColorR() << 16) | (wp.getColorG() << 8) | wp.getColorB();
+
+                // Petite flèche/triangle vers le bas pointant sur la barre (3px de base)
+                Gui.drawRect(isx - 1, BAR_TOP,     isx + 2, BAR_TOP + 1, applyAlpha(wpColor, 0xCC));
+                Gui.drawRect(isx,     BAR_TOP + 1, isx + 1, BAR_TOP + 2, applyAlpha(wpColor, 0xFF));
+
+                if (showWaypointLabels) {
+                    // Nom du waypoint en petit, au-dessus de la barre
+                    String name = wp.getName();
+                    float nscale = 0.55f;
+                    int maxNameW = 30;
+                    if (fr.getStringWidth(name) * nscale > maxNameW) {
+                        // Tronquer
+                        while (name.length() > 1 && fr.getStringWidth(name + "..") * nscale > maxNameW) {
+                            name = name.substring(0, name.length() - 1);
+                        }
+                        name = name + "..";
+                    }
+                    // Distance en mètres
+                    String distStr = dist >= 1000 ? String.format("%.1fk", dist / 1000.0) : String.format("%.0fm", dist);
+
+                    float nw = fr.getStringWidth(name) * nscale;
+                    float dw2 = fr.getStringWidth(distStr) * nscale;
+
+                    // Afficher nom (couleur WP) au-dessus de la barre, distance en dessous dans zone DEG_Y
+                    GlStateManager.pushMatrix();
+                    GlStateManager.translate(sx - nw / 2.0f, BAR_TOP - 6.5f, 0);
+                    GlStateManager.scale(nscale, nscale, 1.0f);
+                    fr.drawStringWithShadow(name, 0, 0, applyAlpha(wpColor, 0xDD));
+                    GlStateManager.popMatrix();
+
+                    GlStateManager.pushMatrix();
+                    GlStateManager.translate(sx - dw2 / 2.0f, DEG_Y + 0.5f, 0);
+                    GlStateManager.scale(nscale, nscale, 1.0f);
+                    fr.drawStringWithShadow(distStr, 0, 0, 0x88FFFFFF);
+                    GlStateManager.popMatrix();
+                }
+            }
+        }
+
+        // ── 4. Marqueur central (triangle pointant vers le bas, 3px de large) ──
         // Petite pointe triangulaire au lieu d'une barre pleine
         int accentColor = applyAlpha(col, 0xFF);
         Gui.drawRect(centerX - 1, BAR_TOP,     centerX + 2, BAR_TOP + 1, applyAlpha(col, 0x88));
         Gui.drawRect(centerX,     BAR_TOP + 1, centerX + 1, BAR_TOP + 3, accentColor);
 
-        // ── 4. Degré exact, centré, très compact ──
+        // ── 5. Degré exact, centré, très compact ──
+        // N'afficher le degré que s'il n'y a pas de waypoints trop proches du centre
         int displayDeg = Math.round(compassDeg) % 360;
         String degStr = displayDeg + "\u00B0";
         float dscale = 0.7f;

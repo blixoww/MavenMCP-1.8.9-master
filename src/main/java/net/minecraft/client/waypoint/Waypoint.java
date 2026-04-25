@@ -36,6 +36,7 @@ public class Waypoint {
     private int colorR, colorG, colorB;
     private boolean beamVisible;
     private boolean coordsVisible;
+    private boolean labelVisible;
     private boolean enabled;
     private TextSize textSize = TextSize.MEDIUM;
 
@@ -49,6 +50,7 @@ public class Waypoint {
         this.colorB = b;
         this.beamVisible = true;
         this.coordsVisible = true;
+        this.labelVisible = true;
         this.enabled = true;
     }
 
@@ -83,6 +85,9 @@ public class Waypoint {
 
     public boolean isCoordsVisible() { return coordsVisible; }
     public void setCoordsVisible(boolean coordsVisible) { this.coordsVisible = coordsVisible; }
+
+    public boolean isLabelVisible() { return labelVisible; }
+    public void setLabelVisible(boolean labelVisible) { this.labelVisible = labelVisible; }
 
     public boolean isEnabled() { return enabled; }
     public void setEnabled(boolean enabled) { this.enabled = enabled; }

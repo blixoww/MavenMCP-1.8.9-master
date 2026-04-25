@@ -24,6 +24,7 @@ public class GuiWaypointEdit extends GuiScreen {
 
     private boolean beamEnabled   = true;
     private boolean coordsEnabled = true;
+    private boolean labelEnabled  = true;
     private int     selectedColorIndex = 0;
     private Waypoint.TextSize textSize = Waypoint.TextSize.MEDIUM;
 
@@ -74,6 +75,7 @@ public class GuiWaypointEdit extends GuiScreen {
             fieldZ.setText(String.valueOf(editing.getZ()));
             beamEnabled   = editing.isBeamVisible();
             coordsEnabled = editing.isCoordsVisible();
+            labelEnabled  = editing.isLabelVisible();
             textSize      = editing.getTextSize();
             // Retrouver l'index couleur
             for (int i = 0; i < COLORS.length; i++) {
@@ -90,17 +92,19 @@ public class GuiWaypointEdit extends GuiScreen {
 
         // Boutons Options (placés plus bas)
         int optY = top + 100;
-        this.buttonList.add(new GuiButton(10, cx - 100, optY, 64, 20, getBeamText()));
-        this.buttonList.add(new GuiButton(11, cx - 32, optY, 64, 20, getCoordsText()));
-        this.buttonList.add(new GuiButton(12, cx + 36, optY, 64, 20, getTextSizeText()));
+        this.buttonList.add(new GuiButton(10, cx - 100, optY,      50, 20, getBeamText()));
+        this.buttonList.add(new GuiButton(11, cx -  46, optY,      50, 20, getCoordsText()));
+        this.buttonList.add(new GuiButton(13, cx +   8, optY,      50, 20, getLabelText()));
+        this.buttonList.add(new GuiButton(12, cx +  62, optY,      50, 20, getTextSizeText()));
 
         // Boutons Sauver / Annuler (tout en bas)
         this.buttonList.add(new GuiButton(20, cx - 102, this.height - 40, 100, 20, "\u00a7aSauvegarder"));
         this.buttonList.add(new GuiButton(21, cx + 2, this.height - 40, 100, 20, "\u00a7cAnnuler"));
     }
 
-    private String getBeamText()     { return beamEnabled   ? "\u00a7bBeam: ON"  : "\u00a77Beam: OFF"; }
-    private String getCoordsText()   { return coordsEnabled ? "\u00a7eXYZ: ON"     : "\u00a77XYZ: OFF"; }
+    private String getBeamText()     { return beamEnabled   ? "\u00a7bBeam: ON"   : "\u00a77Beam: OFF"; }
+    private String getCoordsText()   { return coordsEnabled ? "\u00a7eXYZ: ON"    : "\u00a77XYZ: OFF"; }
+    private String getLabelText()    { return labelEnabled  ? "\u00a7aLabel: ON"  : "\u00a77Label: OFF"; }
     private String getTextSizeText() {
         return (textSize == Waypoint.TextSize.LARGE ? "\u00a7a" : textSize == Waypoint.TextSize.MEDIUM ? "\u00a7e" : "\u00a77") + textSize.label;
     }
@@ -230,6 +234,10 @@ public class GuiWaypointEdit extends GuiScreen {
                 coordsEnabled = !coordsEnabled;
                 button.displayString = getCoordsText();
                 break;
+            case 13: // Label
+                labelEnabled = !labelEnabled;
+                button.displayString = getLabelText();
+                break;
             case 12: // Size
                 textSize = textSize.next();
                 button.displayString = getTextSizeText();
@@ -265,6 +273,7 @@ public class GuiWaypointEdit extends GuiScreen {
             editing.setColor(c[0], c[1], c[2]);
             editing.setBeamVisible(beamEnabled);
             editing.setCoordsVisible(coordsEnabled);
+            editing.setLabelVisible(labelEnabled);
             editing.setTextSize(textSize);
             WaypointManager.INSTANCE.save();
         } else {
@@ -272,6 +281,7 @@ public class GuiWaypointEdit extends GuiScreen {
             Waypoint wp = new Waypoint(name, x, y, z, c[0], c[1], c[2]);
             wp.setBeamVisible(beamEnabled);
             wp.setCoordsVisible(coordsEnabled);
+            wp.setLabelVisible(labelEnabled);
             wp.setTextSize(textSize);
             WaypointManager.INSTANCE.addWaypoint(wp);
         }

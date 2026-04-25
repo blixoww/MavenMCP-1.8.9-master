@@ -112,6 +112,7 @@ public class WaypointManager {
                 obj.addProperty("b", wp.getColorB());
                 obj.addProperty("beam", wp.isBeamVisible());
                 obj.addProperty("coords", wp.isCoordsVisible());
+                obj.addProperty("label", wp.isLabelVisible());
                 obj.addProperty("enabled", wp.isEnabled());
                 obj.addProperty("textSize", wp.getTextSize().name());
                 arr.add(obj);
@@ -146,6 +147,7 @@ public class WaypointManager {
                     Waypoint wp = new Waypoint(name, x, y, z, r, g, b);
                     wp.setBeamVisible(obj.has("beam") ? obj.get("beam").getAsBoolean() : true);
                     wp.setCoordsVisible(obj.has("coords") ? obj.get("coords").getAsBoolean() : true);
+                    wp.setLabelVisible(obj.has("label") ? obj.get("label").getAsBoolean() : true);
                     wp.setEnabled(obj.has("enabled") ? obj.get("enabled").getAsBoolean() : true);
                     if (obj.has("textSize")) {
                         try {

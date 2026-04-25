@@ -274,27 +274,29 @@
         }
       },
       "compass": {
-        "x": 226,
-        "y": 6,
+        "x": 199,
+        "y": 19,
         "enabled": false,
         "color": -1,
         "rgb": false,
-        "scale": 1.0,
-        "relX": 0.5136363636363637,
-        "relY": 0.01929260450160772,
+        "scale": 1.3012422,
+        "relX": 0.5236842105263158,
+        "relY": 0.0625,
         "refW": 640,
         "refH": 337,
         "width": 200,
         "height": 26,
         "props": {
-          "snapGrid": false
+          "showWaypoints": true,
+          "snapGrid": true,
+          "showWaypointLabels": true
         }
       },
       "Keystrokes": {
         "x": 573,
         "y": 5,
         "enabled": true,
-        "color": -13703453,
+        "color": -13721882,
         "rgb": true,
         "scale": 1.0,
         "relX": 1.0,
@@ -585,31 +587,33 @@
         }
       },
       "compass": {
-        "x": 226,
-        "y": 6,
+        "x": 199,
+        "y": 19,
         "enabled": false,
         "color": -1,
         "rgb": false,
-        "scale": 1.0,
-        "relX": 0.5136363636363637,
-        "relY": 0.01929260450160772,
+        "scale": 1.3012422,
+        "relX": 0.5236842105263158,
+        "relY": 0.0625,
         "refW": 640,
         "refH": 337,
         "width": 200,
         "height": 26,
         "props": {
-          "snapGrid": false
+          "showWaypoints": true,
+          "snapGrid": true,
+          "showWaypointLabels": true
         }
       },
       "Keystrokes": {
         "x": 547,
-        "y": 18,
+        "y": 19,
         "enabled": false,
-        "color": -13703453,
+        "color": -13722138,
         "rgb": true,
         "scale": 1.0,
         "relX": 0.9838129496402878,
-        "relY": 0.075,
+        "relY": 0.07916666666666666,
         "refW": 640,
         "refH": 337,
         "width": 84,
