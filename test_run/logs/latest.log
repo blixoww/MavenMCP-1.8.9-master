@@ -1,386 +1,305 @@
-[16:39:21] [Client thread/INFO]: Setting user: leziink
-[16:39:21] [Client thread/INFO]: (Session ID is token:0:leziink)
-[16:39:22] [Client thread/INFO]: [OptiFine] *** Reflector Forge ***
-[16:39:22] [Client thread/INFO]: [OptiFine] *** Reflector Vanilla ***
-[16:39:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.eventhandler.Event$Result
-[16:39:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraft.launchwrapper.Launch
-[16:39:22] [Client thread/INFO]: LWJGL Version: 2.9.4
-[16:39:22] [Client thread/INFO]: [OptiFine] 
-[16:39:22] [Client thread/INFO]: [OptiFine] OptiFine_1.8.9_HD_U_M6_pre2
-[16:39:22] [Client thread/INFO]: [OptiFine] Build: null
-[16:39:22] [Client thread/INFO]: [OptiFine] OS: Windows 10 (amd64) version 10.0
-[16:39:22] [Client thread/INFO]: [OptiFine] Java: 1.8.0_181, Oracle Corporation
-[16:39:22] [Client thread/INFO]: [OptiFine] VM: Java HotSpot(TM) 64-Bit Server VM (mixed mode), Oracle Corporation
-[16:39:22] [Client thread/INFO]: [OptiFine] LWJGL: 2.9.4
-[16:39:22] [Client thread/INFO]: [OptiFine] OpenGL: AMD Radeon RX 7800 XT, version 4.6.0 Compatibility Profile Context 26.3.1.260309, ATI Technologies Inc.
-[16:39:22] [Client thread/INFO]: [OptiFine] OpenGL Version: 4.6.0
-[16:39:22] [Client thread/INFO]: [OptiFine] OpenGL Fancy fog: Not available (GL_NV_fog_distance)
-[16:39:22] [Client thread/INFO]: [OptiFine] Maximum texture size: 16384x16384
-[16:39:22] [VersionCheck/INFO]: [OptiFine] Checking for new version
-[16:39:22] [Client thread/INFO]: [Shaders] OpenGL Version: 4.6.0 Compatibility Profile Context 26.3.1.260309
-[16:39:22] [Client thread/INFO]: [Shaders] Vendor:  ATI Technologies Inc.
-[16:39:22] [Client thread/INFO]: [Shaders] Renderer: AMD Radeon RX 7800 XT
-[16:39:22] [Client thread/INFO]: [Shaders] Capabilities:  2.0  2.1  3.0  3.2  4.0 
-[16:39:22] [Client thread/INFO]: [Shaders] GL_MAX_DRAW_BUFFERS: 8
-[16:39:22] [Client thread/INFO]: [Shaders] GL_MAX_COLOR_ATTACHMENTS_EXT: 8
-[16:39:22] [Client thread/INFO]: [Shaders] GL_MAX_TEXTURE_IMAGE_UNITS: 32
-[16:39:22] [Client thread/INFO]: [Shaders] Load shaders configuration.
-[16:39:22] [Client thread/INFO]: [Shaders] Loaded shaderpack: (internal)
-[16:39:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.Loader
-[16:39:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.Attributes
-[16:39:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.pipeline.LightUtil
-[16:39:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.client.SplashProgress
-[16:39:22] [Client thread/INFO]: Reloading ResourceManager: Default
-[16:39:22] [Client thread/INFO]: [OptiFine] *** Reloading textures ***
-[16:39:22] [Client thread/INFO]: [OptiFine] Resource packs: Default
-[16:39:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.client.renderer.vertex.VertexFormatElement$EnumUsage.preDraw
-[16:39:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.client.renderer.vertex.VertexFormatElement$EnumUsage.postDraw
-[16:39:22] [Sound Library Loader/INFO]: Starting up SoundSystem...
-[16:39:22] [VersionCheck/INFO]: [OptiFine] Version found: M5
-[16:39:22] [Thread-7/INFO]: Initializing LWJGL OpenAL
-[16:39:22] [Thread-7/INFO]: (The LWJGL binding of OpenAL.  For more information, see http://www.lwjgl.org)
-[16:39:23] [Thread-7/INFO]: OpenAL initialized.
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=east,half=upper,hinge=left,open=true,powered=true from minecraft:obsidian_door#facing=east,half=upper,hinge=left,open=true,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: half=bottom,variant=nether_brick from minecraft:obsidian_slab#half=bottom,variant=nether_brick
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=east,half=lower,hinge=left,open=false,powered=true from minecraft:obsidian_door#facing=east,half=lower,hinge=left,open=false,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: half=top,variant=wood_old from minecraft:obsidian_slab#half=top,variant=wood_old
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=east,half=lower,hinge=right,open=true,powered=true from minecraft:obsidian_door#facing=east,half=lower,hinge=right,open=true,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=south,half=lower,hinge=left,open=true,powered=false from minecraft:obsidian_door#facing=south,half=lower,hinge=left,open=true,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: seamless=false,variant=sandstone from minecraft:double_obsidian_slab#seamless=false,variant=sandstone
-[16:39:23] [Client thread/WARN]: Unable to load variant: half=bottom,variant=cobblestone from minecraft:obsidian_slab#half=bottom,variant=cobblestone
-[16:39:23] [Client thread/WARN]: Unable to load variant: half=top,variant=sandstone from minecraft:obsidian_slab#half=top,variant=sandstone
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=north,half=lower,hinge=left,open=true,powered=true from minecraft:obsidian_door#facing=north,half=lower,hinge=left,open=true,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=south,half=lower,hinge=right,open=false,powered=true from minecraft:obsidian_door#facing=south,half=lower,hinge=right,open=false,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: seamless=true,variant=cobblestone from minecraft:double_obsidian_slab#seamless=true,variant=cobblestone
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=north,half=lower,hinge=right,open=false,powered=false from minecraft:obsidian_door#facing=north,half=lower,hinge=right,open=false,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=south,half=upper,hinge=left,open=true,powered=false from minecraft:obsidian_door#facing=south,half=upper,hinge=left,open=true,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=north,half=upper,hinge=right,open=false,powered=false from minecraft:obsidian_door#facing=north,half=upper,hinge=right,open=false,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: seamless=false,variant=wood_old from minecraft:double_obsidian_slab#seamless=false,variant=wood_old
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=north,half=upper,hinge=left,open=true,powered=true from minecraft:obsidian_door#facing=north,half=upper,hinge=left,open=true,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: seamless=false,variant=nether_brick from minecraft:double_obsidian_slab#seamless=false,variant=nether_brick
-[16:39:23] [Client thread/WARN]: Unable to load variant: half=bottom,variant=brick from minecraft:obsidian_slab#half=bottom,variant=brick
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=north,half=upper,hinge=left,open=false,powered=false from minecraft:obsidian_door#facing=north,half=upper,hinge=left,open=false,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=west,half=upper,hinge=right,open=false,powered=true from minecraft:obsidian_door#facing=west,half=upper,hinge=right,open=false,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=south,half=upper,hinge=right,open=false,powered=true from minecraft:obsidian_door#facing=south,half=upper,hinge=right,open=false,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: half=bottom,variant=wood_old from minecraft:obsidian_slab#half=bottom,variant=wood_old
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=south,half=upper,hinge=left,open=false,powered=false from minecraft:obsidian_door#facing=south,half=upper,hinge=left,open=false,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=west,half=lower,hinge=left,open=false,powered=false from minecraft:obsidian_door#facing=west,half=lower,hinge=left,open=false,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: seamless=true,variant=wood_old from minecraft:double_obsidian_slab#seamless=true,variant=wood_old
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=east,half=lower,hinge=left,open=true,powered=true from minecraft:obsidian_door#facing=east,half=lower,hinge=left,open=true,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=south,half=lower,hinge=right,open=false,powered=false from minecraft:obsidian_door#facing=south,half=lower,hinge=right,open=false,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: half=top,variant=nether_brick from minecraft:obsidian_slab#half=top,variant=nether_brick
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=west,half=upper,hinge=right,open=true,powered=false from minecraft:obsidian_door#facing=west,half=upper,hinge=right,open=true,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: half=top,variant=quartz from minecraft:obsidian_slab#half=top,variant=quartz
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=north,half=lower,hinge=left,open=false,powered=false from minecraft:obsidian_door#facing=north,half=lower,hinge=left,open=false,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=north,half=upper,hinge=right,open=false,powered=true from minecraft:obsidian_door#facing=north,half=upper,hinge=right,open=false,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=south,half=lower,hinge=left,open=true,powered=true from minecraft:obsidian_door#facing=south,half=lower,hinge=left,open=true,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: seamless=false,variant=stone_brick from minecraft:double_obsidian_slab#seamless=false,variant=stone_brick
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=south,half=lower,hinge=left,open=false,powered=true from minecraft:obsidian_door#facing=south,half=lower,hinge=left,open=false,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: half=top,variant=stone_brick from minecraft:obsidian_slab#half=top,variant=stone_brick
-[16:39:23] [Client thread/WARN]: Unable to load variant: seamless=false,variant=quartz from minecraft:double_obsidian_slab#seamless=false,variant=quartz
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=north,half=lower,hinge=right,open=true,powered=true from minecraft:obsidian_door#facing=north,half=lower,hinge=right,open=true,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: seamless=true,variant=quartz from minecraft:double_obsidian_slab#seamless=true,variant=quartz
-[16:39:23] [Client thread/WARN]: Unable to load variant: seamless=true,variant=stone_brick from minecraft:double_obsidian_slab#seamless=true,variant=stone_brick
-[16:39:23] [Client thread/WARN]: Unable to load variant: half=bottom,variant=sandstone from minecraft:obsidian_slab#half=bottom,variant=sandstone
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=east,half=upper,hinge=right,open=false,powered=false from minecraft:obsidian_door#facing=east,half=upper,hinge=right,open=false,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=west,half=lower,hinge=left,open=false,powered=true from minecraft:obsidian_door#facing=west,half=lower,hinge=left,open=false,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=east,half=lower,hinge=right,open=true,powered=false from minecraft:obsidian_door#facing=east,half=lower,hinge=right,open=true,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=south,half=upper,hinge=right,open=true,powered=false from minecraft:obsidian_door#facing=south,half=upper,hinge=right,open=true,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=south,half=upper,hinge=left,open=false,powered=true from minecraft:obsidian_door#facing=south,half=upper,hinge=left,open=false,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=west,half=upper,hinge=left,open=false,powered=true from minecraft:obsidian_door#facing=west,half=upper,hinge=left,open=false,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=north,half=lower,hinge=left,open=true,powered=false from minecraft:obsidian_door#facing=north,half=lower,hinge=left,open=true,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=south,half=upper,hinge=right,open=true,powered=true from minecraft:obsidian_door#facing=south,half=upper,hinge=right,open=true,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=north,half=upper,hinge=left,open=true,powered=false from minecraft:obsidian_door#facing=north,half=upper,hinge=left,open=true,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=north,half=lower,hinge=right,open=true,powered=false from minecraft:obsidian_door#facing=north,half=lower,hinge=right,open=true,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=west,half=lower,hinge=left,open=true,powered=false from minecraft:obsidian_door#facing=west,half=lower,hinge=left,open=true,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=south,half=upper,hinge=right,open=false,powered=false from minecraft:obsidian_door#facing=south,half=upper,hinge=right,open=false,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: seamless=false,variant=cobblestone from minecraft:double_obsidian_slab#seamless=false,variant=cobblestone
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=west,half=upper,hinge=right,open=false,powered=false from minecraft:obsidian_door#facing=west,half=upper,hinge=right,open=false,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=east,half=upper,hinge=left,open=true,powered=false from minecraft:obsidian_door#facing=east,half=upper,hinge=left,open=true,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=west,half=lower,hinge=left,open=true,powered=true from minecraft:obsidian_door#facing=west,half=lower,hinge=left,open=true,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=north,half=upper,hinge=left,open=false,powered=true from minecraft:obsidian_door#facing=north,half=upper,hinge=left,open=false,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=east,half=upper,hinge=left,open=false,powered=false from minecraft:obsidian_door#facing=east,half=upper,hinge=left,open=false,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: seamless=true,variant=sandstone from minecraft:double_obsidian_slab#seamless=true,variant=sandstone
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=west,half=upper,hinge=right,open=true,powered=true from minecraft:obsidian_door#facing=west,half=upper,hinge=right,open=true,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=east,half=upper,hinge=right,open=true,powered=false from minecraft:obsidian_door#facing=east,half=upper,hinge=right,open=true,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=west,half=upper,hinge=left,open=true,powered=true from minecraft:obsidian_door#facing=west,half=upper,hinge=left,open=true,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=south,half=lower,hinge=left,open=false,powered=false from minecraft:obsidian_door#facing=south,half=lower,hinge=left,open=false,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: half=top,variant=cobblestone from minecraft:obsidian_slab#half=top,variant=cobblestone
-[16:39:23] [Client thread/WARN]: Unable to load variant: half=bottom,variant=stone_brick from minecraft:obsidian_slab#half=bottom,variant=stone_brick
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=south,half=upper,hinge=left,open=true,powered=true from minecraft:obsidian_door#facing=south,half=upper,hinge=left,open=true,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: seamless=false,variant=brick from minecraft:double_obsidian_slab#seamless=false,variant=brick
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=east,half=lower,hinge=right,open=false,powered=false from minecraft:obsidian_door#facing=east,half=lower,hinge=right,open=false,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: half=top,variant=brick from minecraft:obsidian_slab#half=top,variant=brick
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=west,half=lower,hinge=right,open=true,powered=false from minecraft:obsidian_door#facing=west,half=lower,hinge=right,open=true,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=west,half=lower,hinge=right,open=false,powered=true from minecraft:obsidian_door#facing=west,half=lower,hinge=right,open=false,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=north,half=upper,hinge=right,open=true,powered=false from minecraft:obsidian_door#facing=north,half=upper,hinge=right,open=true,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=north,half=lower,hinge=left,open=false,powered=true from minecraft:obsidian_door#facing=north,half=lower,hinge=left,open=false,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=north,half=upper,hinge=right,open=true,powered=true from minecraft:obsidian_door#facing=north,half=upper,hinge=right,open=true,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=east,half=lower,hinge=right,open=false,powered=true from minecraft:obsidian_door#facing=east,half=lower,hinge=right,open=false,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: seamless=true,variant=brick from minecraft:double_obsidian_slab#seamless=true,variant=brick
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=east,half=upper,hinge=right,open=false,powered=true from minecraft:obsidian_door#facing=east,half=upper,hinge=right,open=false,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=south,half=lower,hinge=right,open=true,powered=true from minecraft:obsidian_door#facing=south,half=lower,hinge=right,open=true,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=east,half=upper,hinge=right,open=true,powered=true from minecraft:obsidian_door#facing=east,half=upper,hinge=right,open=true,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: half=bottom,variant=quartz from minecraft:obsidian_slab#half=bottom,variant=quartz
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=west,half=lower,hinge=right,open=false,powered=false from minecraft:obsidian_door#facing=west,half=lower,hinge=right,open=false,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=west,half=lower,hinge=right,open=true,powered=true from minecraft:obsidian_door#facing=west,half=lower,hinge=right,open=true,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=east,half=lower,hinge=left,open=true,powered=false from minecraft:obsidian_door#facing=east,half=lower,hinge=left,open=true,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=north,half=lower,hinge=right,open=false,powered=true from minecraft:obsidian_door#facing=north,half=lower,hinge=right,open=false,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=east,half=lower,hinge=left,open=false,powered=false from minecraft:obsidian_door#facing=east,half=lower,hinge=left,open=false,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: seamless=true,variant=nether_brick from minecraft:double_obsidian_slab#seamless=true,variant=nether_brick
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=south,half=lower,hinge=right,open=true,powered=false from minecraft:obsidian_door#facing=south,half=lower,hinge=right,open=true,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=west,half=upper,hinge=left,open=true,powered=false from minecraft:obsidian_door#facing=west,half=upper,hinge=left,open=true,powered=false
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=east,half=upper,hinge=left,open=false,powered=true from minecraft:obsidian_door#facing=east,half=upper,hinge=left,open=false,powered=true
-[16:39:23] [Client thread/WARN]: Unable to load variant: facing=west,half=upper,hinge=left,open=false,powered=false from minecraft:obsidian_door#facing=west,half=upper,hinge=left,open=false,powered=false
-[16:39:23] [Sound Library Loader/INFO]: Sound engine started
-[16:39:24] [Client thread/INFO]: [OptiFine] Sprite size: 32
-[16:39:24] [Client thread/INFO]: [OptiFine] Mipmap levels: 5
-[16:39:24] [Client thread/INFO]: [OptiFine] Multitexture: false
-[16:39:24] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.ForgeHooksClient
-[16:39:24] [Client thread/INFO]: [OptiFine] Scaled too small texture: minecraft:blocks/redstone_dust_cross_overlay, 16 -> 32
-[16:39:24] [Client thread/INFO]: [OptiFine] Scaled too small texture: minecraft:blocks/redstone_dust_line_overlay, 16 -> 32
-[16:39:24] [Client thread/INFO]: Created: 1024x1024 textures-atlas
-[16:39:24] [Client thread/INFO]: [Shaders] allocateTextureMap 5 1024 1024 
-[16:39:24] [Client thread/INFO]: [OptiFine] Animated sprites: 11
-[16:39:24] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.ItemModelMesherForge
-[16:39:24] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.ModelLoader
-[16:39:24] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.client.registry.RenderingRegistry
-[16:39:24] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.ForgeModContainer
-[16:39:25] [Client thread/INFO]: [CustomPackets] ✓ Initialisation du système de packets custom...
-[16:39:25] [Client thread/INFO]: [CustomPackets] ✓ HdvPacketHandler enregistré
-[16:39:25] [Client thread/INFO]: [CustomPackets] ✓ PingSystem handler enregistré
-[16:39:25] [Client thread/INFO]: [CustomPackets] ✓ FactionData handler enregistré
-[16:39:25] [Client thread/INFO]: [CustomPackets] ✓ CombatLogManager initialisé
-[16:39:25] [Client thread/INFO]: [CustomPackets] ✓ Système initialisé avec succès.
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: mods.betterfoliage.client.BetterFoliageClient
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.asm.transformers.BlamingTransformer
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.event.world.ChunkWatchEvent$UnWatch
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.relauncher.CoreModManager
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.DimensionManager
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.GuiScreenEvent$DrawScreenEvent$Pre
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.GuiScreenEvent$DrawScreenEvent$Post
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.EntityViewRenderEvent$CameraSetup
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.EntityViewRenderEvent$FogColors
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.eventhandler.Event
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.eventhandler.EventBus
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.property.ExtendedBlockState
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.client.FMLClientHandler
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.FMLCommonHandler
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.biome.BiomeGenBase.getWaterColorMultiplier
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.addDestroyEffects
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.addHitEffects
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.canCreatureSpawn
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.canRenderInLayer
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.doesSideBlockRendering
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.getBedDirection
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.getExtendedState
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.getLightOpacity
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.getLightValue
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.hasTileEntity
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.isAir
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.isBed
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.isBedFoot
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.isSideSolid
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.ChunkCache.isSideSolid
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.entity.Entity.canRiderInteract
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Field not present: net.minecraft.entity.Entity.captureDrops
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Field not present: net.minecraft.entity.Entity.capturedDrops
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.entity.Entity.shouldRenderInPass
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.entity.Entity.shouldRiderSit
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.event.ForgeEventFactory
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.ForgeHooks
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Field not present: net.minecraft.item.Item.delegate
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.getDurabilityForDisplay
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.getModel
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.onEntitySwing
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.shouldCauseReequipAnimation
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.showDurabilityBar
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.potion.PotionEffect.isCurativeItem
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.tileentity.TileEntity.canRenderBreaking
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.tileentity.TileEntity.getRenderBoundingBox
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.tileentity.TileEntity.hasFastRenderer
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.tileentity.TileEntity.shouldRenderInPass
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.World.countEntities
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.World.getPerWorldStorage
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.WorldProvider.getCloudRenderer
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.WorldProvider.getSkyRenderer
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.WorldProvider.getWeatherRenderer
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.WorldProvider.getSaveFolder
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.client.GuiModList
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.IColoredBakedQuad
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.property.IExtendedBlockState
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.IModel
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.IRenderHandler
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.MinecraftForge
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.MinecraftForgeClient
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.ModContainer
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.ModelLoader$VanillaLoader
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderBlockOverlayEvent$OverlayType
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderItemInFrameEvent
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderLivingEvent$Pre
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderLivingEvent$Post
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderLivingEvent$Specials$Pre
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderLivingEvent$Specials$Post
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.event.world.WorldEvent$Load
-[16:39:25] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: optifine.OptiFineClassTransformer
-[16:39:25] [Client thread/INFO]: [OptiFine] *** Reloading custom textures ***
-[16:39:25] [Client thread/INFO]: [OptiFine] Enable face culling: acacia_leaves, birch_leaves, dark_oak_leaves, jungle_leaves, oak_leaves, spruce_leaves
-[16:39:28] [Server thread/INFO]: Starting integrated minecraft server version 1.8.9
-[16:39:28] [Server thread/INFO]: Generating keypair
-[16:39:28] [Server thread/INFO]: Preparing start region for level 0
-[16:39:28] [Server thread/INFO]: Changing view distance to 16, from 10
-[16:39:28] [Server thread/INFO]: leziink[local:E:41f36c9d] logged in with entity id 184 at (-446.0734024638895, 63.0, 215.5736612852143)
-[16:39:28] [Server thread/INFO]: leziink joined the game
-[16:39:28] [Client thread/INFO]: [CustomPackets] ✓ Packet REGISTER envoyé pour : CUSTOM:HDV_S2C CUSTOM:HDV_C2S CUSTOM:SHOP_S2C CUSTOM:SHOP_C2S CUSTOM:PDATA_S2C CUSTOM:PDATA_C2S CUSTOM:C2S CUSTOM:S2C CUSTOM:PING_C2S CUSTOM:PING_S2C CUSTOM:FACTION_S2C OF_COMBAT
-[16:39:28] [Client thread/INFO]: [Shaders] usedColorBuffers: 4
-[16:39:28] [Client thread/INFO]: [Shaders] usedDepthBuffers: 1
-[16:39:28] [Client thread/INFO]: [Shaders] usedShadowColorBuffers: 0
-[16:39:28] [Client thread/INFO]: [Shaders] usedShadowDepthBuffers: 0
-[16:39:28] [Client thread/INFO]: [Shaders] usedColorAttachs: 4
-[16:39:28] [Client thread/INFO]: [Shaders] usedDrawBuffers: 1
-[16:39:28] [Client thread/INFO]: [Shaders] Framebuffer created.
-[16:39:28] [Client thread/INFO]: [Shaders] Reset model renderers
-[16:39:28] [Client thread/INFO]: [Shaders] Reset world renderers
-[16:39:29] [Chunk Batcher 6/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:30] [Chunk Batcher 11/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:30] [Chunk Batcher 4/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:30] [Chunk Batcher 0/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:30] [Chunk Batcher 1/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:30] [Chunk Batcher 6/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:30] [Chunk Batcher 9/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:30] [Chunk Batcher 8/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:30] [Chunk Batcher 2/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:30] [Chunk Batcher 7/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:30] [Chunk Batcher 7/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:30] [Chunk Batcher 9/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:30] [Chunk Batcher 11/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:30] [Chunk Batcher 2/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:30] [Chunk Batcher 8/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:30] [Chunk Batcher 1/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:30] [Chunk Batcher 2/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:30] [Chunk Batcher 7/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:30] [Chunk Batcher 13/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:30] [Chunk Batcher 9/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:30] [Chunk Batcher 0/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:30] [Chunk Batcher 2/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:31] [Chunk Batcher 2/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:31] [Chunk Batcher 6/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:31] [Chunk Batcher 10/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:31] [Chunk Batcher 4/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:31] [Chunk Batcher 8/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:31] [Chunk Batcher 12/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:31] [Chunk Batcher 6/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:31] [Chunk Batcher 10/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:31] [Chunk Batcher 0/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:31] [Chunk Batcher 4/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:31] [Chunk Batcher 13/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:31] [Chunk Batcher 11/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:31] [Chunk Batcher 10/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:31] [Chunk Batcher 13/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:31] [Chunk Batcher 6/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:32] [Chunk Batcher 10/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:32] [Chunk Batcher 11/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:32] [Chunk Batcher 5/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:32] [Chunk Batcher 10/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:32] [Chunk Batcher 12/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:32] [Chunk Batcher 7/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:32] [Chunk Batcher 11/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:32] [Chunk Batcher 0/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:32] [Chunk Batcher 8/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:32] [Chunk Batcher 7/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:32] [Chunk Batcher 7/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:32] [Chunk Batcher 13/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:32] [Chunk Batcher 0/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:32] [Chunk Batcher 10/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:32] [Chunk Batcher 8/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:32] [Chunk Batcher 3/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:32] [Chunk Batcher 6/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:32] [Chunk Batcher 0/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:32] [Chunk Batcher 1/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:32] [Chunk Batcher 1/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:32] [Chunk Batcher 8/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:33] [Chunk Batcher 4/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:33] [Chunk Batcher 10/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:33] [Chunk Batcher 13/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:33] [Chunk Batcher 11/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:33] [Chunk Batcher 5/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:33] [Chunk Batcher 4/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:33] [Chunk Batcher 9/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:33] [Chunk Batcher 4/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:33] [Chunk Batcher 6/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:33] [Chunk Batcher 6/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:33] [Chunk Batcher 8/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:33] [Chunk Batcher 6/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:33] [Chunk Batcher 3/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:33] [Chunk Batcher 1/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:33] [Chunk Batcher 7/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:33] [Chunk Batcher 11/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:33] [Chunk Batcher 0/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:33] [Chunk Batcher 4/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:33] [Chunk Batcher 10/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:33] [Chunk Batcher 1/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:33] [Chunk Batcher 7/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:33] [Chunk Batcher 2/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:33] [Chunk Batcher 4/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:34] [Chunk Batcher 7/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:34] [Chunk Batcher 0/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:34] [Chunk Batcher 12/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:34] [Chunk Batcher 5/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:34] [Chunk Batcher 5/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:34] [Chunk Batcher 5/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:34] [Chunk Batcher 12/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:35] [Chunk Batcher 13/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:35] [Chunk Batcher 13/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:36] [Chunk Batcher 4/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:36] [Chunk Batcher 3/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:36] [Chunk Batcher 9/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:36] [Chunk Batcher 1/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:36] [Chunk Batcher 11/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:39] [Chunk Batcher 3/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:43] [Chunk Batcher 1/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:44] [Chunk Batcher 11/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:51] [Chunk Batcher 1/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:56] [Chunk Batcher 7/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:56] [Chunk Batcher 7/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:39:57] [Server thread/INFO]: Saving and pausing game...
-[16:39:57] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[16:39:57] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[16:39:57] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[16:40:01] [Server thread/INFO]: Saving and pausing game...
-[16:40:01] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[16:40:01] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[16:40:01] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[16:40:08] [Server thread/INFO]: Saving and pausing game...
-[16:40:08] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[16:40:08] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[16:40:08] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[16:46:36] [Chunk Batcher 3/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:46:42] [Chunk Batcher 7/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:46:44] [Server thread/INFO]: [leziink: Set the time to 0]
-[16:46:44] [Client thread/INFO]: [CHAT] Set the time to 0
-[16:46:45] [Chunk Batcher 11/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:46:46] [Chunk Batcher 8/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:46:48] [Chunk Batcher 6/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:47:08] [Chunk Batcher 11/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:47:18] [Server thread/INFO]: Saving and pausing game...
-[16:47:18] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[16:47:18] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[16:47:18] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[16:54:45] [Chunk Batcher 11/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:54:45] [Chunk Batcher 9/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:54:54] [Chunk Batcher 13/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:54:58] [Chunk Batcher 9/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:55:27] [Chunk Batcher 5/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[16:57:40] [Server thread/INFO]: Saving and pausing game...
-[16:57:40] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[16:57:40] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[16:57:40] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[16:57:41] [Server thread/INFO]: Stopping server
-[16:57:41] [Server thread/INFO]: Saving players
-[16:57:41] [Server thread/INFO]: Saving worlds
-[16:57:41] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[16:57:41] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[16:57:41] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[16:57:42] [Client thread/INFO]: Stopping!
-[16:57:42] [Client thread/INFO]: SoundSystem shutting down...
-[16:57:42] [Client thread/WARN]: Author: Paul Lamb, www.paulscode.com
+[18:06:17] [Client thread/INFO]: Setting user: leziink
+[18:06:17] [Client thread/INFO]: (Session ID is token:0:leziink)
+[18:06:17] [Client thread/INFO]: [OptiFine] *** Reflector Forge ***
+[18:06:17] [Client thread/INFO]: [OptiFine] *** Reflector Vanilla ***
+[18:06:17] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.eventhandler.Event$Result
+[18:06:17] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraft.launchwrapper.Launch
+[18:06:17] [Client thread/INFO]: LWJGL Version: 2.9.4
+[18:06:17] [Client thread/INFO]: [OptiFine] 
+[18:06:17] [Client thread/INFO]: [OptiFine] OptiFine_1.8.9_HD_U_M6_pre2
+[18:06:17] [Client thread/INFO]: [OptiFine] Build: null
+[18:06:17] [Client thread/INFO]: [OptiFine] OS: Windows 10 (amd64) version 10.0
+[18:06:17] [Client thread/INFO]: [OptiFine] Java: 1.8.0_181, Oracle Corporation
+[18:06:17] [Client thread/INFO]: [OptiFine] VM: Java HotSpot(TM) 64-Bit Server VM (mixed mode), Oracle Corporation
+[18:06:17] [Client thread/INFO]: [OptiFine] LWJGL: 2.9.4
+[18:06:17] [Client thread/INFO]: [OptiFine] OpenGL: AMD Radeon RX 7800 XT, version 4.6.0 Compatibility Profile Context 26.3.1.260309, ATI Technologies Inc.
+[18:06:17] [Client thread/INFO]: [OptiFine] OpenGL Version: 4.6.0
+[18:06:17] [Client thread/INFO]: [OptiFine] OpenGL Fancy fog: Not available (GL_NV_fog_distance)
+[18:06:17] [Client thread/INFO]: [OptiFine] Maximum texture size: 16384x16384
+[18:06:17] [VersionCheck/INFO]: [OptiFine] Checking for new version
+[18:06:17] [Client thread/INFO]: [Shaders] OpenGL Version: 4.6.0 Compatibility Profile Context 26.3.1.260309
+[18:06:17] [Client thread/INFO]: [Shaders] Vendor:  ATI Technologies Inc.
+[18:06:17] [Client thread/INFO]: [Shaders] Renderer: AMD Radeon RX 7800 XT
+[18:06:17] [Client thread/INFO]: [Shaders] Capabilities:  2.0  2.1  3.0  3.2  4.0 
+[18:06:17] [Client thread/INFO]: [Shaders] GL_MAX_DRAW_BUFFERS: 8
+[18:06:17] [Client thread/INFO]: [Shaders] GL_MAX_COLOR_ATTACHMENTS_EXT: 8
+[18:06:17] [Client thread/INFO]: [Shaders] GL_MAX_TEXTURE_IMAGE_UNITS: 32
+[18:06:17] [Client thread/INFO]: [Shaders] Load shaders configuration.
+[18:06:17] [Client thread/INFO]: [Shaders] Loaded shaderpack: (internal)
+[18:06:17] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.Loader
+[18:06:17] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.Attributes
+[18:06:17] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.pipeline.LightUtil
+[18:06:17] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.client.SplashProgress
+[18:06:17] [Client thread/INFO]: Reloading ResourceManager: Default
+[18:06:17] [Client thread/INFO]: [OptiFine] *** Reloading textures ***
+[18:06:17] [Client thread/INFO]: [OptiFine] Resource packs: Default
+[18:06:17] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.client.renderer.vertex.VertexFormatElement$EnumUsage.preDraw
+[18:06:17] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.client.renderer.vertex.VertexFormatElement$EnumUsage.postDraw
+[18:06:17] [Sound Library Loader/INFO]: Starting up SoundSystem...
+[18:06:18] [Thread-7/INFO]: Initializing LWJGL OpenAL
+[18:06:18] [Thread-7/INFO]: (The LWJGL binding of OpenAL.  For more information, see http://www.lwjgl.org)
+[18:06:18] [Client thread/WARN]: Unable to load variant: half=bottom,variant=nether_brick from minecraft:obsidian_slab#half=bottom,variant=nether_brick
+[18:06:18] [Thread-7/INFO]: OpenAL initialized.
+[18:06:18] [VersionCheck/INFO]: [OptiFine] Version found: M5
+[18:06:18] [Client thread/WARN]: Unable to load variant: half=top,variant=wood_old from minecraft:obsidian_slab#half=top,variant=wood_old
+[18:06:18] [Client thread/WARN]: Unable to load variant: seamless=false,variant=sandstone from minecraft:double_obsidian_slab#seamless=false,variant=sandstone
+[18:06:18] [Client thread/WARN]: Unable to load variant: half=bottom,variant=cobblestone from minecraft:obsidian_slab#half=bottom,variant=cobblestone
+[18:06:18] [Client thread/WARN]: Unable to load variant: half=top,variant=sandstone from minecraft:obsidian_slab#half=top,variant=sandstone
+[18:06:18] [Client thread/WARN]: Unable to load variant: seamless=true,variant=cobblestone from minecraft:double_obsidian_slab#seamless=true,variant=cobblestone
+[18:06:18] [Client thread/WARN]: Unable to load variant: seamless=false,variant=wood_old from minecraft:double_obsidian_slab#seamless=false,variant=wood_old
+[18:06:18] [Client thread/WARN]: Unable to load variant: seamless=false,variant=nether_brick from minecraft:double_obsidian_slab#seamless=false,variant=nether_brick
+[18:06:18] [Client thread/WARN]: Unable to load variant: half=bottom,variant=brick from minecraft:obsidian_slab#half=bottom,variant=brick
+[18:06:18] [Client thread/WARN]: Unable to load variant: half=bottom,variant=wood_old from minecraft:obsidian_slab#half=bottom,variant=wood_old
+[18:06:18] [Client thread/WARN]: Unable to load variant: seamless=true,variant=wood_old from minecraft:double_obsidian_slab#seamless=true,variant=wood_old
+[18:06:18] [Client thread/WARN]: Unable to load variant: half=top,variant=nether_brick from minecraft:obsidian_slab#half=top,variant=nether_brick
+[18:06:18] [Client thread/WARN]: Unable to load variant: half=top,variant=quartz from minecraft:obsidian_slab#half=top,variant=quartz
+[18:06:18] [Client thread/WARN]: Unable to load variant: seamless=false,variant=stone_brick from minecraft:double_obsidian_slab#seamless=false,variant=stone_brick
+[18:06:18] [Client thread/WARN]: Unable to load variant: half=top,variant=stone_brick from minecraft:obsidian_slab#half=top,variant=stone_brick
+[18:06:18] [Client thread/WARN]: Unable to load variant: seamless=false,variant=quartz from minecraft:double_obsidian_slab#seamless=false,variant=quartz
+[18:06:18] [Client thread/WARN]: Unable to load variant: seamless=true,variant=quartz from minecraft:double_obsidian_slab#seamless=true,variant=quartz
+[18:06:18] [Client thread/WARN]: Unable to load variant: seamless=true,variant=stone_brick from minecraft:double_obsidian_slab#seamless=true,variant=stone_brick
+[18:06:18] [Client thread/WARN]: Unable to load variant: half=bottom,variant=sandstone from minecraft:obsidian_slab#half=bottom,variant=sandstone
+[18:06:18] [Client thread/WARN]: Unable to load variant: seamless=false,variant=cobblestone from minecraft:double_obsidian_slab#seamless=false,variant=cobblestone
+[18:06:18] [Client thread/WARN]: Unable to load variant: seamless=true,variant=sandstone from minecraft:double_obsidian_slab#seamless=true,variant=sandstone
+[18:06:18] [Client thread/WARN]: Unable to load variant: half=top,variant=cobblestone from minecraft:obsidian_slab#half=top,variant=cobblestone
+[18:06:18] [Client thread/WARN]: Unable to load variant: half=bottom,variant=stone_brick from minecraft:obsidian_slab#half=bottom,variant=stone_brick
+[18:06:18] [Client thread/WARN]: Unable to load variant: seamless=false,variant=brick from minecraft:double_obsidian_slab#seamless=false,variant=brick
+[18:06:18] [Client thread/WARN]: Unable to load variant: half=top,variant=brick from minecraft:obsidian_slab#half=top,variant=brick
+[18:06:18] [Client thread/WARN]: Unable to load variant: seamless=true,variant=brick from minecraft:double_obsidian_slab#seamless=true,variant=brick
+[18:06:18] [Client thread/WARN]: Unable to load variant: half=bottom,variant=quartz from minecraft:obsidian_slab#half=bottom,variant=quartz
+[18:06:18] [Client thread/WARN]: Unable to load variant: seamless=true,variant=nether_brick from minecraft:double_obsidian_slab#seamless=true,variant=nether_brick
+[18:06:18] [Sound Library Loader/INFO]: Sound engine started
+[18:06:19] [Client thread/INFO]: [OptiFine] Sprite size: 32
+[18:06:19] [Client thread/INFO]: [OptiFine] Mipmap levels: 5
+[18:06:19] [Client thread/INFO]: [OptiFine] Multitexture: false
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.ForgeHooksClient
+[18:06:19] [Client thread/INFO]: [OptiFine] Scaled too small texture: minecraft:blocks/redstone_dust_cross_overlay, 16 -> 32
+[18:06:19] [Client thread/INFO]: [OptiFine] Scaled too small texture: minecraft:blocks/redstone_dust_line_overlay, 16 -> 32
+[18:06:19] [Client thread/INFO]: Created: 1024x1024 textures-atlas
+[18:06:19] [Client thread/INFO]: [Shaders] allocateTextureMap 5 1024 1024 
+[18:06:19] [Client thread/INFO]: [OptiFine] Animated sprites: 11
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.ItemModelMesherForge
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.ModelLoader
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.client.registry.RenderingRegistry
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.ForgeModContainer
+[18:06:19] [Client thread/INFO]: [CustomPackets] ✓ Initialisation du système de packets custom...
+[18:06:19] [Client thread/INFO]: [CustomPackets] ✓ HdvPacketHandler enregistré
+[18:06:19] [Client thread/INFO]: [CustomPackets] ✓ PingSystem handler enregistré
+[18:06:19] [Client thread/INFO]: [CustomPackets] ✓ FactionData handler enregistré
+[18:06:19] [Client thread/INFO]: [CustomPackets] ✓ CombatLogManager initialisé
+[18:06:19] [Client thread/INFO]: [CustomPackets] ✓ Système initialisé avec succès.
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: mods.betterfoliage.client.BetterFoliageClient
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.asm.transformers.BlamingTransformer
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.event.world.ChunkWatchEvent$UnWatch
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.relauncher.CoreModManager
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.DimensionManager
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.GuiScreenEvent$DrawScreenEvent$Pre
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.GuiScreenEvent$DrawScreenEvent$Post
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.EntityViewRenderEvent$CameraSetup
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.EntityViewRenderEvent$FogColors
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.eventhandler.Event
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.eventhandler.EventBus
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.property.ExtendedBlockState
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.client.FMLClientHandler
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.FMLCommonHandler
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.biome.BiomeGenBase.getWaterColorMultiplier
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.addDestroyEffects
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.addHitEffects
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.canCreatureSpawn
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.canRenderInLayer
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.doesSideBlockRendering
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.getBedDirection
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.getExtendedState
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.getLightOpacity
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.getLightValue
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.hasTileEntity
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.isAir
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.isBed
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.isBedFoot
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.isSideSolid
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.ChunkCache.isSideSolid
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.entity.Entity.canRiderInteract
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Field not present: net.minecraft.entity.Entity.captureDrops
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Field not present: net.minecraft.entity.Entity.capturedDrops
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.entity.Entity.shouldRenderInPass
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.entity.Entity.shouldRiderSit
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.event.ForgeEventFactory
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.ForgeHooks
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Field not present: net.minecraft.item.Item.delegate
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.getDurabilityForDisplay
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.getModel
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.onEntitySwing
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.shouldCauseReequipAnimation
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.showDurabilityBar
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.potion.PotionEffect.isCurativeItem
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.tileentity.TileEntity.canRenderBreaking
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.tileentity.TileEntity.getRenderBoundingBox
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.tileentity.TileEntity.hasFastRenderer
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.tileentity.TileEntity.shouldRenderInPass
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.World.countEntities
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.World.getPerWorldStorage
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.WorldProvider.getCloudRenderer
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.WorldProvider.getSkyRenderer
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.WorldProvider.getWeatherRenderer
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.WorldProvider.getSaveFolder
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.client.GuiModList
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.IColoredBakedQuad
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.property.IExtendedBlockState
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.IModel
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.IRenderHandler
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.MinecraftForge
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.MinecraftForgeClient
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.ModContainer
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.ModelLoader$VanillaLoader
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderBlockOverlayEvent$OverlayType
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderItemInFrameEvent
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderLivingEvent$Pre
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderLivingEvent$Post
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderLivingEvent$Specials$Pre
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderLivingEvent$Specials$Post
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.event.world.WorldEvent$Load
+[18:06:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: optifine.OptiFineClassTransformer
+[18:06:19] [Client thread/INFO]: [OptiFine] *** Reloading custom textures ***
+[18:06:19] [Client thread/INFO]: [OptiFine] Enable face culling: acacia_leaves, birch_leaves, dark_oak_leaves, jungle_leaves, oak_leaves, spruce_leaves
+[18:06:23] [Client thread/INFO]: Connecting to 127.0.0.1, 7777
+[18:06:44] [Client thread/INFO]: Connecting to 127.0.0.1, 7777
+[18:06:44] [Client thread/INFO]: [CustomPackets] ✓ Packet REGISTER envoyé pour : CUSTOM:HDV_S2C CUSTOM:HDV_C2S CUSTOM:SHOP_S2C CUSTOM:SHOP_C2S CUSTOM:PDATA_S2C CUSTOM:PDATA_C2S CUSTOM:C2S CUSTOM:S2C CUSTOM:PING_C2S CUSTOM:PING_S2C CUSTOM:FACTION_S2C OF_COMBAT
+[18:06:44] [Client thread/INFO]: [CHAT] [+] leziink a rejoint RedConflict.
+[18:06:44] [Client thread/INFO]: [CHAT] --------------------------------
+[18:06:44] [Client thread/INFO]: [CHAT]   Bienvenue sur RedConflict !
+[18:06:44] [Client thread/INFO]: [CHAT]   Serveur 1.8.9 | PvP / Survie
+[18:06:44] [Client thread/INFO]: [CHAT]   Discord : discord.gg/UMJUnfQq
+[18:06:44] [Client thread/INFO]: [CHAT]   Tapez /commands pour voir les commandes.
+[18:06:44] [Client thread/INFO]: [CHAT] --------------------------------
+[18:06:44] [Client thread/INFO]: [Shaders] usedColorBuffers: 4
+[18:06:44] [Client thread/INFO]: [Shaders] usedDepthBuffers: 1
+[18:06:44] [Client thread/INFO]: [Shaders] usedShadowColorBuffers: 0
+[18:06:44] [Client thread/INFO]: [Shaders] usedShadowDepthBuffers: 0
+[18:06:44] [Client thread/INFO]: [Shaders] usedColorAttachs: 4
+[18:06:44] [Client thread/INFO]: [Shaders] usedDrawBuffers: 1
+[18:06:44] [Client thread/INFO]: [Shaders] Framebuffer created.
+[18:06:44] [Client thread/INFO]: [Shaders] Reset model renderers
+[18:06:44] [Client thread/INFO]: [Shaders] Reset world renderers
+[18:06:45] [Chunk Batcher 12/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:45] [Chunk Batcher 3/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:45] [Chunk Batcher 8/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:45] [Chunk Batcher 6/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:45] [Chunk Batcher 0/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:46] [Chunk Batcher 9/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:46] [Chunk Batcher 12/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:47] [Chunk Batcher 10/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:47] [Chunk Batcher 10/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:47] [Chunk Batcher 2/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:47] [Chunk Batcher 10/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:47] [Chunk Batcher 11/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:47] [Chunk Batcher 1/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:48] [Chunk Batcher 4/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:48] [Chunk Batcher 7/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:48] [Chunk Batcher 3/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:48] [Chunk Batcher 12/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:48] [Chunk Batcher 8/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:48] [Chunk Batcher 3/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:48] [Chunk Batcher 7/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:48] [Chunk Batcher 1/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:48] [Chunk Batcher 12/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:49] [Chunk Batcher 4/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:49] [Chunk Batcher 6/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:49] [Chunk Batcher 2/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:57] [Chunk Batcher 1/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:57] [Chunk Batcher 1/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:57] [Chunk Batcher 11/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:57] [Chunk Batcher 12/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:57] [Chunk Batcher 12/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:57] [Chunk Batcher 10/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:58] [Chunk Batcher 12/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:58] [Chunk Batcher 7/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:06:58] [Chunk Batcher 3/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[18:12:03] [Client thread/INFO]: [CHAT] Vous êtes maintenant AFK.
+[18:25:33] [Client thread/INFO]: [CHAT] [ClearLagg] Les entités seront supprimées dans 1 minute(s) !
+[18:26:03] [Client thread/INFO]: [CHAT] [ClearLagg] Les entités seront supprimées dans 30 seconde(s) !
+[18:31:16] [Client thread/INFO]: [CHAT] [ClearLagg] Nettoyage terminé — 28 entité(s) supprimée(s).
+[18:43:39] [Client thread/INFO]: [CHAT] --------------------------------
+[18:43:39] [Client thread/INFO]: [CHAT] [RedConflict] Accédez à l'Hotel des Ventes avec /hdv !
+[18:43:39] [Client thread/INFO]: [CHAT]   | Vendez et achetez des items entre joueurs.
+[18:43:39] [Client thread/INFO]: [CHAT] --------------------------------
+[18:50:46] [Client thread/INFO]: [CHAT] [ClearLagg] Les entités seront supprimées dans 30 seconde(s) !
+[18:56:02] [Client thread/INFO]: [CHAT] [ClearLagg] Nettoyage terminé — 34 entité(s) supprimée(s).
+[18:58:31] [Client thread/INFO]: [CHAT] 
+[18:58:31] [Client thread/INFO]: [CHAT] -----------------------------------------------------
+[18:58:31] [Client thread/INFO]: [CHAT]  < GUESS > -----------------------------------------------------
+[18:58:31] [Client thread/INFO]: [CHAT] Un Guess vient de commencer !
+[18:58:31] [Client thread/INFO]: [CHAT] Soyez le premier à trouver le bon mot !
+[18:58:31] [Client thread/INFO]: [CHAT] -----------------------------------------------------
+[18:58:31] [Client thread/INFO]: [CHAT] [Guess] Mot à deviner (1/2) : rtreoireti
+[18:58:31] [Client thread/INFO]: [CHAT] [Guess] Répondez avec /answer <mot>
+[18:59:31] [Client thread/INFO]: [CHAT] [Guess] Indice : le mot commence par t e _ _ _ _ _ _ _ _ (10 lettres)
+[19:00:31] [Client thread/INFO]: [CHAT] [Guess] Temps écoulé ! Le mot était : territoire
+[19:00:31] [Client thread/INFO]: [CHAT] [Guess] Mot à deviner (2/2) : epxnoiols
+[19:00:31] [Client thread/INFO]: [CHAT] [Guess] Répondez avec /answer <mot>
+[19:01:31] [Client thread/INFO]: [CHAT] [Guess] Indice : le mot commence par e x _ _ _ _ _ _ _ (9 lettres)
+[19:02:31] [Client thread/INFO]: [CHAT] [Guess] Temps écoulé ! Le mot était : explosion
+[19:02:31] [Client thread/INFO]: [CHAT] [Guess] Le Guess est terminé.
+[19:10:23] [Client thread/INFO]: [CHAT] [+] Arkhan a rejoint RedConflict.
+[19:15:01] [Client thread/INFO]: [CHAT] [ClearLagg] Les entités seront supprimées dans 1 minute(s) !
+[19:17:56] [Client thread/INFO]: [CHAT] Vous n'êtes plus AFK.
+[19:17:56] [Client thread/INFO]: [CHAT] [PURGE] Usage : /purge <start|stop|top>
+[19:17:56] [Client thread/INFO]: [CHAT] start, stop, top
+[19:17:58] [Client thread/INFO]: [CHAT] 
+[19:17:58] [Client thread/INFO]: [CHAT] -----------------------------------------------------
+[19:17:58] [Client thread/INFO]: [CHAT]  < PURGE > -----------------------------------------------------
+[19:17:58] [Client thread/INFO]: [CHAT] La Purge commence ! Toutes les portes sont ouvertes !
+[19:17:58] [Client thread/INFO]: [CHAT] Chaque kill rapporte de l'argent et des items (/purgereward)
+[19:17:58] [Client thread/INFO]: [CHAT] Durée : 30m | Top 5 récompensé en fin d'event
+[19:17:58] [Client thread/INFO]: [CHAT] -----------------------------------------------------
+[19:18:41] [Client thread/INFO]: [CHAT] [PURGE] La Purge a été annulée.
+[19:18:46] [Client thread/INFO]: [CHAT] [Server: Stopping the server]
+[19:27:17] [Client thread/INFO]: Connecting to 127.0.0.1, 7777
+[19:27:19] [Client thread/INFO]: [CustomPackets] ✓ Packet REGISTER envoyé pour : CUSTOM:HDV_S2C CUSTOM:HDV_C2S CUSTOM:SHOP_S2C CUSTOM:SHOP_C2S CUSTOM:PDATA_S2C CUSTOM:PDATA_C2S CUSTOM:C2S CUSTOM:S2C CUSTOM:PING_C2S CUSTOM:PING_S2C CUSTOM:FACTION_S2C OF_COMBAT
+[19:27:19] [Client thread/INFO]: [CHAT] [+] leziink a rejoint RedConflict.
+[19:27:19] [Client thread/INFO]: [CHAT] --------------------------------
+[19:27:19] [Client thread/INFO]: [CHAT]   Bienvenue sur RedConflict !
+[19:27:19] [Client thread/INFO]: [CHAT]   Serveur 1.8.9 | PvP / Survie
+[19:27:19] [Client thread/INFO]: [CHAT]   Discord : discord.gg/UMJUnfQq
+[19:27:19] [Client thread/INFO]: [CHAT]   Tapez /commands pour voir les commandes.
+[19:27:19] [Client thread/INFO]: [CHAT] --------------------------------
+[19:27:19] [Chunk Batcher 8/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:19] [Chunk Batcher 3/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:20] [Chunk Batcher 13/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:20] [Chunk Batcher 3/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:20] [Chunk Batcher 5/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:20] [Client thread/INFO]: [CHAT] [Classement] Le classement des factions a été mis à jour.
+[19:27:20] [Chunk Batcher 2/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:20] [Chunk Batcher 3/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:20] [Chunk Batcher 7/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:20] [Chunk Batcher 1/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:20] [Chunk Batcher 5/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:20] [Chunk Batcher 2/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:20] [Chunk Batcher 11/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:20] [Chunk Batcher 4/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:20] [Chunk Batcher 7/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:22] [Chunk Batcher 5/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:22] [Chunk Batcher 0/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:22] [Chunk Batcher 7/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:22] [Chunk Batcher 7/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:22] [Chunk Batcher 9/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:22] [Chunk Batcher 3/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:22] [Chunk Batcher 4/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:22] [Chunk Batcher 10/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:22] [Chunk Batcher 12/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:22] [Chunk Batcher 7/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:23] [Chunk Batcher 1/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:23] [Chunk Batcher 6/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:23] [Chunk Batcher 10/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:23] [Chunk Batcher 1/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:27:24] [Client thread/INFO]: [CHAT] 
+[19:27:24] [Client thread/INFO]: [CHAT] -----------------------------------------------------
+[19:27:24] [Client thread/INFO]: [CHAT]  < PURGE > -----------------------------------------------------
+[19:27:24] [Client thread/INFO]: [CHAT] La Purge commence ! Toutes les portes sont ouvertes !
+[19:27:24] [Client thread/INFO]: [CHAT] Chaque kill rapporte de l'argent et des items (/purgereward)
+[19:27:24] [Client thread/INFO]: [CHAT] Durée : 30m | Top 5 récompensé en fin d'event
+[19:27:24] [Client thread/INFO]: [CHAT] -----------------------------------------------------
+[19:27:28] [Client thread/INFO]: [CHAT] [+] Arkhan a rejoint RedConflict.
+[19:30:02] [Chunk Batcher 8/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:30:02] [Chunk Batcher 7/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:30:02] [Chunk Batcher 2/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
+[19:30:02] [Chunk Batcher 4/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
