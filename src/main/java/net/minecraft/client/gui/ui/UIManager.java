@@ -71,6 +71,13 @@ public class UIManager {
         register(new CombatLogWidget("combatlog", 10, 230));
         // Reach widget
         register(new ReachWidget("Reach", 10, 250));
+        // Compass HUD widget — centré horizontalement en haut par défaut
+        CompassWidget compassW = new CompassWidget("compass", 0, 2);
+        compassW.setColor(0xFFFFFFFF);
+        // relX=0.5 centre le widget horizontalement quelle que soit la résolution
+        compassW.relX = 0.5;
+        compassW.relY = 0.0;
+        register(compassW);
         // Keystrokes widget is registered in GuiIngame (needs GameSettings.keyBind* to be ready)
 
         boolean loaded = loadConfig();

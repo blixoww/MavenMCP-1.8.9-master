@@ -216,9 +216,6 @@ public class GuiUIEditor extends GuiScreen {
             else if ("colorEditor".equals(panel) && colorEditorOpen && selected instanceof BaseWidget) drawColorEditor(mouseX, mouseY);
         }
 
-        // Title bar
-        drawTitleBar(ease);
-
         // Done button
         int btnW = 100, btnH = 18;
         int btnX = (this.width - btnW) / 2;
@@ -228,16 +225,6 @@ public class GuiUIEditor extends GuiScreen {
         setHB(hbDoneBtn, btnX, btnY, btnW, btnH);
     }
 
-    private void drawTitleBar(float ease) {
-        int tw = 170, th = 22;
-        int tx = (this.width - tw) / 2, ty = 3;
-        GuiRenderUtils.drawShadow(tx, ty, tw, th, 4, (int)(ease * 60));
-        Gui.drawRect(tx, ty, tx + tw, ty + th, 0xEE0D0D15);
-        Gui.drawRect(tx, ty, tx + tw, ty + 1, ACCENT);
-        Gui.drawRect(tx, ty + th, tx + tw, ty + th + 1, BORDER);
-        String title = "EDITEUR D'INTERFACE";
-        fontRendererObj.drawStringWithShadow(title, tx + (tw - fontRendererObj.getStringWidth(title)) / 2.0f, ty + 7, 0xFF8EC8FF);
-    }
 
     private void drawWidgetList(int mx, int my) {
         int px = wlX, py = wlY;
@@ -770,6 +757,7 @@ public class GuiUIEditor extends GuiScreen {
             case "toggle_sneak": return "Toggle Sneak"; case "toggle_sprint": return "Toggle Sprint";
             case "combatlog": return "Combat Tag"; case "keystrokes": return "Keystrokes"; case "Keystrokes": return "Keystrokes";
             case "reach": return "Reach Display"; case "Reach": return "Reach Display";
+            case "compass": return "Boussole HUD";
             default: String s = id.replace('_', ' '); return Character.toUpperCase(s.charAt(0)) + s.substring(1);
         }
     }
