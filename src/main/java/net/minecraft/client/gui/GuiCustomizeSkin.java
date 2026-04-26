@@ -1,100 +1,110 @@
 package net.minecraft.client.gui;
 
 import java.io.IOException;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EnumPlayerModelParts;
+import net.minecraft.util.MathHelper;
 
 public class GuiCustomizeSkin extends GuiScreen
 {
-    /** The parent GUI for this GUI */
-    private final GuiScreen parentScreen;
+    private static final int ACCENT = 0xFFDC1E1E;
 
-    /** The title of the GUI. */
+    private final GuiScreen parentScreen;
     private String title;
+
+    private float animation = 0f;
+    private long  animLastTime = -1L;
+    private int[] btnYCache;
 
     public GuiCustomizeSkin(GuiScreen parentScreenIn)
     {
         this.parentScreen = parentScreenIn;
     }
 
-    /**
-     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
-     * window resizes, the buttonList is cleared beforehand.
-     */
     public void initGui()
     {
+        this.buttonList.clear();
+        this.animation = 0f; this.animLastTime = -1L;
+        this.title = I18n.format("options.skinCustomisation.title");
+
+        int btnW = 150, btnH = 22, gap = 4;
         int i = 0;
-        this.title = I18n.format("options.skinCustomisation.title", new Object[0]);
-
-        for (EnumPlayerModelParts enumplayermodelparts : EnumPlayerModelParts.values())
-        {
-            this.buttonList.add(new GuiCustomizeSkin.ButtonPart(enumplayermodelparts.getPartId(), this.width / 2 - 155 + i % 2 * 160, this.height / 6 + 24 * (i >> 1), 150, 20, enumplayermodelparts));
+        for (EnumPlayerModelParts part : EnumPlayerModelParts.values()) {
+            int bx = this.width / 2 + (i % 2 == 0 ? -btnW - 5 : 5);
+            int by = 50 + (i / 2) * (btnH + gap);
+            this.buttonList.add(new GuiMenuButton(part.getPartId(), bx, by, btnW, btnH, getPartText(part)));
             ++i;
         }
-
-        if (i % 2 == 1)
-        {
-            ++i;
-        }
-
-        this.buttonList.add(new GuiButton(200, this.width / 2 - 100, this.height / 6 + 24 * (i >> 1), I18n.format("gui.done", new Object[0])));
+        if (i % 2 == 1) ++i;
+        int doneY = 50 + (i / 2) * (btnH + gap) + 8;
+        this.buttonList.add(new GuiMenuButton(200, this.width / 2 - 75, doneY, 150, btnH, "DONE", true));
+        this.btnYCache = new int[this.buttonList.size()];
     }
 
-    /**
-     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
-     */
     protected void actionPerformed(GuiButton button) throws IOException
     {
-        if (button.enabled)
-        {
-            if (button.id == 200)
-            {
-                this.mc.gameSettings.saveOptions();
-                this.mc.displayGuiScreen(this.parentScreen);
-            }
-            else if (button instanceof GuiCustomizeSkin.ButtonPart)
-            {
-                EnumPlayerModelParts enumplayermodelparts = ((GuiCustomizeSkin.ButtonPart)button).playerModelParts;
-                this.mc.gameSettings.switchModelPartEnabled(enumplayermodelparts);
-                button.displayString = this.func_175358_a(enumplayermodelparts);
+        if (!button.enabled) return;
+        if (button.id == 200) {
+            this.mc.gameSettings.saveOptions();
+            this.mc.displayGuiScreen(this.parentScreen);
+        } else {
+            for (EnumPlayerModelParts part : EnumPlayerModelParts.values()) {
+                if (part.getPartId() == button.id) {
+                    this.mc.gameSettings.switchModelPartEnabled(part);
+                    button.displayString = getPartText(part);
+                    break;
+                }
             }
         }
     }
 
-    /**
-     * Draws the screen and all the components in it. Args : mouseX, mouseY, renderPartialTicks
-     */
+    private String getPartText(EnumPlayerModelParts part)
+    {
+        boolean on = this.mc.gameSettings.getModelParts().contains(part);
+        return part.func_179326_d().getFormattedText() + ": " + (on ? "§aON" : "§7OFF");
+    }
+
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
+        long now = Minecraft.getSystemTime();
+        if (animLastTime != -1L) animation = MathHelper.clamp_float(animation + (now - animLastTime) / 250f, 0f, 1f);
+        animLastTime = now;
+        float e = animation * animation * (3f - 2f * animation);
+
         this.drawDefaultBackground();
-        this.drawCenteredString(this.fontRendererObj, this.title, this.width / 2, 20, 16777215);
+
+        Gui.drawRect(0, 0, this.width, 36, (int)(e*210) << 24 | 0x05070A);
+        Gui.drawRect(0, 36, this.width, 37, (int)(e*255) << 24 | (ACCENT & 0xFFFFFF));
+        GuiRenderUtils.drawGradientRect(0, 37, this.width, 52, (int)(e*80) << 24 | 0x05070A, 0x00000000);
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(0, (1f - e) * 8, 0);
+
+        int ta = (int)(e * 255) << 24;
+        String t1 = "§c§lSKIN ";
+        String t2 = "§f§lCUSTOMS";
+        int tw = fontRendererObj.getStringWidth(t1) + fontRendererObj.getStringWidth(t2);
+        int tx = this.width / 2 - tw / 2;
+        fontRendererObj.drawStringWithShadow(t1, tx, 13, ta | 0xFFFFFF);
+        fontRendererObj.drawStringWithShadow(t2, tx + fontRendererObj.getStringWidth(t1), 13, ta | 0xFFFFFF);
+        int dw = (int)((tw + 20) * e);
+        Gui.drawRect(this.width/2 - dw/2, 26, this.width/2 + dw/2, 27, (int)(e*45) << 24 | 0xFFFFFF);
+
+        if (btnYCache == null || btnYCache.length != this.buttonList.size()) btnYCache = new int[this.buttonList.size()];
+        for (int i2 = 0; i2 < this.buttonList.size(); i2++) {
+            GuiButton b = this.buttonList.get(i2);
+            btnYCache[i2] = b.yPosition;
+            float ba = MathHelper.clamp_float(animation * 2f - i2 * 0.08f, 0f, 1f);
+            ba = ba * ba * (3f - 2f * ba);
+            b.yPosition += (int)((1f - ba) * 12);
+        }
         super.drawScreen(mouseX, mouseY, partialTicks);
-    }
+        for (int i2 = 0; i2 < this.buttonList.size(); i2++) this.buttonList.get(i2).yPosition = btnYCache[i2];
 
-    private String func_175358_a(EnumPlayerModelParts playerModelParts)
-    {
-        String s;
-
-        if (this.mc.gameSettings.getModelParts().contains(playerModelParts))
-        {
-            s = I18n.format("options.on", new Object[0]);
-        }
-        else
-        {
-            s = I18n.format("options.off", new Object[0]);
-        }
-
-        return playerModelParts.func_179326_d().getFormattedText() + ": " + s;
-    }
-
-    class ButtonPart extends GuiButton
-    {
-        private final EnumPlayerModelParts playerModelParts;
-
-        private ButtonPart(int p_i45514_2_, int p_i45514_3_, int p_i45514_4_, int p_i45514_5_, int p_i45514_6_, EnumPlayerModelParts playerModelParts)
-        {
-            super(p_i45514_2_, p_i45514_3_, p_i45514_4_, p_i45514_5_, p_i45514_6_, GuiCustomizeSkin.this.func_175358_a(playerModelParts));
-            this.playerModelParts = playerModelParts;
-        }
+        Gui.drawRect(0, this.height - 36, this.width, this.height, (int)(e*200) << 24 | 0x05070A);
+        Gui.drawRect(0, this.height - 36, this.width, this.height - 35, (int)(e*30) << 24 | 0xFFFFFF);
+        GlStateManager.popMatrix();
     }
 }

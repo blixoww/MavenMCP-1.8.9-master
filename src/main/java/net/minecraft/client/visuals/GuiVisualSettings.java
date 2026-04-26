@@ -93,7 +93,13 @@ public class GuiVisualSettings extends GuiScreen {
         GlStateManager.translate(0, (1.0f - ease) * 8, 0);
 
         GuiRenderUtils.drawShadow(panelX, panelY, panelW, panelH, 10, (int)(ease * 120));
-        Gui.drawRect(panelX, panelY, panelX + panelW, panelY + panelH, BG_DARK);
+        GuiRenderUtils.drawGradientRect(
+                panelX, panelY,
+                panelX + panelW, panelY + panelH,
+                0xF0101018,
+                0xF0181824
+        );
+        Gui.drawRect(panelX, panelY + 18, panelX + panelW, panelY + 19, 0x20FFFFFF);
         Gui.drawRect(panelX, panelY, panelX + panelW, panelY + 1, ACCENT);
         Gui.drawRect(panelX, panelY + 1, panelX + panelW, panelY + 18, BG_HEADER);
 
@@ -102,15 +108,37 @@ public class GuiVisualSettings extends GuiScreen {
 
         String resetText = "\u00A77[Reset]";
         int rtw = fontRendererObj.getStringWidth(resetText);
-        int rtx = panelX + panelW - rtw - 4;
+        int rtx = panelX + panelW - rtw - 8;
         boolean resetHover = mouseX >= rtx && mouseX < rtx + rtw && mouseY >= panelY + 3 && mouseY < panelY + 15;
         fontRendererObj.drawStringWithShadow(resetHover ? "\u00A7c[Reset]" : resetText, rtx, panelY + 5, 0xFFFFFFFF);
+
+        // ── Bouton RETOUR ─────────────────────────────────────
+        String backIcon = "<";
+        String backText = "RETOUR";
+        int bw = fontRendererObj.getStringWidth(backIcon + " " + backText) + 8;
+        int bh = 12;
+        int bx = panelX + 4;
+        int by = panelY + 3;
+        
+        boolean backHover = mouseX >= bx && mouseX < bx + bw && mouseY >= by && mouseY < by + bh;
+        
+        // Fond discret au survol
+        if (backHover) {
+            Gui.drawRect(bx, by, bx + bw, by + bh, 0x20FFFFFF);
+            GuiRenderUtils.drawRectOutline(bx, by, bw, bh, 0x30FFFFFF);
+        } else {
+            GuiRenderUtils.drawRectOutline(bx, by, bw, bh, 0x15FFFFFF);
+        }
+
+        int backColor = backHover ? 0xFFFFFFFF : 0xAAFFFFFF;
+        fontRendererObj.drawString(backIcon, bx + 3, by + 2, backColor);
+        fontRendererObj.drawString("\u00A77" + backText, bx + 11, by + 2, backHover ? 0xFFFFFFFF : 0xFFAAAAAA);
 
         GuiRenderUtils.drawRectOutline(panelX, panelY, panelW, panelH, BORDER);
 
         drawCategories(mouseX, mouseY);
         Gui.drawRect(panelX + catW, panelY + 18, panelX + catW + 1, panelY + panelH, 0x20FFFFFF);
-        
+
         int previewH = Math.min(60, panelH / 4);
         int clipTop = panelY + 20;
         int clipBottom = panelY + panelH - previewH - 2;
@@ -119,7 +147,15 @@ public class GuiVisualSettings extends GuiScreen {
         int factor = sr.getScaleFactor();
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         GL11.glScissor(settingsX * factor, (this.height - clipBottom) * factor, settingsW * factor, (clipBottom - clipTop) * factor);
-        
+
+        if (awaitingKeyBind != -1) {
+            drawCenteredString(fontRendererObj,
+                    "Appuyez sur une touche... (ESC pour annuler)",
+                    width / 2,
+                    panelY + panelH + 10,
+                    0xFFAAAAAA
+            );
+        }
         drawSettings(mouseX, mouseY);
         
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
@@ -139,12 +175,24 @@ public class GuiVisualSettings extends GuiScreen {
             float target = (hovered || selected) ? 1.0f : 0.0f;
             catHover[i] += (target - catHover[i]) * 0.2f;
             float t = catHover[i];
-            Gui.drawRect(panelX, y, panelX + catW, y + h, GuiRenderUtils.colorLerp(0x00000000, 0x30FFFFFF, t));
-            if (selected) Gui.drawRect(panelX, y, panelX + 2, y + h, ACCENT);
+            
+            int bg = GuiRenderUtils.colorLerp(0x00000000, 0x40FFFFFF, t);
+            Gui.drawRect(panelX, y, panelX + catW, y + h, bg);
+            
+            if (selected) {
+                Gui.drawRect(panelX, y, panelX + 2, y + h, ACCENT);
+                GuiRenderUtils.drawGradientRect(panelX + 2, y, panelX + catW, y + h, 0x15FFFFFF, 0x00000000);
+            } else if (hovered) {
+                Gui.drawRect(panelX, y + h - 1, panelX + catW, y + h, 0x40FFFFFF);
+            }
+
             int textColor = selected ? 0xFFFFFFFF : GuiRenderUtils.colorLerp(0xFF888888, 0xFFFFFFFF, t);
-            fontRendererObj.drawStringWithShadow(CATEGORIES[i], panelX + 6, y + (h - 8) / 2, textColor);
+            fontRendererObj.drawStringWithShadow(CATEGORIES[i], panelX + 8, y + (h - 8) / 2, textColor);
+            
             boolean enabled = isModuleEnabled(i);
-            Gui.drawRect(panelX + catW - 7, y + h / 2 - 2, panelX + catW - 3, y + h / 2 + 2, enabled ? 0xFF44CC44 : 0xFF663333);
+            int dotCol = enabled ? 0xFF44CC44 : 0xFF663333;
+            Gui.drawRect(panelX + catW - 8, y + h / 2 - 2, panelX + catW - 4, y + h / 2 + 2, dotCol);
+            
             y += h;
         }
     }
@@ -165,6 +213,12 @@ public class GuiVisualSettings extends GuiScreen {
             case 4: currentY = drawPingSettings(x, currentY, w, mx, my, y, y + availH); break;
         }
         maxScroll = Math.max(0, (currentY + scrollOffset) - (y + availH));
+    }
+
+    private void drawRowSeparator(int x, int y, int w, int ct, int cb) {
+        if (y >= ct && y <= cb) {
+            Gui.drawRect(x, y, x + w, y + 1, 0x08FFFFFF);
+        }
     }
 
     private int drawComboSettings(int x, int y, int w, int mx, int my, int ct, int cb) {
@@ -226,51 +280,27 @@ public class GuiVisualSettings extends GuiScreen {
     }
 
     private int drawPingSettings(int x, int y, int w, int mx, int my, int ct, int cb) {
-        // row 0
         y = drawToggle(x, y, w, "Activ\u00e9", pingSettings.enabled, mx, my, ct, cb);
-        // row 1
         y = drawToggle(x, y, w, "Pings \u00e9quipe visibles", pingSettings.showTeamPings, mx, my, ct, cb);
-        // row 2
         y = drawToggle(x, y, w, "Pings alli\u00e9s visibles", pingSettings.showAllyPings, mx, my, ct, cb);
-        // row 3
         y = drawToggle(x, y, w, "Pings amis visibles", pingSettings.showFriendPings, mx, my, ct, cb);
-        // row 4
         y = drawToggle(x, y, w, "Indicateur hors-\u00e9cran", pingSettings.showOffScreenIndicator, mx, my, ct, cb);
-        // row 5
         y = drawToggle(x, y, w, "Nom exp\u00e9diteur", pingSettings.showSenderName, mx, my, ct, cb);
-        // row 6
         y = drawToggle(x, y, w, "Distance", pingSettings.showDistance, mx, my, ct, cb);
-        // row 7
         y = drawToggle(x, y, w, "Son", pingSettings.soundEnabled, mx, my, ct, cb);
-        // row 8
         y = drawSlider(x, y, w, "Taille", pingSettings.scale, 0.5f, 3.0f, mx, my, ct, cb);
-        // row 9
         y = drawSlider(x, y, w, "\u00c9paisseur anneau", pingSettings.ringThickness, 0.5f, 6.0f, mx, my, ct, cb);
-        // row 10
         y = drawSlider(x, y, w, "Port\u00e9e (blocs)", (float) pingSettings.maxRange, 16f, 256f, mx, my, ct, cb);
-        // row 11
         y = drawSlider(x, y, w, "Dur\u00e9e (s)", pingSettings.durationMs / 1000.0f, 1f, 15f, mx, my, ct, cb);
-        // row 12
         y = drawSlider(x, y, w, "Cooldown (s)", pingSettings.cooldownMs / 1000.0f, 0.5f, 10f, mx, my, ct, cb);
-        // row 13
         y = drawEnum(x, y, w, "Style", new String[]{"Anneau", "Point", "Losange"}, pingSettings.markerStyle, mx, my, ct, cb);
-        // row 14
         y = drawColorSelector(x, y, w, "Couleur", pingSettings.color, mx, my, ct, cb, 9);
-        // ── Glow ─────────────────────────────────────────────────────────────
-        // row 15
         y = drawToggle(x, y, w, "Surbrillance (Glow)", pingSettings.glowEnabled, mx, my, ct, cb);
-        // row 16
         y = drawSlider(x, y, w, "Intensit\u00e9 glow", pingSettings.glowIntensity, 0.05f, 1.0f, mx, my, ct, cb);
-        // row 17
         y = drawSlider(x, y, w, "Passes glow", pingSettings.glowLayers, 1, 4, mx, my, ct, cb);
-        // row 18
         y = drawToggle(x, y, w, "Couleur glow auto", pingSettings.glowColorAuto, mx, my, ct, cb);
-        // row 19
         y = drawKeyBind(x, y, w, "Touche Ping", pingSettings.keyCode, 0, mx, my, ct, cb);
-        // ── Scale à distance ──────────────────────────────────────────────────
-        // row 20
         y = drawToggle(x, y, w, "Scale \u00e0 distance", pingSettings.distanceScaleEnabled, mx, my, ct, cb);
-        // row 21
         y = drawSlider(x, y, w, "Facteur scale", pingSettings.distanceScaleFactor, 0.0f, 1.5f, mx, my, ct, cb);
         return y;
     }
@@ -286,19 +316,12 @@ public class GuiVisualSettings extends GuiScreen {
         boolean hovered = mx >= kx && mx < kx + kw && my >= y && my < y + 14;
         int keyColor = waiting ? 0xFFFFFF44 : (hovered ? 0xFFFFFFFF : 0xFFFF8888);
         fontRendererObj.drawStringWithShadow(keyName, kx, y + 3, keyColor);
+        drawRowSeparator(x, y + 15, w, ct, cb);
         return y + 16;
     }
 
-    /**
-     * Retourne le nom lisible d'un keyCode, qu'il soit clavier ou souris.
-     * Convention MC : bouton souris = (mouseButton - 100), donc valeurs < 0.
-     *  -100 = bouton 0 (gauche)
-     *  -99  = bouton 1 (droit)
-     *  -98  = bouton 2 (molette / milieu)
-     */
     private static String getKeyDisplayName(int keyCode) {
         if (keyCode < 0) {
-            // Bouton souris
             int btn = keyCode + 100;
             switch (btn) {
                 case 0:  return "Clic Gauche";
@@ -322,11 +345,12 @@ public class GuiVisualSettings extends GuiScreen {
         int tw = 22, th = 10;
         int tx = x + w - tw;
         int ty = y + 2;
-        int bg = value ? 0xFF1A7A4A : 0xFF2A2A3A;
+        int bg = value ? ACCENT : 0xFF2A2A3A;
         Gui.drawRect(tx, ty, tx + tw, ty + th, bg);
         GuiRenderUtils.drawRectOutline(tx, ty, tw, th, 0x1AFFFFFF);
         int knobX = value ? tx + tw - th + 1 : tx + 1;
-        Gui.drawRect(knobX, ty + 1, knobX + th - 2, ty + th - 1, 0xFFEEEEEE);
+        Gui.drawRect(knobX, ty + 1, knobX + th - 2, ty + th - 1, value ? 0xFFFFFFFF : 0xFFAAAAAA);
+        drawRowSeparator(x, y + 15, w, ct, cb);
         return y + 16;
     }
 
@@ -335,20 +359,28 @@ public class GuiVisualSettings extends GuiScreen {
         fontRendererObj.drawStringWithShadow(label, x, y + 3, 0xFFCCCCCC);
         
         String valStr = (max > 10 && min >= 1) ? String.valueOf((int) value) : String.format("%.2f", value);
-        
+
         int sx = x + w - SW - TW - GAP;
         int sy = y + 7;
         
-        // Texte fixe à droite
-        int tx = x + w - TW;
-        fontRendererObj.drawStringWithShadow(valStr, tx + (TW - fontRendererObj.getStringWidth(valStr)), y + 3, 0xFFFF8888);
+        // Background track
+        Gui.drawRect(sx, sy + 1, sx + SW, sy + 2, 0xFF2A2A3A);
         
-        // Barre fixe
-        Gui.drawRect(sx, sy, sx + SW, sy + 3, 0xFF2A2A3A);
         float ratio = MathHelper.clamp_float((value - min) / (max - min), 0, 1);
         int filledW = (int)(SW * ratio);
-        Gui.drawRect(sx, sy, sx + filledW, sy + 3, ACCENT);
-        Gui.drawRect(sx + filledW - 2, sy - 1, sx + filledW + 2, sy + 4, 0xFFEEEEEE);
+        
+        // Filled track
+        Gui.drawRect(sx, sy + 1, sx + filledW, sy + 2, ACCENT);
+        
+        // Knob
+        int knobX = sx + filledW;
+        Gui.drawRect(knobX - 2, sy - 1, knobX + 2, sy + 4, 0xFFEEEEEE);
+        GuiRenderUtils.drawRectOutline(knobX - 2, sy - 1, 4, 5, 0x40000000);
+
+        int tx = x + w - TW;
+        fontRendererObj.drawStringWithShadow(valStr, tx + (TW - fontRendererObj.getStringWidth(valStr)), y + 3, 0xFFFF8888);
+
+        drawRowSeparator(x, y + 15, w, ct, cb);
         return y + 16;
     }
 
@@ -360,6 +392,7 @@ public class GuiVisualSettings extends GuiScreen {
         int dx = x + w - dw;
         boolean hovered = mx >= dx && mx < dx + dw && my >= y && my < y + 14;
         fontRendererObj.drawStringWithShadow(display, dx, y + 3, hovered ? 0xFFFFFFFF : 0xFFFF8888);
+        drawRowSeparator(x, y + 15, w, ct, cb);
         return y + 16;
     }
 
@@ -371,8 +404,6 @@ public class GuiVisualSettings extends GuiScreen {
         int cy = y + 2;
         String left = "<";
         String right = ">";
-        int lw = fontRendererObj.getStringWidth(left);
-        int rw = fontRendererObj.getStringWidth(right);
         int lx = cx - 14;
         int rx = cx + sz + 4;
         boolean hL = mx >= lx && mx < lx + 10 && my >= y && my < y + 14;
@@ -381,6 +412,7 @@ public class GuiVisualSettings extends GuiScreen {
         fontRendererObj.drawStringWithShadow(right, rx, y + 3, hR ? 0xFFFFFFFF : 0xFFAAAAAA);
         Gui.drawRect(cx, cy, cx + sz, cy + sz, color | 0xFF000000);
         GuiRenderUtils.drawRectOutline(cx, cy, sz, sz, 0x44FFFFFF);
+        drawRowSeparator(x, y + 15, w, ct, cb);
         return y + 16;
     }
 
@@ -519,9 +551,6 @@ public class GuiVisualSettings extends GuiScreen {
         int baseColor = pingSettings.color != 0
             ? (pingSettings.color | 0xFF000000)
             : (net.minecraft.client.visuals.ping.PingType.PING.defaultColor | 0xFF000000);
-        int cr = (baseColor >> 16) & 0xFF;
-        int cg = (baseColor >>  8) & 0xFF;
-        int cb =  baseColor        & 0xFF;
 
         float cycle = (elapsed % 2000) / 2000.0f;
         float alpha = cycle > 0.8f ? 1.0f - (cycle - 0.8f) / 0.2f : 1.0f;
@@ -529,7 +558,6 @@ public class GuiVisualSettings extends GuiScreen {
         int ca = (int)(alpha * 220);
         int ringR = (int)(20 * pingSettings.scale * pulse);
 
-        // ── Glow preview ─────────────────────────────────────────────────────
         if (pingSettings.glowEnabled) {
             int layers = Math.max(1, Math.min(pingSettings.glowLayers, 4));
             for (int pass = layers; pass >= 1; pass--) {
@@ -546,19 +574,14 @@ public class GuiVisualSettings extends GuiScreen {
             }
         }
 
-        // ── Marqueur selon style ──────────────────────────────────────────────
         if (pingSettings.markerStyle == 2) {
-            // Losange
             int d = ringR;
             Gui.drawRect(cx - 1, cy - d, cx + 2, cy + d, (ca << 24) | (baseColor & 0x00FFFFFF));
             Gui.drawRect(cx - d, cy - 1, cx + d, cy + 2, (ca << 24) | (baseColor & 0x00FFFFFF));
-            // Centre blanc
             Gui.drawRect(cx - 2, cy - 2, cx + 3, cy + 3, (ca << 24) | 0xFFFFFF);
         } else if (pingSettings.markerStyle == 1) {
-            // Point + rayons
             int pr = (int)(5 * pingSettings.scale);
             Gui.drawRect(cx - pr, cy - pr, cx + pr, cy + pr, ((int)(alpha * 200) << 24) | (baseColor & 0x00FFFFFF));
-            // Rayons
             for (int i = 0; i < 4; i++) {
                 double angle = Math.PI * i / 2.0;
                 int r2 = (int)(ringR * 0.7f);
@@ -570,29 +593,24 @@ public class GuiVisualSettings extends GuiScreen {
                 }
             }
         } else {
-            // Anneau + croix
             for (int i = 0; i < 32; i++) {
                 double angle = 2.0 * Math.PI * i / 32;
                 int px2 = cx + (int)(Math.cos(angle) * ringR);
                 int py2 = cy + (int)(Math.sin(angle) * ringR);
                 Gui.drawRect(px2, py2, px2 + 2, py2 + 2, (ca << 24) | (baseColor & 0x00FFFFFF));
             }
-            // Croix intérieure
             int cl = (int)(ringR * 0.55f);
             int cg2 = (int)(ringR * 0.15f);
             Gui.drawRect(cx + cg2, cy, cx + cl, cy + 1, ((int)(ca * 0.7f) << 24) | (baseColor & 0x00FFFFFF));
             Gui.drawRect(cx - cl,  cy, cx - cg2, cy + 1, ((int)(ca * 0.7f) << 24) | (baseColor & 0x00FFFFFF));
             Gui.drawRect(cx, cy + cg2, cx + 1, cy + cl, ((int)(ca * 0.7f) << 24) | (baseColor & 0x00FFFFFF));
             Gui.drawRect(cx, cy - cl, cx + 1, cy - cg2, ((int)(ca * 0.7f) << 24) | (baseColor & 0x00FFFFFF));
-            // Centre blanc
             Gui.drawRect(cx - 2, cy - 2, cx + 3, cy + 3, (ca << 24) | 0xFFFFFF);
         }
 
-        // Ligne verticale
         int lineH = 22;
         Gui.drawRect(cx, cy - lineH, cx + 1, cy, (ca << 24) | (baseColor & 0x00FFFFFF));
 
-        // Labels style + glow
         String[] styleNames = {"Anneau+Croix", "Point", "Losange"};
         String sn = styleNames[pingSettings.markerStyle];
         int labelA = (int)(alpha * 150);
@@ -614,17 +632,12 @@ public class GuiVisualSettings extends GuiScreen {
     protected void mouseClicked(int mx, int my, int btn) throws IOException {
         super.mouseClicked(mx, my, btn);
 
-        // Si on attend une keybind pour le Ping, capturer les boutons souris ici
         if (awaitingKeyBind == 0) {
             if (btn == 1 || btn == 2 || btn == 0) {
-                // btn: 0=left,1=right,2=middle
                 if (btn == 0) {
-                    // clic gauche: annuler la capture et laisser le clic continuer à traiter l'UI
                     awaitingKeyBind = -1;
-                    // ne pas return; laisser le traitement suivant
                 } else {
-                    // Clic droit ou molette -> enregistrer comme binding
-                    int keyCode = btn - 100; // convention GameSettings
+                    int keyCode = btn - 100;
                     pingSettings.keyCode = keyCode;
                     mc.gameSettings.keyBindPing.setKeyCode(keyCode);
                     net.minecraft.client.settings.KeyBinding.resetKeyBindingArrayAndHash();
@@ -636,19 +649,23 @@ public class GuiVisualSettings extends GuiScreen {
             }
         }
 
-        // Si le clic n'est pas gauche, on ne gère pas la suite (UI principale n'utilise que le clic gauche)
+        // Bouton Retour - Zone de clic ajustée (bw = environ 46px)
+        if (mx >= panelX + 4 && mx < panelX + 50 && my >= panelY + 3 && my < panelY + 15) {
+            settings.save();
+            this.mc.displayGuiScreen(parent);
+            return;
+        }
+
         if (btn != 0) return;
 
         int rtw = fontRendererObj.getStringWidth("\u00A77[Reset]");
-        int rtx = panelX + panelW - rtw - 4;
+        int rtx = panelX + panelW - rtw - 8;
         if (mx >= rtx && mx < rtx + rtw && my >= panelY + 3 && my < panelY + 15) {
             settings = new VisualSettings();
             settings.save();
             VisualManager.getInstance().setSettings(settings);
-            // Reset ping settings aussi
             pingSettings = net.minecraft.client.visuals.ping.PingSettings.resetToDefaultAndSave();
             PingManager.INSTANCE.setSettings(pingSettings);
-            // Mettre à jour la keyBind globale et appliquer
             mc.gameSettings.keyBindPing.setKeyCode(pingSettings.keyCode);
             net.minecraft.client.settings.KeyBinding.resetKeyBindingArrayAndHash();
             PingManager.INSTANCE.applyStoredKeyBinding();
@@ -700,7 +717,6 @@ public class GuiVisualSettings extends GuiScreen {
             case 3: handleHeartClick(row, mx, x, w); break;
             case 4: handlePingClick(row, mx, x, w, baseY + row * 16); break;
         }
-        // settings.save() retiré d'ici pour éviter lag pendant drag
     }
 
     private void handleComboClick(int row, int mx, int x, int w) {
@@ -764,7 +780,6 @@ public class GuiVisualSettings extends GuiScreen {
         if (isOverEnum(mx, x, w)) {
             if (row == 13) { pingSettings.markerStyle = (pingSettings.markerStyle + 1) % 3; pingSettings.save(); }
         }
-        // Touche Ping (row 19)
         if (row == 19) { awaitingKeyBind = 0; }
         handleColorClick(row, mx, x, w, 14, 9);
     }
@@ -845,8 +860,6 @@ public class GuiVisualSettings extends GuiScreen {
         int sx = x + w - SW - TW - GAP;
 
         if (draggingSlider == -1) {
-            // Ne démarre un drag que si le clic initial était sur la barre du slider,
-            // évite de régler la valeur à 1 quand on clique sur le label (côté gauche)
             if (mx < sx) return;
             draggingSlider = row;
         }
@@ -917,9 +930,8 @@ public class GuiVisualSettings extends GuiScreen {
 
     @Override
     protected void keyTyped(char c, int keyCode) throws IOException {
-        // Capture d'une touche pour la keybind Ping
         if (awaitingKeyBind == 0) {
-            if (keyCode == 1) { // Échap = annuler
+            if (keyCode == 1) {
                 awaitingKeyBind = -1;
                 return;
             }

@@ -13,11 +13,24 @@ public abstract class GuiResourcePackList extends GuiListExtended
 
     public GuiResourcePackList(Minecraft mcIn, int p_i45055_2_, int p_i45055_3_, List<ResourcePackListEntry> p_i45055_4_)
     {
-        super(mcIn, p_i45055_2_, p_i45055_3_, 32, p_i45055_3_ - 55 + 4, 36);
+        super(mcIn, p_i45055_2_, p_i45055_3_, 52, p_i45055_3_ - 55 + 4, 36);
         this.mc = mcIn;
         this.field_148204_l = p_i45055_4_;
         this.field_148163_i = false;
+        this.renderBackground = false; // pas de fond "terre"
         this.setHasListHeader(true, (int)((float)mcIn.fontRendererObj.FONT_HEIGHT * 1.5F));
+    }
+
+    /** Pas de fond dirt. */
+    @Override
+    protected void drawBackground() { /* transparent */ }
+
+    /** Remplace les zones dirt haut/bas par un dégradé sombre. */
+    @Override
+    protected void overlayBackground(int startY, int endY, int startAlpha, int endAlpha)
+    {
+        GuiRenderUtils.drawGradientRect(this.left, startY, this.right, endY,
+                (startAlpha << 24) | 0x080B10, (endAlpha << 24) | 0x080B10);
     }
 
     /**

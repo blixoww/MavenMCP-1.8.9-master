@@ -13,12 +13,16 @@ import net.minecraft.util.ResourceLocation;
 
 public class GuiScreenOptionsSounds extends GuiScreen
 {
-    private final GuiScreen field_146505_f;
+    private static final int ACCENT = 0xFFDC1E1E;
 
-    /** Reference to the GameSettings object. */
+    private final GuiScreen field_146505_f;
     private final GameSettings game_settings_4;
     protected String field_146507_a = "Options";
     private String field_146508_h;
+
+    private float animation = 0f;
+    private long  animLastTime = -1L;
+    private int[] btnYCache;
 
     public GuiScreenOptionsSounds(GuiScreen p_i45025_1_, GameSettings p_i45025_2_)
     {
@@ -26,140 +30,182 @@ public class GuiScreenOptionsSounds extends GuiScreen
         this.game_settings_4 = p_i45025_2_;
     }
 
-    /**
-     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
-     * window resizes, the buttonList is cleared beforehand.
-     */
     public void initGui()
     {
+        this.buttonList.clear();
+        this.animation = 0f; this.animLastTime = -1L;
+        this.field_146507_a = I18n.format("options.sounds.title");
+        this.field_146508_h  = I18n.format("options.off");
+
+        int btnW = 150, btnH = 28, gap = 4;
         int i = 0;
-        this.field_146507_a = I18n.format("options.sounds.title", new Object[0]);
-        this.field_146508_h = I18n.format("options.off", new Object[0]);
-        this.buttonList.add(new GuiScreenOptionsSounds.Button(SoundCategory.MASTER.getCategoryId(), this.width / 2 - 155 + i % 2 * 160, this.height / 6 - 12 + 24 * (i >> 1), SoundCategory.MASTER, true));
-        i = i + 2;
-
-        for (SoundCategory soundcategory : SoundCategory.values())
-        {
-            if (soundcategory != SoundCategory.MASTER)
-            {
-                this.buttonList.add(new GuiScreenOptionsSounds.Button(soundcategory.getCategoryId(), this.width / 2 - 155 + i % 2 * 160, this.height / 6 - 12 + 24 * (i >> 1), soundcategory, false));
-                ++i;
-            }
+        // MASTER : pleine largeur
+        this.buttonList.add(new SoundSlider(SoundCategory.MASTER.getCategoryId(),
+                this.width / 2 - btnW - 5, 50 + i * (btnH + gap),
+                btnW * 2 + 10, btnH, SoundCategory.MASTER));
+        i += 2;
+        for (SoundCategory cat : SoundCategory.values()) {
+            if (cat == SoundCategory.MASTER) continue;
+            int bx = this.width / 2 + (i % 2 == 0 ? -btnW - 5 : 5);
+            int by = 50 + (i / 2) * (btnH + gap);
+            this.buttonList.add(new SoundSlider(cat.getCategoryId(), bx, by, btnW, btnH, cat));
+            ++i;
         }
-
-        this.buttonList.add(new GuiButton(200, this.width / 2 - 100, this.height / 6 + 168, I18n.format("gui.done", new Object[0])));
+        int doneY = 50 + ((i + 1) / 2) * (btnH + gap) + 8;
+        this.buttonList.add(new GuiMenuButton(200, this.width / 2 - 75, doneY, 150, 22, "DONE", true));
+        this.btnYCache = new int[this.buttonList.size()];
     }
 
-    /**
-     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
-     */
     protected void actionPerformed(GuiButton button) throws IOException
     {
-        if (button.enabled)
-        {
-            if (button.id == 200)
-            {
-                this.mc.gameSettings.saveOptions();
-                this.mc.displayGuiScreen(this.field_146505_f);
-            }
+        if (button.enabled && button.id == 200) {
+            this.mc.gameSettings.saveOptions();
+            this.mc.displayGuiScreen(this.field_146505_f);
         }
     }
 
-    /**
-     * Draws the screen and all the components in it. Args : mouseX, mouseY, renderPartialTicks
-     */
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
+        long now = Minecraft.getSystemTime();
+        if (animLastTime != -1L) animation = MathHelper.clamp_float(animation + (now - animLastTime) / 250f, 0f, 1f);
+        animLastTime = now;
+        float e = animation * animation * (3f - 2f * animation);
+
         this.drawDefaultBackground();
-        this.drawCenteredString(this.fontRendererObj, this.field_146507_a, this.width / 2, 15, 16777215);
+        Gui.drawRect(0, 0, this.width, 36, (int)(e*210) << 24 | 0x05070A);
+        Gui.drawRect(0, 36, this.width, 37, (int)(e*255) << 24 | (ACCENT & 0xFFFFFF));
+        GuiRenderUtils.drawGradientRect(0, 37, this.width, 52, (int)(e*80) << 24 | 0x05070A, 0x00000000);
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(0, (1f - e) * 8, 0);
+
+        int ta = (int)(e * 255) << 24;
+        String t1 = "§c§lOPTIONS ";
+        String t2 = "§f§lSONS";
+        int tw = fontRendererObj.getStringWidth(t1) + fontRendererObj.getStringWidth(t2);
+        int tx = this.width / 2 - tw / 2;
+        fontRendererObj.drawStringWithShadow(t1, tx, 13, ta | 0xFFFFFF);
+        fontRendererObj.drawStringWithShadow(t2, tx + fontRendererObj.getStringWidth(t1), 13, ta | 0xFFFFFF);
+        int dw2 = (int)((tw + 20) * e);
+        Gui.drawRect(this.width/2 - dw2/2, 26, this.width/2 + dw2/2, 27, (int)(e*45) << 24 | 0xFFFFFF);
+
+        if (btnYCache == null || btnYCache.length != this.buttonList.size()) btnYCache = new int[this.buttonList.size()];
+        for (int i2 = 0; i2 < this.buttonList.size(); i2++) {
+            GuiButton b = this.buttonList.get(i2);
+            btnYCache[i2] = b.yPosition;
+            float ba = MathHelper.clamp_float(animation * 2f - i2 * 0.07f, 0f, 1f);
+            ba = ba * ba * (3f - 2f * ba);
+            b.yPosition += (int)((1f - ba) * 12);
+        }
         super.drawScreen(mouseX, mouseY, partialTicks);
+        for (int i2 = 0; i2 < this.buttonList.size(); i2++) this.buttonList.get(i2).yPosition = btnYCache[i2];
+
+        Gui.drawRect(0, this.height - 36, this.width, this.height, (int)(e*200) << 24 | 0x05070A);
+        Gui.drawRect(0, this.height - 36, this.width, this.height - 35, (int)(e*30) << 24 | 0xFFFFFF);
+        GlStateManager.popMatrix();
     }
 
-    protected String getSoundVolume(SoundCategory p_146504_1_)
+    protected String getSoundVolume(SoundCategory cat)
     {
-        float f = this.game_settings_4.getSoundLevel(p_146504_1_);
-        return f == 0.0F ? this.field_146508_h : (int)(f * 100.0F) + "%";
+        float f = this.game_settings_4.getSoundLevel(cat);
+        return f == 0f ? this.field_146508_h : (int)(f * 100f) + "%";
     }
 
-    class Button extends GuiButton
+    // ── Slider stylé pour les catégories son ──────────────────────────────
+    class SoundSlider extends GuiButton
     {
-        private final SoundCategory field_146153_r;
-        private final String field_146152_s;
-        public float field_146156_o = 1.0F;
-        public boolean field_146155_p;
+        private final SoundCategory category;
+        private final String        label;
+        private float sliderValue;
+        private boolean dragging;
+        private float hover = 0f;
+        private long  hoverTime = -1L;
 
-        public Button(int p_i45024_2_, int p_i45024_3_, int p_i45024_4_, SoundCategory p_i45024_5_, boolean p_i45024_6_)
+        SoundSlider(int id, int x, int y, int w, int h, SoundCategory cat)
         {
-            super(p_i45024_2_, p_i45024_3_, p_i45024_4_, p_i45024_6_ ? 310 : 150, 20, "");
-            this.field_146153_r = p_i45024_5_;
-            this.field_146152_s = I18n.format("soundCategory." + p_i45024_5_.getCategoryName(), new Object[0]);
-            this.displayString = this.field_146152_s + ": " + GuiScreenOptionsSounds.this.getSoundVolume(p_i45024_5_);
-            this.field_146156_o = GuiScreenOptionsSounds.this.game_settings_4.getSoundLevel(p_i45024_5_);
+            super(id, x, y, w, h, "");
+            this.category   = cat;
+            this.label      = I18n.format("soundCategory." + cat.getCategoryName());
+            this.sliderValue = GuiScreenOptionsSounds.this.game_settings_4.getSoundLevel(cat);
         }
 
-        protected int getHoverState(boolean mouseOver)
+        protected int getHoverState(boolean mo) { return 0; }
+
+        public void drawButton(Minecraft mc, int mx, int my)
         {
-            return 0;
+            if (!this.visible) return;
+            long now = Minecraft.getSystemTime();
+            float dt = (hoverTime < 0) ? 0f : (float)(now - hoverTime);
+            hoverTime = now;
+            this.hovered = mx >= xPosition && my >= yPosition && mx < xPosition + width && my < yPosition + height;
+            hover = MathHelper.clamp_float(hover + (hovered ? dt / 120f : -dt / 120f), 0f, 1f);
+            float t = hover * hover * (3f - 2f * hover);
+
+            GlStateManager.pushMatrix();
+            GlStateManager.enableBlend();
+            GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+
+            int bg = (int)(20 + t*25) << 24 | 0x1A1A1A;
+            Gui.drawRect(xPosition, yPosition, xPosition + width, yPosition + height, bg);
+            int border = GuiRenderUtils.colorLerp(0x30FFFFFF, 0xFFDC1E1E, t);
+            GuiRenderUtils.drawRectOutline(xPosition, yPosition, width, height, border);
+
+            // Label
+            int lc = GuiRenderUtils.colorLerp(0xFF707880, 0xFFE0E0E0, t);
+            mc.fontRendererObj.drawStringWithShadow(label, xPosition + 6, yPosition + 5, lc);
+
+            // Track
+            int ty = yPosition + height - 8;
+            int tx1 = xPosition + 6, tx2 = xPosition + width - 6, tw2 = tx2 - tx1;
+            Gui.drawRect(tx1, ty, tx2, ty + 3, 0xFF0D1017);
+            int fill = (int)(sliderValue * tw2);
+            if (fill > 0) Gui.drawRect(tx1, ty, tx1 + fill, ty + 3, 0xFFDC1E1E);
+            // Thumb
+            int thumbX = tx1 + fill - 3;
+            Gui.drawRect(thumbX, ty - 2, thumbX + 6, ty + 5,
+                    GuiRenderUtils.colorLerp(0xFFAAAAAA, 0xFFFFFFFF, t));
+
+            // Valeur
+            String vol = GuiScreenOptionsSounds.this.getSoundVolume(category);
+            int vw = mc.fontRendererObj.getStringWidth(vol);
+            mc.fontRendererObj.drawString(vol, xPosition + width - vw - 6, yPosition + 5,
+                    GuiRenderUtils.colorLerp(0xFFAAAAAA, 0xFFFFFFFF, t));
+
+            GlStateManager.disableBlend();
+            GlStateManager.popMatrix();
         }
 
         protected void mouseDragged(Minecraft mc, int mouseX, int mouseY)
         {
-            if (this.visible)
-            {
-                if (this.field_146155_p)
-                {
-                    this.field_146156_o = (float)(mouseX - (this.xPosition + 4)) / (float)(this.width - 8);
-                    this.field_146156_o = MathHelper.clamp_float(this.field_146156_o, 0.0F, 1.0F);
-                    mc.gameSettings.setSoundLevel(this.field_146153_r, this.field_146156_o);
-                    mc.gameSettings.saveOptions();
-                    this.displayString = this.field_146152_s + ": " + GuiScreenOptionsSounds.this.getSoundVolume(this.field_146153_r);
-                }
-
-                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-                this.drawTexturedModalRect(this.xPosition + (int)(this.field_146156_o * (float)(this.width - 8)), this.yPosition, 0, 66, 4, 20);
-                this.drawTexturedModalRect(this.xPosition + (int)(this.field_146156_o * (float)(this.width - 8)) + 4, this.yPosition, 196, 66, 4, 20);
+            if (this.visible && this.dragging) {
+                int tx1 = xPosition + 6, tw2 = width - 12;
+                sliderValue = MathHelper.clamp_float((float)(mouseX - tx1) / tw2, 0f, 1f);
+                mc.gameSettings.setSoundLevel(category, sliderValue);
+                mc.gameSettings.saveOptions();
             }
         }
 
         public boolean mousePressed(Minecraft mc, int mouseX, int mouseY)
         {
-            if (super.mousePressed(mc, mouseX, mouseY))
-            {
-                this.field_146156_o = (float)(mouseX - (this.xPosition + 4)) / (float)(this.width - 8);
-                this.field_146156_o = MathHelper.clamp_float(this.field_146156_o, 0.0F, 1.0F);
-                mc.gameSettings.setSoundLevel(this.field_146153_r, this.field_146156_o);
+            if (super.mousePressed(mc, mouseX, mouseY)) {
+                int tx1 = xPosition + 6, tw2 = width - 12;
+                sliderValue = MathHelper.clamp_float((float)(mouseX - tx1) / tw2, 0f, 1f);
+                mc.gameSettings.setSoundLevel(category, sliderValue);
                 mc.gameSettings.saveOptions();
-                this.displayString = this.field_146152_s + ": " + GuiScreenOptionsSounds.this.getSoundVolume(this.field_146153_r);
-                this.field_146155_p = true;
+                this.dragging = true;
                 return true;
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
 
-        public void playPressSound(SoundHandler soundHandlerIn)
-        {
-        }
+        public void playPressSound(SoundHandler sh) {}
 
         public void mouseReleased(int mouseX, int mouseY)
         {
-            if (this.field_146155_p)
-            {
-                if (this.field_146153_r == SoundCategory.MASTER)
-                {
-                    float f = 1.0F;
-                }
-                else
-                {
-                    GuiScreenOptionsSounds.this.game_settings_4.getSoundLevel(this.field_146153_r);
-                }
-
-                GuiScreenOptionsSounds.this.mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
-            }
-
-            this.field_146155_p = false;
+            if (this.dragging)
+                GuiScreenOptionsSounds.this.mc.getSoundHandler()
+                        .playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1f));
+            this.dragging = false;
         }
     }
 }

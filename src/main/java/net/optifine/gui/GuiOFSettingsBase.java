@@ -40,6 +40,9 @@ public abstract class GuiOFSettingsBase extends GuiScreen {
     /** ID du bouton Done */
     protected static final int BTN_DONE = 200;
 
+    // Cache pour le stagger animation des boutons
+    private int[] btnYCache;
+
     // ── Sous-classes doivent implémenter ────────────────────────────────────
 
     /** Retourne le tableau d'options à afficher dans la grille. */
@@ -61,9 +64,10 @@ public abstract class GuiOFSettingsBase extends GuiScreen {
 
     @Override
     public void initGui() {
+        this.animation = 0.0f;
+        this.lastTime  = -1L;
         this.title = buildTitle();
         this.buttonList.clear();
-        this.lastTime = Minecraft.getSystemTime();
 
         GameSettings.Options[] opts = getOptions();
         int cx       = this.width  / 2;
@@ -136,54 +140,45 @@ public abstract class GuiOFSettingsBase extends GuiScreen {
         lastTime = now;
         float e = animation * animation * (3.0f - 2.0f * animation);
 
-        // Fond : gradient du monde visible derrière, puis léger overlay sombre
+        // ── Fond du jeu (dirt/options background) ────────────────────────────
         this.drawDefaultBackground();
-        Gui.drawRect(0, 0, this.width, this.height, (int)(e * 140) << 24 | 0x050505);
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(0, (1.0f - e) * 10, 0);
 
-        int textAlpha = (int)(e * 255) << 24;
+        int ta = (int)(e * 255) << 24;
+
+        // ── Ombre douce + ligne rouge — style "Options Sons" ─────────────────
+        GuiRenderUtils.drawGradientRect(0, 0, this.width, 40,
+                (int)(e * 160) << 24 | 0x000000, 0x00000000);
+        Gui.drawRect(0, 0, this.width, 1, ta | (ACCENT & 0xFFFFFF));
+
+        // ── Titre flottant centré ────────────────────────────────────────────
         int cx = this.width / 2;
+        String t1 = "§c§lRED ", t2 = "§f§lCONFLICT", sep = " §8| §7";
+        int w1 = fr(t1), w2 = fr(t2), w3 = fr(sep), w4 = fr(title);
+        int tX = cx - (w1 + w2 + w3 + w4) / 2;
+        this.fontRendererObj.drawStringWithShadow(t1,    tX,                     11, ta | 0xFFFFFF);
+        this.fontRendererObj.drawStringWithShadow(t2,    tX + w1,                11, ta | 0xFFFFFF);
+        this.fontRendererObj.drawStringWithShadow(sep,   tX + w1 + w2,           11, ta | 0xFFFFFF);
+        this.fontRendererObj.drawStringWithShadow(title, tX + w1 + w2 + w3,      11, ta | 0xFFFFFF);
+        // Diviseur animé sous le titre
+        int divW = (int)((w1 + w2 + w3 + w4 + 20) * e);
+        Gui.drawRect(cx - divW / 2, 23, cx + divW / 2, 24, (int)(e * 60) << 24 | 0xFFFFFF);
 
-        // ── Header bar (full width) ──────────────────────────────────────────
-        Gui.drawRect(0, 0, this.width, HEADER_H, (int)(e * 220) << 24 | 0x0C0C0C);
-        Gui.drawRect(0, 0, this.width, 1, textAlpha | (ACCENT & 0xFFFFFF));
-        Gui.drawRect(0, HEADER_H - 1, this.width, HEADER_H, (int)(e * 40) << 24 | 0xFFFFFF);
-
-        // Titre "RED CONFLICT | <sous-titre>"
-        String t1  = "§c§lRED ", t2 = "§f§lCONFLICT", sep = " §8| §7";
-        int w1 = fr(t1), w2 = fr(t2), w3 = fr(sep);
-        int tX = cx - (w1 + w2 + w3 + fr(title)) / 2;
-        int tY = (HEADER_H - 8) / 2;
-        this.fontRendererObj.drawStringWithShadow(t1,   tX,                tY, textAlpha | 0xFFFFFF);
-        this.fontRendererObj.drawStringWithShadow(t2,   tX + w1,           tY, textAlpha | 0xFFFFFF);
-        this.fontRendererObj.drawStringWithShadow(sep,  tX + w1 + w2,      tY, textAlpha | 0xFFFFFF);
-        this.fontRendererObj.drawStringWithShadow(title,tX + w1 + w2 + w3, tY, textAlpha | 0xFFFFFF);
-
-        // ── Content panel ────────────────────────────────────────────────────
-        GameSettings.Options[] opts = getOptions();
-        int rows      = (opts.length + 1) / 2;
-        int extraRows = extraButtonRows();
-        int pX = cx - BTN_W - COL_GAP / 2 - 6;
-        int pW = BTN_W * 2 + COL_GAP + 12;
-        int pY = HEADER_H + 8;   // doit correspondre à initGui
-        // label (18px) + gap (4px) + grille + gap (8px) + extra rows + done + padding bas (8px)
-        int pH = 18 + 4
-               + rows * (BTN_H + BTN_GAP)
-               + 8
-               + extraRows * (BTN_H + BTN_GAP)
-               + BTN_H + 8;
-        GuiRenderUtils.drawShadow(pX, pY, pW, pH, 5, (int)(e * 80));
-        Gui.drawRect(pX, pY, pX + pW, pY + pH, (int)(e * 190) << 24 | 0x080808);
-        Gui.drawRect(pX, pY, pX + pW, pY + 1, textAlpha | (ACCENT & 0xFFFFFF));
-        GuiRenderUtils.drawRectOutline(pX, pY, pW, pH, (int)(e * 30) << 24 | 0xFFFFFF);
-
-        // Section header inside panel
-        GuiRenderUtils.drawSectionHeader(this.fontRendererObj, pX + 6, pY + 4, pW - 12, title, ACCENT);
-
-        // ── Boutons ───────────────────────────────────────────────────────────
+        // ── Stagger animation des boutons ────────────────────────────────────
+        if (btnYCache == null || btnYCache.length != this.buttonList.size())
+            btnYCache = new int[this.buttonList.size()];
+        for (int i = 0; i < this.buttonList.size(); i++) {
+            GuiButton b = this.buttonList.get(i);
+            btnYCache[i] = b.yPosition;
+            float ba = MathHelper.clamp_float(animation * 2f - i * 0.06f, 0f, 1f);
+            ba = ba * ba * (3f - 2f * ba);
+            b.yPosition += (int)((1f - ba) * 14);
+        }
         super.drawScreen(mouseX, mouseY, partialTicks);
+        for (int i = 0; i < this.buttonList.size(); i++)
+            this.buttonList.get(i).yPosition = btnYCache[i];
 
         GlStateManager.popMatrix();
     }

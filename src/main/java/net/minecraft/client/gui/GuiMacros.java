@@ -1,8 +1,10 @@
 package net.minecraft.client.gui;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.macro.MacroManager;
 import net.minecraft.client.macro.MacroManager.Macro;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.MathHelper;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -13,11 +15,11 @@ import java.util.stream.Collectors;
 
 public class GuiMacros extends GuiScreen {
     
-    // ── Palette de couleurs "Origins Premium" ────────────────────────────────
+    // ── Palette de couleurs "Red Conflict" (style GuiIngameMenu) ─────────────
     private static final int C_BG           = 0xEE0A0D14;
     private static final int C_HEADER       = 0xFF141926;
-    private static final int C_ACCENT       = 0xFF007FFF;
-    private static final int C_ACCENT_DIM   = 0xFF0055AA;
+    private static final int C_ACCENT       = 0xFFDC1E1E;
+    private static final int C_ACCENT_DIM   = 0xFF992222;
     private static final int C_TEXT         = 0xFFE0E0E0;
     private static final int C_TEXT_MUTED   = 0xFF707880;
     private static final int C_DANGER       = 0xFFEE4444;
@@ -28,8 +30,7 @@ public class GuiMacros extends GuiScreen {
 
     // Dimensions dynamiques
     private int px, py, pw, ph;
-    private float entryAnim = 0f;
-    
+
     // Formulaire
     private GuiTextField fieldCommand;
     private GuiTextField fieldSearch;
@@ -42,6 +43,10 @@ public class GuiMacros extends GuiScreen {
     private static final int ROW_H = 36;
     private int listY, listH;
     private String searchFilter = "";
+
+    // ── Animation entrée (style GuiIngameMenu) ────────────────────────────
+    private float animation = 0.0f;
+    private long  animLastTime = -1L;
 
     // Hover Animations State
     private final float[] rowHovers = new float[25];
@@ -60,7 +65,9 @@ public class GuiMacros extends GuiScreen {
     @Override
     public void initGui() {
         Keyboard.enableRepeatEvents(true);
-        
+        animation = 0.0f;
+        animLastTime = -1L;
+
         // --- Calcul RESPONSIVE ---
         // Le GUI prend 70% de l'écran en largeur/hauteur, mais reste entre 320 et 420px de large
         pw = GuiRenderUtils.clamp((int)(width * 0.7f), 320, 420);
@@ -100,14 +107,21 @@ public class GuiMacros extends GuiScreen {
 
     @Override
     public void drawScreen(int mx, int my, float pt) {
-        drawDefaultBackground();
-        entryAnim = GuiRenderUtils.lerp(entryAnim, 1.0f, 0.15f);
-        
-        float scale = 0.95f + 0.05f * entryAnim;
+        // ── Animation entrée style GuiIngameMenu ──────────────────────────
+        long now = Minecraft.getSystemTime();
+        if (animLastTime != -1L) {
+            float dt = (now - animLastTime) / 1000.0f;
+            animation = MathHelper.clamp_float(animation + dt * 4.0f, 0.0f, 1.0f);
+        }
+        animLastTime = now;
+
+        float eased = animation * animation * (3.0f - 2.0f * animation);
+
+        // Fond obscurci animé
+        this.drawRect(0, 0, this.width, this.height, (int)(eased * 155) << 24);
+
         GlStateManager.pushMatrix();
-        GlStateManager.translate(width/2f, height/2f, 0);
-        GlStateManager.scale(scale, scale, 1);
-        GlStateManager.translate(-width/2f, -height/2f, 0);
+        GlStateManager.translate(0, (1.0f - eased) * 10, 0);
 
         // ── Fenêtre Principale ────────────────────────────────────────────────
         GuiRenderUtils.drawRoundedPanel(px, py, pw, ph, C_BG, C_HEADER, 32, C_ACCENT);

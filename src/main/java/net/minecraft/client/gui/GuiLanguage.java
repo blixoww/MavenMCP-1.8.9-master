@@ -5,32 +5,27 @@ import com.google.common.collect.Maps;
 import java.io.IOException;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.resources.Language;
 import net.minecraft.client.resources.LanguageManager;
 import net.minecraft.client.settings.GameSettings;
+import net.minecraft.util.MathHelper;
 
 public class GuiLanguage extends GuiScreen
 {
-    /** The parent Gui screen */
+    private static final int ACCENT   = 0xFFDC1E1E;
+    private static final int C_SEL    = 0xFFDC1E1E;
+
     protected GuiScreen parentScreen;
-
-    /** The List GuiSlot object reference. */
     private GuiLanguage.List list;
-
-    /** Reference to the GameSettings object. */
     private final GameSettings game_settings_3;
-
-    /** Reference to the LanguageManager object. */
     private final LanguageManager languageManager;
+    private GuiMenuButton forceUnicodeFontBtn;
+    private GuiMenuButton confirmSettingsBtn;
 
-    /**
-     * A button which allows the user to determine if the Unicode font should be forced.
-     */
-    private GuiOptionButton forceUnicodeFontBtn;
-
-    /** The button to confirm the current settings. */
-    private GuiOptionButton confirmSettingsBtn;
+    private float animation = 0f;
+    private long  animLastTime = -1L;
 
     public GuiLanguage(GuiScreen screen, GameSettings gameSettingsObj, LanguageManager manager)
     {
@@ -39,127 +34,142 @@ public class GuiLanguage extends GuiScreen
         this.languageManager = manager;
     }
 
-    /**
-     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
-     * window resizes, the buttonList is cleared beforehand.
-     */
     public void initGui()
     {
-        this.buttonList.add(this.forceUnicodeFontBtn = new GuiOptionButton(100, this.width / 2 - 155, this.height - 38, GameSettings.Options.FORCE_UNICODE_FONT, this.game_settings_3.getKeyBinding(GameSettings.Options.FORCE_UNICODE_FONT)));
-        this.buttonList.add(this.confirmSettingsBtn = new GuiOptionButton(6, this.width / 2 - 155 + 160, this.height - 38, I18n.format("gui.done", new Object[0])));
+        this.animation = 0f; this.animLastTime = -1L;
+        this.buttonList.clear();
+        this.buttonList.add(this.forceUnicodeFontBtn = new GuiMenuButton(100,
+                this.width / 2 - 155, this.height - 38, 150, 20,
+                this.game_settings_3.getKeyBinding(GameSettings.Options.FORCE_UNICODE_FONT)));
+        this.buttonList.add(this.confirmSettingsBtn = new GuiMenuButton(6,
+                this.width / 2 - 155 + 160, this.height - 38, 150, 20,
+                "DONE", true));
         this.list = new GuiLanguage.List(this.mc);
         this.list.registerScrollButtons(7, 8);
     }
 
-    /**
-     * Handles mouse input.
-     */
     public void handleMouseInput() throws IOException
     {
         super.handleMouseInput();
         this.list.handleMouseInput();
     }
 
-    /**
-     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
-     */
     protected void actionPerformed(GuiButton button) throws IOException
     {
-        if (button.enabled)
-        {
-            switch (button.id)
-            {
-                case 5:
-                    break;
-
-                case 6:
-                    this.mc.displayGuiScreen(this.parentScreen);
-                    break;
-
-                case 100:
-                    if (button instanceof GuiOptionButton)
-                    {
-                        this.game_settings_3.setOptionValue(((GuiOptionButton)button).returnEnumOptions(), 1);
-                        button.displayString = this.game_settings_3.getKeyBinding(GameSettings.Options.FORCE_UNICODE_FONT);
-                        ScaledResolution scaledresolution = new ScaledResolution(this.mc);
-                        int i = scaledresolution.getScaledWidth();
-                        int j = scaledresolution.getScaledHeight();
-                        this.setWorldAndResolution(this.mc, i, j);
-                    }
-
-                    break;
-
-                default:
-                    this.list.actionPerformed(button);
-            }
+        if (!button.enabled) return;
+        switch (button.id) {
+            case 6: this.mc.displayGuiScreen(this.parentScreen); break;
+            case 100:
+                this.game_settings_3.setOptionValue(GameSettings.Options.FORCE_UNICODE_FONT, 1);
+                button.displayString = this.game_settings_3.getKeyBinding(GameSettings.Options.FORCE_UNICODE_FONT);
+                ScaledResolution sr = new ScaledResolution(this.mc);
+                this.setWorldAndResolution(this.mc, sr.getScaledWidth(), sr.getScaledHeight());
+                break;
+            default: this.list.actionPerformed(button); break;
         }
     }
 
-    /**
-     * Draws the screen and all the components in it. Args : mouseX, mouseY, renderPartialTicks
-     */
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
+        long now = Minecraft.getSystemTime();
+        if (animLastTime != -1L) animation = MathHelper.clamp_float(animation + (now - animLastTime) / 250f, 0f, 1f);
+        animLastTime = now;
+        float e = animation * animation * (3f - 2f * animation);
+
+        Gui.drawRect(0, 0, this.width, this.height, 0xFF080B10);
+        Gui.drawRect(0, 0, this.width, 36, (int)(e*200) << 24 | 0x05070A);
+        Gui.drawRect(0, 36, this.width, 37, (int)(e*255) << 24 | (ACCENT & 0xFFFFFF));
+        GuiRenderUtils.drawGradientRect(0, 37, this.width, 52, (int)(e*80) << 24 | 0x05070A, 0x00000000);
+
         this.list.drawScreen(mouseX, mouseY, partialTicks);
-        this.drawCenteredString(this.fontRendererObj, I18n.format("options.language", new Object[0]), this.width / 2, 16, 16777215);
-        this.drawCenteredString(this.fontRendererObj, "(" + I18n.format("options.languageWarning", new Object[0]) + ")", this.width / 2, this.height - 56, 8421504);
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(0, (1f - e) * 8, 0);
+
+        int ta = (int)(e * 255) << 24;
+        String t1 = "§c§lCHOIX DE ";
+        String t2 = "§f§lLANGUE";
+        int tw = fontRendererObj.getStringWidth(t1) + fontRendererObj.getStringWidth(t2);
+        int tx = this.width / 2 - tw / 2;
+        fontRendererObj.drawStringWithShadow(t1, tx, 13, ta | 0xFFFFFF);
+        fontRendererObj.drawStringWithShadow(t2, tx + fontRendererObj.getStringWidth(t1), 13, ta | 0xFFFFFF);
+        int dw = (int)((tw + 20) * e);
+        Gui.drawRect(this.width/2 - dw/2, 26, this.width/2 + dw/2, 27, (int)(e*45) << 24 | 0xFFFFFF);
+
+        // Avertissement
+        String warn = "(" + I18n.format("options.languageWarning") + ")";
+        drawCenteredString(fontRendererObj, warn, this.width / 2, this.height - 54, ta | 0x555555);
+
+        // Footer bar
+        Gui.drawRect(0, this.height - 46, this.width, this.height, (int)(e*200) << 24 | 0x05070A);
+        Gui.drawRect(0, this.height - 46, this.width, this.height - 45, (int)(e*30) << 24 | 0xFFFFFF);
+
         super.drawScreen(mouseX, mouseY, partialTicks);
+        GlStateManager.popMatrix();
     }
 
     class List extends GuiSlot
     {
-        private final java.util.List<String> langCodeList = Lists.<String>newArrayList();
-        private final Map<String, Language> languageMap = Maps.<String, Language>newHashMap();
+        private final java.util.List<String> langCodeList = Lists.newArrayList();
+        private final Map<String, Language>  languageMap  = Maps.newHashMap();
 
         public List(Minecraft mcIn)
         {
-            super(mcIn, GuiLanguage.this.width, GuiLanguage.this.height, 32, GuiLanguage.this.height - 65 + 4, 18);
-
-            for (Language language : GuiLanguage.this.languageManager.getLanguages())
-            {
-                this.languageMap.put(language.getLanguageCode(), language);
-                this.langCodeList.add(language.getLanguageCode());
+            super(mcIn, GuiLanguage.this.width, GuiLanguage.this.height, 40, GuiLanguage.this.height - 56, 18);
+            this.renderBackground = false;
+            for (Language lang : GuiLanguage.this.languageManager.getLanguages()) {
+                this.languageMap.put(lang.getLanguageCode(), lang);
+                this.langCodeList.add(lang.getLanguageCode());
             }
         }
 
-        protected int getSize()
-        {
-            return this.langCodeList.size();
-        }
+        protected int getSize() { return this.langCodeList.size(); }
 
-        protected void elementClicked(int slotIndex, boolean isDoubleClick, int mouseX, int mouseY)
+        protected void elementClicked(int idx, boolean dbl, int mx, int my)
         {
-            Language language = (Language)this.languageMap.get(this.langCodeList.get(slotIndex));
-            GuiLanguage.this.languageManager.setCurrentLanguage(language);
-            GuiLanguage.this.game_settings_3.language = language.getLanguageCode();
+            Language lang = this.languageMap.get(this.langCodeList.get(idx));
+            GuiLanguage.this.languageManager.setCurrentLanguage(lang);
+            GuiLanguage.this.game_settings_3.language = lang.getLanguageCode();
             this.mc.refreshResources();
-            GuiLanguage.this.fontRendererObj.setUnicodeFlag(GuiLanguage.this.languageManager.isCurrentLocaleUnicode() || GuiLanguage.this.game_settings_3.forceUnicodeFont);
+            GuiLanguage.this.fontRendererObj.setUnicodeFlag(
+                    GuiLanguage.this.languageManager.isCurrentLocaleUnicode()
+                    || GuiLanguage.this.game_settings_3.forceUnicodeFont);
             GuiLanguage.this.fontRendererObj.setBidiFlag(GuiLanguage.this.languageManager.isCurrentLanguageBidirectional());
-            GuiLanguage.this.confirmSettingsBtn.displayString = I18n.format("gui.done", new Object[0]);
-            GuiLanguage.this.forceUnicodeFontBtn.displayString = GuiLanguage.this.game_settings_3.getKeyBinding(GameSettings.Options.FORCE_UNICODE_FONT);
+            GuiLanguage.this.confirmSettingsBtn.displayString = "DONE";
+            GuiLanguage.this.forceUnicodeFontBtn.displayString =
+                    GuiLanguage.this.game_settings_3.getKeyBinding(GameSettings.Options.FORCE_UNICODE_FONT);
             GuiLanguage.this.game_settings_3.saveOptions();
         }
 
-        protected boolean isSelected(int slotIndex)
+        protected boolean isSelected(int idx)
         {
-            return ((String)this.langCodeList.get(slotIndex)).equals(GuiLanguage.this.languageManager.getCurrentLanguage().getLanguageCode());
+            return this.langCodeList.get(idx).equals(GuiLanguage.this.languageManager.getCurrentLanguage().getLanguageCode());
         }
 
-        protected int getContentHeight()
+        protected int getContentHeight() { return this.getSize() * 18; }
+        protected void drawBackground()  { /* fond sombre de GuiLanguage */ }
+
+        @Override
+        protected void overlayBackground(int sY, int eY, int sa, int ea)
         {
-            return this.getSize() * 18;
+            GuiRenderUtils.drawGradientRect(0, sY, GuiLanguage.this.width, eY,
+                    (sa << 24) | 0x080B10, (ea << 24) | 0x080B10);
         }
 
-        protected void drawBackground()
+        protected void drawSlot(int id, int x, int y, int h, int mx, int my)
         {
-            GuiLanguage.this.drawDefaultBackground();
-        }
-
-        protected void drawSlot(int entryID, int p_180791_2_, int p_180791_3_, int p_180791_4_, int mouseXIn, int mouseYIn)
-        {
+            boolean sel = isSelected(id);
+            if (sel) {
+                // Ligne de sélection rouge à gauche
+                Gui.drawRect(x - 2, y, x - 2 + 2, y + 18, ACCENT);
+                Gui.drawRect(x, y, x + this.width - 20, y + 18, 0x22FFFFFF);
+            }
             GuiLanguage.this.fontRendererObj.setBidiFlag(true);
-            GuiLanguage.this.drawCenteredString(GuiLanguage.this.fontRendererObj, ((Language)this.languageMap.get(this.langCodeList.get(entryID))).toString(), this.width / 2, p_180791_3_ + 1, 16777215);
-            GuiLanguage.this.fontRendererObj.setBidiFlag(GuiLanguage.this.languageManager.getCurrentLanguage().isBidirectional());
+            String label = this.languageMap.get(this.langCodeList.get(id)).toString();
+            GuiLanguage.this.drawCenteredString(GuiLanguage.this.fontRendererObj, label,
+                    this.width / 2, y + 1, sel ? 0xFFFFFFFF : 0xFFAAAAAA);
+            GuiLanguage.this.fontRendererObj.setBidiFlag(
+                    GuiLanguage.this.languageManager.getCurrentLanguage().isBidirectional());
         }
     }
 }

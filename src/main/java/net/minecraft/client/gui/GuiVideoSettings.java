@@ -88,7 +88,8 @@ public class GuiVideoSettings extends GuiScreenOF
     {
         this.screenTitle = I18n.format("options.videoTitle");
         this.buttonList.clear();
-        this.lastTime = Minecraft.getSystemTime();
+        this.animation = 0.0f;
+        this.lastTime  = Minecraft.getSystemTime();
 
         int rows  = (videoOptions.length + 1) / 2;          // 6 rows
         int leftW = OPT_COL_W * 2 + OPT_COL_GAP;           // 310 px — option grid
@@ -229,26 +230,25 @@ public class GuiVideoSettings extends GuiScreenOF
         int a = (int)(e * 255) << 24;
 
         this.drawDefaultBackground();
-        // Léger overlay sombre animé par-dessus le fond monde
-        Gui.drawRect(0, 0, this.width, this.height, (int)(e * 140) << 24 | 0x050505);
+        // Ombre douce + ligne rouge — style "Options Sons"
+        GuiRenderUtils.drawGradientRect(0, 0, this.width, 40, (int)(e * 160) << 24 | 0x000000, 0x00000000);
+        Gui.drawRect(0, 0, this.width, 1, a | (ACCENT & 0xFFFFFF));
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(0, (1.0f - e) * 8, 0);
-
-        // ── Header bar ───────────────────────────────────────────────────────
-        Gui.drawRect(0, 0, this.width, HDR_H, (int)(e * 220) << 24 | 0x0C0C0C);
-        Gui.drawRect(0, 0, this.width, 1, a | (ACCENT & 0xFFFFFF));
-        Gui.drawRect(0, HDR_H - 1, this.width, HDR_H, (int)(e * 40) << 24 | 0xFFFFFF);
 
         // Title: "RED CONFLICT | <screen title>"
         String t1 = "§c§lRED ", t2 = "§f§lCONFLICT", sep = " §8| §7";
         int w1 = fr(t1), w2 = fr(t2), w3 = fr(sep), w4 = fr(screenTitle);
         int titleX = this.width / 2 - (w1 + w2 + w3 + w4) / 2;
-        int titleY = (HDR_H - 8) / 2;
+        int titleY = 11;
         this.fontRendererObj.drawStringWithShadow(t1,          titleX,              titleY, a | 0xFFFFFF);
         this.fontRendererObj.drawStringWithShadow(t2,          titleX + w1,         titleY, a | 0xFFFFFF);
         this.fontRendererObj.drawStringWithShadow(sep,         titleX + w1 + w2,    titleY, a | 0xFFFFFF);
         this.fontRendererObj.drawStringWithShadow(screenTitle, titleX + w1+w2+w3,   titleY, a | 0xFFFFFF);
+        // Diviseur animé
+        int divW = (int)((w1 + w2 + w3 + w4 + 20) * e);
+        Gui.drawRect(this.width/2 - divW/2, 23, this.width/2 + divW/2, 24, (int)(e*60) << 24 | 0xFFFFFF);
 
         // ── Main panel ───────────────────────────────────────────────────────
         GuiRenderUtils.drawShadow(panelX, panelY, panelW, panelH, 6, (int)(e * 100));
@@ -276,16 +276,16 @@ public class GuiVideoSettings extends GuiScreenOF
         super.drawScreen(mouseX, mouseY, partialTicks);
         this.tooltipManager.drawTooltips(mouseX, mouseY, this.buttonList);
 
-        // ── Footer bar ────────────────────────────────────────────────────────
+        // ── Footer discret ────────────────────────────────────────────────────
         int footY = this.height - FTR_H;
-        Gui.drawRect(0, footY, this.width, this.height, (int)(e * 160) << 24 | 0x0A0A0A);
-        Gui.drawRect(0, footY, this.width, footY + 1, (int)(e * 50) << 24 | 0xFFFFFF);
+        GuiRenderUtils.drawGradientRect(0, footY - 10, this.width, this.height,
+                0x00000000, (int)(e * 120) << 24 | 0x000000);
 
-        int ta = (int)(e * 150) << 24;
+        int ta2 = (int)(e * 100) << 24;
         String verStr = "§8Minecraft 1.8.9 | OptiFine";
         int verW = this.fontRendererObj.getStringWidth(verStr);
         this.fontRendererObj.drawString(verStr, this.width / 2 - verW / 2,
-                footY + (FTR_H - 8) / 2, ta | 0xFFFFFF);
+                footY + (FTR_H - 8) / 2, ta2 | 0xFFFFFF);
 
         GlStateManager.popMatrix();
     }

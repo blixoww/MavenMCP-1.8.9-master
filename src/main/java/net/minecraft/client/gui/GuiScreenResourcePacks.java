@@ -6,11 +6,14 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.resources.ResourcePackListEntry;
 import net.minecraft.client.resources.ResourcePackListEntryDefault;
 import net.minecraft.client.resources.ResourcePackListEntryFound;
 import net.minecraft.client.resources.ResourcePackRepository;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.Util;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,6 +31,10 @@ public class GuiScreenResourcePacks extends GuiScreen
 
     /** List component that contains the selected resource packs */
     private GuiResourcePackSelected selectedResourcePacksList;
+    private static final int ACCENT = 0xFFDC1E1E;
+    private float animation = 0f;
+    private long  animLastTime = -1L;
+
     private boolean changed = false;
 
     public GuiScreenResourcePacks(GuiScreen parentScreenIn)
@@ -41,8 +48,11 @@ public class GuiScreenResourcePacks extends GuiScreen
      */
     public void initGui()
     {
-        this.buttonList.add(new GuiOptionButton(2, this.width / 2 - 154, this.height - 48, I18n.format("resourcePack.openFolder", new Object[0])));
-        this.buttonList.add(new GuiOptionButton(1, this.width / 2 + 4, this.height - 48, I18n.format("gui.done", new Object[0])));
+        this.animation = 0f; this.animLastTime = -1L;
+        // descendre légèrement les boutons pour qu'ils soient alignés visuellement avec le footer
+        int btnY = this.height - 40;
+        this.buttonList.add(new GuiMenuButton(2, this.width / 2 - 154, btnY, 150, 20, "📁 OUVRIR DOSSIER"));
+        this.buttonList.add(new GuiMenuButton(1, this.width / 2 + 4, btnY, 150, 20, "DONE", true));
 
         if (!this.changed)
         {
@@ -225,11 +235,56 @@ public class GuiScreenResourcePacks extends GuiScreen
      */
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
-        this.drawBackground(0);
+        long now = Minecraft.getSystemTime();
+        if (animLastTime != -1L) animation = MathHelper.clamp_float(animation + (now - animLastTime) / 250f, 0f, 1f);
+        animLastTime = now;
+        float e = animation * animation * (3f - 2f * animation);
+
+        // Fond sombre plein — propre
+        Gui.drawRect(0, 0, this.width, this.height, 0xFF080B10);
+
+        // Listes resource packs (renderBackground=false, elles ne redessinett pas le dirt)
         this.availableResourcePacksList.drawScreen(mouseX, mouseY, partialTicks);
         this.selectedResourcePacksList.drawScreen(mouseX, mouseY, partialTicks);
-        this.drawCenteredString(this.fontRendererObj, I18n.format("resourcePack.title", new Object[0]), this.width / 2, 16, 16777215);
-        this.drawCenteredString(this.fontRendererObj, I18n.format("resourcePack.folderInfo", new Object[0]), this.width / 2 - 77, this.height - 26, 8421504);
+
+        // ── Header ────────────────────────────────────────────────────────
+        // Ligne rouge tout en haut
+        Gui.drawRect(0, 0, this.width, 1, 0xFFDC1E1E);
+        // Fond header
+        Gui.drawRect(0, 1, this.width, 36, (int)(e*230) << 24 | 0x0A0D14);
+        // Dégradé de fondu sous le header
+        GuiRenderUtils.drawGradientRect(0, 36, this.width, 50, (int)(e*120) << 24 | 0x0A0D14, 0x00000000);
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(0, (1f - e) * 8, 0);
+
+        int ta = (int)(e * 255) << 24;
+        String t1 = "§c§lRESOURCE ";
+        String t2 = "§f§lPACKS";
+        int tw = fontRendererObj.getStringWidth(t1) + fontRendererObj.getStringWidth(t2);
+        int tx = this.width / 2 - tw / 2;
+        fontRendererObj.drawStringWithShadow(t1, tx, 12, ta | 0xFFFFFF);
+        fontRendererObj.drawStringWithShadow(t2, tx + fontRendererObj.getStringWidth(t1), 12, ta | 0xFFFFFF);
+        // Diviseur animé
+        int dw = (int)((tw + 20) * e);
+        Gui.drawRect(this.width/2 - dw/2, 24, this.width/2 + dw/2, 25, (int)(e*50) << 24 | 0xFFFFFF);
+
+        GlStateManager.popMatrix();
+
+        // ── Footer ─────────────────────────────────────────────────────────
+        // Dégradé de fondu avant le footer
+        GuiRenderUtils.drawGradientRect(0, this.height - 58, this.width, this.height - 44, 0x00000000, (int)(e*120) << 24 | 0x0A0D14);
+        // Fond footer
+        Gui.drawRect(0, this.height - 44, this.width, this.height, (int)(e*230) << 24 | 0x0A0D14);
+        // Ligne séparatrice fine
+        Gui.drawRect(0, this.height - 44, this.width, this.height - 43, 0x33FFFFFF);
+
+        String folderInfo = I18n.format("resourcePack.folderInfo");
+        // Enlever le contenu entre parenthèses (ex. "(Place resource pack files here)") pour alléger l'affichage
+        folderInfo = folderInfo.replaceAll("\\(.*\\)", "").trim();
+        int fiW = this.fontRendererObj.getStringWidth(folderInfo);
+        fontRendererObj.drawString("§8" + folderInfo, this.width / 2 - fiW / 2, this.height - 18, ta | 0xFFFFFF);
+
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
