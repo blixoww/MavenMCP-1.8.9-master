@@ -28,6 +28,14 @@ public class CombatLogWidget extends BaseWidget {
     public void render(int mouseX, int mouseY, float partialTicks) {
         Minecraft mc = Minecraft.getMinecraft();
         if (mc != null && mc.thePlayer != null) {
+            // Reset immédiat à la mort
+            if (mc.thePlayer.getHealth() <= 0 || mc.thePlayer.isDead) {
+                this.localCombatExpire = 0;
+                this.lastHealth = -1f;
+                CombatLogManager.INSTANCE.reset();
+                return;
+            }
+
             float currentHealth = mc.thePlayer.getHealth();
             if (lastHealth < 0f) lastHealth = currentHealth;
 

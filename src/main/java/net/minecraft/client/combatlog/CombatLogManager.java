@@ -44,4 +44,9 @@ public class CombatLogManager {
     public boolean isInCombat() {
         return getRemainingMillis() > 0;
     }
+
+    public void reset() {
+        this.combatTimeRemaining = 0;
+        this.lastUpdateTime = 0;
+    }
 }
