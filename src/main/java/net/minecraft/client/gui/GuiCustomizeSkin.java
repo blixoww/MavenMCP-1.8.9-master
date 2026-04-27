@@ -75,9 +75,10 @@ public class GuiCustomizeSkin extends GuiScreen
 
         this.drawDefaultBackground();
 
-        Gui.drawRect(0, 0, this.width, 36, (int)(e*210) << 24 | 0x05070A);
-        Gui.drawRect(0, 36, this.width, 37, (int)(e*255) << 24 | (ACCENT & 0xFFFFFF));
-        GuiRenderUtils.drawGradientRect(0, 37, this.width, 52, (int)(e*80) << 24 | 0x05070A, 0x00000000);
+        // Bandeau discret style Chat
+        GuiRenderUtils.drawGradientRect(0, 0, this.width, 38, (int)(e*160) << 24 | 0x000000, 0x00000000);
+        // Fine ligne accent en haut
+        Gui.drawRect(0, 0, this.width, 1, (int)(e * 255) << 24 | (ACCENT & 0xFFFFFF));
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(0, (1f - e) * 8, 0);
@@ -87,10 +88,10 @@ public class GuiCustomizeSkin extends GuiScreen
         String t2 = "§f§lCUSTOMS";
         int tw = fontRendererObj.getStringWidth(t1) + fontRendererObj.getStringWidth(t2);
         int tx = this.width / 2 - tw / 2;
-        fontRendererObj.drawStringWithShadow(t1, tx, 13, ta | 0xFFFFFF);
-        fontRendererObj.drawStringWithShadow(t2, tx + fontRendererObj.getStringWidth(t1), 13, ta | 0xFFFFFF);
+        fontRendererObj.drawStringWithShadow(t1, tx, 11, ta | 0xFFFFFF);
+        fontRendererObj.drawStringWithShadow(t2, tx + fontRendererObj.getStringWidth(t1), 11, ta | 0xFFFFFF);
         int dw = (int)((tw + 20) * e);
-        Gui.drawRect(this.width/2 - dw/2, 26, this.width/2 + dw/2, 27, (int)(e*45) << 24 | 0xFFFFFF);
+        Gui.drawRect(this.width/2 - dw/2, 23, this.width/2 + dw/2, 24, (int)(e*60) << 24 | 0xFFFFFF);
 
         if (btnYCache == null || btnYCache.length != this.buttonList.size()) btnYCache = new int[this.buttonList.size()];
         for (int i2 = 0; i2 < this.buttonList.size(); i2++) {
@@ -103,8 +104,6 @@ public class GuiCustomizeSkin extends GuiScreen
         super.drawScreen(mouseX, mouseY, partialTicks);
         for (int i2 = 0; i2 < this.buttonList.size(); i2++) this.buttonList.get(i2).yPosition = btnYCache[i2];
 
-        Gui.drawRect(0, this.height - 36, this.width, this.height, (int)(e*200) << 24 | 0x05070A);
-        Gui.drawRect(0, this.height - 36, this.width, this.height - 35, (int)(e*30) << 24 | 0xFFFFFF);
         GlStateManager.popMatrix();
     }
 }

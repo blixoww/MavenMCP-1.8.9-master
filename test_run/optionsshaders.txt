@@ -1,4 +1,4 @@
-#Sun Apr 26 18:32:26 CEST 2026
+#Mon Apr 27 20:52:56 CEST 2026
 shaderPack=OFF
 antialiasingLevel=0
 normalMapEnabled=true
