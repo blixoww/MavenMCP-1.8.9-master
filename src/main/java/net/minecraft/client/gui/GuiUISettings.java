@@ -44,20 +44,22 @@ public class GuiUISettings extends GuiScreen {
 
     // Layout cache
     private int panelX, panelY, panelW, panelH;
-    private int headerH = 28;
-    private int rowH = 24;
-    private int footerH = 50; // Increased to fit two rows of buttons
+    private int headerH = 35;
+    private int rowH = 28;
+    private int footerH = 68;
     private int contentTop, contentBottom, contentH;
     private int maxScroll;
 
     // Colors
-    private static final int ACCENT = 0xFF2A7FFF;
-    private static final int BG_PANEL = 0xF0101018;
-    private static final int BG_HEADER = 0xFF141420;
-    private static final int BORDER = 0x18FFFFFF;
-    private static final int TEXT_PRIMARY = 0xFFEEEEEE;
-    private static final int TEXT_SECONDARY = 0xFFAAAAAA;
-    private static final int TEXT_MUTED = 0xFF666666;
+    private static final int ACCENT         = 0xFFE02828;  // Vibrant red — PvP theme
+    private static final int ACCENT_LINE    = 0xFFE02828;  // Hot red top line
+    private static final int ACCENT_DIM     = 0xFF6E1212;  // Dim red for details
+    private static final int BG_PANEL       = 0xF20A0808;  // Deep dark panel
+    private static final int BG_HEADER      = 0xFF0E0606;  // Very dark header
+    private static final int BORDER         = 0x2BFFFFFF;  // Slightly more visible
+    private static final int TEXT_PRIMARY   = 0xFFF2F2F2;
+    private static final int TEXT_SECONDARY = 0xFF8A9AB0;  // Cool blue-grey
+    private static final int TEXT_MUTED     = 0xFF445060;
 
     public GuiUISettings(GuiScreen parent) {
         this.parent = parent;
@@ -119,26 +121,36 @@ public class GuiUISettings extends GuiScreen {
         GlStateManager.translate(0, (1.0f - ease) * 10, 0);
 
         // Panel shadow + background
-        GuiRenderUtils.drawShadow(panelX, panelY, panelW, panelH, 10, (int)(ease * 100));
+        GuiRenderUtils.drawShadow(panelX, panelY, panelW, panelH, 8, (int)(ease * 90));
         Gui.drawRect(panelX, panelY, panelX + panelW, panelY + panelH, BG_PANEL);
 
-        // Top accent line
-        Gui.drawRect(panelX, panelY, panelX + panelW, panelY + 1, ACCENT);
+        // Red top line (2px) + subtle glow
+        Gui.drawRect(panelX, panelY, panelX + panelW, panelY + 2, ACCENT_LINE);
+        GuiRenderUtils.drawGradientRect(panelX, panelY + 2, panelX + panelW, panelY + 8, 0x18E02828, 0x00000000);
 
-        // Header
-        Gui.drawRect(panelX, panelY + 1, panelX + panelW, panelY + headerH, BG_HEADER);
-        Gui.drawRect(panelX, panelY + headerH, panelX + panelW, panelY + headerH + 1, BORDER);
+        // Header gradient
+        GuiRenderUtils.drawGradientRect(panelX, panelY + 2, panelX + panelW, panelY + headerH, BG_HEADER, BG_PANEL);
+        // Separator
+        Gui.drawRect(panelX, panelY + headerH, panelX + panelW, panelY + headerH + 1, 0x30FFFFFF);
 
-        String title = "INTERFACE";
-        int titleW = this.fontRendererObj.getStringWidth(title);
-        this.fontRendererObj.drawStringWithShadow(title,
-                panelX + (panelW - titleW) / 2.0f, panelY + 10, TEXT_PRIMARY);
+        // Left accent bar in header (2px)
+        Gui.drawRect(panelX + 8, panelY + 10, panelX + 10, panelY + headerH - 10, ACCENT);
 
-        // Subtle icon hint on each side of title
-        int iconCol = 0x33FFFFFF;
-        int lineY = panelY + 14;
-        Gui.drawRect(panelX + 10, lineY, panelX + (panelW - titleW) / 2 - 8, lineY + 1, iconCol);
-        Gui.drawRect(panelX + (panelW + titleW) / 2 + 8, lineY, panelX + panelW - 10, lineY + 1, iconCol);
+        // Two-tone title — HUD (light red) + SETTINGS (white)
+        String t1 = "HUD ";
+        String t2 = "SETTINGS";
+        int tw1 = fontRendererObj.getStringWidth(t1);
+        int tw2 = fontRendererObj.getStringWidth(t2);
+        int titleW = tw1 + tw2;
+        int ttx = panelX + (panelW - titleW) / 2;
+        int tty = panelY + (headerH - 8) / 2;
+        fontRendererObj.drawStringWithShadow(t1, ttx,       tty, 0xFFFF8888);
+        fontRendererObj.drawStringWithShadow(t2, ttx + tw1, tty, TEXT_PRIMARY);
+
+        // Decorative lines flanking title
+        int lineY = panelY + headerH / 2;
+        GuiRenderUtils.drawGradientRect(panelX + 18, lineY, panelX + ttx - 6, lineY + 1, 0x00000000, 0x44FFFFFF);
+        GuiRenderUtils.drawGradientRect(panelX + ttx + titleW + 6, lineY, panelX + panelW - 10, lineY + 1, 0x44FFFFFF, 0x00000000);
 
         // Content area with scissor
         ScaledResolution sr = new ScaledResolution(mc);
@@ -155,51 +167,53 @@ public class GuiUISettings extends GuiScreen {
 
         org.lwjgl.opengl.GL11.glDisable(org.lwjgl.opengl.GL11.GL_SCISSOR_TEST);
 
-        // Scroll indicators (fade gradients)
+        // Scroll fade indicators
         if (scrollOffset > 2) {
-            GuiRenderUtils.drawGradientRect(panelX + 1, contentTop, panelX + panelW - 1, contentTop + 12, 0xCC101018, 0x00101018);
+            GuiRenderUtils.drawGradientRect(panelX + 1, contentTop, panelX + panelW - 1, contentTop + 14, 0xCC101018, 0x00101018);
         }
         if (scrollOffset < maxScroll - 2) {
-            GuiRenderUtils.drawGradientRect(panelX + 1, contentBottom - 12, panelX + panelW - 1, contentBottom, 0x00101018, 0xCC101018);
+            GuiRenderUtils.drawGradientRect(panelX + 1, contentBottom - 14, panelX + panelW - 1, contentBottom, 0x00101018, 0xCC101018);
         }
 
-        // Scrollbar
+        // Scrollbar (6 px wide, accent-colored thumb with highlight)
         if (maxScroll > 0) {
-            int sbW = 4;
-            int sbX = panelX + panelW - sbW - 2;
+            int sbW = 5;
+            int sbX = panelX + panelW - sbW - 3;
             int sbTrackH = contentH - 4;
-            Gui.drawRect(sbX, contentTop + 2, sbX + sbW, contentTop + 2 + sbTrackH, 0x15FFFFFF);
+            Gui.drawRect(sbX, contentTop + 2, sbX + sbW, contentTop + 2 + sbTrackH, 0x0FFFFFFF);
 
             float scrollRatio = scrollOffset / (float) maxScroll;
             float thumbRatio = (float) contentH / (contentH + maxScroll);
-            int thumbH = Math.max(12, (int)(sbTrackH * thumbRatio));
+            int thumbH = Math.max(16, (int)(sbTrackH * thumbRatio));
             int thumbY = (int)((sbTrackH - thumbH) * scrollRatio);
-            Gui.drawRect(sbX, contentTop + 2 + thumbY, sbX + sbW, contentTop + 2 + thumbY + thumbH, ACCENT);
+            // Thumb body
+            Gui.drawRect(sbX, contentTop + 2 + thumbY, sbX + sbW, contentTop + 2 + thumbY + thumbH, ACCENT_DIM);
+            // Thumb top highlight
+            Gui.drawRect(sbX, contentTop + 2 + thumbY, sbX + sbW, contentTop + 3 + thumbY, 0x88FF8888);
         }
 
         // Footer separator
-        Gui.drawRect(panelX, contentBottom, panelX + panelW, contentBottom + 1, BORDER);
+        Gui.drawRect(panelX, contentBottom, panelX + panelW, contentBottom + 1, 0x30FFFFFF);
 
         // Footer buttons
         int btnW = (panelW - 20);
-        int btnH = 16;
-        int gap = 4;
-        
-        // Row 1: HUD Editor
-        int btnY1 = contentBottom + 6;
-        boolean hoverEdit = inRect(mouseX, mouseY, panelX + 10, btnY1, btnW, btnH);
-        drawFooterButton(panelX + 10, btnY1, btnW, btnH, "Editeur HUD", ACCENT, hoverEdit);
+        int btnH = 22;
+        int gap  = 6;
 
-        // Row 2: Profiles & Done
+        // Row 1: HUD Editor — primary action, full width (RED CTA)
+        int btnY1 = contentBottom + 8;
+        boolean hoverEdit = inRect(mouseX, mouseY, panelX + 10, btnY1, btnW, btnH);
+        drawFooterButton(panelX + 10, btnY1, btnW, btnH, "EDITEUR HUD", 0xFF1E0808, hoverEdit, true);
+
+        // Row 2: Profiles & Done — half width each
         int btnY2 = btnY1 + btnH + gap;
         int halfW = (btnW - gap) / 2;
-        
+
         boolean hoverProf = inRect(mouseX, mouseY, panelX + 10, btnY2, halfW, btnH);
-        // Changed color to a clearer blue-green to stand out
-        drawFooterButton(panelX + 10, btnY2, halfW, btnH, "Profils HUD", 0xFF2ECC71, hoverProf);
-        
+        drawFooterButton(panelX + 10, btnY2, halfW, btnH, "PROFILS HUD", 0xFF141010, hoverProf, false);
+
         boolean hoverDone = inRect(mouseX, mouseY, panelX + 10 + halfW + gap, btnY2, halfW, btnH);
-        drawFooterButton(panelX + 10 + halfW + gap, btnY2, halfW, btnH, I18n.format("gui.done"), 0xFF333344, hoverDone);
+        drawFooterButton(panelX + 10 + halfW + gap, btnY2, halfW, btnH, "RETOUR", 0xFF141010, hoverDone, false);
 
         // Panel outline
         GuiRenderUtils.drawRectOutline(panelX, panelY, panelW, panelH, BORDER);
@@ -227,14 +241,18 @@ public class GuiUISettings extends GuiScreen {
     }
 
     private void drawHeaderRow(SettingRow row, int x, int y, int w) {
-        // Section header with accent bar
-        int barW = 3;
-        Gui.drawRect(x + 10, y + 6, x + 10 + barW, y + 15, ACCENT);
-        this.fontRendererObj.drawStringWithShadow(row.label, x + 18, y + 7, ACCENT);
-
-        int textEnd = x + 18 + this.fontRendererObj.getStringWidth(row.label) + 8;
-        GuiRenderUtils.drawGradientRect(textEnd, y + 11, x + w - 14, y + 12,
-                (0x33 << 24) | (ACCENT & 0xFFFFFF), 0x00000000);
+        // Full-width gradient band
+        GuiRenderUtils.drawGradientRect(x + 2, y + 2, x + w - 6, y + 18, 0x18FFFFFF, 0x08FFFFFF);
+        GuiRenderUtils.drawGradientRect(x + 2, y + 2, x + w - 6, y + 4, 0x28E02828, 0x00000000);
+        // Left accent stripe (3px wide)
+        Gui.drawRect(x + 8, y + 4, x + 12, y + 16, ACCENT);
+        Gui.drawRect(x + 12, y + 5, x + 13, y + 15, ACCENT_DIM);
+        // Label
+        fontRendererObj.drawStringWithShadow(row.label, x + 18, y + 6, 0xFFFFAAAA);
+        // Fading separator line after text
+        int textEnd = x + 18 + fontRendererObj.getStringWidth(row.label) + 6;
+        GuiRenderUtils.drawGradientRect(textEnd, y + 10, x + w - 14, y + 11,
+                0x55E02828, 0x00000000);
     }
 
     private void drawSettingRow(SettingRow row, int x, int y, int w, int h, int mx, int my) {
@@ -247,23 +265,35 @@ public class GuiUISettings extends GuiScreen {
         hAnim = GuiRenderUtils.lerp(hAnim, hovered ? 1f : 0f, 0.18f);
         hoverAnimMap.put(hKey, hAnim);
 
-        // Hover background
-        if (hAnim > 0.01f) {
-            int alpha = (int)(hAnim * 0x18);
-            Gui.drawRect(x + 4, y + 1, x + w - 8, y + h - 1, (alpha << 24) | 0xFFFFFF);
-        }
-
         boolean enabled = row.isEnabled(this.mc.gameSettings);
 
-        // Status dot with glow
-        int dotX = x + 14;
-        int dotY = y + h / 2 - 2;
-        int dotCol = enabled ? 0xFF44DD66 : 0xFF444455;
-        if (enabled && hAnim > 0.01f) {
-            // Subtle glow around enabled dot on hover
-            Gui.drawRect(dotX - 1, dotY - 1, dotX + 5, dotY + 5, (int)(hAnim * 0x20) << 24 | 0x44DD66);
+        // Hover background (orange-ish warm tint)
+        if (hAnim > 0.01f) {
+            int alpha = (int)(hAnim * 0x16);
+            Gui.drawRect(x + 4, y + 1, x + w - 8, y + h - 1, (alpha << 24) | 0xFFDDCC);
         }
-        Gui.drawRect(dotX, dotY, dotX + 4, dotY + 4, dotCol);
+
+        // Left edge status bar (only when enabled)
+        if (enabled) {
+            int barAlpha = (int)(0x55 + hAnim * 0x44);
+            Gui.drawRect(x + 4, y + 4, x + 6, y + h - 4, (barAlpha << 24) | (ACCENT & 0xFFFFFF));
+        }
+
+        // Status indicator — 8×8 with glow when active
+        int dotX = x + 12;
+        int dotY = y + h / 2 - 4;
+        if (enabled) {
+            // Outer glow halo
+            int glowA = (int)(0x18 + hAnim * 0x28);
+            Gui.drawRect(dotX - 2, dotY - 2, dotX + 10, dotY + 10, (glowA << 24) | 0x22EE55);
+            // Main dot — vibrant green
+            Gui.drawRect(dotX, dotY, dotX + 8, dotY + 8, 0xFF22CC50);
+            // Top-left shine
+            Gui.drawRect(dotX + 1, dotY + 1, dotX + 4, dotY + 2, 0x55FFFFFF);
+        } else {
+            Gui.drawRect(dotX, dotY, dotX + 8, dotY + 8, 0xFF141420);
+            GuiRenderUtils.drawRectOutline(dotX, dotY, 8, 8, 0x25FFFFFF);
+        }
 
         // Label
         String displayLabel = row.element != null ? friendlyName(row.element.getId()) : row.label;
@@ -272,18 +302,16 @@ public class GuiUISettings extends GuiScreen {
                 TEXT_PRIMARY,
                 hAnim
         );
-        this.fontRendererObj.drawStringWithShadow(displayLabel, x + 24, y + (h - 8) / 2, labelCol);
+        this.fontRendererObj.drawStringWithShadow(displayLabel, x + 27, y + (h - 8) / 2, labelCol);
 
-        // Click hint on hover (for widget rows)
-        if (row.element != null && hAnim > 0.3f) {
-            int hintAlpha = (int)(Math.min(1f, (hAnim - 0.3f) / 0.7f) * 0x55);
-            String hint = ">";
-            int hw = fontRendererObj.getStringWidth(hint);
-            this.fontRendererObj.drawString(hint, x + w - 48 - hw, y + (h - 8) / 2, (hintAlpha << 24) | 0xFFFFFF);
+        // Arrow hint on hover (widget rows only)
+        if (row.element != null && hAnim > 0.2f) {
+            int hintAlpha = (int)(Math.min(1f, (hAnim - 0.2f) / 0.8f) * 0x80);
+            this.fontRendererObj.drawString(">", x + w - 52, y + (h - 8) / 2, (hintAlpha << 24) | 0xFFDDCC);
         }
 
         // Toggle switch
-        drawToggle(x + w - 42, y + (h - 12) / 2, enabled, row.getId());
+        drawToggle(x + w - 41, y + (h - 12) / 2, enabled, row.getId());
     }
 
     private void drawToggle(int x, int y, boolean value, String id) {
@@ -295,30 +323,41 @@ public class GuiUISettings extends GuiScreen {
         GuiRenderUtils.drawSmoothToggle(x, y, value, current);
     }
 
-    private void drawFooterButton(int x, int y, int w, int h, String text, int baseColor, boolean hovered) {
-        int bg = hovered ? GuiRenderUtils.colorLerp(baseColor, 0xFFFFFFFF, 0.15f) : baseColor;
-        Gui.drawRect(x, y, x + w, y + h, bg);
-        GuiRenderUtils.drawRectOutline(x, y, w, h, hovered ? 0x44FFFFFF : 0x22FFFFFF);
-
-        if (hovered) {
-            GuiRenderUtils.drawGradientRect(x + 1, y + 1, x + w - 1, y + 3, 0x22FFFFFF, 0x00FFFFFF);
+    private void drawFooterButton(int x, int y, int w, int h, String text, int baseColor, boolean hovered, boolean isPrimary) {
+        if (isPrimary) {
+            // Primary CTA → filled dark red, accent top border
+            Gui.drawRect(x, y, x + w, y + h, hovered ? 0xFF2A0606 : 0xFF1C0404);
+            Gui.drawRect(x, y, x + w, y + 1, hovered ? 0xFFFF4444 : ACCENT);
+            GuiRenderUtils.drawRectOutline(x, y, w, h, hovered ? 0x44EE3333 : 0x33E02828);
+            int tw = this.fontRendererObj.getStringWidth(text);
+            this.fontRendererObj.drawStringWithShadow(text, x + (w - tw) / 2, y + (h - 8) / 2.0f,
+                    hovered ? 0xFFFFDDDD : 0xFFFFBBAA);
+        } else {
+            // Secondary → outlined style
+            int bg = hovered ? 0x1EFFFFFF : 0x0A000000;
+            Gui.drawRect(x, y, x + w, y + h, bg);
+            GuiRenderUtils.drawRectOutline(x, y, w, h, hovered ? 0x44FFFFFF : 0x28FFFFFF);
+            if (hovered) {
+                // Left accent bar appears on hover
+                Gui.drawRect(x, y + 1, x + 2, y + h - 1, ACCENT);
+                GuiRenderUtils.drawGradientRect(x + 1, y + 1, x + w - 1, y + 3, 0x16FFFFFF, 0x00000000);
+            }
+            // Label
+            int tw = this.fontRendererObj.getStringWidth(text);
+            this.fontRendererObj.drawStringWithShadow(text, x + (w - tw) / 2, y + (h - 8) / 2.0f,
+                    hovered ? 0xFFFFFFFF : 0xFFCCCCDD);
         }
-
-        int tw = this.fontRendererObj.getStringWidth(text);
-        this.fontRendererObj.drawStringWithShadow(text,
-                x + (w - tw) / 2.0f, y + (h - 8) / 2.0f,
-                hovered ? 0xFFFFFFFF : 0xFFCCCCCC);
     }
 
     @Override
     protected void mouseClicked(int mx, int my, int btn) throws IOException {
         if (btn != 0) return;
 
-        // Footer layout logic
+        // Footer layout logic — must match drawScreen values exactly
         int btnW = (panelW - 20);
-        int btnH = 16;
-        int gap = 4;
-        int btnY1 = contentBottom + 6;
+        int btnH = 22;
+        int gap  = 6;
+        int btnY1 = contentBottom + 8;
         int btnY2 = btnY1 + btnH + gap;
         int halfW = (btnW - gap) / 2;
 

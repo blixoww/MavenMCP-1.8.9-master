@@ -24,35 +24,36 @@ public class GuiHudProfiles extends GuiScreen {
     private final GuiScreen parent;
 
     // --- Palette -------------------------------------------------
-    // Couleurs et constantes utilisées pour l'interface
-    private static final int COL_BG_OVERLAY = 0xA0060608;
-    private static final int COL_PANEL_BG   = 0xF0101016;
-    private static final int COL_PANEL_BRD  = 0x28FFFFFF;
-    private static final int COL_ACCENT     = 0xFF4488FF;
-    private static final int COL_CARD_BG    = 0xFF13131A;
-    private static final int COL_CARD_HOV   = 0xFF181820;
-    private static final int COL_CARD_ACT   = 0xFF10101E;
-    private static final int COL_CARD_BRD   = 0x18FFFFFF;
-    private static final int COL_CARD_BRD_A = 0xFF4488FF;
-    private static final int COL_TXT_PRI    = 0xFFDDDDEE;
-    private static final int COL_TXT_SEC    = 0xFF888899;
-    private static final int COL_TXT_MUT    = 0xFF3A3A4A;
-    private static final int COL_SAVE       = 0xFF27AE60;
-    private static final int COL_LOAD       = 0xFF2980B9;
-    private static final int COL_DEL        = 0xFFC0392B;
-    private static final int COL_RES        = 0xFFD35400;
+    private static final int COL_BG_OVERLAY  = 0xA8050303;
+    private static final int COL_PANEL_BG    = 0xF20A0808;  // Deep dark panel
+    private static final int COL_PANEL_BRD   = 0x2BFFFFFF;
+    private static final int COL_ACCENT_LINE = 0xFFE02828;  // Vibrant red top border
+    private static final int COL_ACCENT      = 0xFFE02828;  // Vibrant red
+    private static final int COL_ACCENT_DIM  = 0xFF6E1212;  // Dim red detail
+    private static final int COL_CARD_BG     = 0xFF0D0808;
+    private static final int COL_CARD_HOV    = 0xFF161010;
+    private static final int COL_CARD_ACT    = 0xFF1A0808;  // Dark red for active card
+    private static final int COL_CARD_BRD    = 0x18FFFFFF;
+    private static final int COL_CARD_BRD_A  = 0xFFE02828;  // Red border for active card
+    private static final int COL_TXT_PRI     = 0xFFF2F2F2;
+    private static final int COL_TXT_SEC     = 0xFF8A9AB0;
+    private static final int COL_TXT_MUT     = 0xFF445060;
+    private static final int COL_SAVE        = 0xFF27AE60;
+    private static final int COL_LOAD        = 0xFF2980B9;
+    private static final int COL_DEL         = 0xFFCC3322;
+    private static final int COL_RES         = 0xFFE07822;
 
     // --- Géométrie ------------------------------------------------
     // Largeur du panneau — calculée dynamiquement dans computePanelW()
     // pour s'adapter à la résolution (min 300, max 460, environ 78% de la largeur écran)
     private int panelW = 400;
 
-    private static final int CARD_H    = 44;   // hauteur d'une carte
-    private static final int CARD_GAP  = 5;    // espace entre cartes
+    private static final int CARD_H    = 46;   // hauteur d'une carte
+    private static final int CARD_GAP  = 6;    // espace entre cartes
     private static final int PAD       = 10;   // padding panneau
-    private static final int HDR_H     = 28;   // hauteur zone titre
-    private static final int FTR_H     = 24;   // hauteur zone footer
-    private static final int BTN_H     = 13;   // hauteur des boutons d'action
+    private static final int HDR_H     = 30;   // hauteur zone titre
+    private static final int FTR_H     = 26;   // hauteur zone footer
+    private static final int BTN_H     = 15;   // hauteur des boutons d'action
     private static final int BTN_SAVE  = 46;   // largeur fixe bouton Sauver
     private static final int BTN_LOAD  = 46;   // largeur fixe bouton Charger
     private static final int BTN_DEL   = 20;   // largeur fixe bouton Supprimer (carré)
@@ -159,16 +160,21 @@ public class GuiHudProfiles extends GuiScreen {
         GlStateManager.enableBlend();
 
         // Panneau principal
+        GuiRenderUtils.drawShadow(pX, pY, panelW, pH, 8, (int)(ease * 80));
         Gui.drawRect(pX, pY, pX + panelW, pY + pH, COL_PANEL_BG);
         GuiRenderUtils.drawRectOutline(pX, pY, panelW, pH, COL_PANEL_BRD);
-        // Trait d'accent en haut
-        Gui.drawRect(pX + 1, pY, pX + panelW - 1, pY + 2, COL_ACCENT);
+        // Red top accent (2px) + léger glow
+        Gui.drawRect(pX, pY, pX + panelW, pY + 2, COL_ACCENT_LINE);
+        GuiRenderUtils.drawGradientRect(pX, pY + 2, pX + panelW, pY + 8, 0x18E02828, 0x00000000);
+        // Gradient header background
+        GuiRenderUtils.drawGradientRect(pX, pY + 2, pX + panelW, pY + PAD + HDR_H, 0xFF0E0606, COL_PANEL_BG);
 
         // En-tête
         drawHeader(pX, pY + PAD, pm);
 
-        // Séparateur sous l'en-tête
-        Gui.drawRect(pX + PAD, pY + PAD + HDR_H, pX + panelW - PAD, pY + PAD + HDR_H + 1, COL_PANEL_BRD);
+        // Séparateur sous l'en-tête avec glow subtil
+        GuiRenderUtils.drawGradientRect(pX + PAD, pY + PAD + HDR_H - 2, pX + panelW - PAD, pY + PAD + HDR_H, 0x00000000, 0x20FFFFFF);
+        Gui.drawRect(pX + PAD, pY + PAD + HDR_H, pX + panelW - PAD, pY + PAD + HDR_H + 1, 0x44FFFFFF);
 
         // Cartes
         for (int i = 0; i < HudProfileManager.MAX_PROFILES; i++) {
@@ -192,16 +198,22 @@ public class GuiHudProfiles extends GuiScreen {
     // --- En-tête -----------------------------------------------
 
     private void drawHeader(int pX, int hY, HudProfileManager pm) {
-        String title = "Profils HUD";
-        fontRendererObj.drawStringWithShadow(title, pX + PAD, hY + 2, 0xFFCCDDFF);
+        // Simple left accent bar (2px)
+        Gui.drawRect(pX + PAD, hY + 5, pX + PAD + 2, hY + HDR_H - 5, COL_ACCENT);
+
+        // Two-tone title
+        String t1 = "PROFILS ";
+        String t2 = "HUD";
+        int ty = hY + (HDR_H - 8) / 2;
+        fontRendererObj.drawStringWithShadow(t1, pX + PAD + 7, ty, 0xFFFF8888);
+        fontRendererObj.drawStringWithShadow(t2, pX + PAD + 7 + fontRendererObj.getStringWidth(t1), ty, COL_TXT_PRI);
 
         int active = pm.getActiveProfile();
         String sub = active >= 0
             ? "\u00A77Actif : \u00A7b" + pm.getProfileName(active)
             : "\u00A77Aucun profil actif";
-        // Sous-titre aligné à droite dans le header
         int subX = pX + panelW - PAD - fontRendererObj.getStringWidth(sub);
-        fontRendererObj.drawStringWithShadow(sub, subX, hY + 2, COL_TXT_SEC);
+        fontRendererObj.drawStringWithShadow(sub, subX, ty, COL_TXT_SEC);
     }
 
     // --- Carte --------------------------------------------------
@@ -213,40 +225,49 @@ public class GuiHudProfiles extends GuiScreen {
         boolean hovCard = inRect(mx, my, x, y, w, CARD_H);
 
         // Fond
-        int bg = active ? COL_CARD_ACT : (hovCard ? COL_CARD_HOV : COL_CARD_BG);
-        Gui.drawRect(x, y, x + w, y + CARD_H, bg);
+        if (active) {
+            GuiRenderUtils.drawGradientRect(x, y, x + w, y + CARD_H, 0xFF180808, COL_CARD_ACT);
+        } else {
+            Gui.drawRect(x, y, x + w, y + CARD_H, hovCard ? COL_CARD_HOV : COL_CARD_BG);
+        }
         GuiRenderUtils.drawRectOutline(x, y, w, CARD_H, active ? COL_CARD_BRD_A : COL_CARD_BRD);
 
-        // Trait gauche actif
-        if (active) Gui.drawRect(x, y + 1, x + 2, y + CARD_H - 1, COL_ACCENT);
+        // Left accent stripe (2px) for active card only
+        if (active) {
+            Gui.drawRect(x, y + 1, x + 2, y + CARD_H - 1, COL_ACCENT);
+        }
 
         // Ligne haute : badge + nom + état
         int topRowY = y + 6;
         // Badge
-        int bx = x + 6, by = y + (CARD_H - BADGE_S) / 2;
-        Gui.drawRect(bx, by, bx + BADGE_S, by + BADGE_S,
-                     active ? 0xFF1A4080 : (used ? 0x20FFFFFF : 0x0CFFFFFF));
-        if (active) GuiRenderUtils.drawRectOutline(bx, by, BADGE_S, BADGE_S, COL_ACCENT);
+        int bx = x + 7, by = y + (CARD_H - BADGE_S) / 2;
+        if (active) {
+            Gui.drawRect(bx, by, bx + BADGE_S, by + BADGE_S, 0xFF300808);
+            GuiRenderUtils.drawRectOutline(bx, by, BADGE_S, BADGE_S, COL_ACCENT);
+        } else {
+            Gui.drawRect(bx, by, bx + BADGE_S, by + BADGE_S, used ? 0x18FFFFFF : 0x0AFFFFFF);
+            GuiRenderUtils.drawRectOutline(bx, by, BADGE_S, BADGE_S, used ? 0x22FFFFFF : 0x10FFFFFF);
+        }
         String num = String.valueOf(slot + 1);
         fontRendererObj.drawString(num,
             bx + (BADGE_S - fontRendererObj.getStringWidth(num)) / 2,
-            by + (BADGE_S - 8) / 2, active ? 0xFFAAD4FF : 0xFF888899);
+            by + (BADGE_S - 8) / 2, active ? 0xFFFF8888 : (used ? 0xFFAAAAAA : 0xFF556066));
 
         // Nom / champ de renommage
-        int nameX = x + 6 + BADGE_S + 6;
-        int maxNameW = w - (BADGE_S + 14) - computeActionsWidth(used, active, slot) - 6;
+        int nameX = x + 7 + BADGE_S + 7;
+        int maxNameW = w - (BADGE_S + 16) - computeActionsWidth(used, active, slot) - 6;
 
         if (renamingSlot == slot) {
             String cur = (System.currentTimeMillis() / 500 % 2 == 0) ? "|" : "";
             String disp = renameBuffer + cur;
             int fieldW = Math.min(maxNameW, 110);
-            Gui.drawRect(nameX - 1, topRowY - 1, nameX + fieldW + 1, topRowY + 10, 0x22000000);
+            Gui.drawRect(nameX - 1, topRowY - 1, nameX + fieldW + 1, topRowY + 10, 0x18000000);
             GuiRenderUtils.drawRectOutline(nameX - 1, topRowY - 1, fieldW + 2, 11, COL_ACCENT);
             fontRendererObj.drawString(clipText(disp, fieldW), nameX + 1, topRowY, COL_TXT_PRI);
         } else {
             // Nom
             String name = used ? pm.getProfileName(slot) : "Vide";
-            int nameCol = active ? 0xFFAAD4FF : (used ? COL_TXT_PRI : COL_TXT_MUT);
+            int nameCol = active ? 0xFFFF8888 : (used ? COL_TXT_PRI : COL_TXT_MUT);
             fontRendererObj.drawString(clipText(name, maxNameW), nameX, topRowY, nameCol);
 
             // Crayon (renommage) juste après le nom si utilisé
@@ -327,33 +348,42 @@ public class GuiHudProfiles extends GuiScreen {
     private void drawToast(long now, int pY) {
         if (now - toastTime >= 2200L) return;
         float t = 1f - (float)(now - toastTime) / 2200f;
-        int a = (int)(t * 210);
+        int a = (int)(t * 200);
         String msg = toastMsg;
-        int tw = fontRendererObj.getStringWidth(msg) + 14;
+        int tw = fontRendererObj.getStringWidth(msg) + 16;
         int tx = (this.width - tw) / 2;
         int ty = pY - 20;
         if (ty < 2) ty = 2;
-        Gui.drawRect(tx, ty, tx + tw, ty + 14, (a << 24) | (COL_PANEL_BG & 0xFFFFFF));
+        Gui.drawRect(tx, ty, tx + tw, ty + 14, (a << 24) | (COL_PANEL_BG & 0x00FFFFFF));
         GuiRenderUtils.drawRectOutline(tx, ty, tw, 14, (a << 24) | (toastCol & 0xFFFFFF));
-        fontRendererObj.drawString(msg, tx + 7, ty + 3, (a << 24) | (toastCol & 0xFFFFFF));
+        fontRendererObj.drawString(msg, tx + 8, ty + 3, (a << 24) | (toastCol & 0xFFFFFF));
     }
 
     // --- Bouton générique compact --------------------------------
 
     private void drawSmallBtn(int x, int y, int w, int h,
                                String text, boolean hov, int col) {
-        int bgA  = hov ? 0x66 : 0x20;
-        int brdA = hov ? 0xCC : 0x40;
+        int bgA  = hov ? 0x55 : 0x18;
+        int brdA = hov ? 0xBB : 0x38;
         Gui.drawRect(x, y, x + w, y + h, (bgA << 24) | (col & 0xFFFFFF));
         GuiRenderUtils.drawRectOutline(x, y, w, h, (brdA << 24) | (col & 0xFFFFFF));
         int tc = hov ? 0xFFFFFFFF : ((0xBB << 24) | (col & 0xFFFFFF));
+
+        // Le glyphe Unicode ✕ varie selon le renderer; on dessine une croix pixel-perfect centrée.
+        if ("\u2715".equals(text)) {
+            int cx = x + w / 2;
+            int cy = y + h / 2;
+            for (int i = -3; i <= 3; i++) {
+                Gui.drawRect(cx + i, cy + i, cx + i + 1, cy + i + 1, tc);
+                Gui.drawRect(cx + i, cy - i, cx + i + 1, cy - i + 1, tc);
+            }
+            return;
+        }
+
         String clipped = clipText(text, w - 4);
         int textW = fontRendererObj.getStringWidth(clipped);
-        int textH = fontRendererObj.FONT_HEIGHT;
         int tx = x + (w - textW) / 2;
-        int ty = y + (h - textH) / 2;
-        // Petite correction visuelle pour icônes d'un seul caractère (croix, etc.)
-        if (clipped.length() == 1) ty += 1;
+        int ty = y + (h - 8) / 2;
         fontRendererObj.drawString(clipped, tx, ty, tc);
     }
 
@@ -411,7 +441,7 @@ public class GuiHudProfiles extends GuiScreen {
 
         // Fermeture renommage si clic hors du champ
         if (renamingSlot >= 0) {
-            int fieldX = pX + PAD + BADGE_S + 18;
+            int fieldX = pX + PAD + BADGE_S + 18;  // cx + 7 + BADGE_S + 7 - 1 ≈ PAD + BADGE_S + 13
             int fieldY = csY + renamingSlot * (CARD_H + CARD_GAP) + 5;
             if (!inRect(mx, my, fieldX - 1, fieldY - 1, 112, 11)) finishRenaming();
             return;
@@ -468,9 +498,9 @@ public class GuiHudProfiles extends GuiScreen {
 
             // Crayon renommage
             if (used) {
-                int nameX  = cx + 6 + BADGE_S + 6;
+                int nameX  = cx + 7 + BADGE_S + 7;
                 String name = pm.getProfileName(i);
-                int maxNW  = cw - (BADGE_S + 14) - computeActionsWidth(used, active, i) - 6;
+                int maxNW  = cw - (BADGE_S + 16) - computeActionsWidth(used, active, i) - 6;
                 String clipped = clipText(name, maxNW);
                 int cw2    = fontRendererObj.getStringWidth(clipped);
                 int penX   = nameX + cw2 + 4;

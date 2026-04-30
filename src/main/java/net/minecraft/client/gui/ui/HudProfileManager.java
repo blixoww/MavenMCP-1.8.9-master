@@ -324,7 +324,7 @@ public class HudProfileManager {
         int sw = screen[0], sh = screen[1];
 
         Set<String> explorationWidgets = new HashSet<>(Arrays.asList(
-            "fps", "dir", "coords", "biome", "helditem", "date"
+            "fps", "dir", "coords", "biome", "helditem", "date", "compass"
         ));
 
         Map<String, int[]> positions = new LinkedHashMap<>();
@@ -335,6 +335,7 @@ public class HudProfileManager {
         positions.put("biome",  new int[]{leftX, topY + lineH * 3});
         positions.put("date",   new int[]{leftX, topY + lineH * 4});
         positions.put("helditem", new int[]{sw - 55, sh - 20});
+        positions.put("compass", new int[]{sw / 2 - 50, 5});
 
         Map<String, Map<String, Object>> profileData = new LinkedHashMap<>();
         for (UIElement e : ui.all()) {

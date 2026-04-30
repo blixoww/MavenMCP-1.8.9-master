@@ -64,18 +64,22 @@ public class GuiMainMenu extends GuiScreen
     private final List<AmbientParticle> particles = new ArrayList<>();
     private final List<AmbientParticle> particlePool = new ArrayList<>();
     private final Random rng = new Random();
-    private static final int PARTICLE_MAX = 100;
+    private static final int PARTICLE_MAX = 40;
 
     // ── Layout ──────────────────────────────────────────────────────────────
     private int logoY, btnStartY, btnW, btnH, btnGap, smallBtnW;
     private float logoPxHalfWidth = 130f;
     private int[] btnYCache = new int[0];
 
-    // ── Couleurs (Ajustées pour plus de modernité et moins de saturation brute) ──
-    private static final int RED        = 0xE63946;
+    // ── Couleurs (palette restreinte : rouge, blanc, noir transparent)
+    private static final int RED        = 0xE63946; // accent rouge
     private static final int RED_BRIGHT = 0xFF5E6A;
     private static final int RED_DIM    = 0xB22D38;
     private static final int RED_DARK   = 0x8D222B;
+    private static final int COLOR_WHITE = 0x00FFFFFF; // RGB white (use with alpha)
+    private static final int WHITE_SOLID = 0xFFFFFFFF; // ARGB white full
+    private static final int WHITE_DIM   = 0xAAFFFFFF; // ARGB dim white
+    private static final int COLOR_BLACK = 0x000000;   // RGB black
 
     // ── Client info ─────────────────────────────────────────────────────────
     private static final String CLIENT_NAME = "REDCONFLICT";
@@ -94,7 +98,7 @@ public class GuiMainMenu extends GuiScreen
         ++this.panoramaTimer;
 
         // Spawn progressif de particules
-        if (particles.size() < PARTICLE_MAX && rng.nextInt(2) == 0)
+        if (particles.size() < PARTICLE_MAX && rng.nextInt(4) == 0)
         {
             float spawnX = rng.nextFloat() * (this.width  > 0 ? this.width  : 854);
             float spawnY = (this.height > 0 ? this.height : 480) + 10f;
@@ -303,6 +307,8 @@ public class GuiMainMenu extends GuiScreen
             GlStateManager.color(1f, 1f, 1f, btnAlpha);
         }
         super.drawScreen(mouseX, mouseY, partialTicks);
+        // Reset couleur GL — important pour éviter les artefacts visuels sur les éléments suivants
+        GlStateManager.color(1f, 1f, 1f, 1f);
 
         // Restore positions
         for (int i = 0; i < this.buttonList.size(); i++) {
@@ -352,29 +358,26 @@ public class GuiMainMenu extends GuiScreen
         // Vignette bas
         drawGradientRect(0, height - 60, width, height, 0x00000000, (vigA << 24));
 
-        // Vignettes laterales subtiles
+        // Vignettes latérales — 5 tranches larges au lieu de 40 lignes (8× moins de draw calls)
         int sideA = (int)(30f * fade);
-        for (int i = 0; i < 40; i++) {
-            int a = sideA * (40 - i) / 40;
-            drawRect(i, 0, i + 1, height, (a << 24));
-            drawRect(width - i - 1, 0, width - i, height, (a << 24));
+        int steps = 5;
+        for (int i = 0; i < steps; i++) {
+            int a = sideA * (steps - i) / steps;
+            int x0 = 40 * i / steps;
+            int x1 = 40 * (i + 1) / steps;
+            drawRect(x0, 0, x1, height, (a << 24));
+            drawRect(width - x1, 0, width - x0, height, (a << 24));
         }
     }
 
-    /** Scanlines subtiles pour un look tech/PvP */
+    /** Scanlines — un seul drawRect au lieu d'une boucle (~360 draw calls économisés/frame) */
     private void renderScanlines(float fade)
     {
         if (fade <= 0.3f) return;
-        int a = (int)(6f * fade);
+        int a = (int)(4f * fade);
         if (a <= 0) return;
-
-        // Dessiner des lignes horizontales tous les 3 pixels
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(770, 771);
-        for (int y = 0; y < height; y += 3) {
-            drawRect(0, y, width, y + 1, (a << 24));
-        }
-        GlStateManager.disableBlend();
+        // Un seul overlay au lieu de height/3 appels drawRect
+        drawRect(0, 0, width, height, (a << 24));
     }
 
     /** Particules ambiantes ameliorees */
@@ -394,8 +397,8 @@ public class GuiMainMenu extends GuiScreen
             float alphaFactor = p.alpha * fade;
             if (alphaFactor <= 0.02f) continue;
 
-            float a = MathHelper.clamp_float(alphaFactor, 0f, 1f);
-            int col = p.color & 0x00FFFFFF;
+                    float a = MathHelper.clamp_float(alphaFactor, 0f, 1f);
+                    int col = p.color & 0x00FFFFFF;
             int alpha = (int)(a * 255f);
             int color = (alpha << 24) | col;
 
@@ -431,7 +434,7 @@ public class GuiMainMenu extends GuiScreen
         int halfW = (int)logoPxHalfWidth;
         int cy   = logoY + 16;
 
-        int layers = 8;
+        int layers = 3;
         for (int i = 1; i <= layers; i++)
         {
             float factor = 1f - (float)(i - 1) / layers;
@@ -475,7 +478,7 @@ public class GuiMainMenu extends GuiScreen
 
         // Texte principal
         fontRendererObj.drawString(t1, (int)(-total / 2f),      0, (aFull << 24) | RED,        false);
-        fontRendererObj.drawString(t2, (int)(-total / 2f + w1), 0, (aFull << 24) | 0xEEEEEE,   false);
+        fontRendererObj.drawString(t2, (int)(-total / 2f + w1), 0, (aFull << 24) | (COLOR_WHITE & 0x00FFFFFF),   false);
 
         GlStateManager.popMatrix();
     }
@@ -490,10 +493,10 @@ public class GuiMainMenu extends GuiScreen
         int sw = fontRendererObj.getStringWidth(sub);
         // Position ajustée pour être plus proche du titre
         int yOff = (int)(8 * logoScale) + 8;
-        fontRendererObj.drawString(sub, width / 2 - sw / 2, logoY + yOff, (a << 24) | 0x999999, false);
+        fontRendererObj.drawString(sub, width / 2 - sw / 2, logoY + yOff, (a << 24) | (COLOR_WHITE & 0x00FFFFFF), false);
     }
 
-    /** Separateur anime avec onde sinusoidale */
+    /** Separateur anime — 2 drawGradientRect au lieu de ~250 drawRect pixel par pixel */
     private void renderAnimatedSeparator(float fade)
     {
         if (fade <= 0.01f) return;
@@ -501,33 +504,23 @@ public class GuiMainMenu extends GuiScreen
         int cx    = width / 2;
         int halfW = (int)(logoPxHalfWidth * 0.7f);
         int y     = logoY + (int)(8 * logoScale) + 22;
-        int a     = (int)(200f * fade);
 
         float time = (float)(System.currentTimeMillis() % 3000L) / 3000f;
+        float breathe = (float)(Math.sin(time * Math.PI * 2.0) * 0.2 + 0.8);
+        int a = (int)(200f * fade * breathe);
 
-        // Bras gauche avec animation
-        for (int i = 0; i < halfW - 5; i++) {
-            float progress = (float)i / (halfW - 5);
-            float wave = (float)(Math.sin(progress * 4.0 + time * Math.PI * 2.0) * 0.5 + 0.5);
-            int lineA = (int)(a * progress * (0.6f + 0.4f * wave));
-            drawRect(cx - halfW + i, y, cx - halfW + i + 1, y + 1,
-                    (lineA << 24) | RED);
-        }
+        // Bras gauche : gradient transparent → rouge (1 draw call)
+        GuiRenderUtils.drawGradientRect(cx - halfW, y, cx - 4, y + 1,
+                0x00000000, (a << 24) | RED);
 
-        // Bras droit avec animation
-        for (int i = 0; i < halfW - 5; i++) {
-            float progress = (float)i / (halfW - 5);
-            float wave = (float)(Math.sin(progress * 4.0 - time * Math.PI * 2.0) * 0.5 + 0.5);
-            int lineA = (int)(a * progress * (0.6f + 0.4f * wave));
-            drawRect(cx + 5 + (halfW - 5 - i) - 1, y, cx + 5 + (halfW - 5 - i), y + 1,
-                    (lineA << 24) | RED);
-        }
+        // Bras droit : gradient rouge → transparent (1 draw call)
+        GuiRenderUtils.drawGradientRect(cx + 4, y, cx + halfW, y + 1,
+                (a << 24) | RED, 0x00000000);
 
         // Point central anime (pulsation)
         float centerPulse = (float)(Math.sin(time * Math.PI * 4.0) * 0.3 + 0.7);
         int da = (int)(240f * fade * centerPulse);
         drawRect(cx - 2, y - 1, cx + 3, y + 2, (da << 24) | RED_BRIGHT);
-        // Glow du point central
         int ga = (int)(80f * fade * centerPulse);
         drawRect(cx - 3, y - 2, cx + 4, y + 3, (ga << 24) | RED);
     }
@@ -545,21 +538,18 @@ public class GuiMainMenu extends GuiScreen
         int x2    = cx + btnW / 2 + padX;
         int y2    = row3Y + btnH + padY;
 
-        // Fond verre avec gradient subtil
+        // Fond verre avec gradient subtil (noir transparent)
         int bgA = (int)(16f * fade);
         GuiRenderUtils.drawGradientRect(x1, y1, x2, y2,
-                (bgA << 24) | 0x111111, ((bgA + 4) << 24) | 0x080808);
+                (bgA << 24) | (COLOR_BLACK & 0x00FFFFFF), ((bgA + 4) << 24) | (COLOR_BLACK & 0x00FFFFFF));
 
-        // Bordure fine
+        // Bordure fine (blanc transparent)
         int borderA = (int)(24f * fade);
-        GuiRenderUtils.drawRectOutline(x1, y1, x2 - x1, y2 - y1, (borderA << 24) | 0xFFFFFF);
+        GuiRenderUtils.drawRectOutline(x1, y1, x2 - x1, y2 - y1, (borderA << 24) | (COLOR_WHITE & 0x00FFFFFF));
 
-        // Accent rouge en haut du panel (fine ligne)
+        // Accent rouge en haut du panel — un seul drawRect pour éviter le pixel décalé au centre
         int accentA = (int)(60f * fade);
-        GuiRenderUtils.drawGradientRect(x1 + 1, y1, cx, y1 + 1,
-                (0 << 24) | RED, (accentA << 24) | RED);
-        GuiRenderUtils.drawGradientRect(cx, y1, x2 - 1, y1 + 1,
-                (accentA << 24) | RED, (0 << 24) | RED);
+        drawRect(x1 + 1, y1, x2 - 1, y1 + 1, (accentA << 24) | RED);
     }
 
     /** Barre superieure avec badge client et infos */
@@ -574,9 +564,9 @@ public class GuiMainMenu extends GuiScreen
         // Ligne separatrice avec gradient
         int lineA = (int)(35f * fade);
         GuiRenderUtils.drawGradientRect(0, 28, width / 2, 29,
-                0x00000000, (lineA << 24) | 0xFFFFFF);
+                0x00000000, (lineA << 24) | (COLOR_WHITE & 0x00FFFFFF));
         GuiRenderUtils.drawGradientRect(width / 2, 28, width, 29,
-                (lineA << 24) | 0xFFFFFF, 0x00000000);
+                (lineA << 24) | (COLOR_WHITE & 0x00FFFFFF), 0x00000000);
 
         // Badge CLIENT avec style
         String lbl = CLIENT_NAME;
@@ -585,19 +575,19 @@ public class GuiMainMenu extends GuiScreen
         int pX  = 6, pY = 4;
         int bdgA = (int)(255f * fade);
 
-        // Fond du badge
-        drawRect(px, py, px + tw + pX * 2, py + 8 + pY * 2, (bdgA << 24) | 0x0A0A0A);
+        // Fond du badge (noir transparent)
+        drawRect(px, py, px + tw + pX * 2, py + 8 + pY * 2, (bdgA << 24) | (COLOR_BLACK & 0x00FFFFFF));
         // Bordure rouge
         GuiRenderUtils.drawRectOutline(px, py, tw + pX * 2, 8 + pY * 2, (bdgA << 24) | RED_DIM);
         // Accent gauche
         drawRect(px, py + 1, px + 2, py + 8 + pY * 2 - 1, (bdgA << 24) | RED);
-        // Texte
-        fontRendererObj.drawString(lbl, px + pX + 1, py + pY, (bdgA << 24) | 0xFFFFFF);
+        // Texte (blanc)
+        fontRendererObj.drawString(lbl, px + pX + 1, py + pY, (bdgA << 24) | (COLOR_WHITE & 0x00FFFFFF));
 
-        // Version a droite du badge
+        // Version a droite du badge (blanc atténué)
         String ver = CLIENT_VERSION;
         int verA = (int)(120f * fade);
-        fontRendererObj.drawString(ver, px + tw + pX * 2 + 6, py + pY, (verA << 24) | 0x888888);
+        fontRendererObj.drawString(ver, px + tw + pX * 2 + 6, py + pY, (verA << 24) | (COLOR_WHITE & 0x00FFFFFF));
     }
 
     /** Affiche les infos du joueur en haut a droite, sans chevaucher le Discord */
@@ -608,20 +598,20 @@ public class GuiMainMenu extends GuiScreen
         String playerName = mc.getSession().getUsername();
         int nameW = fontRendererObj.getStringWidth(playerName);
         int a = (int)(200f * fade);
-        int dimA = (int)(80f * fade);
+        // int dimA = (int)(80f * fade); // Non utilise
 
         // On prend en compte le bouton Discord (positionné à width - discW - 10)
         String discLabel = "Discord";
         int discW = fontRendererObj.getStringWidth(discLabel) + 16;
-        
+
         int rx = width - nameW - discW - 35; // Positionné à gauche du Discord
         int ry = 12; // Aligné avec le texte du bouton Discord (7 + 5)
 
         // Petit indicateur "online" (point vert)
         drawRect(rx - 2, ry + 2, rx + 3, ry + 7, (a << 24) | 0x44CC44);
 
-        // Nom du joueur
-        fontRendererObj.drawStringWithShadow(playerName, rx + 6, ry, (a << 24) | 0xFFFFFF);
+        // Nom du joueur (blanc)
+        fontRendererObj.drawStringWithShadow(playerName, rx + 6, ry, (a << 24) | (COLOR_WHITE & 0x00FFFFFF));
     }
 
     /** Footer avec infos PvP et version Minecraft */
@@ -636,9 +626,9 @@ public class GuiMainMenu extends GuiScreen
         // Ligne separatrice avec gradient
         int lineA = (int)(30f * fade);
         GuiRenderUtils.drawGradientRect(0, height - 24, width / 2, height - 23,
-                0x00000000, (lineA << 24) | 0xFFFFFF);
+                0x00000000, (lineA << 24) | (COLOR_WHITE & 0x00FFFFFF));
         GuiRenderUtils.drawGradientRect(width / 2, height - 24, width, height - 23,
-                (lineA << 24) | 0xFFFFFF, 0x00000000);
+                (lineA << 24) | (COLOR_WHITE & 0x00FFFFFF), 0x00000000);
 
         int py = height - 16;
         int a  = (int)(150f * fade);
@@ -652,12 +642,12 @@ public class GuiMainMenu extends GuiScreen
         drawRect(10, py + 1, 14, py + 5, (pulseA << 24) | RED);
 
         String leftText = "\u00a78" + CLIENT_NAME + "  \u00a77" + CLIENT_VERSION + "  \u00a78| \u00a77" + CLIENT_EDITION;
-        fontRendererObj.drawStringWithShadow(leftText, 18, py - 1, (a << 24) | 0xFFFFFF);
+        fontRendererObj.drawStringWithShadow(leftText, 18, py - 1, (a << 24) | (COLOR_WHITE & 0x00FFFFFF));
 
         // ── Droite : version Minecraft ───────────────────────────────────
         String mcVer = "Minecraft 1.8.9";
         int mcW = fontRendererObj.getStringWidth(mcVer);
-        fontRendererObj.drawString(mcVer, width - mcW - 10, py - 1, (dimA << 24) | 0x666666, false);
+        fontRendererObj.drawString(mcVer, width - mcW - 10, py - 1, (dimA << 24) | (COLOR_WHITE & 0x00FFFFFF), false);
     }
 
     // =========================================================================
@@ -837,14 +827,14 @@ public class GuiMainMenu extends GuiScreen
             // Mouvement plus fluide et organique
             float wave = MathHelper.sin((float)age * 0.05f + seed);
             vx = vx * 0.99f + wave * 0.02f;
-            
+
             // Pulsation legere de la taille
             size += MathHelper.sin((float)age * 0.1f) * 0.01f;
-            
+
             x += vx;
             y += vy;
             age++;
-            
+
             float lifeNorm = (float)age / (float)life;
             // Fade in/out en cloche pour plus de douceur
             alpha = MathHelper.sin(lifeNorm * (float)Math.PI);
@@ -902,11 +892,11 @@ public class GuiMainMenu extends GuiScreen
                 int shimA = (int)(15f * t);
                 GuiRenderUtils.drawGradientRect(xPosition + 1, yPosition,
                         xPosition + width - 1, yPosition + 2,
-                        (shimA << 24) | 0xFFFFFF, 0x00FFFFFF);
+                        (shimA << 24) | (COLOR_WHITE & 0x00FFFFFF), 0x00FFFFFF);
             }
 
-            // Texte
-            int txtCol = GuiRenderUtils.colorLerp(0xFF888888, 0xFFFFFFFF, t);
+            // Texte (de Gris -> Blanc, mais palette limitée à blanc)
+            int txtCol = GuiRenderUtils.colorLerp(WHITE_DIM, WHITE_SOLID, t);
             drawCenteredString(mc.fontRendererObj, displayString,
                     xPosition + width / 2, yPosition + (height - 8) / 2, txtCol);
 
@@ -917,8 +907,8 @@ public class GuiMainMenu extends GuiScreen
                 int tx = xPosition + width / 2 - tw / 2;
                 int ty = yPosition + height + 4;
                 drawRect(tx - 4, ty - 2, tx + tw + 4, ty + 11, 0xDD000000);
-                GuiRenderUtils.drawRectOutline(tx - 4, ty - 2, tw + 8, 13, 0x33FFFFFF);
-                mc.fontRendererObj.drawStringWithShadow(tooltip, tx, ty, 0xFFCCCCCC);
+                GuiRenderUtils.drawRectOutline(tx - 4, ty - 2, tw + 8, 13, (0x33 << 24) | (COLOR_WHITE & 0x00FFFFFF));
+                mc.fontRendererObj.drawStringWithShadow(tooltip, tx, ty, WHITE_DIM);
             }
         }
 

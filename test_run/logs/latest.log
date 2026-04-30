@@ -1,282 +1,165 @@
-[20:52:19] [Client thread/INFO]: Setting user: leziink
-[20:52:19] [Client thread/INFO]: (Session ID is token:0:leziink)
-[20:52:20] [Client thread/INFO]: [OptiFine] *** Reflector Forge ***
-[20:52:20] [Client thread/INFO]: [OptiFine] *** Reflector Vanilla ***
-[20:52:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.eventhandler.Event$Result
-[20:52:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraft.launchwrapper.Launch
-[20:52:20] [Client thread/INFO]: LWJGL Version: 2.9.4
-[20:52:20] [Client thread/INFO]: [OptiFine] 
-[20:52:20] [Client thread/INFO]: [OptiFine] OptiFine_1.8.9_HD_U_M6_pre2
-[20:52:20] [Client thread/INFO]: [OptiFine] Build: null
-[20:52:20] [Client thread/INFO]: [OptiFine] OS: Windows 10 (amd64) version 10.0
-[20:52:20] [Client thread/INFO]: [OptiFine] Java: 1.8.0_181, Oracle Corporation
-[20:52:20] [Client thread/INFO]: [OptiFine] VM: Java HotSpot(TM) 64-Bit Server VM (mixed mode), Oracle Corporation
-[20:52:20] [Client thread/INFO]: [OptiFine] LWJGL: 2.9.4
-[20:52:20] [Client thread/INFO]: [OptiFine] OpenGL: AMD Radeon RX 7800 XT, version 4.6.0 Compatibility Profile Context 26.3.1.260309, ATI Technologies Inc.
-[20:52:20] [Client thread/INFO]: [OptiFine] OpenGL Version: 4.6.0
-[20:52:20] [Client thread/INFO]: [OptiFine] OpenGL Fancy fog: Not available (GL_NV_fog_distance)
-[20:52:20] [Client thread/INFO]: [OptiFine] Maximum texture size: 16384x16384
-[20:52:20] [VersionCheck/INFO]: [OptiFine] Checking for new version
-[20:52:20] [Client thread/INFO]: [Shaders] OpenGL Version: 4.6.0 Compatibility Profile Context 26.3.1.260309
-[20:52:20] [Client thread/INFO]: [Shaders] Vendor:  ATI Technologies Inc.
-[20:52:20] [Client thread/INFO]: [Shaders] Renderer: AMD Radeon RX 7800 XT
-[20:52:20] [Client thread/INFO]: [Shaders] Capabilities:  2.0  2.1  3.0  3.2  4.0 
-[20:52:20] [Client thread/INFO]: [Shaders] GL_MAX_DRAW_BUFFERS: 8
-[20:52:20] [Client thread/INFO]: [Shaders] GL_MAX_COLOR_ATTACHMENTS_EXT: 8
-[20:52:20] [Client thread/INFO]: [Shaders] GL_MAX_TEXTURE_IMAGE_UNITS: 32
-[20:52:20] [Client thread/INFO]: [Shaders] Load shaders configuration.
-[20:52:20] [Client thread/INFO]: [Shaders] No shaderpack loaded.
-[20:52:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.Loader
-[20:52:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.client.SplashProgress
-[20:52:20] [Client thread/INFO]: Reloading ResourceManager: Default
-[20:52:20] [Client thread/INFO]: [OptiFine] *** Reloading textures ***
-[20:52:20] [Client thread/INFO]: [OptiFine] Resource packs: Default
-[20:52:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.Attributes
-[20:52:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.client.renderer.vertex.VertexFormatElement$EnumUsage.preDraw
-[20:52:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.client.renderer.vertex.VertexFormatElement$EnumUsage.postDraw
-[20:52:20] [Sound Library Loader/INFO]: Starting up SoundSystem...
-[20:52:20] [VersionCheck/INFO]: [OptiFine] Version found: M5
-[20:52:20] [Thread-7/INFO]: Initializing LWJGL OpenAL
-[20:52:20] [Thread-7/INFO]: (The LWJGL binding of OpenAL.  For more information, see http://www.lwjgl.org)
-[20:52:20] [Thread-7/INFO]: OpenAL initialized.
-[20:52:20] [Client thread/WARN]: Unable to load variant: half=bottom,variant=nether_brick from minecraft:obsidian_slab#half=bottom,variant=nether_brick
-[20:52:20] [Client thread/WARN]: Unable to load variant: half=top,variant=wood_old from minecraft:obsidian_slab#half=top,variant=wood_old
-[20:52:20] [Client thread/WARN]: Unable to load variant: seamless=false,variant=sandstone from minecraft:double_obsidian_slab#seamless=false,variant=sandstone
-[20:52:20] [Client thread/WARN]: Unable to load variant: half=bottom,variant=cobblestone from minecraft:obsidian_slab#half=bottom,variant=cobblestone
-[20:52:20] [Client thread/WARN]: Unable to load variant: half=top,variant=sandstone from minecraft:obsidian_slab#half=top,variant=sandstone
-[20:52:20] [Client thread/WARN]: Unable to load variant: seamless=true,variant=cobblestone from minecraft:double_obsidian_slab#seamless=true,variant=cobblestone
-[20:52:20] [Client thread/WARN]: Unable to load variant: seamless=false,variant=wood_old from minecraft:double_obsidian_slab#seamless=false,variant=wood_old
-[20:52:20] [Client thread/WARN]: Unable to load variant: seamless=false,variant=nether_brick from minecraft:double_obsidian_slab#seamless=false,variant=nether_brick
-[20:52:20] [Client thread/WARN]: Unable to load variant: half=bottom,variant=brick from minecraft:obsidian_slab#half=bottom,variant=brick
-[20:52:20] [Client thread/WARN]: Unable to load variant: half=bottom,variant=wood_old from minecraft:obsidian_slab#half=bottom,variant=wood_old
-[20:52:20] [Client thread/WARN]: Unable to load variant: seamless=true,variant=wood_old from minecraft:double_obsidian_slab#seamless=true,variant=wood_old
-[20:52:20] [Client thread/WARN]: Unable to load variant: half=top,variant=nether_brick from minecraft:obsidian_slab#half=top,variant=nether_brick
-[20:52:20] [Client thread/WARN]: Unable to load variant: half=top,variant=quartz from minecraft:obsidian_slab#half=top,variant=quartz
-[20:52:20] [Client thread/WARN]: Unable to load variant: seamless=false,variant=stone_brick from minecraft:double_obsidian_slab#seamless=false,variant=stone_brick
-[20:52:20] [Client thread/WARN]: Unable to load variant: half=top,variant=stone_brick from minecraft:obsidian_slab#half=top,variant=stone_brick
-[20:52:20] [Client thread/WARN]: Unable to load variant: seamless=false,variant=quartz from minecraft:double_obsidian_slab#seamless=false,variant=quartz
-[20:52:20] [Client thread/WARN]: Unable to load variant: seamless=true,variant=quartz from minecraft:double_obsidian_slab#seamless=true,variant=quartz
-[20:52:20] [Client thread/WARN]: Unable to load variant: seamless=true,variant=stone_brick from minecraft:double_obsidian_slab#seamless=true,variant=stone_brick
-[20:52:20] [Client thread/WARN]: Unable to load variant: half=bottom,variant=sandstone from minecraft:obsidian_slab#half=bottom,variant=sandstone
-[20:52:20] [Client thread/WARN]: Unable to load variant: seamless=false,variant=cobblestone from minecraft:double_obsidian_slab#seamless=false,variant=cobblestone
-[20:52:20] [Client thread/WARN]: Unable to load variant: seamless=true,variant=sandstone from minecraft:double_obsidian_slab#seamless=true,variant=sandstone
-[20:52:20] [Client thread/WARN]: Unable to load variant: half=top,variant=cobblestone from minecraft:obsidian_slab#half=top,variant=cobblestone
-[20:52:20] [Client thread/WARN]: Unable to load variant: half=bottom,variant=stone_brick from minecraft:obsidian_slab#half=bottom,variant=stone_brick
-[20:52:20] [Client thread/WARN]: Unable to load variant: seamless=false,variant=brick from minecraft:double_obsidian_slab#seamless=false,variant=brick
-[20:52:20] [Client thread/WARN]: Unable to load variant: half=top,variant=brick from minecraft:obsidian_slab#half=top,variant=brick
-[20:52:20] [Client thread/WARN]: Unable to load variant: seamless=true,variant=brick from minecraft:double_obsidian_slab#seamless=true,variant=brick
-[20:52:20] [Client thread/WARN]: Unable to load variant: half=bottom,variant=quartz from minecraft:obsidian_slab#half=bottom,variant=quartz
-[20:52:20] [Client thread/WARN]: Unable to load variant: seamless=true,variant=nether_brick from minecraft:double_obsidian_slab#seamless=true,variant=nether_brick
-[20:52:21] [Sound Library Loader/INFO]: Sound engine started
-[20:52:22] [Client thread/INFO]: [OptiFine] Sprite size: 32
-[20:52:22] [Client thread/INFO]: [OptiFine] Mipmap levels: 5
-[20:52:22] [Client thread/INFO]: [OptiFine] Multitexture: false
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.ForgeHooksClient
-[20:52:22] [Client thread/INFO]: [OptiFine] Scaled too small texture: minecraft:blocks/redstone_dust_cross_overlay, 16 -> 32
-[20:52:22] [Client thread/INFO]: [OptiFine] Scaled too small texture: minecraft:blocks/redstone_dust_line_overlay, 16 -> 32
-[20:52:22] [Client thread/INFO]: Created: 1024x1024 textures-atlas
-[20:52:22] [Client thread/INFO]: [OptiFine] Animated sprites: 11
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.ItemModelMesherForge
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.ModelLoader
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.client.registry.RenderingRegistry
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.ForgeModContainer
-[20:52:22] [Client thread/INFO]: [CustomPackets] ✓ Initialisation du système de packets custom...
-[20:52:22] [Client thread/INFO]: [CustomPackets] ✓ HdvPacketHandler enregistré
-[20:52:22] [Client thread/INFO]: [CustomPackets] ✓ PingSystem handler enregistré
-[20:52:22] [Client thread/INFO]: [CustomPackets] ✓ FactionData handler enregistré
-[20:52:22] [Client thread/INFO]: [CustomPackets] ✓ CombatLogManager initialisé
-[20:52:22] [Client thread/INFO]: [CustomPackets] ✓ Système initialisé avec succès.
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: mods.betterfoliage.client.BetterFoliageClient
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.asm.transformers.BlamingTransformer
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.event.world.ChunkWatchEvent$UnWatch
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.relauncher.CoreModManager
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.DimensionManager
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.GuiScreenEvent$DrawScreenEvent$Pre
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.GuiScreenEvent$DrawScreenEvent$Post
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.EntityViewRenderEvent$CameraSetup
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.EntityViewRenderEvent$FogColors
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.eventhandler.Event
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.eventhandler.EventBus
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.property.ExtendedBlockState
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.client.FMLClientHandler
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.FMLCommonHandler
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.biome.BiomeGenBase.getWaterColorMultiplier
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.addDestroyEffects
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.addHitEffects
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.canCreatureSpawn
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.canRenderInLayer
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.doesSideBlockRendering
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.getBedDirection
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.getExtendedState
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.getLightOpacity
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.getLightValue
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.hasTileEntity
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.isAir
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.isBed
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.isBedFoot
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.isSideSolid
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.ChunkCache.isSideSolid
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.entity.Entity.canRiderInteract
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Field not present: net.minecraft.entity.Entity.captureDrops
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Field not present: net.minecraft.entity.Entity.capturedDrops
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.entity.Entity.shouldRenderInPass
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.entity.Entity.shouldRiderSit
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.event.ForgeEventFactory
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.ForgeHooks
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Field not present: net.minecraft.item.Item.delegate
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.getDurabilityForDisplay
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.getModel
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.onEntitySwing
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.shouldCauseReequipAnimation
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.showDurabilityBar
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.potion.PotionEffect.isCurativeItem
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.tileentity.TileEntity.canRenderBreaking
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.tileentity.TileEntity.getRenderBoundingBox
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.tileentity.TileEntity.hasFastRenderer
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.tileentity.TileEntity.shouldRenderInPass
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.World.countEntities
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.World.getPerWorldStorage
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.WorldProvider.getCloudRenderer
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.WorldProvider.getSkyRenderer
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.WorldProvider.getWeatherRenderer
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.WorldProvider.getSaveFolder
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.client.GuiModList
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.IColoredBakedQuad
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.property.IExtendedBlockState
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.IModel
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.IRenderHandler
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.pipeline.LightUtil
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.MinecraftForge
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.MinecraftForgeClient
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.ModContainer
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.ModelLoader$VanillaLoader
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderBlockOverlayEvent$OverlayType
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderItemInFrameEvent
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderLivingEvent$Pre
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderLivingEvent$Post
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderLivingEvent$Specials$Pre
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderLivingEvent$Specials$Post
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.event.world.WorldEvent$Load
-[20:52:22] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: optifine.OptiFineClassTransformer
-[20:52:22] [Client thread/INFO]: [OptiFine] *** Reloading custom textures ***
-[20:52:22] [Client thread/INFO]: [OptiFine] Enable face culling: acacia_leaves, birch_leaves, dark_oak_leaves, jungle_leaves, oak_leaves, spruce_leaves
-[20:52:29] [Server thread/INFO]: Starting integrated minecraft server version 1.8.9
-[20:52:29] [Server thread/INFO]: Generating keypair
-[20:52:29] [Server thread/INFO]: Preparing start region for level 0
-[20:52:29] [Server thread/INFO]: Changing view distance to 16, from 10
-[20:52:29] [Server thread/INFO]: leziink[local:E:d76caa12] logged in with entity id 165 at (-461.5082410815605, 66.27901806852132, 200.48798275761254)
-[20:52:29] [Server thread/INFO]: leziink joined the game
-[20:52:29] [Client thread/INFO]: [CustomPackets] ✓ Packet REGISTER envoyé pour : CUSTOM:HDV_S2C CUSTOM:HDV_C2S CUSTOM:SHOP_S2C CUSTOM:SHOP_C2S CUSTOM:PDATA_S2C CUSTOM:PDATA_C2S CUSTOM:C2S CUSTOM:S2C CUSTOM:PING_C2S CUSTOM:PING_S2C CUSTOM:FACTION_S2C OF_COMBAT
-[20:52:31] [Server thread/INFO]: Saving and pausing game...
-[20:52:31] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[20:52:31] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[20:52:31] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[20:52:56] [Client thread/INFO]: [Shaders] Save shaders configuration.
-[20:55:44] [Server thread/INFO]: Saving and pausing game...
-[20:55:44] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[20:55:45] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[20:55:45] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[20:55:50] [Server thread/INFO]: Saving and pausing game...
-[20:55:50] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[20:55:50] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[20:55:50] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[20:55:55] [Server thread/INFO]: Saving and pausing game...
-[20:55:55] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[20:55:55] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[20:55:55] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[20:56:03] [Server thread/INFO]: Saving and pausing game...
-[20:56:03] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[20:56:04] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[20:56:04] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[20:56:55] [Server thread/INFO]: Saving and pausing game...
-[20:56:55] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[20:56:55] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[20:56:55] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[20:56:58] [Server thread/INFO]: Saving and pausing game...
-[20:56:58] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[20:56:58] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[20:56:58] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[20:57:45] [Server thread/INFO]: Saving and pausing game...
-[20:57:45] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[20:57:45] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[20:57:45] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[20:58:18] [Server thread/INFO]: Stopping server
-[20:58:18] [Server thread/INFO]: Saving players
-[20:58:18] [Server thread/INFO]: Saving worlds
-[20:58:18] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[20:58:18] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[20:58:18] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[20:58:20] [Client thread/INFO]: Connecting to 127.0.0.1, 7777
-[20:59:34] [Server thread/INFO]: Starting integrated minecraft server version 1.8.9
-[20:59:34] [Server thread/INFO]: Generating keypair
-[20:59:34] [Server thread/INFO]: Preparing start region for level 0
-[20:59:34] [Server thread/INFO]: Changing view distance to 16, from 10
-[20:59:35] [Server thread/INFO]: leziink[local:E:7cf26e95] logged in with entity id 19926 at (-456.28611029862134, 63.0, 204.1696436484185)
-[20:59:35] [Server thread/INFO]: leziink joined the game
-[20:59:35] [Client thread/INFO]: [CustomPackets] ✓ Packet REGISTER envoyé pour : CUSTOM:HDV_S2C CUSTOM:HDV_C2S CUSTOM:SHOP_S2C CUSTOM:SHOP_C2S CUSTOM:PDATA_S2C CUSTOM:PDATA_C2S CUSTOM:C2S CUSTOM:S2C CUSTOM:PING_C2S CUSTOM:PING_S2C CUSTOM:FACTION_S2C OF_COMBAT
-[21:01:19] [Server thread/INFO]: Saving and pausing game...
-[21:01:19] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[21:01:19] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[21:01:19] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[21:01:20] [Server thread/INFO]: Saving and pausing game...
-[21:01:20] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[21:01:20] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[21:01:20] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[21:13:32] [Server thread/INFO]: Saving and pausing game...
-[21:13:32] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[21:13:32] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[21:13:32] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[21:13:32] [Server thread/INFO]: Stopping server
-[21:13:32] [Server thread/INFO]: Saving players
-[21:13:32] [Server thread/INFO]: Saving worlds
-[21:13:32] [Server thread/INFO]: Saving chunks for level 'New World'/Overworld
-[21:13:32] [Server thread/INFO]: Saving chunks for level 'New World'/Nether
-[21:13:32] [Server thread/INFO]: Saving chunks for level 'New World'/The End
-[21:13:34] [Client thread/INFO]: Connecting to 127.0.0.1, 7777
-[21:13:34] [Client thread/INFO]: [CustomPackets] ✓ Packet REGISTER envoyé pour : CUSTOM:HDV_S2C CUSTOM:HDV_C2S CUSTOM:SHOP_S2C CUSTOM:SHOP_C2S CUSTOM:PDATA_S2C CUSTOM:PDATA_C2S CUSTOM:C2S CUSTOM:S2C CUSTOM:PING_C2S CUSTOM:PING_S2C CUSTOM:FACTION_S2C OF_COMBAT
-[21:13:34] [Client thread/INFO]: [CHAT] [+] leziink a rejoint RedConflict.
-[21:13:34] [Client thread/INFO]: [CHAT] --------------------------------
-[21:13:34] [Client thread/INFO]: [CHAT]   Bienvenue sur RedConflict !
-[21:13:34] [Client thread/INFO]: [CHAT]   Serveur 1.8.9 | PvP / Survie
-[21:13:34] [Client thread/INFO]: [CHAT]   Discord : discord.gg/UMJUnfQq
-[21:13:34] [Client thread/INFO]: [CHAT]   Tapez /commands pour voir les commandes.
-[21:13:34] [Client thread/INFO]: [CHAT] --------------------------------
-[21:13:34] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 2049, defaulting to 0 (Ocean)
-[21:13:34] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 55578, defaulting to 0 (Ocean)
-[21:13:34] [Chunk Batcher 5/WARN]: Biome ID is out of bounds: 20578, defaulting to 0 (Ocean)
-[21:13:34] [Chunk Batcher 8/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:13:34] [Chunk Batcher 9/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:13:35] [Chunk Batcher 2/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:13:37] [Chunk Batcher 0/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:13:38] [Chunk Batcher 4/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:13:38] [Chunk Batcher 13/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:13:38] [Chunk Batcher 8/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:13:45] [Chunk Batcher 0/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:13:48] [Chunk Batcher 3/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:13:54] [Chunk Batcher 5/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:14:14] [Chunk Batcher 0/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:14:17] [Chunk Batcher 8/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:14:17] [Chunk Batcher 8/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:14:32] [Chunk Batcher 12/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:15:02] [Client thread/WARN]: Unable to play unknown soundEvent: minecraft:step.anvil
-[21:15:02] [Client thread/WARN]: Unable to play unknown soundEvent: minecraft:step.anvil
-[21:15:19] [Chunk Batcher 6/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:16:52] [Chunk Batcher 6/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:16:57] [Chunk Batcher 4/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:16:58] [Chunk Batcher 9/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:17:00] [Chunk Batcher 0/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:17:21] [Chunk Batcher 10/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:17:21] [Chunk Batcher 9/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:17:36] [Chunk Batcher 11/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:17:36] [Chunk Batcher 1/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:18:02] [Chunk Batcher 0/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:18:03] [Chunk Batcher 3/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:18:03] [Chunk Batcher 13/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:18:27] [Chunk Batcher 11/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:18:30] [Chunk Batcher 1/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:18:34] [Chunk Batcher 12/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:18:39] [Chunk Batcher 11/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:18:39] [Chunk Batcher 5/WARN]: Needed to grow BufferBuilder buffer: Old size 524288 bytes, new size 2621440 bytes.
-[21:18:48] [Client thread/INFO]: Stopping!
-[21:18:48] [Client thread/INFO]: SoundSystem shutting down...
-[21:18:48] [Client thread/WARN]: Author: Paul Lamb, www.paulscode.com
+[21:03:17] [Client thread/INFO]: Setting user: leziink
+[21:03:17] [Client thread/INFO]: (Session ID is token:0:leziink)
+[21:03:18] [Client thread/INFO]: [OptiFine] *** Reflector Forge ***
+[21:03:18] [Client thread/INFO]: [OptiFine] *** Reflector Vanilla ***
+[21:03:18] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.eventhandler.Event$Result
+[21:03:18] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraft.launchwrapper.Launch
+[21:03:18] [Client thread/INFO]: LWJGL Version: 2.9.4
+[21:03:18] [Client thread/INFO]: [OptiFine] 
+[21:03:18] [Client thread/INFO]: [OptiFine] OptiFine_1.8.9_HD_U_M6_pre2
+[21:03:18] [Client thread/INFO]: [OptiFine] Build: null
+[21:03:18] [Client thread/INFO]: [OptiFine] OS: Windows 10 (amd64) version 10.0
+[21:03:18] [Client thread/INFO]: [OptiFine] Java: 1.8.0_181, Oracle Corporation
+[21:03:18] [Client thread/INFO]: [OptiFine] VM: Java HotSpot(TM) 64-Bit Server VM (mixed mode), Oracle Corporation
+[21:03:18] [Client thread/INFO]: [OptiFine] LWJGL: 2.9.4
+[21:03:18] [Client thread/INFO]: [OptiFine] OpenGL: AMD Radeon RX 7800 XT, version 4.6.0 Compatibility Profile Context 26.3.1.260309, ATI Technologies Inc.
+[21:03:18] [Client thread/INFO]: [OptiFine] OpenGL Version: 4.6.0
+[21:03:18] [Client thread/INFO]: [OptiFine] OpenGL Fancy fog: Not available (GL_NV_fog_distance)
+[21:03:18] [Client thread/INFO]: [OptiFine] Maximum texture size: 16384x16384
+[21:03:18] [VersionCheck/INFO]: [OptiFine] Checking for new version
+[21:03:18] [Client thread/INFO]: [Shaders] OpenGL Version: 4.6.0 Compatibility Profile Context 26.3.1.260309
+[21:03:18] [Client thread/INFO]: [Shaders] Vendor:  ATI Technologies Inc.
+[21:03:18] [Client thread/INFO]: [Shaders] Renderer: AMD Radeon RX 7800 XT
+[21:03:18] [Client thread/INFO]: [Shaders] Capabilities:  2.0  2.1  3.0  3.2  4.0 
+[21:03:18] [Client thread/INFO]: [Shaders] GL_MAX_DRAW_BUFFERS: 8
+[21:03:18] [Client thread/INFO]: [Shaders] GL_MAX_COLOR_ATTACHMENTS_EXT: 8
+[21:03:18] [Client thread/INFO]: [Shaders] GL_MAX_TEXTURE_IMAGE_UNITS: 32
+[21:03:18] [Client thread/INFO]: [Shaders] Load shaders configuration.
+[21:03:18] [Client thread/INFO]: [Shaders] No shaderpack loaded.
+[21:03:18] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.Loader
+[21:03:18] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.client.SplashProgress
+[21:03:18] [Client thread/INFO]: Reloading ResourceManager: Default
+[21:03:18] [Client thread/INFO]: [OptiFine] *** Reloading textures ***
+[21:03:18] [Client thread/INFO]: [OptiFine] Resource packs: Default
+[21:03:18] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.Attributes
+[21:03:18] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.client.renderer.vertex.VertexFormatElement$EnumUsage.preDraw
+[21:03:18] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.client.renderer.vertex.VertexFormatElement$EnumUsage.postDraw
+[21:03:18] [Sound Library Loader/INFO]: Starting up SoundSystem...
+[21:03:18] [VersionCheck/INFO]: [OptiFine] Version found: M5
+[21:03:18] [Thread-7/INFO]: Initializing LWJGL OpenAL
+[21:03:18] [Thread-7/INFO]: (The LWJGL binding of OpenAL.  For more information, see http://www.lwjgl.org)
+[21:03:18] [Thread-7/INFO]: OpenAL initialized.
+[21:03:18] [Client thread/WARN]: Unable to load variant: half=bottom,variant=nether_brick from minecraft:obsidian_slab#half=bottom,variant=nether_brick
+[21:03:18] [Client thread/WARN]: Unable to load variant: half=top,variant=wood_old from minecraft:obsidian_slab#half=top,variant=wood_old
+[21:03:18] [Client thread/WARN]: Unable to load variant: seamless=false,variant=sandstone from minecraft:double_obsidian_slab#seamless=false,variant=sandstone
+[21:03:18] [Client thread/WARN]: Unable to load variant: half=bottom,variant=cobblestone from minecraft:obsidian_slab#half=bottom,variant=cobblestone
+[21:03:18] [Client thread/WARN]: Unable to load variant: half=top,variant=sandstone from minecraft:obsidian_slab#half=top,variant=sandstone
+[21:03:18] [Client thread/WARN]: Unable to load variant: seamless=true,variant=cobblestone from minecraft:double_obsidian_slab#seamless=true,variant=cobblestone
+[21:03:18] [Client thread/WARN]: Unable to load variant: seamless=false,variant=wood_old from minecraft:double_obsidian_slab#seamless=false,variant=wood_old
+[21:03:18] [Client thread/WARN]: Unable to load variant: seamless=false,variant=nether_brick from minecraft:double_obsidian_slab#seamless=false,variant=nether_brick
+[21:03:18] [Client thread/WARN]: Unable to load variant: half=bottom,variant=brick from minecraft:obsidian_slab#half=bottom,variant=brick
+[21:03:18] [Client thread/WARN]: Unable to load variant: half=bottom,variant=wood_old from minecraft:obsidian_slab#half=bottom,variant=wood_old
+[21:03:18] [Client thread/WARN]: Unable to load variant: seamless=true,variant=wood_old from minecraft:double_obsidian_slab#seamless=true,variant=wood_old
+[21:03:18] [Client thread/WARN]: Unable to load variant: half=top,variant=nether_brick from minecraft:obsidian_slab#half=top,variant=nether_brick
+[21:03:18] [Client thread/WARN]: Unable to load variant: half=top,variant=quartz from minecraft:obsidian_slab#half=top,variant=quartz
+[21:03:18] [Client thread/WARN]: Unable to load variant: seamless=false,variant=stone_brick from minecraft:double_obsidian_slab#seamless=false,variant=stone_brick
+[21:03:18] [Client thread/WARN]: Unable to load variant: half=top,variant=stone_brick from minecraft:obsidian_slab#half=top,variant=stone_brick
+[21:03:18] [Client thread/WARN]: Unable to load variant: seamless=false,variant=quartz from minecraft:double_obsidian_slab#seamless=false,variant=quartz
+[21:03:18] [Client thread/WARN]: Unable to load variant: seamless=true,variant=quartz from minecraft:double_obsidian_slab#seamless=true,variant=quartz
+[21:03:18] [Client thread/WARN]: Unable to load variant: seamless=true,variant=stone_brick from minecraft:double_obsidian_slab#seamless=true,variant=stone_brick
+[21:03:18] [Client thread/WARN]: Unable to load variant: half=bottom,variant=sandstone from minecraft:obsidian_slab#half=bottom,variant=sandstone
+[21:03:18] [Client thread/WARN]: Unable to load variant: seamless=false,variant=cobblestone from minecraft:double_obsidian_slab#seamless=false,variant=cobblestone
+[21:03:18] [Client thread/WARN]: Unable to load variant: seamless=true,variant=sandstone from minecraft:double_obsidian_slab#seamless=true,variant=sandstone
+[21:03:18] [Client thread/WARN]: Unable to load variant: half=top,variant=cobblestone from minecraft:obsidian_slab#half=top,variant=cobblestone
+[21:03:18] [Client thread/WARN]: Unable to load variant: half=bottom,variant=stone_brick from minecraft:obsidian_slab#half=bottom,variant=stone_brick
+[21:03:18] [Client thread/WARN]: Unable to load variant: seamless=false,variant=brick from minecraft:double_obsidian_slab#seamless=false,variant=brick
+[21:03:18] [Client thread/WARN]: Unable to load variant: half=top,variant=brick from minecraft:obsidian_slab#half=top,variant=brick
+[21:03:18] [Client thread/WARN]: Unable to load variant: seamless=true,variant=brick from minecraft:double_obsidian_slab#seamless=true,variant=brick
+[21:03:18] [Client thread/WARN]: Unable to load variant: half=bottom,variant=quartz from minecraft:obsidian_slab#half=bottom,variant=quartz
+[21:03:18] [Client thread/WARN]: Unable to load variant: seamless=true,variant=nether_brick from minecraft:double_obsidian_slab#seamless=true,variant=nether_brick
+[21:03:18] [Sound Library Loader/INFO]: Sound engine started
+[21:03:19] [Client thread/INFO]: [OptiFine] Sprite size: 32
+[21:03:19] [Client thread/INFO]: [OptiFine] Mipmap levels: 5
+[21:03:19] [Client thread/INFO]: [OptiFine] Multitexture: false
+[21:03:19] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.ForgeHooksClient
+[21:03:19] [Client thread/INFO]: [OptiFine] Scaled too small texture: minecraft:blocks/redstone_dust_cross_overlay, 16 -> 32
+[21:03:20] [Client thread/INFO]: [OptiFine] Scaled too small texture: minecraft:blocks/redstone_dust_line_overlay, 16 -> 32
+[21:03:20] [Client thread/INFO]: Created: 1024x1024 textures-atlas
+[21:03:20] [Client thread/INFO]: [OptiFine] Animated sprites: 11
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.ItemModelMesherForge
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.ModelLoader
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.client.registry.RenderingRegistry
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.ForgeModContainer
+[21:03:20] [Client thread/INFO]: [CustomPackets] ✓ Initialisation du système de packets custom...
+[21:03:20] [Client thread/INFO]: [CustomPackets] ✓ HdvPacketHandler enregistré
+[21:03:20] [Client thread/INFO]: [CustomPackets] ✓ PingSystem handler enregistré
+[21:03:20] [Client thread/INFO]: [CustomPackets] ✓ FactionData handler enregistré
+[21:03:20] [Client thread/INFO]: [CustomPackets] ✓ CombatLogManager initialisé
+[21:03:20] [Client thread/INFO]: [CustomPackets] ✓ Système initialisé avec succès.
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: mods.betterfoliage.client.BetterFoliageClient
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.asm.transformers.BlamingTransformer
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.event.world.ChunkWatchEvent$UnWatch
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.relauncher.CoreModManager
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.DimensionManager
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.GuiScreenEvent$DrawScreenEvent$Pre
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.GuiScreenEvent$DrawScreenEvent$Post
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.EntityViewRenderEvent$CameraSetup
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.EntityViewRenderEvent$FogColors
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.eventhandler.Event
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.eventhandler.EventBus
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.property.ExtendedBlockState
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.client.FMLClientHandler
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.FMLCommonHandler
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.biome.BiomeGenBase.getWaterColorMultiplier
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.addDestroyEffects
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.addHitEffects
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.canCreatureSpawn
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.canRenderInLayer
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.doesSideBlockRendering
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.getBedDirection
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.getExtendedState
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.getLightOpacity
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.getLightValue
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.hasTileEntity
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.isAir
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.isBed
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.isBedFoot
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.block.Block.isSideSolid
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.ChunkCache.isSideSolid
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.entity.Entity.canRiderInteract
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Field not present: net.minecraft.entity.Entity.captureDrops
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Field not present: net.minecraft.entity.Entity.capturedDrops
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.entity.Entity.shouldRenderInPass
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.entity.Entity.shouldRiderSit
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.event.ForgeEventFactory
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.ForgeHooks
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Field not present: net.minecraft.item.Item.delegate
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.getDurabilityForDisplay
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.getModel
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.onEntitySwing
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.shouldCauseReequipAnimation
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.item.Item.showDurabilityBar
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.potion.PotionEffect.isCurativeItem
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.tileentity.TileEntity.canRenderBreaking
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.tileentity.TileEntity.getRenderBoundingBox
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.tileentity.TileEntity.hasFastRenderer
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.tileentity.TileEntity.shouldRenderInPass
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.World.countEntities
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.World.getPerWorldStorage
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.WorldProvider.getCloudRenderer
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.WorldProvider.getSkyRenderer
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.WorldProvider.getWeatherRenderer
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Method not present: net.minecraft.world.WorldProvider.getSaveFolder
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.client.GuiModList
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.IColoredBakedQuad
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.property.IExtendedBlockState
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.IModel
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.IRenderHandler
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.pipeline.LightUtil
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.common.MinecraftForge
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.MinecraftForgeClient
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.fml.common.ModContainer
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.model.ModelLoader$VanillaLoader
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderBlockOverlayEvent$OverlayType
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderItemInFrameEvent
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderLivingEvent$Pre
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderLivingEvent$Post
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderLivingEvent$Specials$Pre
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.client.event.RenderLivingEvent$Specials$Post
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: net.minecraftforge.event.world.WorldEvent$Load
+[21:03:20] [Client thread/INFO]: [OptiFine] (Reflector) Class not present: optifine.OptiFineClassTransformer
+[21:03:20] [Client thread/INFO]: [OptiFine] *** Reloading custom textures ***
+[21:03:20] [Client thread/INFO]: [OptiFine] Enable face culling: acacia_leaves, birch_leaves, dark_oak_leaves, jungle_leaves, oak_leaves, spruce_leaves
+[21:13:33] [Client thread/INFO]: Stopping!
+[21:13:33] [Client thread/INFO]: SoundSystem shutting down...
+[21:13:33] [Client thread/WARN]: Author: Paul Lamb, www.paulscode.com

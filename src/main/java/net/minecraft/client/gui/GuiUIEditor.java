@@ -23,16 +23,18 @@ import java.util.stream.Collectors;
 public class GuiUIEditor extends GuiScreen {
 
     // ---- Colors ----
-    private static final int ACCENT = 0xFF2A7FFF;
-    private static final int BG_PANEL = 0xF0101018;
-    private static final int BG_HEADER = 0xFF141420;
-    private static final int BORDER = 0x18FFFFFF;
-    private static final int TEXT_PRIMARY = 0xFFEEEEEE;
-    private static final int TEXT_SECONDARY = 0xFFAAAAAA;
-    private static final int TEXT_MUTED = 0xFF555555;
-    private static final int ACCENT_PURPLE = 0xFF9932CC;
-    private static final int ACCENT_GREEN = 0xFF2ECC71;
-    private static final int ACCENT_ORANGE = 0xFFE67E22;
+    private static final int ACCENT        = 0xFFE02828;  // Vibrant red
+    private static final int ACCENT_LINE   = 0xFFE02828;  // Red top border
+    private static final int ACCENT_DIM    = 0xFF6E1212;  // Dim red for details
+    private static final int BG_PANEL      = 0xF20A0808;  // Deep dark panel
+    private static final int BG_HEADER     = 0xFF0E0606;  // Very dark header
+    private static final int BORDER        = 0x2BFFFFFF;
+    private static final int TEXT_PRIMARY  = 0xFFF2F2F2;
+    private static final int TEXT_SECONDARY = 0xFF8A9AB0;
+    private static final int TEXT_MUTED    = 0xFF445060;
+    private static final int ACCENT_PURPLE = 0xFFAA44EE;
+    private static final int ACCENT_GREEN  = 0xFF2ECC71;
+    private static final int ACCENT_ORANGE = 0xFFE8871A;
 
     // ---- Core state ----
     private final GuiScreen parent;
@@ -63,7 +65,7 @@ public class GuiUIEditor extends GuiScreen {
     // ---- Color editor ----
     private boolean colorEditorOpen = false;
     private int ceX, ceY;
-    private static final int CE_W = 240, CE_H = 165;
+    private static final int CE_W = 240, CE_H = 173;
     private int ceSpecW = 120, ceSpecH = 100;
     private int r = 255, g = 255, b = 255, a = 255;
 
@@ -143,6 +145,7 @@ public class GuiUIEditor extends GuiScreen {
 
         ceX = this.width / 2 - CE_W / 2;
         ceY = this.height / 2 - CE_H / 2;
+        clampColorEditorPosition();
 
         if (this.preselectId != null) {
             UIElement e = ui.get(this.preselectId);
@@ -191,12 +194,12 @@ public class GuiUIEditor extends GuiScreen {
         float ease = openAnim * openAnim * (3.0f - 2.0f * openAnim);
 
         // Background
-        this.drawRect(0, 0, this.width, this.height, (int)(ease * 140) << 24);
-        drawGrid(16, (int)(ease * 5) << 24 | 0xFFFFFF);
+        this.drawRect(0, 0, this.width, this.height, (int)(ease * 150) << 24);
+        drawGrid(16, (int)(ease * 6) << 24 | 0xFFFFFF);
 
         // Snap lines
-        if (snapLineX != -1) Gui.drawRect(snapLineX, 0, snapLineX + 1, this.height, 0xCC2A7FFF);
-        if (snapLineY != -1) Gui.drawRect(0, snapLineY, this.width, snapLineY + 1, 0xCC2A7FFF);
+        if (snapLineX != -1) Gui.drawRect(snapLineX, 0, snapLineX + 1, this.height, 0xCCE02828);
+        if (snapLineY != -1) Gui.drawRect(0, snapLineY, this.width, snapLineY + 1, 0xCCE02828);
 
         // Render all widgets (BACKGROUND LAYER)
         for (UIElement e : ui.all()) {
@@ -218,12 +221,25 @@ public class GuiUIEditor extends GuiScreen {
             else if ("colorEditor".equals(panel) && colorEditorOpen && selected instanceof BaseWidget) drawColorEditor(mouseX, mouseY);
         }
 
-        // Done button
-        int btnW = 100, btnH = 18;
+        // Done button — compact, outlined style
+        int btnW = 96, btnH = 20;
         int btnX = (this.width - btnW) / 2;
-        int btnY = this.height - 28;
+        int btnY = this.height - 30;
         boolean btnHover = inRect(mouseX, mouseY, btnX, btnY, btnW, btnH);
-        drawStyledButton(btnX, btnY, btnW, btnH, I18n.format("gui.done"), 0xFF1A1A28, btnHover);
+        // Background
+        Gui.drawRect(btnX, btnY, btnX + btnW, btnY + btnH,
+                btnHover ? 0x28FFFFFF : 0x0A000000);
+        // Top accent line
+        Gui.drawRect(btnX, btnY, btnX + btnW, btnY + 1, btnHover ? ACCENT : ACCENT_DIM);
+        // Outline
+        GuiRenderUtils.drawRectOutline(btnX, btnY, btnW, btnH, btnHover ? 0x44FFFFFF : 0x28FFFFFF);
+        if (btnHover) {
+            Gui.drawRect(btnX, btnY + 1, btnX + 2, btnY + btnH - 1, ACCENT);
+        }
+        // Label
+        int btnTw = fontRendererObj.getStringWidth("RETOUR");
+        fontRendererObj.drawStringWithShadow("RETOUR", btnX + (btnW - btnTw) / 2, btnY + (btnH - 8) / 2.0f,
+                btnHover ? 0xFFFFFFFF : TEXT_SECONDARY);
         setHB(hbDoneBtn, btnX, btnY, btnW, btnH);
     }
 
@@ -238,36 +254,57 @@ public class GuiUIEditor extends GuiScreen {
         int h = 50 + listH;
         wlScroll = GuiRenderUtils.clamp(wlScroll, 0, Math.max(0, items.size() - maxVisible));
 
-        GuiRenderUtils.drawShadow(px, py, totalW, h, 6, 0x60);
+        GuiRenderUtils.drawShadow(px, py, totalW, h, 10, 0x80);
         Gui.drawRect(px, py, px + totalW, py + h, BG_PANEL);
-        Gui.drawRect(px, py, px + totalW, py + 1, ACCENT);
-        Gui.drawRect(px, py + 1, px + totalW, py + 22, BG_HEADER);
-        Gui.drawRect(px, py + 22, px + totalW, py + 23, BORDER);
+        // Top accent line (2px) + subtle glow
+        Gui.drawRect(px, py, px + totalW, py + 2, ACCENT_LINE);
+        GuiRenderUtils.drawGradientRect(px, py + 2, px + totalW, py + 8, 0x18E02828, 0x00000000);
+        GuiRenderUtils.drawGradientRect(px, py + 2, px + totalW, py + 24, BG_HEADER, BG_PANEL);
+        Gui.drawRect(px, py + 24, px + totalW, py + 25, 0x28FFFFFF);
         GuiRenderUtils.drawRectOutline(px, py, totalW, h, BORDER);
-        fontRendererObj.drawStringWithShadow("Widgets", px + 10, py + 7, 0xFFAAD4FF);
+        // Left accent bar (2px) + title
+        Gui.drawRect(px + 7, py + 9, px + 9, py + 19, ACCENT);
+        fontRendererObj.drawStringWithShadow("W", px + 14, py + 9, 0xFFFF8888);
+        fontRendererObj.drawStringWithShadow("IDGETS", px + 14 + fontRendererObj.getStringWidth("W"), py + 9, TEXT_PRIMARY);
 
-        int ccx = px + totalW - 16, ccy = py + 6, ccs = 10;
+        int ccx = px + totalW - 16, ccy = py + 7, ccs = 10;
         drawMiniClose(ccx, ccy, ccs, inRect(mx, my, ccx, ccy, ccs, ccs));
         setHB(hbWlClose, ccx, ccy, ccs, ccs);
 
-        int searchY = py + 26, searchW = totalW - 16;
-        Gui.drawRect(px + 8, searchY, px + 8 + searchW, searchY + 16, searchFocused ? 0x33FFFFFF : 0x18FFFFFF);
-        GuiRenderUtils.drawRectOutline(px + 8, searchY, searchW, 16, searchFocused ? ACCENT : 0x22FFFFFF);
+        int searchY = py + 27, searchW = totalW - 16;
+        Gui.drawRect(px + 8, searchY, px + 8 + searchW, searchY + 16, searchFocused ? 0x44FFFFFF : 0x16FFFFFF);
+        GuiRenderUtils.drawRectOutline(px + 8, searchY, searchW, 16, searchFocused ? ACCENT : 0x2AFFFFFF);
+        if (searchFocused) Gui.drawRect(px + 8, searchY, px + 8 + searchW, searchY + 2, ACCENT);
         GuiRenderUtils.drawSearchIcon(px + 12, searchY + 4, TEXT_MUTED);
         if (searchFilter.isEmpty() && !searchFocused) fontRendererObj.drawString("Rechercher...", px + 24, searchY + 4, TEXT_MUTED);
         else fontRendererObj.drawString(searchFilter + (searchFocused && (System.currentTimeMillis() / 500 % 2 == 0) ? "|" : ""), px + 24, searchY + 4, TEXT_PRIMARY);
 
-        int y = py + 46;
+        int y = py + 47;
         if (items.isEmpty()) fontRendererObj.drawString("Aucun resultat", px + 10, y + 4, TEXT_MUTED);
         else {
             int end = Math.min(wlScroll + maxVisible, items.size());
             for (int i = wlScroll; i < end; i++) {
                 UIElement e = items.get(i);
                 boolean isSel = selected == e, isHover = inRect(mx, my, px, y, totalW - 6, WL_ROW_H);
-                if (isSel) { Gui.drawRect(px+1, y, px+totalW-6, y+WL_ROW_H, 0x222A7FFF); Gui.drawRect(px+1, y, px+3, y+WL_ROW_H, ACCENT); }
-                else if (isHover) Gui.drawRect(px+1, y, px+totalW-6, y+WL_ROW_H, 0x0DFFFFFF);
-                Gui.drawRect(px + 10, y + 9, px + 14, y + 13, e.isEnabled() ? 0xFF44DD66 : TEXT_MUTED);
-                fontRendererObj.drawStringWithShadow(friendlyName(e.getId()), px + 20, y + 7, isSel ? TEXT_PRIMARY : (isHover ? 0xFFDDDDDD : TEXT_SECONDARY));
+                if (isSel) {
+                    GuiRenderUtils.drawGradientRect(px+1, y, px+totalW-6, y+WL_ROW_H, 0x28E02828, 0x18E02828);
+                    Gui.drawRect(px+1, y, px+4, y+WL_ROW_H, ACCENT);
+                    Gui.drawRect(px+4, y, px+5, y+WL_ROW_H, ACCENT_DIM);
+                } else if (isHover) {
+                    Gui.drawRect(px+1, y, px+totalW-6, y+WL_ROW_H, 0x0EFFFFFF);
+                }
+                // Status dot — 8×8
+                boolean enab = e.isEnabled();
+                int dotX2 = px + 10, dotY2 = y + WL_ROW_H / 2 - 4;
+                if (enab) {
+                    Gui.drawRect(dotX2 - 1, dotY2 - 1, dotX2 + 9, dotY2 + 9, 0x1822EE55);
+                    Gui.drawRect(dotX2, dotY2, dotX2 + 8, dotY2 + 8, 0xFF22CC50);
+                    Gui.drawRect(dotX2 + 1, dotY2 + 1, dotX2 + 4, dotY2 + 2, 0x44FFFFFF);
+                } else {
+                    Gui.drawRect(dotX2, dotY2, dotX2 + 8, dotY2 + 8, 0xFF141420);
+                    GuiRenderUtils.drawRectOutline(dotX2, dotY2, 8, 8, 0x22FFFFFF);
+                }
+                fontRendererObj.drawStringWithShadow(friendlyName(e.getId()), px + 22, y + 7, isSel ? TEXT_PRIMARY : (isHover ? 0xFFEEEEEE : TEXT_SECONDARY));
                 drawToggle(px + totalW - 40, y + 5, e.isEnabled(), "wl_" + e.getId());
                 y += WL_ROW_H;
             }
@@ -294,12 +331,16 @@ public class GuiUIEditor extends GuiScreen {
 
         GuiRenderUtils.drawShadow(px, py, w, sbH, 6, 0x60);
         Gui.drawRect(px, py, px + w, py + sbH, BG_PANEL);
-        Gui.drawRect(px, py, px + w, py + 1, ACCENT);
-        Gui.drawRect(px, py + 1, px + w, py + 22, BG_HEADER);
-        Gui.drawRect(px, py + 22, px + w, py + 23, BORDER);
+        // Top accent line (2px) + subtle glow
+        Gui.drawRect(px, py, px + w, py + 2, ACCENT_LINE);
+        GuiRenderUtils.drawGradientRect(px, py + 2, px + w, py + 8, 0x18E02828, 0x00000000);
+        GuiRenderUtils.drawGradientRect(px, py + 2, px + w, py + 24, BG_HEADER, BG_PANEL);
+        Gui.drawRect(px, py + 23, px + w, py + 24, 0x28FFFFFF);
         GuiRenderUtils.drawRectOutline(px, py, w, sbH, BORDER);
-        fontRendererObj.drawStringWithShadow(friendlyName(selected.getId()), px + 10, py + 7, 0xFFAAD4FF);
-        int ccx = px + w - 16, ccy = py + 6, ccs = 10;
+        // Left accent bar (2px) + widget name
+        Gui.drawRect(px + 7, py + 9, px + 9, py + 19, ACCENT);
+        fontRendererObj.drawStringWithShadow(friendlyName(selected.getId()).toUpperCase(), px + 15, py + 9, TEXT_PRIMARY);
+        int ccx = px + w - 16, ccy = py + 7, ccs = 10;
         drawMiniClose(ccx, ccy, ccs, inRect(mx, my, ccx, ccy, ccs, ccs));
         setHB(hbSbClose, ccx, ccy, ccs, ccs);
 
@@ -327,15 +368,20 @@ public class GuiUIEditor extends GuiScreen {
     }
 
     private void drawColorEditor(int mx, int my) {
+        clampColorEditorPosition();
         int px = ceX, py = ceY;
-        GuiRenderUtils.drawShadow(px, py, CE_W, CE_H, 8, 0x70);
+        GuiRenderUtils.drawShadow(px, py, CE_W, CE_H, 6, 0x60);
         Gui.drawRect(px, py, px + CE_W, py + CE_H, BG_PANEL);
-        Gui.drawRect(px, py, px + CE_W, py + 1, ACCENT_PURPLE);
-        Gui.drawRect(px, py + 1, px + CE_W, py + 22, BG_HEADER);
-        Gui.drawRect(px, py + 22, px + CE_W, py + 23, BORDER);
+        // Purple top accent (2px) + subtle glow
+        Gui.drawRect(px, py, px + CE_W, py + 2, ACCENT_PURPLE);
+        GuiRenderUtils.drawGradientRect(px, py + 2, px + CE_W, py + 8, 0x18AA44EE, 0x00000000);
+        GuiRenderUtils.drawGradientRect(px, py + 2, px + CE_W, py + 24, BG_HEADER, BG_PANEL);
+        Gui.drawRect(px, py + 23, px + CE_W, py + 24, 0x28FFFFFF);
         GuiRenderUtils.drawRectOutline(px, py, CE_W, CE_H, BORDER);
-        this.fontRendererObj.drawStringWithShadow("Editeur de couleur", px + 10, py + 7, 0xFFCC88FF);
-        int ccx = px + CE_W - 16, ccy = py + 6, ccs = 10;
+        // Title
+        Gui.drawRect(px + 7, py + 9, px + 9, py + 19, ACCENT_PURPLE);
+        this.fontRendererObj.drawStringWithShadow("COULEUR", px + 15, py + 9, 0xFFCC88FF);
+        int ccx = px + CE_W - 16, ccy = py + 7, ccs = 10;
         drawMiniClose(ccx, ccy, ccs, inRect(mx, my, ccx, ccy, ccs, ccs));
         setHB(hbCeClose, ccx, ccy, ccs, ccs);
         int specX = px + 10, specY = py + 28;
@@ -346,26 +392,52 @@ public class GuiUIEditor extends GuiScreen {
                 Gui.drawRect(specX + sx, specY + sy, specX + sx + 1, specY + sy + 1, 0xFF000000 | Color.HSBtoRGB(hue, 1.0f, val));
             }
         }
-        GuiRenderUtils.drawRectOutline(specX, specY, ceSpecW, ceSpecH, 0x33FFFFFF);
+        GuiRenderUtils.drawRectOutline(specX, specY, ceSpecW, ceSpecH, 0x44FFFFFF);
+        // Indicateur de teinte sélectionnée sur le spectre (ligne verticale)
+        float selHue = Color.RGBtoHSB(r, g, b, null)[0];
+        int hx = specX + (int)(selHue * ceSpecW);
+        Gui.drawRect(hx, specY, hx + 1, specY + ceSpecH, 0xBBFFFFFF);
+
         int sldX = specX + ceSpecW + 15, sldW = CE_W - ceSpecW - 35;
-        drawChannelSlider(sldX, specY, sldW, "R", r, 0xFFEE4444);
+        drawChannelSlider(sldX, specY,      sldW, "R", r, 0xFFEE4444);
         drawChannelSlider(sldX, specY + 22, sldW, "G", g, 0xFF44EE44);
         drawChannelSlider(sldX, specY + 44, sldW, "B", b, 0xFF4444EE);
         drawChannelSlider(sldX, specY + 66, sldW, "A", a, 0xFF888888);
         int pvY = specY + 88;
-        GuiRenderUtils.drawCheckerboard(sldX, pvY, sldW, 14, 4, 0xFF999999, 0xFF666666);
+        GuiRenderUtils.drawCheckerboard(sldX, pvY, sldW, 14, 4, 0xFF888888, 0xFF555555);
         Gui.drawRect(sldX, pvY, sldX + sldW, pvY + 14, (a << 24) | (r << 16) | (g << 8) | b);
-        GuiRenderUtils.drawRectOutline(sldX, pvY, sldW, 14, 0x66FFFFFF);
-        this.fontRendererObj.drawString(String.format("#%02X%02X%02X", r, g, b), px + 10, py + CE_H - 14, TEXT_MUTED);
+        GuiRenderUtils.drawRectOutline(sldX, pvY, sldW, 14, 0x44FFFFFF);
+        // Code hex — à l'intérieur du panneau, sous la preview
+        String hex = String.format("#%02X%02X%02X", r, g, b);
+        int hexW = this.fontRendererObj.getStringWidth(hex);
+        this.fontRendererObj.drawString(hex, sldX + (sldW - hexW) / 2, pvY + 17, TEXT_MUTED);
     }
 
     private void drawChannelSlider(int x, int y, int w, String label, int val, int color) {
+        // Label à gauche (lettre R/G/B/A colorée)
         this.fontRendererObj.drawStringWithShadow(label, x - 10, y + 1, color);
-        Gui.drawRect(x, y + 3, x + w, y + 9, 0xFF111122);
-        int fill = (int)(val / 255f * w);
-        GuiRenderUtils.drawGradientRect(x, y + 3, x + fill, y + 9, GuiRenderUtils.colorLerp(0xFF111122, color, 0.3f), color);
-        Gui.drawRect(x + fill - 1, y + 1, x + fill + 1, y + 11, 0xFFEEEEEE);
-        this.fontRendererObj.drawString(String.valueOf(val), x + w + 3, y + 1, TEXT_MUTED);
+
+        int trackW = colorSliderTrackWidth(w);
+        int valueX = x + trackW + 3;
+
+        // Track fond
+        Gui.drawRect(x, y + 3, x + trackW, y + 9, 0xFF111111);
+
+        // Fill gradient
+        int fill = Math.max(0, (int)(val / 255f * trackW));
+        if (fill > 0) {
+            GuiRenderUtils.drawGradientRect(x, y + 3, x + fill, y + 9,
+                    GuiRenderUtils.colorLerp(0xFF111122, color, 0.25f), color);
+        }
+
+        // Curseur blanc
+        Gui.drawRect(x + fill - 1, y + 1, x + fill + 2, y + 11, 0xFFEEEEEE);
+        Gui.drawRect(x + fill, y + 2, x + fill + 1, y + 10, 0xFFFFFFFF);
+
+        // Valeur numérique dans la zone réservée à droite
+        String valStr = String.valueOf(val);
+        int vw = this.fontRendererObj.getStringWidth(valStr);
+        this.fontRendererObj.drawString(valStr, valueX + Math.max(0, 14 - vw), y + 1, TEXT_MUTED);
     }
 
     private interface SidebarItem { int getHeight(); void draw(int px, int y, int w, int mx, int my); }
@@ -421,9 +493,10 @@ public class GuiUIEditor extends GuiScreen {
     }
     private class DoubleToggleItem implements SidebarItem {
         BaseWidget bw; DoubleToggleItem(BaseWidget bw) { this.bw = bw; }
-        public int getHeight() { 
+        private static final int ROW = 14; // lignes compactes pour keystrokes
+        public int getHeight() {
             KeyStrokeWidget ks = (KeyStrokeWidget) bw;
-            return ((ks.getKeyCount() + 1) / 2) * 18 + 18; // keys + rainbow space
+            return ((ks.getKeyCount() + 1) / 2) * ROW + ROW; // rangées de touches + rainbow
         }
         public void draw(int px, int y, int w, int mx, int my) {
             KeyStrokeWidget ks = (KeyStrokeWidget) bw;
@@ -434,23 +507,22 @@ public class GuiUIEditor extends GuiScreen {
                 int ox = px + col * half;
                 String label = ks.getKeyLabel(i);
                 boolean val = Boolean.TRUE.equals(bw.getProps().getOrDefault("showKey" + i, true));
-                boolean hov = inRect(mx, my, ox + 4, curY, half - 8, 16);
-                if (hov) Gui.drawRect(ox + 4, curY, ox + half - 4, curY + 16, 0x08FFFFFF);
+                boolean hov = inRect(mx, my, ox + 4, curY, half - 8, ROW);
+                if (hov) Gui.drawRect(ox + 4, curY, ox + half - 4, curY + ROW, 0x08FFFFFF);
                 String disp = label;
                 if (fontRendererObj.getStringWidth(disp) > half - 45) disp = fontRendererObj.trimStringToWidth(disp, half - 50) + "..";
                 fontRendererObj.drawStringWithShadow(disp, ox + 12, curY + 3, hov ? TEXT_PRIMARY : TEXT_SECONDARY);
-                // Position alignée sur la convention ToggleItem : (largeur_colonne - 42)
-                drawToggle(ox + half - 42, curY + 2, val, "sb_" + i);
-                setHB(hbKeyToggle[i], ox + half - 42, curY + 2, 28, 12);
-                if (col == 1) curY += 18;
+                drawToggle(ox + half - 42, curY + 1, val, "sb_" + i);
+                setHB(hbKeyToggle[i], ox + half - 42, curY + 1, 28, 12);
+                if (col == 1) curY += ROW;
             }
-            if (ks.getKeyCount() % 2 != 0) curY += 18;
+            if (ks.getKeyCount() % 2 != 0) curY += ROW;
             boolean spaceVal = Boolean.TRUE.equals(bw.getProps().getOrDefault("showSpaceRainbow", false));
-            boolean hovS = inRect(mx, my, px + 4, curY, w - 8, 16);
-            if (hovS) Gui.drawRect(px + 4, curY, px + w - 4, curY + 16, 0x08FFFFFF);
+            boolean hovS = inRect(mx, my, px + 4, curY, w - 8, ROW);
+            if (hovS) Gui.drawRect(px + 4, curY, px + w - 4, curY + ROW, 0x08FFFFFF);
             fontRendererObj.drawStringWithShadow("Rainbow Espace", px + 12, curY + 3, hovS ? TEXT_PRIMARY : TEXT_SECONDARY);
-            drawToggle(px + w - 42, curY + 2, spaceVal, "sb_space");
-            setHB(hbSpaceRainbow, px + w - 42, curY + 2, 28, 12);
+            drawToggle(px + w - 42, curY + 1, spaceVal, "sb_space");
+            setHB(hbSpaceRainbow, px + w - 42, curY + 1, 28, 12);
         }
     }
     private class ColorItem implements SidebarItem {
@@ -471,7 +543,7 @@ public class GuiUIEditor extends GuiScreen {
         public void draw(int px, int y, int w, int mx, int my) {
             fontRendererObj.drawStringWithShadow("Echelle: " + String.format("%.2f", bw.getScale()), px + 12, y + 2, TEXT_SECONDARY);
             int sX = px + 12, sW = w - 24, sH = 6;
-            Gui.drawRect(sX, y + 14, sX + sW, y + 14 + sH, 0xFF111122);
+            Gui.drawRect(sX, y + 14, sX + sW, y + 14 + sH, 0xFF111111);
             int fill = (int)(((bw.getScale() - 0.5f) / 1.5f) * sW);
             GuiRenderUtils.drawGradientRect(sX, y + 14, sX + fill, y + 14 + sH, 0xFFE67E22, 0xFFFFCC88);
             Gui.drawRect(sX + fill - 1, y + 13, sX + fill + 1, y + 15 + sH, 0xFFEEEEEE);
@@ -484,7 +556,7 @@ public class GuiUIEditor extends GuiScreen {
         public int getHeight() { return 22; }
         public void draw(int px, int y, int w, int mx, int my) {
             boolean hov = inRect(mx, my, px + 10, y + 2, w - 20, 16);
-            drawStyledButton(px + 10, y + 2, w - 20, 16, l, 0xFF1A1A28, hov);
+            drawStyledButton(px + 10, y + 2, w - 20, 16, l, 0xFF141010, hov);
             setHB(hb, px + 10, y + 2, w - 20, 16);
         }
     }
@@ -493,10 +565,10 @@ public class GuiUIEditor extends GuiScreen {
         public void draw(int px, int y, int w, int mx, int my) {
             int bw = (w - 26) / 2;
             boolean hR = inRect(mx, my, px + 8, y + 6, bw, 16);
-            drawStyledButton(px + 8, y + 6, bw, 16, "Reset Pos.", 0xFF1A1A28, hR);
+            drawStyledButton(px + 8, y + 6, bw, 16, "Reset Pos.", 0xFF141010, hR);
             setHB(hbResetPos, px + 8, y + 6, bw, 16);
             boolean hW = inRect(mx, my, px + 18 + bw, y + 6, bw, 16);
-            drawStyledButton(px + 18 + bw, y + 6, bw, 16, "Blanc", 0xFF1A1A28, hW);
+            drawStyledButton(px + 18 + bw, y + 6, bw, 16, "Blanc", 0xFF141010, hW);
             setHB(hbResetColor, px + 18 + bw, y + 6, bw, 16);
         }
     }
@@ -710,7 +782,13 @@ public class GuiUIEditor extends GuiScreen {
         }
         if (wlDragging) { wlX += mx - wlDragOX; wlY += my - wlDragOY; wlDragOX = mx; wlDragOY = my; }
         if (sbDragging) { sbX += mx - sbDragOX; sbY += my - sbDragOY; sbDragOX = mx; sbDragOY = my; }
-        if (ceDragging) { ceX += mx - ceDragOX; ceY += my - ceDragOY; ceDragOX = mx; ceDragOY = my; }
+        if (ceDragging) {
+            ceX += mx - ceDragOX;
+            ceY += my - ceDragOY;
+            ceDragOX = mx;
+            ceDragOY = my;
+            clampColorEditorPosition();
+        }
         if (draggingSpectrum) updateColorFromSpectrum(mx, my);
         if (draggingSlider != -1) { if (draggingSlider == 100) updateScaleFromSlider(mx); else updateColorFromSlider(mx); }
     }
@@ -746,12 +824,31 @@ public class GuiUIEditor extends GuiScreen {
         r = (rgb >> 16) & 0xFF; g = (rgb >> 8) & 0xFF; b = rgb & 0xFF; applyColor();
     }
     private void updateColorFromSlider(int mx) {
-        int sldX = ceX + 10 + ceSpecW + 15, sldW = CE_W - ceSpecW - 35;
-        int val = (int)((float)GuiRenderUtils.clamp(mx - sldX, 0, sldW) / sldW * 255);
+        int sldX = ceX + 10 + ceSpecW + 15;
+        int sldW = CE_W - ceSpecW - 35;
+        int trackW = colorSliderTrackWidth(sldW);
+        int val = (int)((float)GuiRenderUtils.clamp(mx - sldX, 0, trackW) / trackW * 255);
         if (draggingSlider == 0) r = val; else if (draggingSlider == 1) g = val; else if (draggingSlider == 2) b = val; else if (draggingSlider == 3) a = val;
         applyColor();
     }
-    private void applyColor() { if (selected instanceof BaseWidget) { ((BaseWidget) selected).setColor((a << 24) | (r << 16) | (g << 8) | b); ui.saveConfig(); } }
+
+    private int colorSliderTrackWidth(int totalSliderWidth) {
+        // Reserve ~17px a droite pour la valeur numerique (0-255).
+        return Math.max(24, totalSliderWidth - 17);
+    }
+
+    private void clampColorEditorPosition() {
+        ceX = GuiRenderUtils.clamp(ceX, 2, Math.max(2, this.width - CE_W - 2));
+        ceY = GuiRenderUtils.clamp(ceY, 2, Math.max(2, this.height - CE_H - 2));
+    }
+
+    private void applyColor() {
+        if (selected instanceof BaseWidget) {
+            ((BaseWidget) selected).setColor((a << 24) | (r << 16) | (g << 8) | b);
+            ui.saveConfig();
+        }
+    }
+
     private List<UIElement> getFilteredWidgets() { return ui.all().stream().filter(e -> searchFilter.isEmpty() || friendlyName(e.getId()).toLowerCase().contains(searchFilter.toLowerCase())).collect(Collectors.toList()); }
     private void bringToFront(String name) { panelOrder.remove(name); panelOrder.add(name); }
     private boolean inRect(int mx, int my, int rx, int ry, int rw, int rh) { return mx >= rx && my >= ry && mx < rx + rw && my < ry + rh; }
@@ -804,14 +901,24 @@ public class GuiUIEditor extends GuiScreen {
         return edge;
     }
     private void drawStyledButton(int x, int y, int w, int h, String text, int bgColor, boolean hovered) {
-        int bg = hovered ? GuiRenderUtils.colorLerp(bgColor, 0xFFFFFFFF, 0.12f) : bgColor;
-        Gui.drawRect(x, y, x + w, y + h, bg); GuiRenderUtils.drawRectOutline(x, y, w, h, hovered ? 0x33FFFFFF : 0x1AFFFFFF);
-        if (hovered) GuiRenderUtils.drawGradientRect(x + 1, y + 1, x + w - 1, y + 3, 0x18FFFFFF, 0x00000000);
-        fontRendererObj.drawStringWithShadow(text, x + (w - fontRendererObj.getStringWidth(text)) / 2.0f, y + (h - 8) / 2.0f, hovered ? TEXT_PRIMARY : TEXT_SECONDARY);
+        // Outline-style secondary button
+        int bg = hovered ? 0x1EFFFFFF : 0x0A000000;
+        Gui.drawRect(x, y, x + w, y + h, bg);
+        GuiRenderUtils.drawRectOutline(x, y, w, h, hovered ? 0x44FFFFFF : 0x28FFFFFF);
+        if (hovered) {
+            Gui.drawRect(x, y + 1, x + 2, y + h - 1, ACCENT);
+            GuiRenderUtils.drawGradientRect(x + 1, y + 1, x + w - 1, y + 3, 0x16FFFFFF, 0x00000000);
+        }
+        fontRendererObj.drawStringWithShadow(text, x + (w - fontRendererObj.getStringWidth(text)) / 2.0f, y + (h - 8) / 2.0f,
+                hovered ? TEXT_PRIMARY : TEXT_SECONDARY);
     }
     private void drawMiniClose(int x, int y, int size, boolean hovered) {
-        int bg = hovered ? 0xCCCC3333 : 0x44662222;
-        Gui.drawRect(x, y, x + size, y + size, bg); GuiRenderUtils.drawRectOutline(x, y, size, size, 0x22FFFFFF);
+        // Red fill close button with clear X
+        int bg = hovered ? 0xDDEE2222 : 0x44661111;
+        Gui.drawRect(x, y, x + size, y + size, bg);
+        GuiRenderUtils.drawRectOutline(x, y, size, size, hovered ? 0x66FFFFFF : 0x22FFFFFF);
+        if (hovered) GuiRenderUtils.drawGradientRect(x + 1, y + 1, x + size - 1, y + 3, 0x28FFFFFF, 0x00FFFFFF);
+        // Bigger, more readable X char
         fontRendererObj.drawString("x", x + 2, y + 1, hovered ? 0xFFFFFFFF : 0xAABBBBBB);
     }
     private void drawToggle(int x, int y, boolean value, String id) {
