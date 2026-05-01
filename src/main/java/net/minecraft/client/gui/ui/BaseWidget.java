@@ -150,6 +150,65 @@ public abstract class BaseWidget implements UIElement {
     public void setProp(String key, Object value) { props.put(key, value); }
     public Map<String, Object> getProps() { return props; }
 
+    /**
+     * Retourne true si ce widget supporte la coloration séparée label/valeur.
+     * À surcharger dans les widgets de type "Préfixe: Valeur".
+     */
+    public boolean supportsLabelColor() { return false; }
+
+    /**
+     * Colors du label et de la valeur sont-elles synchronisées ?
+     * Quand true (défaut) : label et valeur ont la même couleur.
+     * Quand false : le label utilise {@link #getLabelColor()}.
+     */
+    public boolean isSyncColors() {
+        return !Boolean.FALSE.equals(props.getOrDefault("syncColors", Boolean.TRUE));
+    }
+
+    /** Couleur du label/préfixe quand syncColors=false. Défaut gris clair. */
+    public int getLabelColor() {
+        Object v = props.get("colorLabel");
+        if (v instanceof Number) {
+            int c = ((Number) v).intValue();
+            if ((c & 0xFF000000) == 0) c |= 0xFF000000;
+            return c;
+        }
+        return 0xFFAAAAAA;
+    }
+
+    /**
+     * Dessine "label" + "value" côte à côte avec des couleurs séparées si syncColors=false.
+     *
+     * @param fr      FontRenderer
+     * @param label   partie préfixe, ex "FPS: "
+     * @param value   partie valeur, ex "60"
+     * @param x       position X locale
+     * @param y       position Y locale
+     * @param valueColor couleur de la valeur (peut différer de getColor() pour les widgets
+     *                   à couleur dynamique comme FactionZone ou CPS)
+     */
+    protected void drawLabelValue(net.minecraft.client.gui.FontRenderer fr,
+                                  String label, String value,
+                                  float x, float y, int valueColor) {
+        if ((valueColor & 0xFF000000) == 0) valueColor |= 0xFF000000;
+        if (isSyncColors()) {
+            fr.drawStringWithShadow(label + value, x, y, valueColor);
+        } else {
+            int lc = getLabelColor();
+            fr.drawStringWithShadow(label, x, y, lc);
+            fr.drawStringWithShadow(value, x + fr.getStringWidth(label), y, valueColor);
+        }
+    }
+
+    /** Variante utilisant getColor() comme couleur de valeur. */
+    protected void drawLabelValue(net.minecraft.client.gui.FontRenderer fr,
+                                  String label, String value, float x, float y) {
+        int vc = getColor();
+        if ((vc & 0xFF000000) == 0) vc |= 0xFF000000;
+        if ((vc & 0x00FFFFFF) == 0) vc = isSyncColors() ? 0xFFFFFFFF : vc | 0xFFFFFFFF;
+        drawLabelValue(fr, label, value, x, y, vc);
+    }
+
     public void updateAbsolutePosition() {
         if (relX < 0.0d || relY < 0.0d) return;
         Minecraft mc = Minecraft.getMinecraft();

@@ -128,5 +128,12 @@ public final class PacketId {
      * relation : 0=own, 1=ally, 2=enemy, 3=neutral
      */
     public static final int FACTION_DATA = 0x80;
+
+    /**
+     * Zone actuelle du joueur (chunk claim).
+     * Format : String factionName (vide = wilderness) | byte relation
+     * relation : 0=own, 1=ally, 2=truce, 3=enemy, 4=neutral
+     */
+    public static final int FACTION_ZONE = 0x81;
 }
 

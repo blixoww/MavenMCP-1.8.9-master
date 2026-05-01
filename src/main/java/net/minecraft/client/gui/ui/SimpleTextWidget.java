@@ -25,6 +25,8 @@ public class SimpleTextWidget extends BaseWidget {
         return fr != null && text != null ? fr.getStringWidth(text) + 6 : this.width;
     }
 
+    @Override public boolean supportsLabelColor() { return true; }
+
     @Override
     protected void draw() {
         Minecraft mc = Minecraft.getMinecraft();
@@ -37,7 +39,13 @@ public class SimpleTextWidget extends BaseWidget {
         int col = getColor();
         if ((col & 0xFF000000) == 0) col |= 0xFF000000;
         if ((col & 0x00FFFFFF) == 0) col = 0xFFFFFFFF;
-        // BaseWidget handles translation, draw at (0,0)
-        fr.drawStringWithShadow(text, 0, 0, col);
+
+        // Détecter la séparation "Label: valeur" pour le split couleur
+        int sep = (text != null) ? text.indexOf(": ") : -1;
+        if (!isSyncColors() && sep >= 0) {
+            drawLabelValue(fr, text.substring(0, sep + 2), text.substring(sep + 2), 0, 0, col);
+        } else {
+            fr.drawStringWithShadow(text, 0, 0, col);
+        }
     }
 }

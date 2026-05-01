@@ -10,15 +10,16 @@ public class BiomeWidget extends BaseWidget {
         this.height = 12;
     }
 
+    @Override public boolean supportsLabelColor() { return true; }
+
     @Override
     protected void draw() {
         Minecraft mc = Minecraft.getMinecraft();
         if (mc == null || mc.thePlayer == null || mc.theWorld == null) return;
-        FontRenderer fr = mc.fontRendererObj;
+        net.minecraft.client.gui.FontRenderer fr = mc.fontRendererObj;
         String biome = mc.theWorld.getBiomeGenForCoords(mc.thePlayer.getPosition()).biomeName;
-        String s = "Biome: " + biome;
         int col = getColor();
-        if ((col & 0x00FFFFFF) == 0) col = 0x00FFFFFF;
-        fr.drawStringWithShadow(s, 0, 0, col & 0x00FFFFFF);
+        if ((col & 0x00FFFFFF) == 0) col |= 0x00FFFFFF;
+        drawLabelValue(fr, "Biome: ", biome, 0, 0);
     }
 }

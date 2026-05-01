@@ -13,6 +13,8 @@ public class ToggleSneakWidget extends BaseWidget {
         this.defaultHeight = 12;
     }
 
+    @Override public boolean supportsLabelColor() { return true; }
+
     @Override
     protected void draw() {
         Minecraft mc = Minecraft.getMinecraft();
@@ -20,12 +22,8 @@ public class ToggleSneakWidget extends BaseWidget {
         FontRenderer fr = mc.fontRendererObj;
         GameSettings gs = mc.gameSettings;
 
-        boolean featureEnabled = gs.toggleSneakEnabled;
-        boolean sneaking = featureEnabled && gs.isToggleSneakActive;
-
-        String text = sneaking ? "Sneaking" : (featureEnabled ? "Sneak: ON" : "Sneak: OFF");
-        int col = featureEnabled ? getColor() : 0xFF888888;
-        if ((col & 0x00FFFFFF) == 0) col = 0xFFFFFFFF;
-        fr.drawStringWithShadow(text, 0, 0, col);
+        boolean sneaking = gs.toggleSneakEnabled && gs.isToggleSneakActive;
+        String value = sneaking ? "ON" : "OFF";
+        drawLabelValue(fr, "Sneak: ", value, 0, 0);
     }
 }

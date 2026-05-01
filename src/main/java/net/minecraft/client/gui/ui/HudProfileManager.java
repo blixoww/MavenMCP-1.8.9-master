@@ -24,12 +24,15 @@ public class HudProfileManager {
 
     private final List<Map<String, Map<String, Object>>> profiles = new ArrayList<>();
     private final List<String> profileNames = new ArrayList<>();
+    /** Index du thème personnalisé associé à chaque slot (-1 = aucun). */
+    private final List<Integer> profileCustomThemeIdx = new ArrayList<>();
     private int activeProfile = -1;
 
     private HudProfileManager() {
         for (int i = 0; i < MAX_PROFILES; i++) {
             profiles.add(null);
             profileNames.add(getDefaultName(i));
+            profileCustomThemeIdx.add(-1);
         }
         load();
     }
@@ -58,6 +61,17 @@ public class HudProfileManager {
     }
 
     public int getActiveProfile() { return activeProfile; }
+
+    public int getProfileCustomThemeIdx(int slot) {
+        if (slot < 0 || slot >= profileCustomThemeIdx.size()) return -1;
+        return profileCustomThemeIdx.get(slot);
+    }
+
+    public void setProfileCustomThemeIdx(int slot, int idx) {
+        if (slot < 0 || slot >= MAX_PROFILES) return;
+        while (profileCustomThemeIdx.size() <= slot) profileCustomThemeIdx.add(-1);
+        profileCustomThemeIdx.set(slot, idx);
+    }
 
     public String getProfileDescription(int slot) {
         if (slot < 0 || slot >= MAX_PROFILES) return "";
@@ -187,6 +201,15 @@ public class HudProfileManager {
         }
         activeProfile = slot;
         ui.saveConfig();
+
+        // Appliquer le thème personnalisé associé s'il y en a un
+        int ctIdx = getProfileCustomThemeIdx(slot);
+        if (ctIdx >= 0) {
+            CustomThemeManager.CustomTheme ct = CustomThemeManager.getInstance().get(ctIdx);
+            if (ct != null) {
+                CustomThemeManager.applyToWidgets(ct, ui);
+            }
+        }
     }
 
     private int[] getScreenSize() {
@@ -313,6 +336,9 @@ public class HudProfileManager {
             profileData.put(e.getId(), data);
         }
 
+        // Appliquer la palette PvP (valeur=rouge vif, prefix=rose)
+        applyPaletteToProfileData(profileData, ui, 0xFFFF5555, 0xFFFF9999);
+
         profiles.set(0, profileData);
         profileNames.set(0, "PvP");
         save();
@@ -346,9 +372,37 @@ public class HudProfileManager {
             profileData.put(e.getId(), buildWidgetData(e, px, py, enabled, sw, sh));
         }
 
+        // Appliquer la palette Minimal (valeur=gris clair, prefix=gris moyen)
+        applyPaletteToProfileData(profileData, ui, 0xFFDDDDDD, 0xFFAAAAAA);
+
         profiles.set(1, profileData);
         profileNames.set(1, "Exploration");
         save();
+    }
+
+    /**
+     * Injecte les couleurs d'une palette (valeur + prefix) dans les données d'un profil.
+     * La couleur 'value' est appliquée sur tous les widgets non-FactionZone.
+     * La couleur 'prefix' va dans colorLabel pour les widgets qui supportent le split label/valeur.
+     */
+    @SuppressWarnings("unchecked")
+    private void applyPaletteToProfileData(
+            Map<String, Map<String, Object>> profileData, UIManager ui,
+            int valueColor, int prefixColor) {
+        for (Map.Entry<String, Map<String, Object>> entry : profileData.entrySet()) {
+            UIElement e = ui.get(entry.getKey());
+            if (!(e instanceof BaseWidget)) continue;
+            if (e instanceof FactionZoneWidget) continue; // FactionZone : couleurs factions inchangées
+            Map<String, Object> data = entry.getValue();
+            data.put("color", valueColor);
+            data.put("rgb",   Boolean.FALSE);
+            if (((BaseWidget) e).supportsLabelColor()) {
+                Map<String, Object> props = (Map<String, Object>) data.get("props");
+                if (props == null) { props = new LinkedHashMap<>(); data.put("props", props); }
+                props.put("colorLabel", prefixColor);
+                props.put("syncColors", Boolean.FALSE);
+            }
+        }
     }
 
     public void save() {
@@ -359,6 +413,7 @@ public class HudProfileManager {
             Map<String, Object> root = new LinkedHashMap<>();
             root.put("activeProfile", activeProfile);
             root.put("profileNames", profileNames);
+            root.put("profileCustomThemeIdx", profileCustomThemeIdx);
             root.put("profiles", profiles);
 
             try (Writer w = new FileWriter(out)) {
@@ -389,6 +444,12 @@ public class HudProfileManager {
                 List<?> names = (List<?>) root.get("profileNames");
                 for (int i = 0; i < Math.min(names.size(), MAX_PROFILES); i++) {
                     profileNames.set(i, String.valueOf(names.get(i)));
+                }
+            }
+            if (root.containsKey("profileCustomThemeIdx")) {
+                List<?> ctIdxList = (List<?>) root.get("profileCustomThemeIdx");
+                for (int i = 0; i < Math.min(ctIdxList.size(), MAX_PROFILES); i++) {
+                    try { profileCustomThemeIdx.set(i, ((Number) ctIdxList.get(i)).intValue()); } catch (Throwable ignored) {}
                 }
             }
             if (root.containsKey("profiles")) {

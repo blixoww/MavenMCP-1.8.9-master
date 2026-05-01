@@ -16,6 +16,8 @@ public class ReachWidget extends BaseWidget {
         this.height = 12;
     }
 
+    @Override public boolean supportsLabelColor() { return true; }
+
     @Override
     protected void draw() {
         Minecraft mc = Minecraft.getMinecraft();
@@ -63,21 +65,20 @@ public class ReachWidget extends BaseWidget {
             lastReach = -1.0D;
         }
 
-        String s;
+        String value;
         if (lastReach < 0) {
-            s = UIManager.getInstance().isEditorActive() ? "Reach: 3.00" : "Reach: 0.00";
+            value = UIManager.getInstance().isEditorActive() ? "3.00" : "0.00";
         } else {
-            s = String.format("Reach: %.2f", lastReach);
+            value = String.format("%.2f", lastReach);
         }
 
         FontRenderer fr = mc.fontRendererObj;
         if (!Boolean.TRUE.equals(getPropOrDefault("customSize", false))) {
-            this.width = fr.getStringWidth(s) + 4;
+            this.width = fr.getStringWidth("Reach: " + value) + 4;
         }
         
-        int drawCol = getColor();
-        if ((drawCol & 0xFF000000) == 0) drawCol |= 0xFF000000;
-        
-        fr.drawStringWithShadow(s, 0, 0, drawCol);
+        int col = getColor();
+        if ((col & 0xFF000000) == 0) col |= 0xFF000000;
+        drawLabelValue(fr, "Reach: ", value, 0, 0, col);
     }
 }

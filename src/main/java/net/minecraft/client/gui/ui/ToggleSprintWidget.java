@@ -13,6 +13,8 @@ public class ToggleSprintWidget extends BaseWidget {
         this.defaultHeight = 12;
     }
 
+    @Override public boolean supportsLabelColor() { return true; }
+
     @Override
     protected void draw() {
         Minecraft mc = Minecraft.getMinecraft();
@@ -20,27 +22,8 @@ public class ToggleSprintWidget extends BaseWidget {
         FontRenderer fr = mc.fontRendererObj;
         GameSettings gs = mc.gameSettings;
 
-        boolean featureEnabled = gs.toggleSprintEnabled;
-        boolean toggleActive   = featureEnabled && gs.isToggleSprintActive;
-        boolean actuallySprint = toggleActive && mc.thePlayer != null && mc.thePlayer.isSprinting();
-
-        String text;
-        int col;
-        if (!featureEnabled) {
-            text = "Sprint: OFF";
-            col  = 0xFF888888;
-        } else if (actuallySprint) {
-            text = "Sprinting";
-            col  = getColor();
-        } else if (toggleActive) {
-            // Toggle actif mais arrêté momentanément (va reprendre dès qu'on avance)
-            text = "Sprint: \u00a7aON";
-            col  = getColor();
-        } else {
-            text = "Sprint: \u00a77OFF";
-            col  = getColor();
-        }
-        if ((col & 0x00FFFFFF) == 0) col = 0xFFFFFFFF;
-        fr.drawStringWithShadow(text, 0, 0, col);
+        boolean toggleActive = gs.toggleSprintEnabled && gs.isToggleSprintActive;
+        String value = toggleActive ? "ON" : "OFF";
+        drawLabelValue(fr, "Sprint: ", value, 0, 0);
     }
 }

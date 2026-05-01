@@ -7,13 +7,20 @@
     "Profil 4",
     "Profil 5"
   ],
+  "profileCustomThemeIdx": [
+    -1,
+    -1,
+    -1,
+    -1,
+    -1
+  ],
   "profiles": [
     {
       "fps": {
         "x": 5,
         "y": 5,
         "enabled": true,
-        "color": -1,
+        "color": -43691,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.008445945945945946,
@@ -24,14 +31,16 @@
         "height": 12,
         "props": {
           "snapGrid": true,
-          "snapAlign": false
+          "snapAlign": false,
+          "colorLabel": -26215,
+          "syncColors": false
         }
       },
       "ping": {
         "x": 5,
         "y": 17,
         "enabled": true,
-        "color": -1,
+        "color": -43691,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.008305647840531562,
@@ -41,14 +50,16 @@
         "width": 38,
         "height": 12,
         "props": {
-          "snapAlign": true
+          "snapAlign": true,
+          "colorLabel": -26215,
+          "syncColors": false
         }
       },
       "biome": {
         "x": 6,
         "y": 54,
         "enabled": false,
-        "color": -1,
+        "color": -43691,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.011538461538461539,
@@ -59,14 +70,16 @@
         "height": 12,
         "props": {
           "snapGrid": false,
-          "snapAlign": true
+          "snapAlign": true,
+          "colorLabel": -26215,
+          "syncColors": false
         }
       },
       "coords": {
         "x": 10,
         "y": 19,
         "enabled": false,
-        "color": -1,
+        "color": -43691,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.018115942028985508,
@@ -79,14 +92,16 @@
           "rgbMode": false,
           "snapGrid": true,
           "snapAlign": true,
-          "rawColor": -1.0
+          "colorLabel": -26215,
+          "rawColor": -1.0,
+          "syncColors": false
         }
       },
       "dir": {
         "x": 5,
         "y": 41,
         "enabled": true,
-        "color": -1,
+        "color": -43691,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.01,
@@ -97,14 +112,16 @@
         "height": 12,
         "props": {
           "snapGrid": false,
-          "snapAlign": false
+          "snapAlign": false,
+          "colorLabel": -26215,
+          "syncColors": false
         }
       },
       "date": {
         "x": 9,
         "y": 58,
         "enabled": false,
-        "color": -1,
+        "color": -43691,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.018,
@@ -122,7 +139,7 @@
         "x": 555,
         "y": 320,
         "enabled": true,
-        "color": -1,
+        "color": -43691,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.9910714285714286,
@@ -141,7 +158,7 @@
         "x": 585,
         "y": 232,
         "enabled": true,
-        "color": -1,
+        "color": -43691,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.9915254237288136,
@@ -162,7 +179,7 @@
         "x": 5,
         "y": 73,
         "enabled": true,
-        "color": -1,
+        "color": -43691,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.00992063492063492,
@@ -185,7 +202,7 @@
         "x": 416,
         "y": 317,
         "enabled": false,
-        "color": -1,
+        "color": -43691,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.6910299003322259,
@@ -198,14 +215,16 @@
           "background": false,
           "showBackground": false,
           "dynamicColor": true,
-          "initialized": false
+          "initialized": false,
+          "colorLabel": -26215,
+          "syncColors": false
         }
       },
       "toggle_sneak": {
         "x": 7,
         "y": 300,
         "enabled": false,
-        "color": -12259721,
+        "color": -43691,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.01232394366197183,
@@ -215,14 +234,16 @@
         "width": 72,
         "height": 14,
         "props": {
-          "snapAlign": true
+          "snapAlign": true,
+          "colorLabel": -26215,
+          "syncColors": false
         }
       },
       "toggle_sprint": {
         "x": 5,
         "y": 269,
         "enabled": true,
-        "color": -12259721,
+        "color": -43691,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.008802816901408451,
@@ -232,14 +253,17 @@
         "width": 72,
         "height": 14,
         "props": {
-          "snapAlign": true
+          "snapGrid": false,
+          "snapAlign": true,
+          "colorLabel": -26215,
+          "syncColors": false
         }
       },
       "combatlog": {
         "x": 5,
         "y": 284,
         "enabled": true,
-        "color": -1,
+        "color": -43691,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.008278145695364239,
@@ -259,7 +283,7 @@
         "x": 5,
         "y": 29,
         "enabled": true,
-        "color": -1,
+        "color": -43691,
         "rgb": false,
         "scale": 1.02,
         "relX": 0.008635578583765112,
@@ -270,18 +294,45 @@
         "height": 12,
         "props": {
           "snapGrid": false,
-          "customSize": true
+          "customSize": true,
+          "colorLabel": -26215,
+          "syncColors": false
+        }
+      },
+      "faction_zone": {
+        "x": 10,
+        "y": 55,
+        "enabled": false,
+        "color": -8065024,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.017391304347826087,
+        "relY": 0.16819571865443425,
+        "refW": 640,
+        "refH": 337,
+        "width": 65,
+        "height": 10,
+        "props": {
+          "showWilderness": false,
+          "colorAlly": -1.0897961E7,
+          "colorWilderness": -7642194.0,
+          "colorNeutral": -7642194.0,
+          "snapGrid": false,
+          "colorOwn": -1.0897961E7,
+          "colorEnemy": -1.0002206E7,
+          "colorLabel": -7642194.0,
+          "syncColors": false
         }
       },
       "compass": {
-        "x": 199,
-        "y": 10,
+        "x": 270,
+        "y": 5,
         "enabled": false,
-        "color": -1,
+        "color": -43691,
         "rgb": false,
         "scale": 1.3012422,
-        "relX": 0.5236842105263158,
-        "relY": 0.03289473684210526,
+        "relX": 0.7105263157894737,
+        "relY": 0.01644736842105263,
         "refW": 640,
         "refH": 337,
         "width": 200,
@@ -296,8 +347,8 @@
         "x": 573,
         "y": 5,
         "enabled": true,
-        "color": -13703492,
-        "rgb": true,
+        "color": -43691,
+        "rgb": false,
         "scale": 1.0,
         "relX": 1.0,
         "relY": 0.020833333333333332,
@@ -326,7 +377,7 @@
         "x": 5,
         "y": 5,
         "enabled": true,
-        "color": -1,
+        "color": -2236963,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.008445945945945946,
@@ -337,14 +388,16 @@
         "height": 12,
         "props": {
           "snapGrid": true,
-          "snapAlign": false
+          "snapAlign": false,
+          "colorLabel": -5592406,
+          "syncColors": false
         }
       },
       "ping": {
         "x": 5,
         "y": 19,
         "enabled": false,
-        "color": -1,
+        "color": -2236963,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.008305647840531562,
@@ -354,14 +407,16 @@
         "width": 38,
         "height": 12,
         "props": {
-          "snapAlign": true
+          "snapAlign": true,
+          "colorLabel": -5592406,
+          "syncColors": false
         }
       },
       "biome": {
         "x": 5,
         "y": 41,
         "enabled": true,
-        "color": -1,
+        "color": -2236963,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.009615384615384616,
@@ -372,14 +427,16 @@
         "height": 12,
         "props": {
           "snapGrid": false,
-          "snapAlign": true
+          "snapAlign": true,
+          "colorLabel": -5592406,
+          "syncColors": false
         }
       },
       "coords": {
         "x": 5,
         "y": 17,
         "enabled": true,
-        "color": -1,
+        "color": -2236963,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.009057971014492754,
@@ -392,14 +449,16 @@
           "rgbMode": false,
           "snapGrid": true,
           "snapAlign": true,
-          "rawColor": -1.0
+          "colorLabel": -5592406,
+          "rawColor": -1.0,
+          "syncColors": false
         }
       },
       "dir": {
         "x": 5,
         "y": 29,
         "enabled": true,
-        "color": -1,
+        "color": -2236963,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.01,
@@ -410,14 +469,16 @@
         "height": 12,
         "props": {
           "snapGrid": false,
-          "snapAlign": false
+          "snapAlign": false,
+          "colorLabel": -5592406,
+          "syncColors": false
         }
       },
       "date": {
         "x": 5,
         "y": 53,
         "enabled": true,
-        "color": -1,
+        "color": -2236963,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.01,
@@ -435,7 +496,7 @@
         "x": 585,
         "y": 317,
         "enabled": true,
-        "color": -1,
+        "color": -2236963,
         "rgb": false,
         "scale": 1.0,
         "relX": 1.0,
@@ -454,7 +515,7 @@
         "x": 581,
         "y": 237,
         "enabled": false,
-        "color": -1,
+        "color": -2236963,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.9847457627118644,
@@ -475,6 +536,363 @@
         "x": 10,
         "y": 170,
         "enabled": false,
+        "color": -2236963,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.01984126984126984,
+        "relY": 0.5647840531561462,
+        "refW": 640,
+        "refH": 337,
+        "width": 136,
+        "height": 36,
+        "props": {
+          "showIcons": true,
+          "snapGrid": true,
+          "initialized": true,
+          "snapAlign": true,
+          "customSize": true,
+          "rawColor": -1.0,
+          "showDuration": true
+        }
+      },
+      "cps": {
+        "x": 416,
+        "y": 317,
+        "enabled": false,
+        "color": -2236963,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.6910299003322259,
+        "relY": 0.9814241486068112,
+        "refW": 640,
+        "refH": 337,
+        "width": 38,
+        "height": 14,
+        "props": {
+          "background": false,
+          "showBackground": false,
+          "dynamicColor": true,
+          "initialized": false,
+          "colorLabel": -5592406,
+          "syncColors": false
+        }
+      },
+      "toggle_sneak": {
+        "x": 7,
+        "y": 300,
+        "enabled": false,
+        "color": -2236963,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.01232394366197183,
+        "relY": 0.9287925696594427,
+        "refW": 640,
+        "refH": 337,
+        "width": 72,
+        "height": 14,
+        "props": {
+          "snapAlign": true,
+          "colorLabel": -5592406,
+          "syncColors": false
+        }
+      },
+      "toggle_sprint": {
+        "x": 5,
+        "y": 319,
+        "enabled": false,
+        "color": -2236963,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.008802816901408451,
+        "relY": 0.9876160990712074,
+        "refW": 640,
+        "refH": 337,
+        "width": 72,
+        "height": 14,
+        "props": {
+          "snapGrid": false,
+          "snapAlign": true,
+          "colorLabel": -5592406,
+          "syncColors": false
+        }
+      },
+      "combatlog": {
+        "x": 10,
+        "y": 273,
+        "enabled": false,
+        "color": -2236963,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.016556291390728478,
+        "relY": 0.9069767441860465,
+        "refW": 640,
+        "refH": 337,
+        "width": 36,
+        "height": 36,
+        "props": {
+          "originalDesign": true,
+          "snapGrid": true,
+          "customSize": true,
+          "debugCombatLog": false
+        }
+      },
+      "Reach": {
+        "x": 10,
+        "y": 43,
+        "enabled": false,
+        "color": -2236963,
+        "rgb": false,
+        "scale": 1.02,
+        "relX": 0.017271157167530225,
+        "relY": 0.13230769230769232,
+        "refW": 640,
+        "refH": 337,
+        "width": 60,
+        "height": 12,
+        "props": {
+          "snapGrid": false,
+          "customSize": true,
+          "colorLabel": -5592406,
+          "syncColors": false
+        }
+      },
+      "faction_zone": {
+        "x": 10,
+        "y": 55,
+        "enabled": false,
+        "color": -8065024,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.017391304347826087,
+        "relY": 0.16819571865443425,
+        "refW": 640,
+        "refH": 337,
+        "width": 65,
+        "height": 10,
+        "props": {
+          "showWilderness": false,
+          "colorAlly": -1.0897961E7,
+          "colorWilderness": -7642194.0,
+          "colorNeutral": -7642194.0,
+          "snapGrid": false,
+          "colorOwn": -1.0897961E7,
+          "colorEnemy": -1.0002206E7,
+          "colorLabel": -7642194.0,
+          "syncColors": false
+        }
+      },
+      "compass": {
+        "x": 270,
+        "y": 5,
+        "enabled": true,
+        "color": -2236963,
+        "rgb": false,
+        "scale": 1.3012422,
+        "relX": 0.7105263157894737,
+        "relY": 0.01644736842105263,
+        "refW": 640,
+        "refH": 337,
+        "width": 200,
+        "height": 26,
+        "props": {
+          "showWaypoints": true,
+          "snapGrid": true,
+          "showWaypointLabels": true
+        }
+      },
+      "Keystrokes": {
+        "x": 547,
+        "y": 18,
+        "enabled": false,
+        "color": -2236963,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.9838129496402878,
+        "relY": 0.075,
+        "refW": 640,
+        "refH": 337,
+        "width": 84,
+        "height": 97,
+        "props": {
+          "showKey1": true,
+          "snapGrid": true,
+          "showBackground": false,
+          "showKey0": true,
+          "showKey3": true,
+          "showSpaceRainbow": true,
+          "initialized": true,
+          "showKey2": true,
+          "showKey5": true,
+          "customSize": true,
+          "showKey4": true,
+          "showKey6": true
+        }
+      }
+    },
+    {
+      "fps": {
+        "x": 10,
+        "y": 7,
+        "enabled": true,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.017271157167530225,
+        "relY": 0.021739130434782608,
+        "refW": 640,
+        "refH": 337,
+        "width": 48,
+        "height": 12,
+        "props": {
+          "snapGrid": true,
+          "snapAlign": false,
+          "colorLabel": -30720,
+          "syncColors": false
+        }
+      },
+      "ping": {
+        "x": 5,
+        "y": 19,
+        "enabled": false,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.008305647840531562,
+        "relY": 0.05846153846153846,
+        "refW": 640,
+        "refH": 337,
+        "width": 38,
+        "height": 12,
+        "props": {
+          "snapAlign": true,
+          "colorLabel": -30720,
+          "syncColors": false
+        }
+      },
+      "biome": {
+        "x": 6,
+        "y": 54,
+        "enabled": false,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.011538461538461539,
+        "relY": 0.16615384615384615,
+        "refW": 640,
+        "refH": 337,
+        "width": 120,
+        "height": 12,
+        "props": {
+          "snapGrid": false,
+          "snapAlign": true,
+          "colorLabel": -30720,
+          "syncColors": false
+        }
+      },
+      "coords": {
+        "x": 10,
+        "y": 19,
+        "enabled": true,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.018115942028985508,
+        "relY": 0.05864197530864197,
+        "refW": 640,
+        "refH": 337,
+        "width": 88,
+        "height": 13,
+        "props": {
+          "rgbMode": false,
+          "snapGrid": true,
+          "snapAlign": true,
+          "colorLabel": -30720,
+          "rawColor": -1.0,
+          "syncColors": false
+        }
+      },
+      "dir": {
+        "x": 10,
+        "y": 31,
+        "enabled": true,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.02,
+        "relY": 0.09538461538461539,
+        "refW": 640,
+        "refH": 337,
+        "width": 140,
+        "height": 12,
+        "props": {
+          "snapGrid": false,
+          "snapAlign": false,
+          "colorLabel": -30720,
+          "syncColors": false
+        }
+      },
+      "date": {
+        "x": 9,
+        "y": 58,
+        "enabled": false,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.018,
+        "relY": 0.17846153846153845,
+        "refW": 640,
+        "refH": 337,
+        "width": 140,
+        "height": 12,
+        "props": {
+          "snapGrid": false,
+          "snapAlign": true
+        }
+      },
+      "helditem": {
+        "x": 501,
+        "y": 295,
+        "enabled": true,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.8946428571428572,
+        "relY": 0.9247648902821317,
+        "refW": 640,
+        "refH": 337,
+        "width": 80,
+        "height": 18,
+        "props": {
+          "snapGrid": false,
+          "showBackground": false,
+          "snapAlign": false
+        }
+      },
+      "armor_group": {
+        "x": 581,
+        "y": 237,
+        "enabled": true,
+        "color": -1,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.9847457627118644,
+        "relY": 0.9442231075697212,
+        "refW": 640,
+        "refH": 337,
+        "width": 50,
+        "height": 86,
+        "props": {
+          "layout": "vertical",
+          "snapGrid": true,
+          "displayPercent": true,
+          "initialized": true,
+          "snapAlign": false
+        }
+      },
+      "potions": {
+        "x": 10,
+        "y": 170,
+        "enabled": true,
         "color": -1,
         "rgb": false,
         "scale": 1.0,
@@ -511,14 +929,16 @@
           "background": false,
           "showBackground": false,
           "dynamicColor": true,
-          "initialized": false
+          "initialized": false,
+          "colorLabel": -30720,
+          "syncColors": false
         }
       },
       "toggle_sneak": {
         "x": 7,
         "y": 300,
         "enabled": false,
-        "color": -12259721,
+        "color": -1,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.01232394366197183,
@@ -528,14 +948,16 @@
         "width": 72,
         "height": 14,
         "props": {
-          "snapAlign": true
+          "snapAlign": true,
+          "colorLabel": -30720,
+          "syncColors": false
         }
       },
       "toggle_sprint": {
         "x": 5,
         "y": 319,
         "enabled": false,
-        "color": -12259721,
+        "color": -1,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.008802816901408451,
@@ -545,13 +967,16 @@
         "width": 72,
         "height": 14,
         "props": {
-          "snapAlign": true
+          "snapGrid": false,
+          "snapAlign": true,
+          "colorLabel": -30720,
+          "syncColors": false
         }
       },
       "combatlog": {
         "x": 10,
         "y": 273,
-        "enabled": false,
+        "enabled": true,
         "color": -1,
         "rgb": false,
         "scale": 1.0,
@@ -571,7 +996,7 @@
       "Reach": {
         "x": 10,
         "y": 43,
-        "enabled": false,
+        "enabled": true,
         "color": -1,
         "rgb": false,
         "scale": 1.02,
@@ -583,18 +1008,45 @@
         "height": 12,
         "props": {
           "snapGrid": false,
-          "customSize": true
+          "customSize": true,
+          "colorLabel": -30720,
+          "syncColors": false
+        }
+      },
+      "faction_zone": {
+        "x": 10,
+        "y": 55,
+        "enabled": false,
+        "color": -8065024,
+        "rgb": false,
+        "scale": 1.0,
+        "relX": 0.017391304347826087,
+        "relY": 0.16819571865443425,
+        "refW": 640,
+        "refH": 337,
+        "width": 65,
+        "height": 10,
+        "props": {
+          "showWilderness": false,
+          "colorAlly": -1.0897961E7,
+          "colorWilderness": -7642194.0,
+          "colorNeutral": -7642194.0,
+          "snapGrid": false,
+          "colorOwn": -1.0897961E7,
+          "colorEnemy": -1.0002206E7,
+          "colorLabel": -7642194.0,
+          "syncColors": false
         }
       },
       "compass": {
-        "x": 199,
-        "y": 10,
+        "x": 270,
+        "y": 5,
         "enabled": false,
         "color": -1,
         "rgb": false,
         "scale": 1.3012422,
-        "relX": 0.5236842105263158,
-        "relY": 0.03289473684210526,
+        "relX": 0.7105263157894737,
+        "relY": 0.01644736842105263,
         "refW": 640,
         "refH": 337,
         "width": 200,
@@ -608,8 +1060,8 @@
       "Keystrokes": {
         "x": 547,
         "y": 18,
-        "enabled": false,
-        "color": -13703491,
+        "enabled": true,
+        "color": -10885586,
         "rgb": true,
         "scale": 1.0,
         "relX": 0.9838129496402878,
@@ -618,300 +1070,6 @@
         "refH": 337,
         "width": 84,
         "height": 97,
-        "props": {
-          "showKey1": true,
-          "snapGrid": true,
-          "showBackground": false,
-          "showKey0": true,
-          "showKey3": true,
-          "showSpaceRainbow": true,
-          "initialized": true,
-          "showKey2": true,
-          "showKey5": true,
-          "customSize": true,
-          "showKey4": true,
-          "showKey6": true
-        }
-      }
-    },
-    {
-      "fps": {
-        "x": 10.0,
-        "y": 7.0,
-        "enabled": true,
-        "color": -1.0,
-        "rgb": false,
-        "scale": 1.0,
-        "relX": 0.017271157167530225,
-        "relY": 0.021739130434782608,
-        "refW": 640.0,
-        "refH": 337.0,
-        "width": 48.0,
-        "height": 12.0,
-        "props": {
-          "snapGrid": true,
-          "snapAlign": false
-        }
-      },
-      "ping": {
-        "x": 5.0,
-        "y": 19.0,
-        "enabled": false,
-        "color": -1.0,
-        "rgb": false,
-        "scale": 1.0,
-        "relX": 0.008305647840531562,
-        "relY": 0.05846153846153846,
-        "refW": 640.0,
-        "refH": 337.0,
-        "width": 38.0,
-        "height": 12.0,
-        "props": {
-          "snapAlign": true
-        }
-      },
-      "biome": {
-        "x": 6.0,
-        "y": 54.0,
-        "enabled": false,
-        "color": -1.0,
-        "rgb": false,
-        "scale": 1.0,
-        "relX": 0.011538461538461539,
-        "relY": 0.16615384615384615,
-        "refW": 640.0,
-        "refH": 337.0,
-        "width": 120.0,
-        "height": 12.0,
-        "props": {
-          "snapGrid": false,
-          "snapAlign": true
-        }
-      },
-      "coords": {
-        "x": 10.0,
-        "y": 19.0,
-        "enabled": true,
-        "color": -1.0,
-        "rgb": false,
-        "scale": 1.0,
-        "relX": 0.018115942028985508,
-        "relY": 0.05864197530864197,
-        "refW": 640.0,
-        "refH": 337.0,
-        "width": 88.0,
-        "height": 13.0,
-        "props": {
-          "rgbMode": false,
-          "snapGrid": true,
-          "snapAlign": true,
-          "rawColor": -1.0
-        }
-      },
-      "dir": {
-        "x": 10.0,
-        "y": 31.0,
-        "enabled": true,
-        "color": -1.0,
-        "rgb": false,
-        "scale": 1.0,
-        "relX": 0.02,
-        "relY": 0.09538461538461539,
-        "refW": 640.0,
-        "refH": 337.0,
-        "width": 140.0,
-        "height": 12.0,
-        "props": {
-          "snapGrid": false,
-          "snapAlign": false
-        }
-      },
-      "date": {
-        "x": 9.0,
-        "y": 58.0,
-        "enabled": false,
-        "color": -1.0,
-        "rgb": false,
-        "scale": 1.0,
-        "relX": 0.018,
-        "relY": 0.17846153846153845,
-        "refW": 640.0,
-        "refH": 337.0,
-        "width": 140.0,
-        "height": 12.0,
-        "props": {
-          "snapGrid": false,
-          "snapAlign": true
-        }
-      },
-      "helditem": {
-        "x": 501.0,
-        "y": 295.0,
-        "enabled": true,
-        "color": -1.0,
-        "rgb": false,
-        "scale": 1.0,
-        "relX": 0.8946428571428572,
-        "relY": 0.9247648902821317,
-        "refW": 640.0,
-        "refH": 337.0,
-        "width": 80.0,
-        "height": 18.0,
-        "props": {
-          "snapGrid": false,
-          "showBackground": false,
-          "snapAlign": false
-        }
-      },
-      "armor_group": {
-        "x": 581.0,
-        "y": 237.0,
-        "enabled": true,
-        "color": -1.0,
-        "rgb": false,
-        "scale": 1.0,
-        "relX": 0.9847457627118644,
-        "relY": 0.9442231075697212,
-        "refW": 640.0,
-        "refH": 337.0,
-        "width": 50.0,
-        "height": 86.0,
-        "props": {
-          "layout": "vertical",
-          "snapGrid": true,
-          "displayPercent": true,
-          "initialized": true,
-          "snapAlign": false
-        }
-      },
-      "potions": {
-        "x": 10.0,
-        "y": 170.0,
-        "enabled": true,
-        "color": -1.0,
-        "rgb": false,
-        "scale": 1.0,
-        "relX": 0.01984126984126984,
-        "relY": 0.5647840531561462,
-        "refW": 640.0,
-        "refH": 337.0,
-        "width": 136.0,
-        "height": 36.0,
-        "props": {
-          "showIcons": true,
-          "snapGrid": true,
-          "initialized": true,
-          "snapAlign": true,
-          "customSize": true,
-          "rawColor": -1.0,
-          "showDuration": true
-        }
-      },
-      "cps": {
-        "x": 416.0,
-        "y": 317.0,
-        "enabled": false,
-        "color": -1.0,
-        "rgb": false,
-        "scale": 1.0,
-        "relX": 0.6910299003322259,
-        "relY": 0.9814241486068112,
-        "refW": 640.0,
-        "refH": 337.0,
-        "width": 38.0,
-        "height": 14.0,
-        "props": {
-          "background": false,
-          "showBackground": false,
-          "dynamicColor": true,
-          "initialized": false
-        }
-      },
-      "toggle_sneak": {
-        "x": 7.0,
-        "y": 300.0,
-        "enabled": false,
-        "color": -1.2259721E7,
-        "rgb": false,
-        "scale": 1.0,
-        "relX": 0.01232394366197183,
-        "relY": 0.9287925696594427,
-        "refW": 640.0,
-        "refH": 337.0,
-        "width": 72.0,
-        "height": 14.0,
-        "props": {
-          "snapAlign": true
-        }
-      },
-      "toggle_sprint": {
-        "x": 5.0,
-        "y": 319.0,
-        "enabled": false,
-        "color": -1.2259721E7,
-        "rgb": false,
-        "scale": 1.0,
-        "relX": 0.008802816901408451,
-        "relY": 0.9876160990712074,
-        "refW": 640.0,
-        "refH": 337.0,
-        "width": 72.0,
-        "height": 14.0,
-        "props": {
-          "snapAlign": true
-        }
-      },
-      "combatlog": {
-        "x": 10.0,
-        "y": 273.0,
-        "enabled": true,
-        "color": -1.0,
-        "rgb": false,
-        "scale": 1.0,
-        "relX": 0.016556291390728478,
-        "relY": 0.9069767441860465,
-        "refW": 640.0,
-        "refH": 337.0,
-        "width": 36.0,
-        "height": 36.0,
-        "props": {
-          "originalDesign": true,
-          "snapGrid": true,
-          "customSize": true,
-          "debugCombatLog": false
-        }
-      },
-      "Reach": {
-        "x": 10.0,
-        "y": 43.0,
-        "enabled": true,
-        "color": -1.0,
-        "rgb": false,
-        "scale": 1.02,
-        "relX": 0.017271157167530225,
-        "relY": 0.13230769230769232,
-        "refW": 640.0,
-        "refH": 337.0,
-        "width": 60.0,
-        "height": 12.0,
-        "props": {
-          "snapGrid": false,
-          "customSize": true
-        }
-      },
-      "Keystrokes": {
-        "x": 547.0,
-        "y": 18.0,
-        "enabled": true,
-        "color": -4641050.0,
-        "rgb": true,
-        "scale": 1.0,
-        "relX": 0.9838129496402878,
-        "relY": 0.075,
-        "refW": 640.0,
-        "refH": 337.0,
-        "width": 84.0,
-        "height": 97.0,
         "props": {
           "showKey1": true,
           "snapGrid": true,

@@ -21,60 +21,48 @@ public class CPSWidget extends BaseWidget {
         if (getPropOrDefault("dynamicColor", null) == null) setProp("dynamicColor", Boolean.TRUE);
     }
 
+    @Override public boolean supportsLabelColor() { return true; }
+
     @Override
     protected void draw() {
         Minecraft mc = Minecraft.getMinecraft();
         if (mc == null) return;
         long now = System.currentTimeMillis();
         boolean attack = false;
-        try {
-            attack = mc.gameSettings.keyBindAttack.isKeyDown();
-        } catch (Throwable t) {
-            attack = false;
-        }
+        try { attack = mc.gameSettings.keyBindAttack.isKeyDown(); } catch (Throwable t) {}
         if (attack && !prevAttack) clicks.add(now);
         prevAttack = attack;
         Iterator<Long> it = clicks.iterator();
-        while (it.hasNext()) {
-            if (it.next() < now - 1000L) it.remove();
-        }
+        while (it.hasNext()) { if (it.next() < now - 1000L) it.remove(); }
         int cps = clicks.size();
-        
-        // Preview in editor
-        if (cps == 0 && UIManager.getInstance().isEditorActive()) {
-            cps = 7;
-        }
-        
+        if (cps == 0 && UIManager.getInstance().isEditorActive()) cps = 7;
+
         FontRenderer fr = mc.fontRendererObj;
-        String s = "CPS: " + cps;
+        String value = String.valueOf(cps);
         if (!Boolean.TRUE.equals(getPropOrDefault("customSize", false))) {
-            this.width = fr.getStringWidth(s) + 8;
+            this.width = fr.getStringWidth("CPS: " + value) + 8;
             this.height = 14;
         }
 
-        // Color logic
         int drawCol;
         if (Boolean.TRUE.equals(getPropOrDefault("dynamicColor", Boolean.FALSE))) {
-            if (cps < 5) drawCol = 0xFFFFFFFF; // Blanc
-            else if (cps < 7) drawCol = 0xFFFFFF55; // Jaune
-            else if (cps < 10) drawCol = 0xFFFFAA00; // Orange/Or
-            else if (cps < 15) drawCol = 0xFFFF5555; // Rouge
-            else drawCol = 0xFFAA00AA; // Violet
+            if      (cps < 5)  drawCol = 0xFFFFFFFF;
+            else if (cps < 7)  drawCol = 0xFFFFFF55;
+            else if (cps < 10) drawCol = 0xFFFFAA00;
+            else if (cps < 15) drawCol = 0xFFFF5555;
+            else               drawCol = 0xFFAA00AA;
         } else {
             drawCol = getColor();
         }
-
         int baseRgb = drawCol & 0x00FFFFFF;
-        int alpha = (drawCol >> 24) & 0xFF;
+        int alpha   = (drawCol >> 24) & 0xFF;
 
-        // background
         boolean showBg = Boolean.TRUE.equals(getPropOrDefault("showBackground", Boolean.FALSE));
         if (showBg) {
-            int bgAlpha = Math.max(40, alpha / 2);
-            int bgCol = (bgAlpha << 24) | baseRgb;
+            int bgCol = (Math.max(40, alpha / 2) << 24) | baseRgb;
             Gui.drawRect(0, 0, getWidth(), getHeight(), bgCol);
         }
 
-        fr.drawStringWithShadow(s, 4, 3, drawCol);
+        drawLabelValue(fr, "CPS: ", value, 4, 3, drawCol);
     }
 }

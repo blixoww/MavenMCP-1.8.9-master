@@ -1,5 +1,6 @@
 package net.minecraft.client.custompackets;
 
+import net.minecraft.client.custompackets.data.FactionZoneTracker;
 import net.minecraft.client.custompackets.handler.FactionDataCache;
 import net.minecraft.client.custompackets.handler.HdvPacketHandler;
 import net.minecraft.client.custompackets.handler.PlayerDataHandler;
@@ -62,6 +63,18 @@ public final class CustomPacketSystem {
             FactionDataCache.update(playerName, factionTag, relation);
         });
         LOGGER.info("[CustomPackets] ✓ FactionData handler enregistré");
+
+        // Zone courante – claim faction du chunk où se trouve le joueur
+        // Format : String factionName | byte relation | String ownFaction
+        PacketDispatcher.register(PacketChannel.FACTION_S2C, PacketId.FACTION_ZONE, buf -> {
+            String name      = buf.readStringFromBuffer(64);
+            int    relation  = buf.readByte() & 0xFF;
+            String ownFaction = "";
+            try { ownFaction = buf.readStringFromBuffer(64); } catch (Exception ignored) {}
+            LOGGER.debug("[FactionZone] name='{}' relation={} own='{}'", name, relation, ownFaction);
+            FactionZoneTracker.update(name, relation, ownFaction);
+        });
+        LOGGER.info("[CustomPackets] ✓ FactionZone handler enregistré");
 
         // Initialiser le combat log
         net.minecraft.client.combatlog.CombatLogManager.INSTANCE.init();

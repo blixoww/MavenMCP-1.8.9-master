@@ -10,29 +10,22 @@ public class DirectionWidget extends BaseWidget {
         this.height = 12;
     }
 
+    @Override public boolean supportsLabelColor() { return true; }
+
     @Override
     protected void draw() {
         Minecraft mc = Minecraft.getMinecraft();
         if (mc == null || mc.thePlayer == null) return;
+        net.minecraft.client.gui.FontRenderer fr = mc.fontRendererObj;
         float yaw = mc.thePlayer.rotationYaw;
         int dirIndex = (MathHelper.floor_double((yaw * 4.0F / 360.0F) + 0.5D) & 3);
-        String dir = "Sud";
+        String dir;
         switch (dirIndex) {
-            case 0:
-                dir = "Sud";
-                break;
-            case 1:
-                dir = "Ouest";
-                break;
-            case 2:
-                dir = "Nord";
-                break;
-            case 3:
-                dir = "Est";
-                break;
+            case 1:  dir = "Ouest"; break;
+            case 2:  dir = "Nord";  break;
+            case 3:  dir = "Est";   break;
+            default: dir = "Sud";   break;
         }
-        int col = getColor();
-        if ((col & 0x00FFFFFF) == 0) col = 0x00FFFFFF;
-        mc.fontRendererObj.drawStringWithShadow("Direction: " + dir, 0, 0, col & 0x00FFFFFF);
+        drawLabelValue(fr, "Direction: ", dir, 0, 0);
     }
 }

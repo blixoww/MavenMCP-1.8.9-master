@@ -68,6 +68,8 @@ public class GuiUIEditor extends GuiScreen {
     private static final int CE_W = 240, CE_H = 173;
     private int ceSpecW = 120, ceSpecH = 100;
     private int r = 255, g = 255, b = 255, a = 255;
+    /** Prop key being edited: "main" = bw.color, otherwise a FactionZoneWidget prop key. */
+    private String colorEditorTarget = "main";
 
     // ---- Drag state ----
     private boolean isDraggingWidget, wlDragging, sbDragging, ceDragging, draggingSpectrum;
@@ -95,6 +97,9 @@ public class GuiUIEditor extends GuiScreen {
         add("widgetList");
         add("sidebar");
         add("colorEditor");
+        add("palette");
+        add("myThemes");
+        add("myThemesEdit");
     }};
 
     // ---- Hitboxes (x, y, w, h) ----
@@ -118,6 +123,96 @@ public class GuiUIEditor extends GuiScreen {
     private final int[] hbDoneBtn = new int[4];
     private final int[] hbResetSize = new int[4];
     private final int[] hbScaleSlider = new int[4];
+    // ---- Color editor hex input ----
+    private boolean hexInputActive   = false;
+    private String  hexInputStr      = "";
+    private int     hexCursorPos     = 0;   // position du curseur dans hexInputStr
+    private int     hexSelAnchor     = -1;  // ancre de sélection (-1 = pas de sélection)
+    private boolean hexDragSelecting = false;
+    private final int[] hbHexInput = new int[4];
+
+    // ---- FactionZone per-relation color hitboxes ----
+    private final int[] hbFactionColorOwn        = new int[4];
+    private final int[] hbFactionColorAlly       = new int[4];
+    private final int[] hbFactionColorEnemy      = new int[4];
+    private final int[] hbFactionColorNeutral    = new int[4];
+    private final int[] hbFactionColorWilderness = new int[4];
+    private final int[] hbShowWilderness         = new int[4];
+    private final int[] hbResetZoneColors        = new int[4];
+    // ---- Split label/value color hitboxes (tous widgets applicables) ----
+    private final int[] hbSyncColors             = new int[4];
+    private final int[] hbColorLabel             = new int[4];
+
+    // ---- Palette / Themes panel ----
+    private boolean paletteOpen = false;
+    private int ppX, ppY;
+    private boolean ppDragging;
+    private int ppDragOX, ppDragOY;
+    private int lastAppliedPaletteIdx = -1;
+    private long paletteApplyTime    = -1L;
+    private final int[] hbPaletteBtn   = new int[4];
+    private final int[] hbPaletteClose = new int[4];
+
+    // ---- Copy-flash animation (champ hex) ----
+    private long copyFlashTime = -1L;
+
+    // ---- My Custom Themes panel ----
+    private boolean myThemesOpen = false;
+    private int mtX, mtY;
+    private boolean mtDragging;
+    private int mtDragOX, mtDragOY;
+    private final int[] hbMyThemesBtn   = new int[4];
+    private final int[] hbMyThemesClose = new int[4];
+    /** Layout : même grille que le panel THEMES */
+    private static final int MT_W = 270, MT_COLS = 3, MT_CELL_W = 82, MT_CELL_H = 54;
+    private static final int MT_H = 233; // 28 + 16 + 3*(54+5) + 12
+
+    // ---- Custom Theme Editor panel ----
+    private boolean mteOpen = false;
+    private int mteX, mteY;
+    private boolean mteDragging;
+    private int mteDragOX, mteDragOY;
+    /** Index du slot édité (0-8). Toujours le slot cliqué (même si vide). */
+    private int editingCtIdx = -1;
+    private CustomThemeManager.CustomTheme ctEditBuffer = null;
+    private boolean ctNameFocused = false;
+    private final int[] hbMteClose     = new int[4];
+    private final int[] hbMteNameField = new int[4];
+    private final int[] hbMteSave      = new int[4];
+    private final int[] hbMteApply     = new int[4];
+    private final int[] hbMteDelete    = new int[4];
+    private final int[] hbMteRandom    = new int[4];
+    private final int[][] hbMteColors  = new int[2][4]; // 2 couleurs : value (valeur) et prefix
+    private static final int MTE_W = 225;
+    private static final int MTE_H = 152; // 28+20+4+2*20+4+26+20+10
+    /** Clés des 2 couleurs du thème personnalisé. */
+    private static final String[] CT_KEYS   = {"value",               "prefix"};
+    /** Descriptions affichées dans l'éditeur. */
+    private static final String[] CT_LABELS = {"Valeur (chiffres/texte)", "Prefix"};
+
+    // ---- Palette definitions ----
+    private static class Palette {
+        final String name, desc;
+        /** Couleur des valeurs / textes principaux. */
+        final int value;
+        /** Couleur des préfixes / étiquettes. */
+        final int prefix;
+        Palette(String n, String d, int value, int prefix) {
+            this.name = n; this.desc = d; this.value = value; this.prefix = prefix;
+        }
+    }
+    private static final int PP_W = 270, PP_COLS = 3, PP_CELL_W = 82, PP_CELL_H = 54;
+    private static final Palette[] PALETTES = {
+        new Palette("PvP",          "Combat intensif",   0xFFFF5555, 0xFFFF9999),
+        new Palette("Exploration",  "Tons naturels",     0xFF55FFAA, 0xFF88FFCC),
+        new Palette("Minimal",      "Discret",           0xFFDDDDDD, 0xFFAAAAAA),
+        new Palette("Ocean",        "Tons bleus",        0xFF4488FF, 0xFF88AAFF),
+        new Palette("Sunset",       "Tons chauds",       0xFFFF8844, 0xFFFFCC88),
+        new Palette("Neon",         "Neon sombre",       0xFF00FF88, 0xFF00FFCC),
+        new Palette("Red Conflict", "Guerre ecarlate",   0xFFFFFFFF, 0xFFFF8800),
+        new Palette("Forest",       "Nature profonde",   0xFF55AA55, 0xFF99CC66),
+        new Palette("Arctic",       "Glace & cristal",   0xFF88EEFF, 0xFFCCEEFF),
+    };
 
     public GuiUIEditor(GuiScreen parent) {
         this(parent, null);
@@ -146,6 +241,14 @@ public class GuiUIEditor extends GuiScreen {
         ceX = this.width / 2 - CE_W / 2;
         ceY = this.height / 2 - CE_H / 2;
         clampColorEditorPosition();
+
+        ppX = 50;
+        ppY = 60;
+
+        mtX  = this.width / 2 - MT_W / 2;
+        mtY  = this.height / 2 - MT_H / 2;
+        mteX = Math.min(this.width - MTE_W - 4, mtX + MT_W + 10);
+        mteY = mtY;
 
         if (this.preselectId != null) {
             UIElement e = ui.get(this.preselectId);
@@ -218,7 +321,10 @@ public class GuiUIEditor extends GuiScreen {
         for (String panel : panelOrder) {
             if ("widgetList".equals(panel) && widgetListAnim > 0.01f) drawWidgetList(mouseX, mouseY);
             else if ("sidebar".equals(panel) && sidebarAnim > 0.01f) drawSidebar(mouseX, mouseY);
-            else if ("colorEditor".equals(panel) && colorEditorOpen && selected instanceof BaseWidget) drawColorEditor(mouseX, mouseY);
+            else if ("colorEditor".equals(panel) && colorEditorOpen && (selected instanceof BaseWidget || (colorEditorTarget != null && colorEditorTarget.startsWith("ct:")))) drawColorEditor(mouseX, mouseY);
+            else if ("palette".equals(panel) && paletteOpen) drawPalettePanel(mouseX, mouseY);
+            else if ("myThemes".equals(panel) && myThemesOpen) drawMyThemesPanel(mouseX, mouseY);
+            else if ("myThemesEdit".equals(panel) && mteOpen && ctEditBuffer != null) drawMyThemesEditPanel(mouseX, mouseY);
         }
 
         // Done button — compact, outlined style
@@ -241,6 +347,37 @@ public class GuiUIEditor extends GuiScreen {
         fontRendererObj.drawStringWithShadow("RETOUR", btnX + (btnW - btnTw) / 2, btnY + (btnH - 8) / 2.0f,
                 btnHover ? 0xFFFFFFFF : TEXT_SECONDARY);
         setHB(hbDoneBtn, btnX, btnY, btnW, btnH);
+
+        // Bouton THEMES — à gauche du bouton RETOUR
+        int palBtnW = 80, palBtnH = 20;
+        int palBtnX = btnX - palBtnW - 8;
+        boolean palHov = inRect(mouseX, mouseY, palBtnX, btnY, palBtnW, palBtnH);
+        Gui.drawRect(palBtnX, btnY, palBtnX + palBtnW, btnY + palBtnH, palHov || paletteOpen ? 0x28FFFFFF : 0x0A000000);
+        Gui.drawRect(palBtnX, btnY, palBtnX + palBtnW, btnY + 1, paletteOpen ? ACCENT_PURPLE : (palHov ? ACCENT_PURPLE : ACCENT_DIM));
+        GuiRenderUtils.drawRectOutline(palBtnX, btnY, palBtnW, palBtnH, palHov || paletteOpen ? 0x66AA44EE : 0x28FFFFFF);
+        if (palHov || paletteOpen) Gui.drawRect(palBtnX, btnY + 1, palBtnX + 2, btnY + palBtnH - 1, ACCENT_PURPLE);
+        fontRendererObj.drawStringWithShadow("THEMES",
+                palBtnX + (palBtnW - fontRendererObj.getStringWidth("THEMES")) / 2,
+                btnY + (palBtnH - 8) / 2.0f,
+                palHov ? 0xFFCC88FF : (paletteOpen ? 0xFFAA66EE : TEXT_SECONDARY));
+        setHB(hbPaletteBtn, palBtnX, btnY, palBtnW, palBtnH);
+
+        // Bouton MES THEMES — à droite du bouton RETOUR
+        int myBtnW = 100, myBtnH = 20;
+        int myBtnX = btnX + btnW + 8;
+        boolean myHov = inRect(mouseX, mouseY, myBtnX, btnY, myBtnW, myBtnH);
+        Gui.drawRect(myBtnX, btnY, myBtnX + myBtnW, btnY + myBtnH,
+                myHov || myThemesOpen ? 0x28FFFFFF : 0x0A000000);
+        Gui.drawRect(myBtnX, btnY, myBtnX + myBtnW, btnY + 1,
+                myThemesOpen ? ACCENT_ORANGE : (myHov ? ACCENT_ORANGE : ACCENT_DIM));
+        GuiRenderUtils.drawRectOutline(myBtnX, btnY, myBtnW, myBtnH,
+                myHov || myThemesOpen ? 0x66E8871A : 0x28FFFFFF);
+        if (myHov || myThemesOpen) Gui.drawRect(myBtnX, btnY + 1, myBtnX + 2, btnY + myBtnH - 1, ACCENT_ORANGE);
+        fontRendererObj.drawStringWithShadow("MES THEMES",
+                myBtnX + (myBtnW - fontRendererObj.getStringWidth("MES THEMES")) / 2,
+                btnY + (myBtnH - 8) / 2.0f,
+                myHov ? 0xFFFFCC88 : (myThemesOpen ? 0xFFE89050 : TEXT_SECONDARY));
+        setHB(hbMyThemesBtn, myBtnX, btnY, myBtnW, myBtnH);
     }
 
 
@@ -407,10 +544,72 @@ public class GuiUIEditor extends GuiScreen {
         GuiRenderUtils.drawCheckerboard(sldX, pvY, sldW, 14, 4, 0xFF888888, 0xFF555555);
         Gui.drawRect(sldX, pvY, sldX + sldW, pvY + 14, (a << 24) | (r << 16) | (g << 8) | b);
         GuiRenderUtils.drawRectOutline(sldX, pvY, sldW, 14, 0x44FFFFFF);
-        // Code hex — à l'intérieur du panneau, sous la preview
-        String hex = String.format("#%02X%02X%02X", r, g, b);
-        int hexW = this.fontRendererObj.getStringWidth(hex);
-        this.fontRendererObj.drawString(hex, sldX + (sldW - hexW) / 2, pvY + 17, TEXT_MUTED);
+        // Code hex RGBA — champ éditable sous la preview
+        String fullHex = String.format("#%02X%02X%02X%02X", r, g, b, a);
+        int hexFieldX = sldX, hexFieldY = pvY + 15, hexFieldH = 12;
+        setHB(hbHexInput, hexFieldX, hexFieldY, sldW, hexFieldH);
+        boolean hexHov = inRect(mx, my, hexFieldX, hexFieldY, sldW, hexFieldH);
+        long nowMs = Minecraft.getSystemTime();
+        boolean showCopyFlash = copyFlashTime > 0 && (nowMs - copyFlashTime) < 700L;
+
+        // Fond du champ
+        if (hexInputActive) {
+            Gui.drawRect(hexFieldX, hexFieldY, hexFieldX + sldW, hexFieldY + hexFieldH, 0x66111133);
+            GuiRenderUtils.drawRectOutline(hexFieldX, hexFieldY, sldW, hexFieldH, ACCENT_PURPLE);
+        } else {
+            if (hexHov) {
+                Gui.drawRect(hexFieldX, hexFieldY, hexFieldX + sldW, hexFieldY + hexFieldH, 0x22FFFFFF);
+                GuiRenderUtils.drawRectOutline(hexFieldX, hexFieldY, sldW, hexFieldH, 0x44FFFFFF);
+            }
+        }
+
+        int textX = hexFieldX + 3;
+        int textY  = hexFieldY + 2;
+
+        if (hexInputActive) {
+            String txt = hexInputStr;
+            hexCursorPos = Math.max(0, Math.min(hexCursorPos, txt.length()));
+            if (hexSelAnchor >= 0) hexSelAnchor = Math.max(0, Math.min(hexSelAnchor, txt.length()));
+
+            // Fond de sélection
+            if (hexSelAnchor >= 0 && hexSelAnchor != hexCursorPos) {
+                int s = Math.min(hexCursorPos, hexSelAnchor);
+                int e = Math.max(hexCursorPos, hexSelAnchor);
+                int sx1 = textX + this.fontRendererObj.getStringWidth(txt.substring(0, s));
+                int sx2 = textX + this.fontRendererObj.getStringWidth(txt.substring(0, e));
+                Gui.drawRect(sx1, hexFieldY + 1, sx2, hexFieldY + hexFieldH - 1, 0xAA7744CC);
+            }
+
+            // Texte
+            this.fontRendererObj.drawString(txt, textX, textY, TEXT_PRIMARY);
+
+            // Curseur clignotant (barre verticale 1px)
+            if (!showCopyFlash && System.currentTimeMillis() / 530 % 2 == 0) {
+                int curX = textX + this.fontRendererObj.getStringWidth(txt.substring(0, hexCursorPos));
+                Gui.drawRect(curX, hexFieldY + 2, curX + 1, hexFieldY + hexFieldH - 2, 0xFFEEEEEE);
+            }
+        } else {
+            // Affichage passif : valeur centrée
+            int hexW = this.fontRendererObj.getStringWidth(fullHex);
+            this.fontRendererObj.drawString(fullHex, textX + (sldW - 6 - hexW) / 2, textY, hexHov ? TEXT_SECONDARY : TEXT_MUTED);
+        }
+
+        // Flash animation copie
+        if (showCopyFlash) {
+            float tf = (nowMs - copyFlashTime) / 700.0f;
+            int fA = (int)(0xAA * (1.0f - tf));
+            Gui.drawRect(hexFieldX, hexFieldY, hexFieldX + sldW, hexFieldY + hexFieldH, (fA << 24) | 0x0044FF44);
+            String copiedStr = "Copie !";
+            int cw2 = this.fontRendererObj.getStringWidth(copiedStr);
+            this.fontRendererObj.drawString(copiedStr, textX + (sldW - 6 - cw2) / 2, textY, (fA << 24) | 0x0055FF55);
+        } else if (copyFlashTime > 0 && (nowMs - copyFlashTime) >= 700L) {
+            copyFlashTime = -1L;
+        }
+
+        // Hint clavier affiché sous le champ quand inactif + survolé
+        if (hexHov && !hexInputActive) {
+            this.fontRendererObj.drawString("Clic pour editer  Ctrl+C copier", hexFieldX, hexFieldY + hexFieldH + 3, TEXT_MUTED);
+        }
     }
 
     private void drawChannelSlider(int x, int y, int w, String label, int val, int color) {
@@ -450,7 +649,17 @@ public class GuiUIEditor extends GuiScreen {
             items.add(new ToggleItem("Mode Rainbow", bw.isRGBMode(), hbRainbow, bw::setRGBMode));
             if (bw instanceof CombatLogWidget) items.add(new ToggleItem("Design circulaire", Boolean.TRUE.equals(bw.getProps().getOrDefault("originalDesign", false)), hbOrigDesign, v -> bw.getProps().put("originalDesign", v)));
             items.add(new ToggleItem("Aligner (Smart)", Boolean.TRUE.equals(bw.getProps().getOrDefault("snapGrid", false)), hbAlignGrid, v -> bw.getProps().put("snapGrid", v)));
-            items.add(new ColorItem(bw.getColor()));
+            // Couleur principale (masquée pour FactionZoneWidget qui a ses propres couleurs par relation)
+            if (!(bw instanceof FactionZoneWidget)) {
+                items.add(new ColorItem(bw.getColor()));
+            }
+            // Sync label/valeur — pour tous les widgets qui ont un format "Préfixe: Valeur"
+            if (bw.supportsLabelColor()) {
+                items.add(new ToggleItem("Sync prefix/valeur", bw.isSyncColors(), hbSyncColors, v -> bw.getProps().put("syncColors", v)));
+                if (!bw.isSyncColors()) {
+                    items.add(new FactionColorItem("Couleur prefix", "colorLabel", 0xFFAAAAAA, hbColorLabel));
+                }
+            }
             if (bw instanceof KeyStrokeWidget) {
                 items.add(new HeaderItem("Keystrokes", ACCENT_PURPLE));
                 items.add(new DoubleToggleItem(bw));
@@ -465,6 +674,24 @@ public class GuiUIEditor extends GuiScreen {
             } else if (bw instanceof CompassWidget) {
                 items.add(new HeaderItem("Boussole", ACCENT_GREEN));
                 items.add(new ToggleItem("Afficher waypoints", !Boolean.FALSE.equals(bw.getProps().getOrDefault("showWaypoints", Boolean.TRUE)), hbCompassWaypoints, v -> bw.getProps().put("showWaypoints", v)));
+            } else if (bw instanceof FactionZoneWidget) {
+                items.add(new HeaderItem("Couleurs Zone", ACCENT_GREEN));
+                items.add(new ToggleItem("Afficher Wilderness", Boolean.TRUE.equals(bw.getProps().getOrDefault("showWilderness", Boolean.FALSE)), hbShowWilderness, v -> bw.getProps().put("showWilderness", v)));
+                items.add(new FactionColorItem("Ma faction",    "colorOwn",       0xFF55FF55, hbFactionColorOwn));
+                items.add(new FactionColorItem("Allie / Treve", "colorAlly",      0xFFAA00AA, hbFactionColorAlly));
+                items.add(new FactionColorItem("Ennemi",        "colorEnemy",     0xFFFF5555, hbFactionColorEnemy));
+                items.add(new FactionColorItem("Neutre",        "colorNeutral",   0xFFFFFFFF, hbFactionColorNeutral));
+                items.add(new FactionColorItem("Wilderness",    "colorWilderness",0xFF2E7D32, hbFactionColorWilderness));
+                items.add(new ButtonItem("Reset couleurs", hbResetZoneColors, () -> {
+                    bw.getProps().remove("colorOwn");
+                    bw.getProps().remove("colorAlly");
+                    bw.getProps().remove("colorEnemy");
+                    bw.getProps().remove("colorNeutral");
+                    bw.getProps().remove("colorWilderness");
+                    bw.getProps().remove("colorLabel");
+                    bw.getProps().remove("syncColors");
+                    ui.saveConfig();
+                }));
             }
             items.add(new HeaderItem("Taille", ACCENT_ORANGE));
             items.add(new ScaleItem(bw));
@@ -537,6 +764,26 @@ public class GuiUIEditor extends GuiScreen {
             setHB(hbColorPreview, cpX, y + 1, cpW, cpH);
         }
     }
+    /** Swatch de couleur lié à une prop du widget (ex: FactionZoneWidget). */
+    private class FactionColorItem implements SidebarItem {
+        String label, propKey; int defColor; int[] hb;
+        FactionColorItem(String label, String propKey, int defColor, int[] hb) { this.label=label; this.propKey=propKey; this.defColor=defColor; this.hb=hb; }
+        public int getHeight() { return 18; }
+        public void draw(int px, int y, int w, int mx, int my) {
+            if (!(selected instanceof BaseWidget)) return;
+            BaseWidget bw = (BaseWidget) selected;
+            Object v = bw.getProps().get(propKey);
+            int c = v instanceof Number ? ((Number) v).intValue() : defColor;
+            boolean hov = inRect(mx, my, px + 4, y, w - 8, 16);
+            if (hov) Gui.drawRect(px + 4, y, px + w - 4, y + 16, 0x08FFFFFF);
+            fontRendererObj.drawStringWithShadow(label, px + 12, y + 3, hov ? TEXT_PRIMARY : TEXT_SECONDARY);
+            int cpX = px + w - 42, cpW = 28, cpH = 12;
+            GuiRenderUtils.drawCheckerboard(cpX, y + 1, cpW, cpH, 4, 0xFF999999, 0xFF666666);
+            Gui.drawRect(cpX, y + 1, cpX + cpW, y + 1 + cpH, c);
+            GuiRenderUtils.drawRectOutline(cpX, y + 1, cpW, cpH, 0x66FFFFFF);
+            setHB(hb, cpX, y + 1, cpW, cpH);
+        }
+    }
     private class ScaleItem implements SidebarItem {
         BaseWidget bw; ScaleItem(BaseWidget bw) { this.bw=bw; }
         public int getHeight() { return 38; }
@@ -588,14 +835,28 @@ public class GuiUIEditor extends GuiScreen {
     @Override
     protected void mouseClicked(int mx, int my, int btn) throws IOException {
         if (btn != 0) return;
+        ctNameFocused = false;
         searchFocused = false;
         for (int i = panelOrder.size() - 1; i >= 0; i--) {
             String p = panelOrder.get(i);
             if ("colorEditor".equals(p) && colorEditorOpen && handleColorClick(mx, my)) return;
             if ("sidebar".equals(p) && selected != null && handleSidebarClick(mx, my)) return;
             if ("widgetList".equals(p) && handleWidgetListClick(mx, my)) return;
+            if ("palette".equals(p) && paletteOpen && handlePaletteClick(mx, my)) return;
+            if ("myThemes".equals(p) && myThemesOpen && handleMyThemesClick(mx, my)) return;
+            if ("myThemesEdit".equals(p) && mteOpen && ctEditBuffer != null && handleMyThemesEditClick(mx, my)) return;
         }
         if (inRect(mx, my, hbDoneBtn[0], hbDoneBtn[1], hbDoneBtn[2], hbDoneBtn[3])) { this.mc.displayGuiScreen(parent); return; }
+        if (inRect(mx, my, hbPaletteBtn[0], hbPaletteBtn[1], hbPaletteBtn[2], hbPaletteBtn[3])) {
+            paletteOpen = !paletteOpen;
+            if (paletteOpen) bringToFront("palette");
+            return;
+        }
+        if (inRect(mx, my, hbMyThemesBtn[0], hbMyThemesBtn[1], hbMyThemesBtn[2], hbMyThemesBtn[3])) {
+            myThemesOpen = !myThemesOpen;
+            if (myThemesOpen) bringToFront("myThemes");
+            return;
+        }
         
         // Determine clicked widget (topmost) first
         UIElement clicked = null;
@@ -634,30 +895,57 @@ public class GuiUIEditor extends GuiScreen {
         if (inRect(mx, my, px, sbY, w, 22)) { sbDragging = true; sbDragOX = mx; sbDragOY = my; return true; }
 
         int sY = sbScroll;
-        if (inRect(mx, my + sY, px + w - 42, sbY + 44, 28, 12)) { selected.setEnabled(!selected.isEnabled()); ui.saveConfig(); return true; }
+        if (inRect(mx, my, px + w - 42, sbY + 44 - sY, 28, 12)) { selected.setEnabled(!selected.isEnabled()); ui.saveConfig(); return true; }
         if (selected instanceof BaseWidget) {
             BaseWidget bw = (BaseWidget) selected;
-            if (clickHB(mx, my + sY, hbRainbow)) { bw.setRGBMode(!bw.isRGBMode()); ui.saveConfig(); return true; }
-            if (bw instanceof CombatLogWidget && clickHB(mx, my + sY, hbOrigDesign)) { bw.getProps().put("originalDesign", !Boolean.TRUE.equals(bw.getProps().getOrDefault("originalDesign", false))); ui.saveConfig(); return true; }
-            if (clickHB(mx, my + sY, hbAlignGrid)) { bw.getProps().put("snapGrid", !Boolean.TRUE.equals(bw.getProps().getOrDefault("snapGrid", false))); ui.saveConfig(); return true; }
-            if (clickHB(mx, my + sY, hbColorPreview)) { colorEditorOpen = true; bringToFront("colorEditor"); int c = bw.getColor(); a=(c>>24)&0xFF; r=(c>>16)&0xFF; g=(c>>8)&0xFF; b=c&0xFF; return true; }
-            if (bw instanceof KeyStrokeWidget) {
-                for(int i=0; i<9; i++) if(clickHB(mx, my + sY, hbKeyToggle[i])) { bw.getProps().put("showKey"+i, !Boolean.TRUE.equals(bw.getProps().getOrDefault("showKey"+i, true))); ui.saveConfig(); return true; }
-                if(clickHB(mx, my + sY, hbSpaceRainbow)) { bw.getProps().put("showSpaceRainbow", !Boolean.TRUE.equals(bw.getProps().getOrDefault("showSpaceRainbow", false))); ui.saveConfig(); return true; }
-            } else if (bw instanceof PotionStatusWidget) {
-                if(clickHB(mx, my + sY, hbPotionDur)) { bw.getProps().put("showDuration", !Boolean.TRUE.equals(bw.getProps().getOrDefault("showDuration", true))); ui.saveConfig(); return true; }
-                if(clickHB(mx, my + sY, hbPotionIcons)) { bw.getProps().put("showIcons", !Boolean.TRUE.equals(bw.getProps().getOrDefault("showIcons", false))); ui.saveConfig(); return true; }
-            } else if (bw instanceof ArmorGroupWidget) {
-                if(clickHB(mx, my + sY, hbArmorLayout)) { bw.getProps().put("layout", "vertical".equals(bw.getProps().getOrDefault("layout", "horizontal")) ? "horizontal" : "vertical"); ui.saveConfig(); return true; }
-                if(clickHB(mx, my + sY, hbArmorPercent)) { bw.getProps().put("displayPercent", !Boolean.TRUE.equals(bw.getProps().getOrDefault("displayPercent", true))); ui.saveConfig(); return true; }
-            } else if (bw instanceof CompassWidget) {
-                if(clickHB(mx, my + sY, hbCompassWaypoints)) { bw.getProps().put("showWaypoints", Boolean.FALSE.equals(bw.getProps().getOrDefault("showWaypoints", Boolean.TRUE))); ui.saveConfig(); return true; }
+            if (clickHB(mx, my, hbRainbow)) { bw.setRGBMode(!bw.isRGBMode()); ui.saveConfig(); return true; }
+            if (bw instanceof CombatLogWidget && clickHB(mx, my, hbOrigDesign)) { bw.getProps().put("originalDesign", !Boolean.TRUE.equals(bw.getProps().getOrDefault("originalDesign", false))); ui.saveConfig(); return true; }
+            if (clickHB(mx, my, hbAlignGrid)) { bw.getProps().put("snapGrid", !Boolean.TRUE.equals(bw.getProps().getOrDefault("snapGrid", false))); ui.saveConfig(); return true; }
+            if (clickHB(mx, my, hbColorPreview)) { colorEditorTarget = "main"; colorEditorOpen = true; hexInputActive = false; bringToFront("colorEditor"); int c = bw.getColor(); a=(c>>24)&0xFF; r=(c>>16)&0xFF; g=(c>>8)&0xFF; b=c&0xFF; return true; }
+            // Sync label/valeur (tous widgets applicables)
+            if (bw.supportsLabelColor()) {
+                if (clickHB(mx, my, hbSyncColors)) { bw.getProps().put("syncColors", !bw.isSyncColors()); ui.saveConfig(); return true; }
+                if (!bw.isSyncColors() && clickHB(mx, my, hbColorLabel)) { openColorEditorForProp(bw, "colorLabel", 0xFFAAAAAA); return true; }
             }
-            if(clickHB(mx, my + sY, hbScaleSlider)) { draggingSlider=100; updateScaleFromSlider(mx); return true; }
-            if(clickHB(mx, my + sY, hbResetSize)) { bw.setScale(1.0f); ui.saveConfig(); return true; }
+            if (bw instanceof KeyStrokeWidget) {
+                for(int i=0; i<9; i++) if(clickHB(mx, my, hbKeyToggle[i])) { bw.getProps().put("showKey"+i, !Boolean.TRUE.equals(bw.getProps().getOrDefault("showKey"+i, true))); ui.saveConfig(); return true; }
+                if(clickHB(mx, my, hbSpaceRainbow)) { bw.getProps().put("showSpaceRainbow", !Boolean.TRUE.equals(bw.getProps().getOrDefault("showSpaceRainbow", false))); ui.saveConfig(); return true; }
+            } else if (bw instanceof PotionStatusWidget) {
+                if(clickHB(mx, my, hbPotionDur)) { bw.getProps().put("showDuration", !Boolean.TRUE.equals(bw.getProps().getOrDefault("showDuration", true))); ui.saveConfig(); return true; }
+                if(clickHB(mx, my, hbPotionIcons)) { bw.getProps().put("showIcons", !Boolean.TRUE.equals(bw.getProps().getOrDefault("showIcons", false))); ui.saveConfig(); return true; }
+            } else if (bw instanceof ArmorGroupWidget) {
+                if(clickHB(mx, my, hbArmorLayout)) { bw.getProps().put("layout", "vertical".equals(bw.getProps().getOrDefault("layout", "horizontal")) ? "horizontal" : "vertical"); ui.saveConfig(); return true; }
+                if(clickHB(mx, my, hbArmorPercent)) { bw.getProps().put("displayPercent", !Boolean.TRUE.equals(bw.getProps().getOrDefault("displayPercent", true))); ui.saveConfig(); return true; }
+            } else if (bw instanceof CompassWidget) {
+                if(clickHB(mx, my, hbCompassWaypoints)) { bw.getProps().put("showWaypoints", Boolean.FALSE.equals(bw.getProps().getOrDefault("showWaypoints", Boolean.TRUE))); ui.saveConfig(); return true; }
+            } else if (bw instanceof FactionZoneWidget) {
+                if (clickHB(mx, my, hbShowWilderness))         { bw.getProps().put("showWilderness", !Boolean.TRUE.equals(bw.getProps().getOrDefault("showWilderness", Boolean.FALSE))); ui.saveConfig(); return true; }
+                if (clickHB(mx, my, hbFactionColorOwn))        { openColorEditorForProp(bw, "colorOwn",       0xFF55FF55); return true; }
+                if (clickHB(mx, my, hbFactionColorAlly))       { openColorEditorForProp(bw, "colorAlly",      0xFFAA00AA); return true; }
+                if (clickHB(mx, my, hbFactionColorEnemy))      { openColorEditorForProp(bw, "colorEnemy",     0xFFFF5555); return true; }
+                if (clickHB(mx, my, hbFactionColorNeutral))    { openColorEditorForProp(bw, "colorNeutral",   0xFFFFFFFF); return true; }
+                if (clickHB(mx, my, hbFactionColorWilderness)) { openColorEditorForProp(bw, "colorWilderness",0xFF2E7D32); return true; }
+                if (clickHB(mx, my, hbResetZoneColors)) {
+                    for (String k : new String[]{"colorOwn","colorAlly","colorEnemy","colorNeutral","colorWilderness","colorLabel","syncColors"})
+                        bw.getProps().remove(k);
+                    ui.saveConfig(); return true;
+                }
+            }
+            if(clickHB(mx, my, hbScaleSlider)) { draggingSlider=100; updateScaleFromSlider(mx); return true; }
+            if(clickHB(mx, my, hbResetSize)) { bw.setScale(1.0f); ui.saveConfig(); return true; }
         }
-        if(clickHB(mx, my + sY, hbResetPos)) { selected.setPosition(10, 10); ui.saveConfig(); return true; }
-        if(clickHB(mx, my + sY, hbResetColor)) { selected.setColor(0xFFFFFFFF); if(selected instanceof BaseWidget) ((BaseWidget)selected).setRGBMode(false); ui.saveConfig(); return true; }
+        if(clickHB(mx, my, hbResetPos)) { selected.setPosition(10, 10); ui.saveConfig(); return true; }
+        if(clickHB(mx, my, hbResetColor)) {
+            selected.setColor(0xFFFFFFFF);
+            if (selected instanceof BaseWidget) {
+                BaseWidget bw2 = (BaseWidget) selected;
+                bw2.setRGBMode(false);
+                // Reset aussi les couleurs de prefix/label
+                bw2.getProps().remove("colorLabel");
+                bw2.getProps().remove("syncColors");
+            }
+            ui.saveConfig(); return true;
+        }
         return true;
     }
 
@@ -782,6 +1070,14 @@ public class GuiUIEditor extends GuiScreen {
         }
         if (wlDragging) { wlX += mx - wlDragOX; wlY += my - wlDragOY; wlDragOX = mx; wlDragOY = my; }
         if (sbDragging) { sbX += mx - sbDragOX; sbY += my - sbDragOY; sbDragOX = mx; sbDragOY = my; }
+        if (ppDragging) { ppX += mx - ppDragOX; ppY += my - ppDragOY; ppDragOX = mx; ppDragOY = my; clampPalettePosition(); }
+        if (mtDragging)  { mtX  += mx - mtDragOX;  mtY  += my - mtDragOY;  mtDragOX  = mx; mtDragOY  = my; clampMtPosition(); }
+        if (mteDragging) { mteX += mx - mteDragOX; mteY += my - mteDragOY; mteDragOX = mx; mteDragOY = my; clampMtePosition(); }
+        // Drag-sélection texte dans le champ hex
+        if (hexDragSelecting && hexInputActive) {
+            hexCursorPos = hexPosFromX(mx);
+            // hexSelAnchor reste fixé au point de départ du clic
+        }
         if (ceDragging) {
             ceX += mx - ceDragOX;
             ceY += my - ceDragOY;
@@ -795,7 +1091,7 @@ public class GuiUIEditor extends GuiScreen {
 
     @Override
     protected void mouseReleased(int mx, int my, int state) {
-        isDraggingWidget = false; isResizingWidget = false; wlDragging = false; sbDragging = false; ceDragging = false; draggingSpectrum = false; draggingSlider = -1;
+        isDraggingWidget = false; isResizingWidget = false; wlDragging = false; sbDragging = false; ppDragging = false; mtDragging = false; mteDragging = false; ceDragging = false; hexDragSelecting = false; draggingSpectrum = false; draggingSlider = -1;
         snapLineX = -1; snapLineY = -1; ui.saveConfig(); super.mouseReleased(mx, my, state);
     }
 
@@ -806,10 +1102,34 @@ public class GuiUIEditor extends GuiScreen {
     }
 
     private boolean handleColorClick(int mx, int my) {
-        if (!inRect(mx, my, ceX, ceY, CE_W, CE_H)) return false;
+        if (!inRect(mx, my, ceX, ceY, CE_W, CE_H)) {
+            if (hexInputActive) { parseAndApplyHex(); hexInputActive = false; }
+            return false;
+        }
         bringToFront("colorEditor");
-        if (inRect(mx, my, hbCeClose[0], hbCeClose[1], hbCeClose[2], hbCeClose[3])) { colorEditorOpen = false; return true; }
+        // Clic hors du champ hex → confirme la saisie
+        if (hexInputActive && !inRect(mx, my, hbHexInput[0], hbHexInput[1], hbHexInput[2], hbHexInput[3])) {
+            parseAndApplyHex();
+            hexInputActive = false;
+        }
+        if (inRect(mx, my, hbCeClose[0], hbCeClose[1], hbCeClose[2], hbCeClose[3])) { colorEditorOpen = false; hexInputActive = false; hexSelAnchor = -1; return true; }
         if (inRect(mx, my, ceX, ceY, CE_W, 22)) { ceDragging = true; ceDragOX = mx; ceDragOY = my; return true; }
+        // Clic sur le champ hex → activer la saisie + placer le curseur
+        if (inRect(mx, my, hbHexInput[0], hbHexInput[1], hbHexInput[2], hbHexInput[3])) {
+            if (!hexInputActive) {
+                // Première activation : sélectionner tout
+                hexInputActive = true;
+                hexInputStr    = String.format("#%02X%02X%02X%02X", r, g, b, a);
+                hexSelAnchor   = 0;
+                hexCursorPos   = hexInputStr.length();
+            } else {
+                // Déjà actif : placer le curseur à la position cliquée + début de drag-sélection
+                hexCursorPos     = hexPosFromX(mx);
+                hexSelAnchor     = hexCursorPos; // ancre = position de départ du drag
+                hexDragSelecting = true;
+            }
+            return true;
+        }
         int specX = ceX + 10, specY = ceY + 28;
         if (inRect(mx, my, specX, specY, ceSpecW, ceSpecH)) { draggingSpectrum = true; updateColorFromSpectrum(mx, my); return true; }
         int sldX = specX + ceSpecW + 15, sldW = CE_W - ceSpecW - 35;
@@ -843,16 +1163,560 @@ public class GuiUIEditor extends GuiScreen {
     }
 
     private void applyColor() {
+        int color = (a << 24) | (r << 16) | (g << 8) | b;
+        // Édition d'une couleur de thème personnalisé
+        if (colorEditorTarget != null && colorEditorTarget.startsWith("ct:") && ctEditBuffer != null) {
+            String key = colorEditorTarget.substring(3);
+            switch (key) {
+                case "value":  ctEditBuffer.value  = color; break;
+                case "prefix": ctEditBuffer.prefix = color; break;
+            }
+            return; // pas de saveConfig() ici, seulement sur Sauvegarder
+        }
         if (selected instanceof BaseWidget) {
-            ((BaseWidget) selected).setColor((a << 24) | (r << 16) | (g << 8) | b);
+            BaseWidget bw = (BaseWidget) selected;
+            if ("main".equals(colorEditorTarget) || colorEditorTarget == null) {
+                bw.setColor(color);
+            } else {
+                bw.getProps().put(colorEditorTarget, color);
+            }
             ui.saveConfig();
         }
+    }
+
+    /** Parse et applique la valeur hex saisie (#RRGGBB ou #RRGGBBAA). */
+    private void parseAndApplyHex() {
+        try {
+            String s = hexInputStr.startsWith("#") ? hexInputStr.substring(1) : hexInputStr;
+            if (s.length() == 6) {
+                r = Integer.parseInt(s.substring(0, 2), 16);
+                g = Integer.parseInt(s.substring(2, 4), 16);
+                b = Integer.parseInt(s.substring(4, 6), 16);
+                applyColor();
+            } else if (s.length() == 8) {
+                r = Integer.parseInt(s.substring(0, 2), 16);
+                g = Integer.parseInt(s.substring(2, 4), 16);
+                b = Integer.parseInt(s.substring(4, 6), 16);
+                a = Integer.parseInt(s.substring(6, 8), 16);
+                applyColor();
+            }
+        } catch (NumberFormatException ignored) {}
+    }
+
+    // ---- Helpers champ hex texte ----
+
+    /** Retourne [start, end] de la sélection active, ou null si aucune. */
+    private int[] getHexSelection() {
+        if (hexSelAnchor < 0 || hexSelAnchor == hexCursorPos) return null;
+        int s = Math.min(hexCursorPos, hexSelAnchor);
+        int e = Math.max(hexCursorPos, hexSelAnchor);
+        return new int[]{ s, e };
+    }
+
+    /** Supprime la sélection active et place le curseur au début. */
+    private void hexDeleteSelection() {
+        int[] sel = getHexSelection();
+        if (sel == null) return;
+        hexInputStr  = hexInputStr.substring(0, sel[0]) + hexInputStr.substring(sel[1]);
+        hexCursorPos = sel[0];
+        hexSelAnchor = -1;
+    }
+
+    /**
+     * Calcule la position de curseur (index dans hexInputStr) la plus proche
+     * de la coordonnée X souris, en s'aidant de hbHexInput[0] pour l'origine.
+     */
+    private int hexPosFromX(int mx) {
+        int textX = hbHexInput[0] + 3;
+        String txt = hexInputStr;
+        int best = txt.length();
+        int bestDist = Integer.MAX_VALUE;
+        for (int i = 0; i <= txt.length(); i++) {
+            int cx = textX + this.fontRendererObj.getStringWidth(txt.substring(0, i));
+            int dist = Math.abs(mx - cx);
+            if (dist < bestDist) { bestDist = dist; best = i; }
+        }
+        return best;
+    }
+
+    /** Ouvre le color editor en ciblant une prop spécifique du widget. */
+    private void openColorEditorForProp(BaseWidget bw, String propKey, int defaultColor) {
+        hexInputActive = false;
+        hexInputStr = "";
+        colorEditorTarget = propKey;
+        colorEditorOpen = true;
+        bringToFront("colorEditor");
+        Object propVal = bw.getProps().get(propKey);
+        int c = propVal instanceof Number ? ((Number) propVal).intValue() : defaultColor;
+        a = (c >> 24) & 0xFF;
+        r = (c >> 16) & 0xFF;
+        g = (c >> 8)  & 0xFF;
+        b = c         & 0xFF;
+    }
+
+    // ========================================================================
+    // PALETTE / THEMES PANEL
+    // ========================================================================
+
+    private int getPaletteH() {
+        int rows = (PALETTES.length + PP_COLS - 1) / PP_COLS;
+        return 28 + 16 + rows * (PP_CELL_H + 5) + 16;
+    }
+
+    private void clampPalettePosition() {
+        ppX = GuiRenderUtils.clamp(ppX, 2, Math.max(2, this.width  - PP_W - 2));
+        ppY = GuiRenderUtils.clamp(ppY, 2, Math.max(2, this.height - getPaletteH() - 2));
+    }
+
+    private void drawPalettePanel(int mx, int my) {
+        clampPalettePosition();
+        int px = ppX, py = ppY, ph = getPaletteH();
+
+        GuiRenderUtils.drawShadow(px, py, PP_W, ph, 6, 0x60);
+        Gui.drawRect(px, py, px + PP_W, py + ph, BG_PANEL);
+        // Purple top accent
+        Gui.drawRect(px, py, px + PP_W, py + 2, ACCENT_PURPLE);
+        GuiRenderUtils.drawGradientRect(px, py + 2, px + PP_W, py + 8, 0x18AA44EE, 0x00000000);
+        GuiRenderUtils.drawGradientRect(px, py + 2, px + PP_W, py + 24, BG_HEADER, BG_PANEL);
+        Gui.drawRect(px, py + 23, px + PP_W, py + 24, 0x28FFFFFF);
+        GuiRenderUtils.drawRectOutline(px, py, PP_W, ph, BORDER);
+
+        // Title
+        Gui.drawRect(px + 7, py + 9, px + 9, py + 19, ACCENT_PURPLE);
+        fontRendererObj.drawStringWithShadow("T", px + 15, py + 9, 0xFFCC88FF);
+        fontRendererObj.drawStringWithShadow("HEMES", px + 15 + fontRendererObj.getStringWidth("T"), py + 9, TEXT_PRIMARY);
+
+        int ccx = px + PP_W - 16, ccy = py + 7, ccs = 10;
+        drawMiniClose(ccx, ccy, ccs, inRect(mx, my, ccx, ccy, ccs, ccs));
+        setHB(hbPaletteClose, ccx, ccy, ccs, ccs);
+
+        // Subtitle
+        fontRendererObj.drawString("1 clic applique a tous les widgets", px + 10, py + 27, TEXT_MUTED);
+
+        // Palette cell grid
+        int gridY = py + 43;
+        for (int i = 0; i < PALETTES.length; i++) {
+            int col = i % PP_COLS;
+            int row = i / PP_COLS;
+            int cx = px + 7 + col * (PP_CELL_W + 7);
+            int cy = gridY + row * (PP_CELL_H + 5);
+            drawPaletteCell(mx, my, cx, cy, PP_CELL_W, PP_CELL_H, i);
+        }
+
+        // Last applied indicator
+        if (lastAppliedPaletteIdx >= 0 && lastAppliedPaletteIdx < PALETTES.length) {
+            long elapsed = Minecraft.getSystemTime() - paletteApplyTime;
+            float fade = elapsed < 2500L ? 1.0f : Math.max(0.0f, 1.0f - (elapsed - 2500L) / 2000.0f);
+            if (fade > 0.01f) {
+                int msgC = ((int)(0xFF * fade) << 24) | (ACCENT_GREEN & 0x00FFFFFF);
+                String msg = "Applique : " + PALETTES[lastAppliedPaletteIdx].name;
+                fontRendererObj.drawStringWithShadow(msg, px + 10, py + ph - 12, msgC);
+            }
+        }
+    }
+
+    private void drawPaletteCell(int mx, int my, int cx, int cy, int cw, int ch, int idx) {
+        Palette p = PALETTES[idx];
+        boolean hov     = inRect(mx, my, cx, cy, cw, ch);
+        boolean applied = (idx == lastAppliedPaletteIdx);
+
+        // Background
+        Gui.drawRect(cx, cy, cx + cw, cy + ch, hov ? 0x22FFFFFF : 0x14FFFFFF);
+
+        // Top accent bar (value color)
+        int accentAlpha = hov ? 0xFF : 0xBB;
+        Gui.drawRect(cx, cy, cx + cw, cy + 3, (accentAlpha << 24) | (p.value & 0x00FFFFFF));
+        GuiRenderUtils.drawGradientRect(cx, cy + 3, cx + cw, cy + 10,
+                ((accentAlpha / 4) << 24) | (p.value & 0x00FFFFFF), 0x00000000);
+
+        // Outline
+        if (applied) {
+            GuiRenderUtils.drawRectOutline(cx, cy, cw, ch, ACCENT_GREEN);
+            Gui.drawRect(cx, cy, cx + 3, cy + ch, ACCENT_GREEN);
+        } else if (hov) {
+            GuiRenderUtils.drawRectOutline(cx, cy, cw, ch, 0x55FFFFFF);
+        } else {
+            GuiRenderUtils.drawRectOutline(cx, cy, cw, ch, 0x28FFFFFF);
+        }
+
+        // Name + description
+        fontRendererObj.drawStringWithShadow(p.name, cx + 6, cy + 7, hov ? TEXT_PRIMARY : TEXT_SECONDARY);
+        fontRendererObj.drawString(p.desc, cx + 6, cy + 18, TEXT_MUTED);
+
+        // Color preview dots (value, prefix) — 2 cercles bien visibles
+        int[] dots = { p.value, p.prefix };
+        for (int d = 0; d < dots.length; d++) {
+            int dx = cx + 7 + d * 18;
+            int dy = cy + ch - 16;
+            GuiRenderUtils.drawCheckerboard(dx, dy, 13, 13, 4, 0xFF555555, 0xFF333333);
+            Gui.drawRect(dx, dy, dx + 13, dy + 13, dots[d]);
+            GuiRenderUtils.drawRectOutline(dx, dy, 13, 13, 0x33FFFFFF);
+        }
+
+        // Applied check mark
+        if (applied) {
+            fontRendererObj.drawStringWithShadow("OK", cx + cw - 18, cy + 6, ACCENT_GREEN);
+        }
+    }
+
+    private boolean handlePaletteClick(int mx, int my) {
+        int ph = getPaletteH();
+        if (!inRect(mx, my, ppX, ppY, PP_W, ph)) return false;
+        bringToFront("palette");
+        if (inRect(mx, my, hbPaletteClose[0], hbPaletteClose[1], hbPaletteClose[2], hbPaletteClose[3])) { paletteOpen = false; return true; }
+        if (inRect(mx, my, ppX, ppY, PP_W, 22)) { ppDragging = true; ppDragOX = mx; ppDragOY = my; return true; }
+        int gridY = ppY + 43;
+        for (int i = 0; i < PALETTES.length; i++) {
+            int col = i % PP_COLS;
+            int row = i / PP_COLS;
+            int cx = ppX + 7 + col * (PP_CELL_W + 7);
+            int cy = gridY + row * (PP_CELL_H + 5);
+            if (inRect(mx, my, cx, cy, PP_CELL_W, PP_CELL_H)) { applyPalette(i); return true; }
+        }
+        return true;
+    }
+
+    private void applyPalette(int idx) {
+        if (idx < 0 || idx >= PALETTES.length) return;
+        Palette p = PALETTES[idx];
+        for (UIElement el : ui.all()) {
+            if (!(el instanceof BaseWidget)) continue;
+            BaseWidget bw = (BaseWidget) el;
+            if (bw instanceof FactionZoneWidget) continue; // FactionZone non géré par 2 couleurs
+            bw.setRGBMode(false);
+            bw.setColor(p.value);
+            if (bw.supportsLabelColor()) {
+                bw.getProps().put("colorLabel", p.prefix);
+                bw.getProps().put("syncColors", false);
+            }
+        }
+        lastAppliedPaletteIdx = idx;
+        paletteApplyTime = Minecraft.getSystemTime();
+        ui.saveConfig();
     }
 
     private List<UIElement> getFilteredWidgets() { return ui.all().stream().filter(e -> searchFilter.isEmpty() || friendlyName(e.getId()).toLowerCase().contains(searchFilter.toLowerCase())).collect(Collectors.toList()); }
     private void bringToFront(String name) { panelOrder.remove(name); panelOrder.add(name); }
     private boolean inRect(int mx, int my, int rx, int ry, int rw, int rh) { return mx >= rx && my >= ry && mx < rx + rw && my < ry + rh; }
     private void setHB(int[] hb, int x, int y, int w, int h) { hb[0] = x; hb[1] = y; hb[2] = w; hb[3] = h; }
+
+    // ========================================================================
+    // MY CUSTOM THEMES PANEL
+    // ========================================================================
+
+    private void clampMtPosition() {
+        mtX = GuiRenderUtils.clamp(mtX, 2, Math.max(2, this.width  - MT_W - 2));
+        mtY = GuiRenderUtils.clamp(mtY, 2, Math.max(2, this.height - MT_H - 2));
+    }
+
+    private void clampMtePosition() {
+        mteX = GuiRenderUtils.clamp(mteX, 2, Math.max(2, this.width  - MTE_W - 2));
+        mteY = GuiRenderUtils.clamp(mteY, 2, Math.max(2, this.height - MTE_H - 2));
+    }
+
+    private void drawMyThemesPanel(int mx, int my) {
+        clampMtPosition();
+        int px = mtX, py = mtY;
+        CustomThemeManager ctm = CustomThemeManager.getInstance();
+
+        GuiRenderUtils.drawShadow(px, py, MT_W, MT_H, 6, 0x60);
+        Gui.drawRect(px, py, px + MT_W, py + MT_H, BG_PANEL);
+        Gui.drawRect(px, py, px + MT_W, py + 2, ACCENT_ORANGE);
+        GuiRenderUtils.drawGradientRect(px, py + 2, px + MT_W, py + 8, 0x18E8871A, 0x00000000);
+        GuiRenderUtils.drawGradientRect(px, py + 2, px + MT_W, py + 24, BG_HEADER, BG_PANEL);
+        Gui.drawRect(px, py + 23, px + MT_W, py + 24, 0x28FFFFFF);
+        GuiRenderUtils.drawRectOutline(px, py, MT_W, MT_H, BORDER);
+
+        // Title
+        Gui.drawRect(px + 7, py + 9, px + 9, py + 19, ACCENT_ORANGE);
+        fontRendererObj.drawStringWithShadow("M", px + 15, py + 9, 0xFFFFCC88);
+        fontRendererObj.drawStringWithShadow("ES THEMES", px + 15 + fontRendererObj.getStringWidth("M"), py + 9, TEXT_PRIMARY);
+
+        int ccx = px + MT_W - 16, ccy = py + 7, ccs = 10;
+        drawMiniClose(ccx, ccy, ccs, inRect(mx, my, ccx, ccy, ccs, ccs));
+        setHB(hbMyThemesClose, ccx, ccy, ccs, ccs);
+
+        fontRendererObj.drawString("Cliquer pour creer / modifier un theme", px + 10, py + 27, TEXT_MUTED);
+
+        // Grille 3×3
+        int gridY = py + 43;
+        for (int i = 0; i < CustomThemeManager.MAX; i++) {
+            int col = i % MT_COLS;
+            int row = i / MT_COLS;
+            int cx = px + 7 + col * (MT_CELL_W + 7);
+            int cy = gridY + row * (MT_CELL_H + 5);
+            drawMyThemeCell(mx, my, cx, cy, MT_CELL_W, MT_CELL_H, i, ctm.get(i));
+        }
+    }
+
+    private void drawMyThemeCell(int mx, int my, int cx, int cy, int cw, int ch, int idx, CustomThemeManager.CustomTheme t) {
+        boolean hov     = inRect(mx, my, cx, cy, cw, ch);
+        boolean editing = (mteOpen && editingCtIdx == idx);
+
+        Gui.drawRect(cx, cy, cx + cw, cy + ch, hov ? 0x22FFFFFF : 0x14FFFFFF);
+
+        if (t != null) {
+            // Barre d'accent (couleur valeur)
+            int aa = (hov || editing) ? 0xFF : 0xBB;
+            Gui.drawRect(cx, cy, cx + cw, cy + 3, (aa << 24) | (t.value & 0x00FFFFFF));
+            GuiRenderUtils.drawGradientRect(cx, cy + 3, cx + cw, cy + 10, ((aa / 4) << 24) | (t.value & 0x00FFFFFF), 0x00000000);
+
+            if (editing) {
+                GuiRenderUtils.drawRectOutline(cx, cy, cw, ch, ACCENT_ORANGE);
+                Gui.drawRect(cx, cy, cx + 3, cy + ch, ACCENT_ORANGE);
+            } else if (hov) {
+                GuiRenderUtils.drawRectOutline(cx, cy, cw, ch, 0x55FFFFFF);
+            } else {
+                GuiRenderUtils.drawRectOutline(cx, cy, cw, ch, 0x28FFFFFF);
+            }
+
+            String displayName = t.name.length() > 10 ? t.name.substring(0, 9) + ".." : t.name;
+            String displayDesc = t.desc.length() > 12 ? t.desc.substring(0, 11) + ".." : t.desc;
+            fontRendererObj.drawStringWithShadow(displayName, cx + 6, cy + 7, hov ? TEXT_PRIMARY : TEXT_SECONDARY);
+            fontRendererObj.drawString(displayDesc, cx + 6, cy + 18, TEXT_MUTED);
+
+            // 2 pastilles : Valeur / Prefix
+            int[] dots = {t.value, t.prefix};
+            for (int d = 0; d < dots.length; d++) {
+                int dx = cx + 7 + d * 18;
+                int dy = cy + ch - 16;
+                GuiRenderUtils.drawCheckerboard(dx, dy, 13, 13, 4, 0xFF555555, 0xFF333333);
+                Gui.drawRect(dx, dy, dx + 13, dy + 13, dots[d]);
+                GuiRenderUtils.drawRectOutline(dx, dy, 13, 13, 0x33FFFFFF);
+            }
+            if (editing) fontRendererObj.drawStringWithShadow("...", cx + cw - 18, cy + 6, ACCENT_ORANGE);
+        } else {
+            // Slot vide — "+"
+            GuiRenderUtils.drawRectOutline(cx, cy, cw, ch, hov ? 0x44FFFFFF : 0x18FFFFFF);
+            String plus = "+";
+            int pw = fontRendererObj.getStringWidth(plus);
+            fontRendererObj.drawStringWithShadow(plus, cx + (cw - pw) / 2, cy + (ch - 8) / 2 - 5, hov ? 0xFFCCCCCC : TEXT_MUTED);
+            String newStr = "Nouveau";
+            int nw2 = fontRendererObj.getStringWidth(newStr);
+            fontRendererObj.drawString(newStr, cx + (cw - nw2) / 2, cy + (ch - 8) / 2 + 5, hov ? TEXT_SECONDARY : TEXT_MUTED);
+        }
+    }
+
+    private void drawMyThemesEditPanel(int mx, int my) {
+        if (ctEditBuffer == null) return;
+        clampMtePosition();
+        int px = mteX, py = mteY;
+
+        GuiRenderUtils.drawShadow(px, py, MTE_W, MTE_H, 6, 0x60);
+        Gui.drawRect(px, py, px + MTE_W, py + MTE_H, BG_PANEL);
+        Gui.drawRect(px, py, px + MTE_W, py + 2, ACCENT_ORANGE);
+        GuiRenderUtils.drawGradientRect(px, py + 2, px + MTE_W, py + 8, 0x18E8871A, 0x00000000);
+        GuiRenderUtils.drawGradientRect(px, py + 2, px + MTE_W, py + 24, BG_HEADER, BG_PANEL);
+        Gui.drawRect(px, py + 23, px + MTE_W, py + 24, 0x28FFFFFF);
+        GuiRenderUtils.drawRectOutline(px, py, MTE_W, MTE_H, BORDER);
+
+        Gui.drawRect(px + 7, py + 9, px + 9, py + 19, ACCENT_ORANGE);
+        boolean isNew = (CustomThemeManager.getInstance().get(editingCtIdx) == null);
+        String title = isNew ? "CREER UN THEME" : "MODIFIER THEME";
+        fontRendererObj.drawStringWithShadow(title, px + 15, py + 9, 0xFFFFCC88);
+
+        int ccx = px + MTE_W - 16, ccy = py + 7, ccs = 10;
+        drawMiniClose(ccx, ccy, ccs, inRect(mx, my, ccx, ccy, ccs, ccs));
+        setHB(hbMteClose, ccx, ccy, ccs, ccs);
+
+        int cy = py + 28;
+
+        // -- Champ Nom --
+        fontRendererObj.drawStringWithShadow("Nom:", px + 10, cy + 3, TEXT_SECONDARY);
+        int nfX = px + 42, nfW = MTE_W - 52, nfH = 14;
+        Gui.drawRect(nfX, cy, nfX + nfW, cy + nfH, ctNameFocused ? 0x44FFFFFF : 0x16FFFFFF);
+        GuiRenderUtils.drawRectOutline(nfX, cy, nfW, nfH, ctNameFocused ? ACCENT_ORANGE : 0x2AFFFFFF);
+        if (ctNameFocused) Gui.drawRect(nfX, cy, nfX + nfW, cy + 2, ACCENT_ORANGE);
+        String dispName = ctEditBuffer.name + (ctNameFocused && System.currentTimeMillis() / 500 % 2 == 0 ? "|" : "");
+        fontRendererObj.drawString(fontRendererObj.trimStringToWidth(dispName, nfW - 6), nfX + 3, cy + 3, TEXT_PRIMARY);
+        setHB(hbMteNameField, nfX, cy, nfW, nfH);
+        cy += 20;
+
+        // Séparateur
+        Gui.drawRect(px + 8, cy, px + MTE_W - 8, cy + 1, 0x18FFFFFF);
+        cy += 4;
+
+        // -- 4 lignes de couleur avec descriptions --
+        for (int i = 0; i < CT_KEYS.length; i++) {
+            boolean hov = inRect(mx, my, px + 6, cy, MTE_W - 12, 16);
+            if (hov) Gui.drawRect(px + 6, cy, px + MTE_W - 6, cy + 16, 0x08FFFFFF);
+            fontRendererObj.drawStringWithShadow(CT_LABELS[i], px + 12, cy + 3, hov ? TEXT_PRIMARY : TEXT_SECONDARY);
+            int swX = px + MTE_W - 42, swW = 28, swH = 12;
+            int cc = getCtColor(CT_KEYS[i]);
+            GuiRenderUtils.drawCheckerboard(swX, cy + 1, swW, swH, 4, 0xFF999999, 0xFF666666);
+            Gui.drawRect(swX, cy + 1, swX + swW, cy + 1 + swH, cc);
+            GuiRenderUtils.drawRectOutline(swX, cy + 1, swW, swH, 0x66FFFFFF);
+            // Indicateur "édité" si target actif
+            if (colorEditorOpen && ("ct:" + CT_KEYS[i]).equals(colorEditorTarget)) {
+                GuiRenderUtils.drawRectOutline(swX - 1, cy, swW + 2, swH + 2, ACCENT_ORANGE);
+            }
+            setHB(hbMteColors[i], swX, cy + 1, swW, swH);
+            cy += 20;
+        }
+
+        // Séparateur
+        Gui.drawRect(px + 8, cy, px + MTE_W - 8, cy + 1, 0x18FFFFFF);
+        cy += 4;
+
+        // -- Boutons rangée 1: [Aléatoire] [Appliquer] --
+        int bw2 = (MTE_W - 26) / 2;
+        boolean hRand  = inRect(mx, my, px + 8, cy, bw2, 20);
+        boolean hApply = inRect(mx, my, px + 18 + bw2, cy, bw2, 20);
+        drawStyledButton(px + 8,        cy, bw2, 20, "Aleatoire", 0xFF141010, hRand);
+        drawStyledButton(px + 18 + bw2, cy, bw2, 20, "Appliquer", 0xFF141010, hApply);
+        setHB(hbMteRandom, px + 8,        cy, bw2, 20);
+        setHB(hbMteApply,  px + 18 + bw2, cy, bw2, 20);
+        cy += 26;
+
+        // -- Boutons rangée 2: [Sauvegarder] [Supprimer] --
+        boolean hSave = inRect(mx, my, px + 8,        cy, bw2, 20);
+        boolean hDel  = inRect(mx, my, px + 18 + bw2, cy, bw2, 20);
+        drawStyledButton(px + 8, cy, bw2, 20, "Sauvegarder", 0xFF141010, hSave);
+        setHB(hbMteSave, px + 8, cy, bw2, 20);
+
+        if (!isNew) {
+            // Bouton Supprimer (rouge)
+            Gui.drawRect(px + 18 + bw2, cy, px + 18 + bw2 + bw2, cy + 20, hDel ? 0x22FF4444 : 0x0AFF0000);
+            GuiRenderUtils.drawRectOutline(px + 18 + bw2, cy, bw2, 20, hDel ? 0x66FF4444 : 0x28FFFFFF);
+            if (hDel) Gui.drawRect(px + 18 + bw2, cy + 1, px + 18 + bw2 + 2, cy + 19, 0xFFEE2222);
+            int dtw = fontRendererObj.getStringWidth("Supprimer");
+            fontRendererObj.drawStringWithShadow("Supprimer", px + 18 + bw2 + (bw2 - dtw) / 2, cy + 6, hDel ? 0xFFFF8888 : 0xFF884444);
+            setHB(hbMteDelete, px + 18 + bw2, cy, bw2, 20);
+        } else {
+            setHB(hbMteDelete, 0, 0, 0, 0);
+        }
+    }
+
+    // ---- Helpers CT ----
+
+    private int getCtColor(String key) {
+        if (ctEditBuffer == null) return 0xFFFFFFFF;
+        switch (key) {
+            case "value":  return ctEditBuffer.value;
+            case "prefix": return ctEditBuffer.prefix;
+            default:       return 0xFFFFFFFF;
+        }
+    }
+
+    private void openCtColorEditor(String key) {
+        if (ctEditBuffer == null) return;
+        hexInputActive = false; hexInputStr = "";
+        colorEditorTarget = "ct:" + key;
+        colorEditorOpen = true;
+        bringToFront("colorEditor");
+        int c = getCtColor(key);
+        a = (c >> 24) & 0xFF; r = (c >> 16) & 0xFF; g = (c >> 8) & 0xFF; b = c & 0xFF;
+    }
+
+    private void randomizeCtBuffer() {
+        if (ctEditBuffer == null) return;
+        java.util.Random rand = new java.util.Random();
+        ctEditBuffer.value  = 0xFF000000 | rand.nextInt(0x1000000);
+        ctEditBuffer.prefix = 0xFF000000 | rand.nextInt(0x1000000);
+    }
+
+    private void openMyThemeEditor(int idx, CustomThemeManager.CustomTheme existing) {
+        editingCtIdx = idx;
+        ctEditBuffer = (existing != null) ? existing.copy() : new CustomThemeManager.CustomTheme();
+        mteOpen = true;
+        bringToFront("myThemesEdit");
+        if (colorEditorTarget != null && colorEditorTarget.startsWith("ct:")) colorEditorOpen = false;
+    }
+
+    // ---- Click handlers ----
+
+    private boolean handleMyThemesClick(int mx, int my) {
+        if (!inRect(mx, my, mtX, mtY, MT_W, MT_H)) return false;
+        bringToFront("myThemes");
+        if (clickHB(mx, my, hbMyThemesClose)) { myThemesOpen = false; return true; }
+        if (inRect(mx, my, mtX, mtY, MT_W, 22)) { mtDragging = true; mtDragOX = mx; mtDragOY = my; return true; }
+
+        int gridY = mtY + 43;
+        CustomThemeManager ctm = CustomThemeManager.getInstance();
+        for (int i = 0; i < CustomThemeManager.MAX; i++) {
+            int col = i % MT_COLS;
+            int row = i / MT_COLS;
+            int cx = mtX + 7 + col * (MT_CELL_W + 7);
+            int cy = gridY + row * (MT_CELL_H + 5);
+            if (inRect(mx, my, cx, cy, MT_CELL_W, MT_CELL_H)) {
+                openMyThemeEditor(i, ctm.get(i));
+                return true;
+            }
+        }
+        return true;
+    }
+
+    private boolean handleMyThemesEditClick(int mx, int my) {
+        if (ctEditBuffer == null) return false;
+        if (!inRect(mx, my, mteX, mteY, MTE_W, MTE_H)) return false;
+        bringToFront("myThemesEdit");
+
+        if (clickHB(mx, my, hbMteClose)) {
+            mteOpen = false;
+            if (colorEditorTarget != null && colorEditorTarget.startsWith("ct:")) colorEditorOpen = false;
+            return true;
+        }
+        if (inRect(mx, my, mteX, mteY, MTE_W, 22)) { mteDragging = true; mteDragOX = mx; mteDragOY = my; return true; }
+
+        // Champ nom
+        if (clickHB(mx, my, hbMteNameField)) { ctNameFocused = true; return true; }
+
+        // Swatches couleur
+        for (int i = 0; i < CT_KEYS.length; i++) {
+            if (clickHB(mx, my, hbMteColors[i])) { openCtColorEditor(CT_KEYS[i]); return true; }
+        }
+
+        // Bouton Aléatoire
+        if (clickHB(mx, my, hbMteRandom)) { randomizeCtBuffer(); return true; }
+
+        // Bouton Appliquer
+        if (clickHB(mx, my, hbMteApply)) {
+            CustomThemeManager.applyToWidgets(ctEditBuffer, ui);
+            ui.saveConfig();
+            // Associer au profil actif si ce slot a déjà été sauvegardé
+            if (CustomThemeManager.getInstance().get(editingCtIdx) != null) {
+                int ap = HudProfileManager.getInstance().getActiveProfile();
+                if (ap >= 0) {
+                    HudProfileManager.getInstance().setProfileCustomThemeIdx(ap, editingCtIdx);
+                    HudProfileManager.getInstance().save();
+                }
+            }
+            return true;
+        }
+
+        // Bouton Sauvegarder
+        if (clickHB(mx, my, hbMteSave)) {
+            if (ctEditBuffer.name.trim().isEmpty()) ctEditBuffer.name = "Theme " + (editingCtIdx + 1);
+            CustomThemeManager ctm2 = CustomThemeManager.getInstance();
+            ctm2.set(editingCtIdx, ctEditBuffer.copy());
+            ctm2.save();
+            // Associer au profil actif
+            int ap = HudProfileManager.getInstance().getActiveProfile();
+            if (ap >= 0) {
+                HudProfileManager.getInstance().setProfileCustomThemeIdx(ap, editingCtIdx);
+                HudProfileManager.getInstance().save();
+            }
+            return true;
+        }
+
+        // Bouton Supprimer (uniquement si slot existant)
+        if (CustomThemeManager.getInstance().get(editingCtIdx) != null && clickHB(mx, my, hbMteDelete)) {
+            CustomThemeManager.getInstance().delete(editingCtIdx);
+            CustomThemeManager.getInstance().save();
+            // Retirer l'association si ce slot était associé à un profil
+            for (int s = 0; s < HudProfileManager.MAX_PROFILES; s++) {
+                if (HudProfileManager.getInstance().getProfileCustomThemeIdx(s) == editingCtIdx) {
+                    HudProfileManager.getInstance().setProfileCustomThemeIdx(s, -1);
+                }
+            }
+            HudProfileManager.getInstance().save();
+            mteOpen = false;
+            if (colorEditorTarget != null && colorEditorTarget.startsWith("ct:")) colorEditorOpen = false;
+            return true;
+        }
+
+        return true;
+    }
     private String friendlyName(String id) {
         switch (id) {
             case "fps": return "FPS"; case "ping": return "Ping"; case "biome": return "Biome"; case "coords": return "Coordonnees";
@@ -929,6 +1793,161 @@ public class GuiUIEditor extends GuiScreen {
         GuiRenderUtils.drawSmoothToggle(x, y, value, current);
     }
     @Override protected void keyTyped(char typedChar, int keyCode) throws IOException {
+        // ---- Saisie du nom de thème personnalisé ----
+        if (ctNameFocused && ctEditBuffer != null && mteOpen) {
+            if (keyCode == Keyboard.KEY_ESCAPE || keyCode == Keyboard.KEY_RETURN) { ctNameFocused = false; return; }
+            if (keyCode == Keyboard.KEY_BACK) {
+                if (!ctEditBuffer.name.isEmpty())
+                    ctEditBuffer.name = ctEditBuffer.name.substring(0, ctEditBuffer.name.length() - 1);
+            } else if (typedChar >= 32 && ctEditBuffer.name.length() < 24) {
+                ctEditBuffer.name += typedChar;
+            }
+            return;
+        }
+        if (hexInputActive) {
+            boolean shift = isShiftKeyDown();
+            boolean ctrl  = isCtrlKeyDown();
+
+            // ---- Escape / Entrée ----
+            if (keyCode == Keyboard.KEY_ESCAPE) {
+                hexInputActive = false; hexSelAnchor = -1; return;
+            }
+            if (keyCode == Keyboard.KEY_RETURN || keyCode == Keyboard.KEY_NUMPADENTER) {
+                parseAndApplyHex(); hexInputActive = false; hexSelAnchor = -1; return;
+            }
+
+            // ---- Saisie de caractère hex (vérifié AVANT Ctrl pour supporter AltGr+##) ----
+            // AltGr sur AZERTY est interprété comme Ctrl+Alt, ce qui ferait consommer '#'
+            // si on entrait dans le bloc ctrl ci-dessous. On le traite donc en priorité.
+            char lcChar = Character.toLowerCase(typedChar);
+            if ((lcChar >= '0' && lcChar <= '9') || (lcChar >= 'a' && lcChar <= 'f') || typedChar == '#') {
+                hexDeleteSelection();
+                if (hexInputStr.length() < 9) {
+                    hexInputStr  = hexInputStr.substring(0, hexCursorPos)
+                            + Character.toUpperCase(typedChar)
+                            + hexInputStr.substring(hexCursorPos);
+                    hexCursorPos++;
+                }
+                // Application immédiate (preview en direct, plus besoin d'appuyer sur Entrée)
+                parseAndApplyHex();
+                return;
+            }
+
+            // ---- Raccourcis Ctrl ----
+            if (ctrl) {
+                switch (keyCode) {
+                    case Keyboard.KEY_A: // Sélectionner tout
+                        hexSelAnchor = 0;
+                        hexCursorPos = hexInputStr.length();
+                        return;
+                    case Keyboard.KEY_C: // Copier
+                        int[] selC = getHexSelection();
+                        String toCopy = selC != null
+                                ? hexInputStr.substring(selC[0], selC[1])
+                                : hexInputStr;
+                        GuiScreen.setClipboardString(toCopy);
+                        copyFlashTime = Minecraft.getSystemTime();
+                        return;
+                    case Keyboard.KEY_X: // Couper
+                        int[] selX = getHexSelection();
+                        if (selX != null) {
+                            GuiScreen.setClipboardString(hexInputStr.substring(selX[0], selX[1]));
+                            hexDeleteSelection();
+                            copyFlashTime = Minecraft.getSystemTime();
+                            parseAndApplyHex();
+                        }
+                        return;
+                    case Keyboard.KEY_V: // Coller
+                        String clip = GuiScreen.getClipboardString();
+                        if (clip != null) {
+                            hexDeleteSelection();
+                            for (char ch : clip.trim().toCharArray()) {
+                                char lc2 = Character.toLowerCase(ch);
+                                if ((lc2 >= '0' && lc2 <= '9') || (lc2 >= 'a' && lc2 <= 'f') || ch == '#') {
+                                    if (hexInputStr.length() < 9) {
+                                        hexInputStr = hexInputStr.substring(0, hexCursorPos)
+                                                + Character.toUpperCase(ch)
+                                                + hexInputStr.substring(hexCursorPos);
+                                        hexCursorPos++;
+                                    }
+                                }
+                            }
+                            parseAndApplyHex();
+                        }
+                        return;
+                    default:
+                        return; // consomme tout autre Ctrl+key
+                }
+            }
+
+            // ---- Navigation ----
+            if (keyCode == Keyboard.KEY_LEFT) {
+                if (!shift && hexSelAnchor >= 0) {
+                    hexCursorPos = Math.min(hexCursorPos, hexSelAnchor);
+                    hexSelAnchor = -1;
+                } else {
+                    if (shift && hexSelAnchor < 0) hexSelAnchor = hexCursorPos;
+                    else if (!shift)               hexSelAnchor = -1;
+                    hexCursorPos = Math.max(0, hexCursorPos - 1);
+                }
+                return;
+            }
+            if (keyCode == Keyboard.KEY_RIGHT) {
+                if (!shift && hexSelAnchor >= 0) {
+                    hexCursorPos = Math.max(hexCursorPos, hexSelAnchor);
+                    hexSelAnchor = -1;
+                } else {
+                    if (shift && hexSelAnchor < 0) hexSelAnchor = hexCursorPos;
+                    else if (!shift)               hexSelAnchor = -1;
+                    hexCursorPos = Math.min(hexInputStr.length(), hexCursorPos + 1);
+                }
+                return;
+            }
+            if (keyCode == Keyboard.KEY_HOME) {
+                if (shift && hexSelAnchor < 0) hexSelAnchor = hexCursorPos;
+                else if (!shift)               hexSelAnchor = -1;
+                hexCursorPos = 0;
+                return;
+            }
+            if (keyCode == Keyboard.KEY_END) {
+                if (shift && hexSelAnchor < 0) hexSelAnchor = hexCursorPos;
+                else if (!shift)               hexSelAnchor = -1;
+                hexCursorPos = hexInputStr.length();
+                return;
+            }
+
+            // ---- Suppression ----
+            if (keyCode == Keyboard.KEY_BACK) {
+                if (hexSelAnchor >= 0 && hexSelAnchor != hexCursorPos) {
+                    hexDeleteSelection();
+                } else if (hexCursorPos > 0) {
+                    hexInputStr  = hexInputStr.substring(0, hexCursorPos - 1) + hexInputStr.substring(hexCursorPos);
+                    hexCursorPos--;
+                    hexSelAnchor = -1;
+                }
+                parseAndApplyHex(); // preview immédiat après suppression
+                return;
+            }
+            if (keyCode == Keyboard.KEY_DELETE) {
+                if (hexSelAnchor >= 0 && hexSelAnchor != hexCursorPos) {
+                    hexDeleteSelection();
+                } else if (hexCursorPos < hexInputStr.length()) {
+                    hexInputStr  = hexInputStr.substring(0, hexCursorPos) + hexInputStr.substring(hexCursorPos + 1);
+                    hexSelAnchor = -1;
+                }
+                parseAndApplyHex(); // preview immédiat après suppression
+                return;
+            }
+
+            return;
+        }
+
+        // Ctrl+C quand l'éditeur de couleur est ouvert (même sans saisie hex active)
+        if (colorEditorOpen && isCtrlKeyDown() && keyCode == Keyboard.KEY_C) {
+            GuiScreen.setClipboardString(String.format("#%02X%02X%02X%02X", r, g, b, a));
+            copyFlashTime = Minecraft.getSystemTime();
+            return;
+        }
         if (searchFocused) { if (keyCode == Keyboard.KEY_ESCAPE || keyCode == Keyboard.KEY_RETURN) searchFocused = false; else if (keyCode == Keyboard.KEY_BACK) { if (!searchFilter.isEmpty()) searchFilter = searchFilter.substring(0, searchFilter.length() - 1); } else if (typedChar >= 32) searchFilter += typedChar; return; }
         super.keyTyped(typedChar, keyCode);
     }

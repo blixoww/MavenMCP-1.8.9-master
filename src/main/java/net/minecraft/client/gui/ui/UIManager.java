@@ -71,6 +71,8 @@ public class UIManager {
         register(new CombatLogWidget("combatlog", 10, 230));
         // Reach widget
         register(new ReachWidget("Reach", 10, 250));
+        // Zone (claim faction) widget
+        register(new FactionZoneWidget("faction_zone", 10, 264));
         // Compass HUD widget — centré horizontalement en haut par défaut
         CompassWidget compassW = new CompassWidget("compass", 0, 2);
         compassW.setColor(0xFFFFFFFF);
