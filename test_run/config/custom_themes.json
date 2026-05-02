@@ -1,5 +1,10 @@
 [
-  null,
+  {
+    "name": "Mon Theme",
+    "desc": "Personnalise",
+    "value": -1,
+    "prefix": -4556544
+  },
   null,
   null,
   null,

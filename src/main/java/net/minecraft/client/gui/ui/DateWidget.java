@@ -6,7 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class DateWidget extends BaseWidget {
-    private final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    private static final SimpleDateFormat DATE_FMT = new SimpleDateFormat("yyyy-MM-dd ");
+    private static final SimpleDateFormat TIME_FMT = new SimpleDateFormat("HH:mm");
 
     public DateWidget(String id, int x, int y) {
         super(id, x, y);
@@ -15,12 +16,13 @@ public class DateWidget extends BaseWidget {
     }
 
     @Override
+    public boolean supportsLabelColor() { return true; }
+
+    @Override
     protected void draw() {
         Minecraft mc = Minecraft.getMinecraft();
         if (mc == null) return;
-        String s = df.format(new Date());
-        int col = getColor();
-        if ((col & 0x00FFFFFF) == 0) col = 0x00FFFFFF;
-        mc.fontRendererObj.drawStringWithShadow(s, 0, 0, col & 0x00FFFFFF);
+        Date now = new Date();
+        drawLabelValue(mc.fontRendererObj, DATE_FMT.format(now), TIME_FMT.format(now), 0, 0);
     }
 }

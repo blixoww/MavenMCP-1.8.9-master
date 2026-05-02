@@ -3,6 +3,7 @@ package net.minecraft.client.gui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ui.HudProfileManager;
 import net.minecraft.client.gui.ui.UIManager;
+import net.minecraft.client.gui.ui.UITheme;
 import net.minecraft.util.MathHelper;
 import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.input.Keyboard;
@@ -162,10 +163,10 @@ public class GuiHudProfiles extends GuiScreen {
         // Panneau principal
         GuiRenderUtils.drawShadow(pX, pY, panelW, pH, 8, (int)(ease * 80));
         Gui.drawRect(pX, pY, pX + panelW, pY + pH, COL_PANEL_BG);
-        GuiRenderUtils.drawRectOutline(pX, pY, panelW, pH, COL_PANEL_BRD);
-        // Red top accent (2px) + léger glow
-        Gui.drawRect(pX, pY, pX + panelW, pY + 2, COL_ACCENT_LINE);
-        GuiRenderUtils.drawGradientRect(pX, pY + 2, pX + panelW, pY + 8, 0x18E02828, 0x00000000);
+        GuiRenderUtils.drawRectOutline(pX, pY, panelW, pH, UITheme.primary(0x2B));
+        // Top accent (2px) + léger glow
+        Gui.drawRect(pX, pY, pX + panelW, pY + 2, UITheme.getPrimary());
+        GuiRenderUtils.drawGradientRect(pX, pY + 2, pX + panelW, pY + 8, UITheme.primary(0x18), 0x00000000);
         // Gradient header background
         GuiRenderUtils.drawGradientRect(pX, pY + 2, pX + panelW, pY + PAD + HDR_H, 0xFF0E0606, COL_PANEL_BG);
 
@@ -187,7 +188,7 @@ public class GuiHudProfiles extends GuiScreen {
         int bW  = 80;
         int bX  = pX + (panelW - bW) / 2;
         boolean hBack = inRect(mouseX, mouseY, bX, fY, bW, BTN_H + 2);
-        drawSmallBtn(bX, fY, bW, BTN_H + 2, "\u2190 Retour", hBack, COL_ACCENT);
+        drawSmallBtn(bX, fY, bW, BTN_H + 2, "\u2190 Retour", hBack, UITheme.getPrimary());
 
         // Toast
         drawToast(now, pY);
@@ -199,14 +200,14 @@ public class GuiHudProfiles extends GuiScreen {
 
     private void drawHeader(int pX, int hY, HudProfileManager pm) {
         // Simple left accent bar (2px)
-        Gui.drawRect(pX + PAD, hY + 5, pX + PAD + 2, hY + HDR_H - 5, COL_ACCENT);
+        Gui.drawRect(pX + PAD, hY + 5, pX + PAD + 2, hY + HDR_H - 5, UITheme.getPrimary());
 
-        // Two-tone title
-        String t1 = "PROFILS ";
-        String t2 = "HUD";
+        // Two-tone title: first letter primary, rest secondary
+        String fullHdr = "PROFILS HUD";
         int ty = hY + (HDR_H - 8) / 2;
-        fontRendererObj.drawStringWithShadow(t1, pX + PAD + 7, ty, 0xFFFF8888);
-        fontRendererObj.drawStringWithShadow(t2, pX + PAD + 7 + fontRendererObj.getStringWidth(t1), ty, COL_TXT_PRI);
+        int hx = pX + PAD + 7;
+        fontRendererObj.drawStringWithShadow(fullHdr.substring(0, 1), hx, ty, UITheme.getPrimary());
+        fontRendererObj.drawStringWithShadow(fullHdr.substring(1), hx + fontRendererObj.getStringWidth(fullHdr.substring(0, 1)), ty, UITheme.getSecondary());
 
         int active = pm.getActiveProfile();
         String sub = active >= 0
@@ -230,11 +231,11 @@ public class GuiHudProfiles extends GuiScreen {
         } else {
             Gui.drawRect(x, y, x + w, y + CARD_H, hovCard ? COL_CARD_HOV : COL_CARD_BG);
         }
-        GuiRenderUtils.drawRectOutline(x, y, w, CARD_H, active ? COL_CARD_BRD_A : COL_CARD_BRD);
+        GuiRenderUtils.drawRectOutline(x, y, w, CARD_H, active ? UITheme.getPrimary() : COL_CARD_BRD);
 
         // Left accent stripe (2px) for active card only
         if (active) {
-            Gui.drawRect(x, y + 1, x + 2, y + CARD_H - 1, COL_ACCENT);
+            Gui.drawRect(x, y + 1, x + 2, y + CARD_H - 1, UITheme.getPrimary());
         }
 
         // Ligne haute : badge + nom + état
@@ -243,7 +244,7 @@ public class GuiHudProfiles extends GuiScreen {
         int bx = x + 7, by = y + (CARD_H - BADGE_S) / 2;
         if (active) {
             Gui.drawRect(bx, by, bx + BADGE_S, by + BADGE_S, 0xFF300808);
-            GuiRenderUtils.drawRectOutline(bx, by, BADGE_S, BADGE_S, COL_ACCENT);
+            GuiRenderUtils.drawRectOutline(bx, by, BADGE_S, BADGE_S, UITheme.getPrimary());
         } else {
             Gui.drawRect(bx, by, bx + BADGE_S, by + BADGE_S, used ? 0x18FFFFFF : 0x0AFFFFFF);
             GuiRenderUtils.drawRectOutline(bx, by, BADGE_S, BADGE_S, used ? 0x22FFFFFF : 0x10FFFFFF);
@@ -262,7 +263,7 @@ public class GuiHudProfiles extends GuiScreen {
             String disp = renameBuffer + cur;
             int fieldW = Math.min(maxNameW, 110);
             Gui.drawRect(nameX - 1, topRowY - 1, nameX + fieldW + 1, topRowY + 10, 0x18000000);
-            GuiRenderUtils.drawRectOutline(nameX - 1, topRowY - 1, fieldW + 2, 11, COL_ACCENT);
+            GuiRenderUtils.drawRectOutline(nameX - 1, topRowY - 1, fieldW + 2, 11, UITheme.getPrimary());
             fontRendererObj.drawString(clipText(disp, fieldW), nameX + 1, topRowY, COL_TXT_PRI);
         } else {
             // Nom
@@ -276,7 +277,7 @@ public class GuiHudProfiles extends GuiScreen {
                 int penX = nameX + clippedW + 4;
                 boolean hovPen = inRect(mx, my, penX - 1, topRowY - 1, 11, 11);
                 fontRendererObj.drawString("\u270E", penX, topRowY,
-                    hovPen ? COL_ACCENT : COL_TXT_MUT);
+                    hovPen ? UITheme.getPrimary() : COL_TXT_MUT);
             }
 
             // État (2e ligne)

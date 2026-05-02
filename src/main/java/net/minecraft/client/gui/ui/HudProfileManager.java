@@ -336,8 +336,8 @@ public class HudProfileManager {
             profileData.put(e.getId(), data);
         }
 
-        // Appliquer la palette PvP (valeur=rouge vif, prefix=rose)
-        applyPaletteToProfileData(profileData, ui, 0xFFFF5555, 0xFFFF9999);
+        // Appliquer la palette Red Conflict (valeur=blanc, prefix=rouge)
+        applyPaletteToProfileData(profileData, ui, 0xFFFFFFFF, 0xFFFF3333);
 
         profiles.set(0, profileData);
         profileNames.set(0, "PvP");
@@ -361,7 +361,7 @@ public class HudProfileManager {
         positions.put("biome",  new int[]{leftX, topY + lineH * 3});
         positions.put("date",   new int[]{leftX, topY + lineH * 4});
         positions.put("helditem", new int[]{sw - 55, sh - 20});
-        positions.put("compass", new int[]{sw / 2 - 50, 5});
+        positions.put("compass", new int[]{(sw - 90) / 2, 5});
 
         Map<String, Map<String, Object>> profileData = new LinkedHashMap<>();
         for (UIElement e : ui.all()) {
@@ -369,7 +369,12 @@ public class HudProfileManager {
             int px = pos != null ? pos[0] : e.getX();
             int py = pos != null ? pos[1] : e.getY();
             boolean enabled = explorationWidgets.contains(e.getId());
-            profileData.put(e.getId(), buildWidgetData(e, px, py, enabled, sw, sh));
+            Map<String, Object> data = buildWidgetData(e, px, py, enabled, sw, sh);
+            if ("compass".equals(e.getId())) {
+                data.put("scale", 1.4f);
+                data.put("relX", 0.5); // centrage parfait quelque soit l'échelle
+            }
+            profileData.put(e.getId(), data);
         }
 
         // Appliquer la palette Minimal (valeur=gris clair, prefix=gris moyen)

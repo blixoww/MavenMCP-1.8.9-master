@@ -209,7 +209,7 @@ public class GuiUIEditor extends GuiScreen {
         new Palette("Ocean",        "Tons bleus",        0xFF4488FF, 0xFF88AAFF),
         new Palette("Sunset",       "Tons chauds",       0xFFFF8844, 0xFFFFCC88),
         new Palette("Neon",         "Neon sombre",       0xFF00FF88, 0xFF00FFCC),
-        new Palette("Red Conflict", "Guerre ecarlate",   0xFFFFFFFF, 0xFFFF8800),
+        new Palette("Red Conflict", "Guerre ecarlate",   0xFFFFFFFF, 0xFFFF3333),
         new Palette("Forest",       "Nature profonde",   0xFF55AA55, 0xFF99CC66),
         new Palette("Arctic",       "Glace & cristal",   0xFF88EEFF, 0xFFCCEEFF),
     };
@@ -336,11 +336,11 @@ public class GuiUIEditor extends GuiScreen {
         Gui.drawRect(btnX, btnY, btnX + btnW, btnY + btnH,
                 btnHover ? 0x28FFFFFF : 0x0A000000);
         // Top accent line
-        Gui.drawRect(btnX, btnY, btnX + btnW, btnY + 1, btnHover ? ACCENT : ACCENT_DIM);
+        Gui.drawRect(btnX, btnY, btnX + btnW, btnY + 1, btnHover ? UITheme.getPrimary() : UITheme.getPrimaryDim());
         // Outline
         GuiRenderUtils.drawRectOutline(btnX, btnY, btnW, btnH, btnHover ? 0x44FFFFFF : 0x28FFFFFF);
         if (btnHover) {
-            Gui.drawRect(btnX, btnY + 1, btnX + 2, btnY + btnH - 1, ACCENT);
+            Gui.drawRect(btnX, btnY + 1, btnX + 2, btnY + btnH - 1, UITheme.getPrimary());
         }
         // Label
         int btnTw = fontRendererObj.getStringWidth("RETOUR");
@@ -353,13 +353,13 @@ public class GuiUIEditor extends GuiScreen {
         int palBtnX = btnX - palBtnW - 8;
         boolean palHov = inRect(mouseX, mouseY, palBtnX, btnY, palBtnW, palBtnH);
         Gui.drawRect(palBtnX, btnY, palBtnX + palBtnW, btnY + palBtnH, palHov || paletteOpen ? 0x28FFFFFF : 0x0A000000);
-        Gui.drawRect(palBtnX, btnY, palBtnX + palBtnW, btnY + 1, paletteOpen ? ACCENT_PURPLE : (palHov ? ACCENT_PURPLE : ACCENT_DIM));
-        GuiRenderUtils.drawRectOutline(palBtnX, btnY, palBtnW, palBtnH, palHov || paletteOpen ? 0x66AA44EE : 0x28FFFFFF);
-        if (palHov || paletteOpen) Gui.drawRect(palBtnX, btnY + 1, palBtnX + 2, btnY + palBtnH - 1, ACCENT_PURPLE);
+        Gui.drawRect(palBtnX, btnY, palBtnX + palBtnW, btnY + 1, paletteOpen ? UITheme.getPrimary() : (palHov ? UITheme.getPrimary() : UITheme.getPrimaryDim()));
+        GuiRenderUtils.drawRectOutline(palBtnX, btnY, palBtnW, palBtnH, palHov || paletteOpen ? UITheme.primary(0x66) : 0x28FFFFFF);
+        if (palHov || paletteOpen) Gui.drawRect(palBtnX, btnY + 1, palBtnX + 2, btnY + palBtnH - 1, UITheme.getPrimary());
         fontRendererObj.drawStringWithShadow("THEMES",
                 palBtnX + (palBtnW - fontRendererObj.getStringWidth("THEMES")) / 2,
                 btnY + (palBtnH - 8) / 2.0f,
-                palHov ? 0xFFCC88FF : (paletteOpen ? 0xFFAA66EE : TEXT_SECONDARY));
+                palHov ? UITheme.getSecondary() : (paletteOpen ? UITheme.getPrimary() : TEXT_SECONDARY));
         setHB(hbPaletteBtn, palBtnX, btnY, palBtnW, palBtnH);
 
         // Bouton MES THEMES — à droite du bouton RETOUR
@@ -369,14 +369,14 @@ public class GuiUIEditor extends GuiScreen {
         Gui.drawRect(myBtnX, btnY, myBtnX + myBtnW, btnY + myBtnH,
                 myHov || myThemesOpen ? 0x28FFFFFF : 0x0A000000);
         Gui.drawRect(myBtnX, btnY, myBtnX + myBtnW, btnY + 1,
-                myThemesOpen ? ACCENT_ORANGE : (myHov ? ACCENT_ORANGE : ACCENT_DIM));
+                myThemesOpen ? UITheme.getPrimary() : (myHov ? UITheme.getPrimary() : UITheme.getPrimaryDim()));
         GuiRenderUtils.drawRectOutline(myBtnX, btnY, myBtnW, myBtnH,
-                myHov || myThemesOpen ? 0x66E8871A : 0x28FFFFFF);
-        if (myHov || myThemesOpen) Gui.drawRect(myBtnX, btnY + 1, myBtnX + 2, btnY + myBtnH - 1, ACCENT_ORANGE);
+                myHov || myThemesOpen ? UITheme.primary(0x66) : 0x28FFFFFF);
+        if (myHov || myThemesOpen) Gui.drawRect(myBtnX, btnY + 1, myBtnX + 2, btnY + myBtnH - 1, UITheme.getPrimary());
         fontRendererObj.drawStringWithShadow("MES THEMES",
                 myBtnX + (myBtnW - fontRendererObj.getStringWidth("MES THEMES")) / 2,
                 btnY + (myBtnH - 8) / 2.0f,
-                myHov ? 0xFFFFCC88 : (myThemesOpen ? 0xFFE89050 : TEXT_SECONDARY));
+                myHov ? UITheme.getSecondary() : (myThemesOpen ? UITheme.getPrimary() : TEXT_SECONDARY));
         setHB(hbMyThemesBtn, myBtnX, btnY, myBtnW, myBtnH);
     }
 
@@ -394,15 +394,15 @@ public class GuiUIEditor extends GuiScreen {
         GuiRenderUtils.drawShadow(px, py, totalW, h, 10, 0x80);
         Gui.drawRect(px, py, px + totalW, py + h, BG_PANEL);
         // Top accent line (2px) + subtle glow
-        Gui.drawRect(px, py, px + totalW, py + 2, ACCENT_LINE);
-        GuiRenderUtils.drawGradientRect(px, py + 2, px + totalW, py + 8, 0x18E02828, 0x00000000);
+        Gui.drawRect(px, py, px + totalW, py + 2, UITheme.getPrimary());
+        GuiRenderUtils.drawGradientRect(px, py + 2, px + totalW, py + 8, UITheme.primary(0x18), 0x00000000);
         GuiRenderUtils.drawGradientRect(px, py + 2, px + totalW, py + 24, BG_HEADER, BG_PANEL);
         Gui.drawRect(px, py + 24, px + totalW, py + 25, 0x28FFFFFF);
-        GuiRenderUtils.drawRectOutline(px, py, totalW, h, BORDER);
-        // Left accent bar (2px) + title
-        Gui.drawRect(px + 7, py + 9, px + 9, py + 19, ACCENT);
-        fontRendererObj.drawStringWithShadow("W", px + 14, py + 9, 0xFFFF8888);
-        fontRendererObj.drawStringWithShadow("IDGETS", px + 14 + fontRendererObj.getStringWidth("W"), py + 9, TEXT_PRIMARY);
+        GuiRenderUtils.drawRectOutline(px, py, totalW, h, UITheme.primary(0x2B));
+        // Left accent bar (2px) + title: first letter primary, rest secondary
+        Gui.drawRect(px + 7, py + 9, px + 9, py + 19, UITheme.getPrimary());
+        fontRendererObj.drawStringWithShadow("W", px + 14, py + 9, UITheme.getPrimary());
+        fontRendererObj.drawStringWithShadow("IDGETS", px + 14 + fontRendererObj.getStringWidth("W"), py + 9, UITheme.getSecondary());
 
         int ccx = px + totalW - 16, ccy = py + 7, ccs = 10;
         drawMiniClose(ccx, ccy, ccs, inRect(mx, my, ccx, ccy, ccs, ccs));
@@ -410,8 +410,8 @@ public class GuiUIEditor extends GuiScreen {
 
         int searchY = py + 27, searchW = totalW - 16;
         Gui.drawRect(px + 8, searchY, px + 8 + searchW, searchY + 16, searchFocused ? 0x44FFFFFF : 0x16FFFFFF);
-        GuiRenderUtils.drawRectOutline(px + 8, searchY, searchW, 16, searchFocused ? ACCENT : 0x2AFFFFFF);
-        if (searchFocused) Gui.drawRect(px + 8, searchY, px + 8 + searchW, searchY + 2, ACCENT);
+        GuiRenderUtils.drawRectOutline(px + 8, searchY, searchW, 16, searchFocused ? UITheme.getPrimary() : 0x2AFFFFFF);
+        if (searchFocused) Gui.drawRect(px + 8, searchY, px + 8 + searchW, searchY + 2, UITheme.getPrimary());
         GuiRenderUtils.drawSearchIcon(px + 12, searchY + 4, TEXT_MUTED);
         if (searchFilter.isEmpty() && !searchFocused) fontRendererObj.drawString("Rechercher...", px + 24, searchY + 4, TEXT_MUTED);
         else fontRendererObj.drawString(searchFilter + (searchFocused && (System.currentTimeMillis() / 500 % 2 == 0) ? "|" : ""), px + 24, searchY + 4, TEXT_PRIMARY);
@@ -424,9 +424,9 @@ public class GuiUIEditor extends GuiScreen {
                 UIElement e = items.get(i);
                 boolean isSel = selected == e, isHover = inRect(mx, my, px, y, totalW - 6, WL_ROW_H);
                 if (isSel) {
-                    GuiRenderUtils.drawGradientRect(px+1, y, px+totalW-6, y+WL_ROW_H, 0x28E02828, 0x18E02828);
-                    Gui.drawRect(px+1, y, px+4, y+WL_ROW_H, ACCENT);
-                    Gui.drawRect(px+4, y, px+5, y+WL_ROW_H, ACCENT_DIM);
+                    GuiRenderUtils.drawGradientRect(px+1, y, px+totalW-6, y+WL_ROW_H, UITheme.primary(0x28), UITheme.primary(0x18));
+                    Gui.drawRect(px+1, y, px+4, y+WL_ROW_H, UITheme.getPrimary());
+                    Gui.drawRect(px+4, y, px+5, y+WL_ROW_H, UITheme.getPrimaryDim());
                 } else if (isHover) {
                     Gui.drawRect(px+1, y, px+totalW-6, y+WL_ROW_H, 0x0EFFFFFF);
                 }
@@ -450,7 +450,7 @@ public class GuiUIEditor extends GuiScreen {
                 Gui.drawRect(sbTrackX, sbTrackTop, sbTrackX + 4, sbTrackTop + listH, 0x10FFFFFF);
                 int thumbH = Math.max(12, (int)(listH * ((float)maxVisible / items.size())));
                 int thumbY = (int)((listH - thumbH) * ((float) wlScroll / (items.size() - maxVisible)));
-                Gui.drawRect(sbTrackX, sbTrackTop + thumbY, sbTrackX + 4, sbTrackTop + thumbY + thumbH, ACCENT);
+                Gui.drawRect(sbTrackX, sbTrackTop + thumbY, sbTrackX + 4, sbTrackTop + thumbY + thumbH, UITheme.getPrimary());
             }
         }
     }
@@ -469,14 +469,16 @@ public class GuiUIEditor extends GuiScreen {
         GuiRenderUtils.drawShadow(px, py, w, sbH, 6, 0x60);
         Gui.drawRect(px, py, px + w, py + sbH, BG_PANEL);
         // Top accent line (2px) + subtle glow
-        Gui.drawRect(px, py, px + w, py + 2, ACCENT_LINE);
-        GuiRenderUtils.drawGradientRect(px, py + 2, px + w, py + 8, 0x18E02828, 0x00000000);
+        Gui.drawRect(px, py, px + w, py + 2, UITheme.getPrimary());
+        GuiRenderUtils.drawGradientRect(px, py + 2, px + w, py + 8, UITheme.primary(0x18), 0x00000000);
         GuiRenderUtils.drawGradientRect(px, py + 2, px + w, py + 24, BG_HEADER, BG_PANEL);
         Gui.drawRect(px, py + 23, px + w, py + 24, 0x28FFFFFF);
-        GuiRenderUtils.drawRectOutline(px, py, w, sbH, BORDER);
-        // Left accent bar (2px) + widget name
-        Gui.drawRect(px + 7, py + 9, px + 9, py + 19, ACCENT);
-        fontRendererObj.drawStringWithShadow(friendlyName(selected.getId()).toUpperCase(), px + 15, py + 9, TEXT_PRIMARY);
+        GuiRenderUtils.drawRectOutline(px, py, w, sbH, UITheme.primary(0x2B));
+        // Left accent bar (2px) + widget name: first letter primary, rest secondary
+        Gui.drawRect(px + 7, py + 9, px + 9, py + 19, UITheme.getPrimary());
+        { String wn = friendlyName(selected.getId()).toUpperCase();
+          fontRendererObj.drawStringWithShadow(wn.substring(0, 1), px + 15, py + 9, UITheme.getPrimary());
+          if (wn.length() > 1) fontRendererObj.drawStringWithShadow(wn.substring(1), px + 15 + fontRendererObj.getStringWidth(wn.substring(0, 1)), py + 9, UITheme.getSecondary()); }
         int ccx = px + w - 16, ccy = py + 7, ccs = 10;
         drawMiniClose(ccx, ccy, ccs, inRect(mx, my, ccx, ccy, ccs, ccs));
         setHB(hbSbClose, ccx, ccy, ccs, ccs);
@@ -494,7 +496,7 @@ public class GuiUIEditor extends GuiScreen {
             Gui.drawRect(sX, sY, sX + 1, sY + sH, 0x10FFFFFF);
             int tH = Math.max(10, (int)(sH * ((float)(sbH - 28) / contentH)));
             int tY = (int)((sH - tH) * ((float)sbScroll / (contentH - (sbH - 28))));
-            Gui.drawRect(sX, sY + tY, sX + 1, sY + tY + tH, ACCENT);
+            Gui.drawRect(sX, sY + tY, sX + 1, sY + tY + tH, UITheme.getPrimary());
         }
     }
 
@@ -509,15 +511,16 @@ public class GuiUIEditor extends GuiScreen {
         int px = ceX, py = ceY;
         GuiRenderUtils.drawShadow(px, py, CE_W, CE_H, 6, 0x60);
         Gui.drawRect(px, py, px + CE_W, py + CE_H, BG_PANEL);
-        // Purple top accent (2px) + subtle glow
-        Gui.drawRect(px, py, px + CE_W, py + 2, ACCENT_PURPLE);
-        GuiRenderUtils.drawGradientRect(px, py + 2, px + CE_W, py + 8, 0x18AA44EE, 0x00000000);
+        // Top accent line (2px) + subtle glow
+        Gui.drawRect(px, py, px + CE_W, py + 2, UITheme.getPrimary());
+        GuiRenderUtils.drawGradientRect(px, py + 2, px + CE_W, py + 8, UITheme.primary(0x18), 0x00000000);
         GuiRenderUtils.drawGradientRect(px, py + 2, px + CE_W, py + 24, BG_HEADER, BG_PANEL);
         Gui.drawRect(px, py + 23, px + CE_W, py + 24, 0x28FFFFFF);
-        GuiRenderUtils.drawRectOutline(px, py, CE_W, CE_H, BORDER);
-        // Title
-        Gui.drawRect(px + 7, py + 9, px + 9, py + 19, ACCENT_PURPLE);
-        this.fontRendererObj.drawStringWithShadow("COULEUR", px + 15, py + 9, 0xFFCC88FF);
+        GuiRenderUtils.drawRectOutline(px, py, CE_W, CE_H, UITheme.primary(0x2B));
+        // Title: first letter primary, rest secondary
+        Gui.drawRect(px + 7, py + 9, px + 9, py + 19, UITheme.getPrimary());
+        this.fontRendererObj.drawStringWithShadow("C", px + 15, py + 9, UITheme.getPrimary());
+        this.fontRendererObj.drawStringWithShadow("OULEUR", px + 15 + fontRendererObj.getStringWidth("C"), py + 9, UITheme.getSecondary());
         int ccx = px + CE_W - 16, ccy = py + 7, ccs = 10;
         drawMiniClose(ccx, ccy, ccs, inRect(mx, my, ccx, ccy, ccs, ccs));
         setHB(hbCeClose, ccx, ccy, ccs, ccs);
@@ -555,7 +558,7 @@ public class GuiUIEditor extends GuiScreen {
         // Fond du champ
         if (hexInputActive) {
             Gui.drawRect(hexFieldX, hexFieldY, hexFieldX + sldW, hexFieldY + hexFieldH, 0x66111133);
-            GuiRenderUtils.drawRectOutline(hexFieldX, hexFieldY, sldW, hexFieldH, ACCENT_PURPLE);
+            GuiRenderUtils.drawRectOutline(hexFieldX, hexFieldY, sldW, hexFieldH, UITheme.getPrimary());
         } else {
             if (hexHov) {
                 Gui.drawRect(hexFieldX, hexFieldY, hexFieldX + sldW, hexFieldY + hexFieldH, 0x22FFFFFF);
@@ -642,7 +645,7 @@ public class GuiUIEditor extends GuiScreen {
     private interface SidebarItem { int getHeight(); void draw(int px, int y, int w, int mx, int my); }
     private List<SidebarItem> buildSidebarItems() {
         List<SidebarItem> items = new ArrayList<>();
-        items.add(new HeaderItem("General", ACCENT));
+        items.add(new HeaderItem("General", UITheme.getPrimary()));
         items.add(new ToggleItem("Active", selected.isEnabled(), null, v -> selected.setEnabled(v)));
         if (selected instanceof BaseWidget) {
             BaseWidget bw = (BaseWidget) selected;
@@ -661,21 +664,21 @@ public class GuiUIEditor extends GuiScreen {
                 }
             }
             if (bw instanceof KeyStrokeWidget) {
-                items.add(new HeaderItem("Keystrokes", ACCENT_PURPLE));
+                items.add(new HeaderItem("Keystrokes", UITheme.getPrimary()));
                 items.add(new DoubleToggleItem(bw));
             } else if (bw instanceof PotionStatusWidget) {
-                items.add(new HeaderItem("Potions", ACCENT_GREEN));
+                items.add(new HeaderItem("Potions", UITheme.getPrimary()));
                 items.add(new ToggleItem("Afficher duree", Boolean.TRUE.equals(bw.getProps().getOrDefault("showDuration", true)), hbPotionDur, v -> bw.getProps().put("showDuration", v)));
                 items.add(new ToggleItem("Afficher icones", Boolean.TRUE.equals(bw.getProps().getOrDefault("showIcons", false)), hbPotionIcons, v -> bw.getProps().put("showIcons", v)));
             } else if (bw instanceof ArmorGroupWidget) {
-                items.add(new HeaderItem("Armure", ACCENT_ORANGE));
+                items.add(new HeaderItem("Armure", UITheme.getPrimary()));
                 items.add(new ToggleItem("Disposition Verticale", "vertical".equals(bw.getProps().getOrDefault("layout", "horizontal")), hbArmorLayout, v -> bw.getProps().put("layout", v ? "vertical" : "horizontal")));
                 items.add(new ToggleItem("Afficher en %", Boolean.TRUE.equals(bw.getProps().getOrDefault("displayPercent", true)), hbArmorPercent, v -> bw.getProps().put("displayPercent", v)));
             } else if (bw instanceof CompassWidget) {
-                items.add(new HeaderItem("Boussole", ACCENT_GREEN));
+                items.add(new HeaderItem("Boussole", UITheme.getPrimary()));
                 items.add(new ToggleItem("Afficher waypoints", !Boolean.FALSE.equals(bw.getProps().getOrDefault("showWaypoints", Boolean.TRUE)), hbCompassWaypoints, v -> bw.getProps().put("showWaypoints", v)));
             } else if (bw instanceof FactionZoneWidget) {
-                items.add(new HeaderItem("Couleurs Zone", ACCENT_GREEN));
+                items.add(new HeaderItem("Couleurs Zone", UITheme.getPrimary()));
                 items.add(new ToggleItem("Afficher Wilderness", Boolean.TRUE.equals(bw.getProps().getOrDefault("showWilderness", Boolean.FALSE)), hbShowWilderness, v -> bw.getProps().put("showWilderness", v)));
                 items.add(new FactionColorItem("Ma faction",    "colorOwn",       0xFF55FF55, hbFactionColorOwn));
                 items.add(new FactionColorItem("Allie / Treve", "colorAlly",      0xFFAA00AA, hbFactionColorAlly));
@@ -693,7 +696,7 @@ public class GuiUIEditor extends GuiScreen {
                     ui.saveConfig();
                 }));
             }
-            items.add(new HeaderItem("Taille", ACCENT_ORANGE));
+            items.add(new HeaderItem("Taille", UITheme.getPrimary()));
             items.add(new ScaleItem(bw));
             items.add(new ButtonItem("Reset Taille", hbResetSize, () -> bw.setScale(1.0f)));
         }
@@ -1274,17 +1277,17 @@ public class GuiUIEditor extends GuiScreen {
 
         GuiRenderUtils.drawShadow(px, py, PP_W, ph, 6, 0x60);
         Gui.drawRect(px, py, px + PP_W, py + ph, BG_PANEL);
-        // Purple top accent
-        Gui.drawRect(px, py, px + PP_W, py + 2, ACCENT_PURPLE);
-        GuiRenderUtils.drawGradientRect(px, py + 2, px + PP_W, py + 8, 0x18AA44EE, 0x00000000);
+        // Top accent line (2px) + subtle glow
+        Gui.drawRect(px, py, px + PP_W, py + 2, UITheme.getPrimary());
+        GuiRenderUtils.drawGradientRect(px, py + 2, px + PP_W, py + 8, UITheme.primary(0x18), 0x00000000);
         GuiRenderUtils.drawGradientRect(px, py + 2, px + PP_W, py + 24, BG_HEADER, BG_PANEL);
         Gui.drawRect(px, py + 23, px + PP_W, py + 24, 0x28FFFFFF);
-        GuiRenderUtils.drawRectOutline(px, py, PP_W, ph, BORDER);
+        GuiRenderUtils.drawRectOutline(px, py, PP_W, ph, UITheme.primary(0x2B));
 
-        // Title
-        Gui.drawRect(px + 7, py + 9, px + 9, py + 19, ACCENT_PURPLE);
-        fontRendererObj.drawStringWithShadow("T", px + 15, py + 9, 0xFFCC88FF);
-        fontRendererObj.drawStringWithShadow("HEMES", px + 15 + fontRendererObj.getStringWidth("T"), py + 9, TEXT_PRIMARY);
+        // Title: first letter primary, rest secondary
+        Gui.drawRect(px + 7, py + 9, px + 9, py + 19, UITheme.getPrimary());
+        fontRendererObj.drawStringWithShadow("T", px + 15, py + 9, UITheme.getPrimary());
+        fontRendererObj.drawStringWithShadow("HEMES", px + 15 + fontRendererObj.getStringWidth("T"), py + 9, UITheme.getSecondary());
 
         int ccx = px + PP_W - 16, ccy = py + 7, ccs = 10;
         drawMiniClose(ccx, ccy, ccs, inRect(mx, my, ccx, ccy, ccs, ccs));
@@ -1343,8 +1346,8 @@ public class GuiUIEditor extends GuiScreen {
         fontRendererObj.drawStringWithShadow(p.name, cx + 6, cy + 7, hov ? TEXT_PRIMARY : TEXT_SECONDARY);
         fontRendererObj.drawString(p.desc, cx + 6, cy + 18, TEXT_MUTED);
 
-        // Color preview dots (value, prefix) — 2 cercles bien visibles
-        int[] dots = { p.value, p.prefix };
+        // Color preview dots (prefix, value) — prefix en premier
+        int[] dots = { p.prefix, p.value };
         for (int d = 0; d < dots.length; d++) {
             int dx = cx + 7 + d * 18;
             int dy = cy + ch - 16;
@@ -1392,6 +1395,7 @@ public class GuiUIEditor extends GuiScreen {
         }
         lastAppliedPaletteIdx = idx;
         paletteApplyTime = Minecraft.getSystemTime();
+        UITheme.set(p.prefix, p.value);
         ui.saveConfig();
     }
 
@@ -1421,16 +1425,16 @@ public class GuiUIEditor extends GuiScreen {
 
         GuiRenderUtils.drawShadow(px, py, MT_W, MT_H, 6, 0x60);
         Gui.drawRect(px, py, px + MT_W, py + MT_H, BG_PANEL);
-        Gui.drawRect(px, py, px + MT_W, py + 2, ACCENT_ORANGE);
-        GuiRenderUtils.drawGradientRect(px, py + 2, px + MT_W, py + 8, 0x18E8871A, 0x00000000);
+        Gui.drawRect(px, py, px + MT_W, py + 2, UITheme.getPrimary());
+        GuiRenderUtils.drawGradientRect(px, py + 2, px + MT_W, py + 8, UITheme.primary(0x18), 0x00000000);
         GuiRenderUtils.drawGradientRect(px, py + 2, px + MT_W, py + 24, BG_HEADER, BG_PANEL);
         Gui.drawRect(px, py + 23, px + MT_W, py + 24, 0x28FFFFFF);
-        GuiRenderUtils.drawRectOutline(px, py, MT_W, MT_H, BORDER);
+        GuiRenderUtils.drawRectOutline(px, py, MT_W, MT_H, UITheme.primary(0x2B));
 
-        // Title
-        Gui.drawRect(px + 7, py + 9, px + 9, py + 19, ACCENT_ORANGE);
-        fontRendererObj.drawStringWithShadow("M", px + 15, py + 9, 0xFFFFCC88);
-        fontRendererObj.drawStringWithShadow("ES THEMES", px + 15 + fontRendererObj.getStringWidth("M"), py + 9, TEXT_PRIMARY);
+        // Title: first letter primary, rest secondary
+        Gui.drawRect(px + 7, py + 9, px + 9, py + 19, UITheme.getPrimary());
+        fontRendererObj.drawStringWithShadow("M", px + 15, py + 9, UITheme.getPrimary());
+        fontRendererObj.drawStringWithShadow("ES THEMES", px + 15 + fontRendererObj.getStringWidth("M"), py + 9, UITheme.getSecondary());
 
         int ccx = px + MT_W - 16, ccy = py + 7, ccs = 10;
         drawMiniClose(ccx, ccy, ccs, inRect(mx, my, ccx, ccy, ccs, ccs));
@@ -1462,8 +1466,8 @@ public class GuiUIEditor extends GuiScreen {
             GuiRenderUtils.drawGradientRect(cx, cy + 3, cx + cw, cy + 10, ((aa / 4) << 24) | (t.value & 0x00FFFFFF), 0x00000000);
 
             if (editing) {
-                GuiRenderUtils.drawRectOutline(cx, cy, cw, ch, ACCENT_ORANGE);
-                Gui.drawRect(cx, cy, cx + 3, cy + ch, ACCENT_ORANGE);
+                GuiRenderUtils.drawRectOutline(cx, cy, cw, ch, UITheme.getPrimary());
+                Gui.drawRect(cx, cy, cx + 3, cy + ch, UITheme.getPrimary());
             } else if (hov) {
                 GuiRenderUtils.drawRectOutline(cx, cy, cw, ch, 0x55FFFFFF);
             } else {
@@ -1475,8 +1479,8 @@ public class GuiUIEditor extends GuiScreen {
             fontRendererObj.drawStringWithShadow(displayName, cx + 6, cy + 7, hov ? TEXT_PRIMARY : TEXT_SECONDARY);
             fontRendererObj.drawString(displayDesc, cx + 6, cy + 18, TEXT_MUTED);
 
-            // 2 pastilles : Valeur / Prefix
-            int[] dots = {t.value, t.prefix};
+            // 2 pastilles : Prefix / Valeur
+            int[] dots = {t.prefix, t.value};
             for (int d = 0; d < dots.length; d++) {
                 int dx = cx + 7 + d * 18;
                 int dy = cy + ch - 16;
@@ -1484,7 +1488,7 @@ public class GuiUIEditor extends GuiScreen {
                 Gui.drawRect(dx, dy, dx + 13, dy + 13, dots[d]);
                 GuiRenderUtils.drawRectOutline(dx, dy, 13, 13, 0x33FFFFFF);
             }
-            if (editing) fontRendererObj.drawStringWithShadow("...", cx + cw - 18, cy + 6, ACCENT_ORANGE);
+            if (editing) fontRendererObj.drawStringWithShadow("...", cx + cw - 18, cy + 6, UITheme.getPrimary());
         } else {
             // Slot vide — "+"
             GuiRenderUtils.drawRectOutline(cx, cy, cw, ch, hov ? 0x44FFFFFF : 0x18FFFFFF);
@@ -1504,16 +1508,18 @@ public class GuiUIEditor extends GuiScreen {
 
         GuiRenderUtils.drawShadow(px, py, MTE_W, MTE_H, 6, 0x60);
         Gui.drawRect(px, py, px + MTE_W, py + MTE_H, BG_PANEL);
-        Gui.drawRect(px, py, px + MTE_W, py + 2, ACCENT_ORANGE);
-        GuiRenderUtils.drawGradientRect(px, py + 2, px + MTE_W, py + 8, 0x18E8871A, 0x00000000);
+        Gui.drawRect(px, py, px + MTE_W, py + 2, UITheme.getPrimary());
+        GuiRenderUtils.drawGradientRect(px, py + 2, px + MTE_W, py + 8, UITheme.primary(0x18), 0x00000000);
         GuiRenderUtils.drawGradientRect(px, py + 2, px + MTE_W, py + 24, BG_HEADER, BG_PANEL);
         Gui.drawRect(px, py + 23, px + MTE_W, py + 24, 0x28FFFFFF);
-        GuiRenderUtils.drawRectOutline(px, py, MTE_W, MTE_H, BORDER);
+        GuiRenderUtils.drawRectOutline(px, py, MTE_W, MTE_H, UITheme.primary(0x2B));
 
-        Gui.drawRect(px + 7, py + 9, px + 9, py + 19, ACCENT_ORANGE);
+        // Title: first letter primary, rest secondary
+        Gui.drawRect(px + 7, py + 9, px + 9, py + 19, UITheme.getPrimary());
         boolean isNew = (CustomThemeManager.getInstance().get(editingCtIdx) == null);
         String title = isNew ? "CREER UN THEME" : "MODIFIER THEME";
-        fontRendererObj.drawStringWithShadow(title, px + 15, py + 9, 0xFFFFCC88);
+        fontRendererObj.drawStringWithShadow(title.substring(0, 1), px + 15, py + 9, UITheme.getPrimary());
+        fontRendererObj.drawStringWithShadow(title.substring(1), px + 15 + fontRendererObj.getStringWidth(title.substring(0, 1)), py + 9, UITheme.getSecondary());
 
         int ccx = px + MTE_W - 16, ccy = py + 7, ccs = 10;
         drawMiniClose(ccx, ccy, ccs, inRect(mx, my, ccx, ccy, ccs, ccs));
@@ -1525,8 +1531,8 @@ public class GuiUIEditor extends GuiScreen {
         fontRendererObj.drawStringWithShadow("Nom:", px + 10, cy + 3, TEXT_SECONDARY);
         int nfX = px + 42, nfW = MTE_W - 52, nfH = 14;
         Gui.drawRect(nfX, cy, nfX + nfW, cy + nfH, ctNameFocused ? 0x44FFFFFF : 0x16FFFFFF);
-        GuiRenderUtils.drawRectOutline(nfX, cy, nfW, nfH, ctNameFocused ? ACCENT_ORANGE : 0x2AFFFFFF);
-        if (ctNameFocused) Gui.drawRect(nfX, cy, nfX + nfW, cy + 2, ACCENT_ORANGE);
+        GuiRenderUtils.drawRectOutline(nfX, cy, nfW, nfH, ctNameFocused ? UITheme.getPrimary() : 0x2AFFFFFF);
+        if (ctNameFocused) Gui.drawRect(nfX, cy, nfX + nfW, cy + 2, UITheme.getPrimary());
         String dispName = ctEditBuffer.name + (ctNameFocused && System.currentTimeMillis() / 500 % 2 == 0 ? "|" : "");
         fontRendererObj.drawString(fontRendererObj.trimStringToWidth(dispName, nfW - 6), nfX + 3, cy + 3, TEXT_PRIMARY);
         setHB(hbMteNameField, nfX, cy, nfW, nfH);
@@ -1548,7 +1554,7 @@ public class GuiUIEditor extends GuiScreen {
             GuiRenderUtils.drawRectOutline(swX, cy + 1, swW, swH, 0x66FFFFFF);
             // Indicateur "édité" si target actif
             if (colorEditorOpen && ("ct:" + CT_KEYS[i]).equals(colorEditorTarget)) {
-                GuiRenderUtils.drawRectOutline(swX - 1, cy, swW + 2, swH + 2, ACCENT_ORANGE);
+                GuiRenderUtils.drawRectOutline(swX - 1, cy, swW + 2, swH + 2, UITheme.getPrimary());
             }
             setHB(hbMteColors[i], swX, cy + 1, swW, swH);
             cy += 20;
@@ -1734,7 +1740,7 @@ public class GuiUIEditor extends GuiScreen {
         int wx = e.getX(), wy = e.getY(), ww = e.getWidth(), wh = e.getHeight(), hs = 6;
         // Only draw corner handles to reduce accidental resize
         int[][] corners = { {wx-hs/2, wy-hs/2}, {wx+ww-hs/2, wy-hs/2}, {wx+ww-hs/2, wy+wh-hs/2}, {wx-hs/2, wy+wh-hs/2} };
-        for (int[] hpos : corners) { Gui.drawRect(hpos[0], hpos[1], hpos[0] + hs, hpos[1] + hs, 0xFFFFFFFF); GuiRenderUtils.drawRectOutline(hpos[0], hpos[1], hs, hs, ACCENT); }
+        for (int[] hpos : corners) { Gui.drawRect(hpos[0], hpos[1], hpos[0] + hs, hpos[1] + hs, 0xFFFFFFFF); GuiRenderUtils.drawRectOutline(hpos[0], hpos[1], hs, hs, UITheme.getPrimary()); }
     }
     private int getResizeEdge(int mx, int my, UIElement e) {
         // Precise detection: only treat as resize when clicking on one of the 8 small handles
@@ -1770,7 +1776,7 @@ public class GuiUIEditor extends GuiScreen {
         Gui.drawRect(x, y, x + w, y + h, bg);
         GuiRenderUtils.drawRectOutline(x, y, w, h, hovered ? 0x44FFFFFF : 0x28FFFFFF);
         if (hovered) {
-            Gui.drawRect(x, y + 1, x + 2, y + h - 1, ACCENT);
+            Gui.drawRect(x, y + 1, x + 2, y + h - 1, UITheme.getPrimary());
             GuiRenderUtils.drawGradientRect(x + 1, y + 1, x + w - 1, y + 3, 0x16FFFFFF, 0x00000000);
         }
         fontRendererObj.drawStringWithShadow(text, x + (w - fontRendererObj.getStringWidth(text)) / 2.0f, y + (h - 8) / 2.0f,

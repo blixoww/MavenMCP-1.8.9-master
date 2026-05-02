@@ -76,6 +76,7 @@ public class CustomThemeManager {
                 bw.getProps().put("syncColors", false);
             }
         }
+        UITheme.set(ct.prefix, ct.value);
     }
 
     // ---- Persistance ----
