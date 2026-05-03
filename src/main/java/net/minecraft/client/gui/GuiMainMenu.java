@@ -64,7 +64,7 @@ public class GuiMainMenu extends GuiScreen
     private final List<AmbientParticle> particles = new ArrayList<>();
     private final List<AmbientParticle> particlePool = new ArrayList<>();
     private final Random rng = new Random();
-    private static final int PARTICLE_MAX = 40;
+    private static final int PARTICLE_MAX = 12; // sober: less visual noise
 
     // ── Layout ──────────────────────────────────────────────────────────────
     private int logoY, btnStartY, btnW, btnH, btnGap, smallBtnW;
@@ -85,6 +85,10 @@ public class GuiMainMenu extends GuiScreen
     private static final String CLIENT_NAME = "REDCONFLICT";
     private static final String CLIENT_VERSION = "v1.0.0";
     private static final String CLIENT_EDITION = "PvP Faction";
+
+    // ── External links ──────────────────────────────────────────────────────
+    private static final String DISCORD_URL = "https://discord.gg/redconflict";
+    private static final String SITE_URL    = "https://redconflict.fr";
 
     public GuiMainMenu() {}
 
@@ -158,10 +162,15 @@ public class GuiMainMenu extends GuiScreen
         this.buttonList.add(new MenuButton(4, cx - btnW / 2 + smallBtnW + btnGap,
                 row3Y, smallBtnW, btnH, "QUIT",    MenuButton.Style.QUIT, 3));
 
-        // ── Bouton Discord (top-right) ───────────────────────────────────
+        // ── Boutons externes (top-right): Discord + Site ─────────────────
         String discLabel = "Discord";
+        String siteLabel = "Site";
         int discW = fontRendererObj.getStringWidth(discLabel) + 16;
-        this.buttonList.add(new IconButton(10, this.width - discW - 10, 7, discW, discLabel, 0xFF5865F2, "Join our Discord!"));
+        int siteW = fontRendererObj.getStringWidth(siteLabel) + 16;
+        // Discord à l'extrême droite
+        this.buttonList.add(new IconButton(10, this.width - discW - 10, 7, discW, discLabel, 0xFF5865F2, "Rejoindre le Discord"));
+        // Site juste à gauche du Discord (4px de gap)
+        this.buttonList.add(new IconButton(11, this.width - discW - siteW - 14, 7, siteW, siteLabel, RED, "Visiter le site"));
 
         // init cache
         ensureBtnCacheCapacity();
@@ -210,9 +219,21 @@ public class GuiMainMenu extends GuiScreen
                     b.xPosition = cx - btnW / 2 + smallBtnW + btnGap; b.yPosition = row3Y;
                     b.width = smallBtnW; b.height = btnH; break;
                 case 10:
+                {
                     int discW = fontRendererObj.getStringWidth(b.displayString) + 16;
                     b.xPosition = this.width - discW - 10;
-                    b.yPosition = 7; b.width = discW; b.height = 18; break;
+                    b.yPosition = 7; b.width = discW; b.height = 18;
+                    break;
+                }
+                case 11:
+                {
+                    // Site button: à gauche de Discord
+                    int discW2 = fontRendererObj.getStringWidth("Discord") + 16;
+                    int siteW2 = fontRendererObj.getStringWidth(b.displayString) + 16;
+                    b.xPosition = this.width - discW2 - siteW2 - 14;
+                    b.yPosition = 7; b.width = siteW2; b.height = 18;
+                    break;
+                }
             }
         }
 
@@ -227,6 +248,18 @@ public class GuiMainMenu extends GuiScreen
         if (button.id == 1) mc.displayGuiScreen(new GuiSelectWorld(this));
         if (button.id == 2) mc.displayGuiScreen(new GuiMultiplayer(this));
         if (button.id == 4) mc.shutdown();
+        if (button.id == 10) openWebsite(DISCORD_URL);
+        if (button.id == 11) openWebsite(SITE_URL);
+    }
+
+    private static void openWebsite(String url)
+    {
+        try {
+            java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+        } catch (Throwable t) {
+            // Fallback : tentative via Sys (LWJGL)
+            try { org.lwjgl.Sys.openURL(url); } catch (Throwable ignored) {}
+        }
     }
 
     // =========================================================================
@@ -370,14 +403,10 @@ public class GuiMainMenu extends GuiScreen
         }
     }
 
-    /** Scanlines — un seul drawRect au lieu d'une boucle (~360 draw calls économisés/frame) */
+    /** Scanlines — désactivé pour un look plus sobre (style Lunar Client) */
     private void renderScanlines(float fade)
     {
-        if (fade <= 0.3f) return;
-        int a = (int)(4f * fade);
-        if (a <= 0) return;
-        // Un seul overlay au lieu de height/3 appels drawRect
-        drawRect(0, 0, width, height, (a << 24));
+        // Volontairement vide : retiré pour l'esthétique sobre
     }
 
     /** Particules ambiantes ameliorees */
@@ -422,36 +451,20 @@ public class GuiMainMenu extends GuiScreen
         GlStateManager.disableBlend();
     }
 
-    /** Glow dynamique avec pulsation sous le logo */
+    /** Glow statique sous le logo — sobre, sans pulsation */
     private void renderLogoGlow(float fade)
     {
         if (fade <= 0.01f) return;
 
-        float time = (float)(System.currentTimeMillis() % 4000L) / 4000f;
-        float pulse = (float)(Math.sin(time * Math.PI * 2.0) * 0.3 + 0.7);
-
-        int cx   = width / 2;
+        int cx    = width / 2;
         int halfW = (int)logoPxHalfWidth;
-        int cy   = logoY + 16;
+        int cy    = logoY + 16;
 
-        int layers = 3;
-        for (int i = 1; i <= layers; i++)
-        {
-            float factor = 1f - (float)(i - 1) / layers;
-            int a = (int)(24f * factor * factor * fade * pulse);
-            if (a <= 0) continue;
-            int c = (a << 24) | RED_DIM;
-            int pad = i * 6;
-            drawRect(cx - halfW - pad, cy - 18 - i * 4,
-                    cx + halfW + pad, cy + 18 + i * 4, c);
+        // Une seule couche de glow subtile (au lieu de 3 + pulsation)
+        int a = (int)(18f * fade);
+        if (a > 0) {
+            drawRect(cx - halfW - 8, cy - 22, cx + halfW + 8, cy + 22, (a << 24) | RED_DIM);
         }
-
-        // Ligne de lumiere horizontale sous le logo
-        int lineA = (int)(35f * fade * pulse);
-        GuiRenderUtils.drawGradientRect(cx - halfW, cy + 14, cx, cy + 16,
-                0x00000000, (lineA << 24) | RED_BRIGHT);
-        GuiRenderUtils.drawGradientRect(cx, cy + 14, cx + halfW, cy + 16,
-                (lineA << 24) | RED_BRIGHT, 0x00000000);
     }
 
     /** Logo REDCONFLICT avec effet de profondeur */
@@ -496,7 +509,7 @@ public class GuiMainMenu extends GuiScreen
         fontRendererObj.drawString(sub, width / 2 - sw / 2, logoY + yOff, (a << 24) | (COLOR_WHITE & 0x00FFFFFF), false);
     }
 
-    /** Separateur anime — 2 drawGradientRect au lieu de ~250 drawRect pixel par pixel */
+    /** Séparateur statique — sobre, sans pulsation */
     private void renderAnimatedSeparator(float fade)
     {
         if (fade <= 0.01f) return;
@@ -505,23 +518,18 @@ public class GuiMainMenu extends GuiScreen
         int halfW = (int)(logoPxHalfWidth * 0.7f);
         int y     = logoY + (int)(8 * logoScale) + 22;
 
-        float time = (float)(System.currentTimeMillis() % 3000L) / 3000f;
-        float breathe = (float)(Math.sin(time * Math.PI * 2.0) * 0.2 + 0.8);
-        int a = (int)(200f * fade * breathe);
+        int a  = (int)(160f * fade);
+        int da = (int)(240f * fade);
+        int ga = (int)(80f  * fade);
 
-        // Bras gauche : gradient transparent → rouge (1 draw call)
+        // Gradients latéraux fins (transparent → rouge → transparent)
         GuiRenderUtils.drawGradientRect(cx - halfW, y, cx - 4, y + 1,
                 0x00000000, (a << 24) | RED);
-
-        // Bras droit : gradient rouge → transparent (1 draw call)
         GuiRenderUtils.drawGradientRect(cx + 4, y, cx + halfW, y + 1,
                 (a << 24) | RED, 0x00000000);
 
-        // Point central anime (pulsation)
-        float centerPulse = (float)(Math.sin(time * Math.PI * 4.0) * 0.3 + 0.7);
-        int da = (int)(240f * fade * centerPulse);
+        // Point central — losange 3×5 comme l'original
         drawRect(cx - 2, y - 1, cx + 3, y + 2, (da << 24) | RED_BRIGHT);
-        int ga = (int)(80f * fade * centerPulse);
         drawRect(cx - 3, y - 2, cx + 4, y + 3, (ga << 24) | RED);
     }
 
@@ -600,12 +608,12 @@ public class GuiMainMenu extends GuiScreen
         int a = (int)(200f * fade);
         // int dimA = (int)(80f * fade); // Non utilise
 
-        // On prend en compte le bouton Discord (positionné à width - discW - 10)
-        String discLabel = "Discord";
-        int discW = fontRendererObj.getStringWidth(discLabel) + 16;
+        // On prend en compte les boutons Discord + Site à droite
+        int discW = fontRendererObj.getStringWidth("Discord") + 16;
+        int siteW = fontRendererObj.getStringWidth("Site") + 16;
 
-        int rx = width - nameW - discW - 35; // Positionné à gauche du Discord
-        int ry = 12; // Aligné avec le texte du bouton Discord (7 + 5)
+        int rx = width - nameW - discW - siteW - 35; // À gauche de Site + Discord
+        int ry = 12; // Aligné avec le texte des boutons (7 + 5)
 
         // Petit indicateur "online" (point vert)
         drawRect(rx - 2, ry + 2, rx + 3, ry + 7, (a << 24) | 0x44CC44);
@@ -887,14 +895,6 @@ public class GuiMainMenu extends GuiScreen
             int border = GuiRenderUtils.colorLerp(0x28FFFFFF, 0xFF000000 | accent, t);
             GuiRenderUtils.drawRectOutline(xPosition, yPosition, width, height, border);
 
-            // Shimmer au hover
-            if (t > 0f) {
-                int shimA = (int)(15f * t);
-                GuiRenderUtils.drawGradientRect(xPosition + 1, yPosition,
-                        xPosition + width - 1, yPosition + 2,
-                        (shimA << 24) | (COLOR_WHITE & 0x00FFFFFF), 0x00FFFFFF);
-            }
-
             // Texte (de Gris -> Blanc, mais palette limitée à blanc)
             int txtCol = GuiRenderUtils.colorLerp(WHITE_DIM, WHITE_SOLID, t);
             drawCenteredString(mc.fontRendererObj, displayString,
@@ -1005,26 +1005,6 @@ public class GuiMainMenu extends GuiScreen
                 drawRect(xPosition, yPosition + 1,
                         xPosition + 2, yPosition + height - 1,
                         (aA << 24) | 0x882222);
-            }
-
-            // ── SHIMMER EN HAUT DU BOUTON ────────────────────────────────
-            if (t > 0f)
-            {
-                int shimA = (int)(14f * t);
-                drawGradientRect(
-                        xPosition + 1, yPosition,
-                        xPosition + width - 1, yPosition + 2,
-                        (shimA << 24) | 0xFFFFFF, 0x00FFFFFF
-                );
-            }
-
-            // ── GLOW SOUS LE BOUTON (hover) ──────────────────────────────
-            if (t > 0.3f && style == Style.PRIMARY)
-            {
-                int glowA = (int)(6f * t);
-                drawRect(xPosition + 2, yPosition + height,
-                         xPosition + width - 2, yPosition + height + 2,
-                         (glowA << 24) | RED_DIM);
             }
 
             // ── TEXTE ────────────────────────────────────────────────────

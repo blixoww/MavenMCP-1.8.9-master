@@ -698,6 +698,8 @@ public class Minecraft implements IThreadListener, IPlayerUsage
                             {
                                 BufferedImage scaled16 = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
                                 java.awt.Graphics2D g16 = scaled16.createGraphics();
+                                g16.setColor(new java.awt.Color(20, 20, 20, 255));
+                                g16.fillRect(0, 0, 16, 16);
                                 g16.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                                 g16.drawImage(img.getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH), 0, 0, null);
                                 g16.dispose();
@@ -720,6 +722,8 @@ public class Minecraft implements IThreadListener, IPlayerUsage
                             {
                                 BufferedImage scaled32 = new BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB);
                                 java.awt.Graphics2D g32 = scaled32.createGraphics();
+                                g32.setColor(new java.awt.Color(20, 20, 20, 255));
+                                g32.fillRect(0, 0, 32, 32);
                                 g32.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                                 g32.drawImage(img.getScaledInstance(32, 32, java.awt.Image.SCALE_SMOOTH), 0, 0, null);
                                 g32.dispose();
