@@ -1,0 +1,1 @@
+- [UI design philosophy — minimal & professional](feedback_ui_design.md) — User wants Lunar Client-style sobriety: remove decorative elements (lines, glassy panels, glows) rather than stack them.

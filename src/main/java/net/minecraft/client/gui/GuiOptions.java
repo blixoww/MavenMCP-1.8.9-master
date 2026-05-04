@@ -82,7 +82,14 @@ public class GuiOptions extends GuiScreen implements GuiYesNoCallback {
         }
         lastTime = now;
 
-        this.drawRect(0, 0, this.width, this.height, (int)(animation * 150) << 24);
+        // ── Fond : panorama si on vient du menu principal, sinon carré noir
+        if (parentScreen instanceof GuiMainMenu) {
+            ((GuiMainMenu) parentScreen).drawBackdrop(mouseX, mouseY, partialTicks);
+            // Voile supplémentaire très léger pour assombrir légèrement derrière le panel
+            this.drawRect(0, 0, this.width, this.height, (int)(animation * 60) << 24);
+        } else {
+            this.drawRect(0, 0, this.width, this.height, (int)(animation * 150) << 24);
+        }
 
         float easedAnim = animation * animation * (3.0f - 2.0f * animation);
 
