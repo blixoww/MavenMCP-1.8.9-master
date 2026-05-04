@@ -22,6 +22,9 @@ public class ToggleSneakWidget extends BaseWidget {
         FontRenderer fr = mc.fontRendererObj;
         GameSettings gs = mc.gameSettings;
 
+        // Respect du prop showDisplay (feature inexistante ici — only display)
+        if (Boolean.FALSE.equals(getPropOrDefault("showDisplay", Boolean.TRUE))) return;
+
         boolean sneaking = gs.toggleSneakEnabled && gs.isToggleSneakActive;
         String value = sneaking ? "ON" : "OFF";
         drawLabelValue(fr, "Sneak: ", value, 0, 0);

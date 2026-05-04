@@ -142,6 +142,9 @@ public class GuiUIEditor extends GuiScreen {
     // ---- Split label/value color hitboxes (tous widgets applicables) ----
     private final int[] hbSyncColors             = new int[4];
     private final int[] hbColorLabel             = new int[4];
+    // ---- Affichage (showDisplay) pour AutoArmor, ToggleSneak, ToggleSprint ----
+    private final int[] hbShowDisplay            = new int[4];
+    private final int[] hbAutoActive             = new int[4];
 
     // ---- Palette / Themes panel ----
     private boolean paletteOpen = false;
@@ -699,6 +702,18 @@ public class GuiUIEditor extends GuiScreen {
             items.add(new HeaderItem("Taille", UITheme.getPrimary()));
             items.add(new ScaleItem(bw));
             items.add(new ButtonItem("Reset Taille", hbResetSize, () -> bw.setScale(1.0f)));
+            // ── Section Affichage (AutoArmor / ToggleSneak / ToggleSprint) ──
+            if (bw instanceof AutoArmorWidget || bw instanceof ToggleSneakWidget || bw instanceof ToggleSprintWidget) {
+                items.add(new HeaderItem("Affichage", UITheme.getPrimary()));
+                boolean showDisp = !Boolean.FALSE.equals(bw.getPropOrDefault("showDisplay", Boolean.TRUE));
+                items.add(new ToggleItem("Afficher widget", showDisp, hbShowDisplay,
+                        v -> { bw.getProps().put("showDisplay", v); ui.saveConfig(); }));
+                if (bw instanceof AutoArmorWidget) {
+                    boolean autoAct = !Boolean.FALSE.equals(bw.getPropOrDefault("autoActive", Boolean.TRUE));
+                    items.add(new ToggleItem("Auto actif", autoAct, hbAutoActive,
+                            v -> { bw.getProps().put("autoActive", v); ui.saveConfig(); }));
+                }
+            }
         }
         items.add(new MultiButtonItem());
         return items;
@@ -936,6 +951,17 @@ public class GuiUIEditor extends GuiScreen {
             }
             if(clickHB(mx, my, hbScaleSlider)) { draggingSlider=100; updateScaleFromSlider(mx); return true; }
             if(clickHB(mx, my, hbResetSize)) { bw.setScale(1.0f); ui.saveConfig(); return true; }
+            // ── Affichage (AutoArmor / ToggleSneak / ToggleSprint) ──
+            if (bw instanceof AutoArmorWidget || bw instanceof ToggleSneakWidget || bw instanceof ToggleSprintWidget) {
+                if (clickHB(mx, my, hbShowDisplay)) {
+                    boolean cur = !Boolean.FALSE.equals(bw.getPropOrDefault("showDisplay", Boolean.TRUE));
+                    bw.getProps().put("showDisplay", !cur); ui.saveConfig(); return true;
+                }
+                if (bw instanceof AutoArmorWidget && clickHB(mx, my, hbAutoActive)) {
+                    boolean cur = !Boolean.FALSE.equals(bw.getPropOrDefault("autoActive", Boolean.TRUE));
+                    bw.getProps().put("autoActive", !cur); ui.saveConfig(); return true;
+                }
+            }
         }
         if(clickHB(mx, my, hbResetPos)) { selected.setPosition(10, 10); ui.saveConfig(); return true; }
         if(clickHB(mx, my, hbResetColor)) {
@@ -1729,6 +1755,7 @@ public class GuiUIEditor extends GuiScreen {
             case "dir": return "Direction"; case "date": return "Date"; case "helditem": return "Objet tenu";
             case "armor_group": return "Armure"; case "potions": return "Potions"; case "cps": return "CPS";
             case "toggle_sneak": return "Toggle Sneak"; case "toggle_sprint": return "Toggle Sprint";
+            case "auto_armor": return "Auto Armor";
             case "combatlog": return "Combat Tag"; case "keystrokes": return "Keystrokes"; case "Keystrokes": return "Keystrokes";
             case "reach": return "Reach Display"; case "Reach": return "Reach Display";
             case "compass": return "Boussole HUD";

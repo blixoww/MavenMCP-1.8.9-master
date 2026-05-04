@@ -67,6 +67,10 @@ public class UIManager {
         ToggleSprintWidget toggleSprintW = new ToggleSprintWidget("toggle_sprint", 90, 210);
         toggleSprintW.setColor(0xFF44EE77);
         register(toggleSprintW);
+        // Auto Armor widget
+        AutoArmorWidget autoArmorW = new AutoArmorWidget("auto_armor", 10, 224);
+        autoArmorW.setColor(0xFFFFFFFF);
+        register(autoArmorW);
         // CombatLog widget
         register(new CombatLogWidget("combatlog", 10, 230));
         // Reach widget

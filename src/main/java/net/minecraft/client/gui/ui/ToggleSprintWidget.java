@@ -22,6 +22,9 @@ public class ToggleSprintWidget extends BaseWidget {
         FontRenderer fr = mc.fontRendererObj;
         GameSettings gs = mc.gameSettings;
 
+        // Respect du prop showDisplay (feature inexistante ici — only display)
+        if (Boolean.FALSE.equals(getPropOrDefault("showDisplay", Boolean.TRUE))) return;
+
         boolean toggleActive = gs.toggleSprintEnabled && gs.isToggleSprintActive;
         String value = toggleActive ? "ON" : "OFF";
         drawLabelValue(fr, "Sprint: ", value, 0, 0);

@@ -46,8 +46,8 @@ reducedDebugInfo:false
 useNativeTransport:true
 entityShadows:true
 realmsNotifications:true
-toggleSneak:false
-toggleSprint:false
+toggleSneak:true
+toggleSprint:true
 key_key.attack:-100
 key_key.use:-99
 key_key.forward:44
