@@ -1,1 +1,2 @@
 - [UI design philosophy — minimal & professional](feedback_ui_design.md) — User wants Lunar Client-style sobriety: remove decorative elements (lines, glassy panels, glows) rather than stack them.
+- [Structure projets — client + serveur](project_structure.md) — OriginsFight server runs Spigot 1.8.8 with plugin `OriginsFightCore`; gameplay/PvP work goes there, not in MavenMCP client.

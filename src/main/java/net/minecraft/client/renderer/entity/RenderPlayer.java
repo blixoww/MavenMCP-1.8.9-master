@@ -5,6 +5,9 @@ import net.minecraft.client.custompackets.handler.FactionDataCache;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.ui.PlayerHealthBarWidget;
+import net.minecraft.client.gui.ui.UIElement;
+import net.minecraft.client.gui.ui.UIManager;
 import net.minecraft.client.model.ModelPlayer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -148,6 +151,14 @@ public class RenderPlayer extends RendererLivingEntity<AbstractClientPlayer>
                 y += (double)((float)this.getFontRendererFromRenderManager().FONT_HEIGHT * 1.15F * p_177069_9_);
             }
 
+            // Barre de vie — juste au-dessus du scoreboard
+            PlayerHealthBarWidget hb = getHealthBarWidget();
+            if (hb != null && hb.isEnabled())
+            {
+                double consumed = hb.renderAboveHead(this.renderManager, entityIn, x, y, z, p_177069_9_);
+                y += consumed;
+            }
+
             // Tag de faction coloré entre la barre de vie et le pseudo
             FactionInfo factionInfo = FactionDataCache.get(entityIn.getName());
             if (factionInfo != null && !factionInfo.tag.isEmpty())
@@ -158,6 +169,15 @@ public class RenderPlayer extends RendererLivingEntity<AbstractClientPlayer>
         }
 
         renderNameTagWithLogo(entityIn, str, x, y, z, 64);
+    }
+
+    private static PlayerHealthBarWidget getHealthBarWidget()
+    {
+        try {
+            UIElement el = UIManager.getInstance().get("player_healthbar");
+            if (el instanceof PlayerHealthBarWidget) return (PlayerHealthBarWidget) el;
+        } catch (Throwable ignored) {}
+        return null;
     }
 
     private void renderNameTagWithLogo(AbstractClientPlayer entityIn, String str, double x, double y, double z, int maxDistance)

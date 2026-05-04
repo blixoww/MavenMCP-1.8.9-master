@@ -84,13 +84,17 @@ public class UIManager {
         compassW.relX = 0.5;
         compassW.relY = 0.0;
         register(compassW);
+        // Player health bar (rendu 3D au-dessus des têtes — activée par défaut)
+        PlayerHealthBarWidget healthBarW = new PlayerHealthBarWidget("player_healthbar", 10, 280);
+        register(healthBarW);
         // Keystrokes widget is registered in GuiIngame (needs GameSettings.keyBind* to be ready)
 
         boolean loaded = loadConfig();
         if (!loaded) {
-            // Par defaut: tout desactive sauf FPS
+            // Par defaut: tout desactive sauf FPS et la barre de vie joueurs
             for (UIElement e : widgets.values()) {
-                if (!"fps".equals(e.getId())) {
+                String id = e.getId();
+                if (!"fps".equals(id) && !"player_healthbar".equals(id)) {
                     e.setEnabled(false);
                 }
             }

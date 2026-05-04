@@ -76,6 +76,7 @@ public class GuiUIEditor extends GuiScreen {
     private int dragOffsetX, dragOffsetY;
     private int wlDragOX, wlDragOY, sbDragOX, sbDragOY, ceDragOX, ceDragOY;
     private int draggingSlider = -1;
+    private HealthBarSliderItem draggingHealthBarSlider = null;
     private int lastMouseX, lastMouseY;
 
     // ---- Resize state ----
@@ -145,6 +146,16 @@ public class GuiUIEditor extends GuiScreen {
     // ---- Affichage (showDisplay) pour AutoArmor, ToggleSneak, ToggleSprint ----
     private final int[] hbShowDisplay            = new int[4];
     private final int[] hbAutoActive             = new int[4];
+    // ---- PlayerHealthBar ----
+    private final int[] hbHealthBarBorder        = new int[4];
+    private final int[] hbHealthBarText          = new int[4];
+    private final int[] hbHealthBarWidth         = new int[4];
+    private final int[] hbHealthBarHeight        = new int[4];
+    private final int[] hbHealthBarColorHP1      = new int[4];
+    private final int[] hbHealthBarColorHP2      = new int[4];
+    private final int[] hbHealthBarColorHP3      = new int[4];
+    private final int[] hbHealthBarColorHP4      = new int[4];
+    private final int[] hbHealthBarResetCols     = new int[4];
 
     // ---- Palette / Themes panel ----
     private boolean paletteOpen = false;
@@ -655,8 +666,9 @@ public class GuiUIEditor extends GuiScreen {
             items.add(new ToggleItem("Mode Rainbow", bw.isRGBMode(), hbRainbow, bw::setRGBMode));
             if (bw instanceof CombatLogWidget) items.add(new ToggleItem("Design circulaire", Boolean.TRUE.equals(bw.getProps().getOrDefault("originalDesign", false)), hbOrigDesign, v -> bw.getProps().put("originalDesign", v)));
             items.add(new ToggleItem("Aligner (Smart)", Boolean.TRUE.equals(bw.getProps().getOrDefault("snapGrid", false)), hbAlignGrid, v -> bw.getProps().put("snapGrid", v)));
-            // Couleur principale (masquée pour FactionZoneWidget qui a ses propres couleurs par relation)
-            if (!(bw instanceof FactionZoneWidget)) {
+            // Couleur principale (masquée pour FactionZoneWidget et PlayerHealthBarWidget
+            // qui gèrent leurs propres couleurs par relation/stade)
+            if (!(bw instanceof FactionZoneWidget) && !(bw instanceof PlayerHealthBarWidget)) {
                 items.add(new ColorItem(bw.getColor()));
             }
             // Sync label/valeur — pour tous les widgets qui ont un format "Préfixe: Valeur"
@@ -698,10 +710,35 @@ public class GuiUIEditor extends GuiScreen {
                     bw.getProps().remove("syncColors");
                     ui.saveConfig();
                 }));
+            } else if (bw instanceof PlayerHealthBarWidget) {
+                items.add(new HeaderItem("Barre de vie", UITheme.getPrimary()));
+                items.add(new ToggleItem("Bordure",
+                        !Boolean.FALSE.equals(bw.getProps().getOrDefault("border", Boolean.TRUE)),
+                        hbHealthBarBorder,
+                        v -> { bw.getProps().put("border", v); ui.saveConfig(); }));
+                items.add(new HealthBarSliderItem(bw, "Largeur",  "barWidth",  10, 100, 40, hbHealthBarWidth));
+                items.add(new HealthBarSliderItem(bw, "Hauteur",  "barHeight",  2,  12,  4, hbHealthBarHeight));
+                // Couleurs configurables par stade HP
+                items.add(new HeaderItem("Couleurs par stade", UITheme.getPrimary()));
+                items.add(new FactionColorItem("> 75 %  (Vert)",    "colorHP1", PlayerHealthBarWidget.DEFAULT_HP1, hbHealthBarColorHP1));
+                items.add(new FactionColorItem("> 50 %  (Jaune)",   "colorHP2", PlayerHealthBarWidget.DEFAULT_HP2, hbHealthBarColorHP2));
+                items.add(new FactionColorItem("> 25 %  (Orange)",  "colorHP3", PlayerHealthBarWidget.DEFAULT_HP3, hbHealthBarColorHP3));
+                items.add(new FactionColorItem("\u2264 25 %  (Rouge)",  "colorHP4", PlayerHealthBarWidget.DEFAULT_HP4, hbHealthBarColorHP4));
+                items.add(new ButtonItem("Reset couleurs", hbHealthBarResetCols, () -> {
+                    bw.getProps().remove("colorHP1");
+                    bw.getProps().remove("colorHP2");
+                    bw.getProps().remove("colorHP3");
+                    bw.getProps().remove("colorHP4");
+                    bw.setRGBMode(false);
+                    ui.saveConfig();
+                }));
             }
-            items.add(new HeaderItem("Taille", UITheme.getPrimary()));
-            items.add(new ScaleItem(bw));
-            items.add(new ButtonItem("Reset Taille", hbResetSize, () -> bw.setScale(1.0f)));
+            // La section Taille (échelle) est inutile pour la barre 3D au-dessus des têtes
+            if (!(bw instanceof PlayerHealthBarWidget)) {
+                items.add(new HeaderItem("Taille", UITheme.getPrimary()));
+                items.add(new ScaleItem(bw));
+                items.add(new ButtonItem("Reset Taille", hbResetSize, () -> bw.setScale(1.0f)));
+            }
             // ── Section Affichage (AutoArmor / ToggleSneak / ToggleSprint) ──
             if (bw instanceof AutoArmorWidget || bw instanceof ToggleSneakWidget || bw instanceof ToggleSprintWidget) {
                 items.add(new HeaderItem("Affichage", UITheme.getPrimary()));
@@ -715,7 +752,12 @@ public class GuiUIEditor extends GuiScreen {
                 }
             }
         }
-        items.add(new MultiButtonItem());
+        // Pour la barre de vie, "Blanc" n'a aucun sens → on n'affiche que Reset Position
+        if (selected instanceof PlayerHealthBarWidget) {
+            items.add(new ButtonItem("Reset Position", hbResetPos, () -> { selected.setPosition(10, 10); ui.saveConfig(); }));
+        } else {
+            items.add(new MultiButtonItem());
+        }
         return items;
     }
 
@@ -814,6 +856,36 @@ public class GuiUIEditor extends GuiScreen {
             Gui.drawRect(sX + fill - 1, y + 13, sX + fill + 1, y + 15 + sH, 0xFFEEEEEE);
             setHB(hbScaleSlider, sX, y + 14, sW, sH);
             fontRendererObj.drawStringWithShadow(bw.getWidth() + "x" + bw.getHeight(), px + w - 12 - fontRendererObj.getStringWidth(bw.getWidth() + "x" + bw.getHeight()), y + 2, TEXT_MUTED);
+        }
+    }
+    private class HealthBarSliderItem implements SidebarItem {
+        BaseWidget bw; String label; String prop; int min; int max; int def; int[] hb;
+        HealthBarSliderItem(BaseWidget bw, String label, String prop, int min, int max, int def, int[] hb) {
+            this.bw = bw; this.label = label; this.prop = prop; this.min = min; this.max = max; this.def = def; this.hb = hb;
+        }
+        public int getHeight() { return 32; }
+        public void draw(int px, int y, int w, int mx, int my) {
+            int cur = getCurrent();
+            fontRendererObj.drawStringWithShadow(label + ": " + cur + "px", px + 12, y + 2, TEXT_SECONDARY);
+            int sX = px + 12, sW = w - 24, sH = 6;
+            Gui.drawRect(sX, y + 14, sX + sW, y + 14 + sH, 0xFF111111);
+            float frac = (float)(cur - min) / (float)Math.max(1, max - min);
+            int fill = (int)(frac * sW);
+            GuiRenderUtils.drawGradientRect(sX, y + 14, sX + fill, y + 14 + sH, 0xFFE67E22, 0xFFFFCC88);
+            Gui.drawRect(sX + fill - 1, y + 13, sX + fill + 1, y + 15 + sH, 0xFFEEEEEE);
+            setHB(hb, sX, y + 14, sW, sH);
+        }
+        int getCurrent() {
+            Object o = bw.getPropOrDefault(prop, def);
+            int v = o instanceof Number ? ((Number) o).intValue() : def;
+            if (v < min) v = min; if (v > max) v = max; return v;
+        }
+        void setFromMouse(int mx) {
+            int cur = getCurrent();
+            float frac = (float)(mx - hb[0]) / (float)Math.max(1, hb[2]);
+            if (frac < 0) frac = 0; if (frac > 1) frac = 1;
+            int v = Math.round(min + frac * (max - min));
+            if (v != cur) { bw.getProps().put(prop, v); ui.saveConfig(); }
         }
     }
     private class ButtonItem implements SidebarItem {
@@ -946,6 +1018,32 @@ public class GuiUIEditor extends GuiScreen {
                 if (clickHB(mx, my, hbResetZoneColors)) {
                     for (String k : new String[]{"colorOwn","colorAlly","colorEnemy","colorNeutral","colorWilderness","colorLabel","syncColors"})
                         bw.getProps().remove(k);
+                    ui.saveConfig(); return true;
+                }
+            } else if (bw instanceof PlayerHealthBarWidget) {
+                if (clickHB(mx, my, hbHealthBarBorder)) {
+                    boolean cur = !Boolean.FALSE.equals(bw.getPropOrDefault("border", Boolean.TRUE));
+                    bw.getProps().put("border", !cur); ui.saveConfig(); return true;
+                }
+                if (clickHB(mx, my, hbHealthBarWidth)) {
+                    HealthBarSliderItem si = new HealthBarSliderItem(bw, "Largeur", "barWidth", 10, 100, 40, hbHealthBarWidth);
+                    draggingHealthBarSlider = si; si.setFromMouse(mx); return true;
+                }
+                if (clickHB(mx, my, hbHealthBarHeight)) {
+                    HealthBarSliderItem si = new HealthBarSliderItem(bw, "Hauteur", "barHeight", 2, 12, 4, hbHealthBarHeight);
+                    draggingHealthBarSlider = si; si.setFromMouse(mx); return true;
+                }
+                // Couleurs par stade
+                if (clickHB(mx, my, hbHealthBarColorHP1)) { openColorEditorForProp(bw, "colorHP1", PlayerHealthBarWidget.DEFAULT_HP1); return true; }
+                if (clickHB(mx, my, hbHealthBarColorHP2)) { openColorEditorForProp(bw, "colorHP2", PlayerHealthBarWidget.DEFAULT_HP2); return true; }
+                if (clickHB(mx, my, hbHealthBarColorHP3)) { openColorEditorForProp(bw, "colorHP3", PlayerHealthBarWidget.DEFAULT_HP3); return true; }
+                if (clickHB(mx, my, hbHealthBarColorHP4)) { openColorEditorForProp(bw, "colorHP4", PlayerHealthBarWidget.DEFAULT_HP4); return true; }
+                if (clickHB(mx, my, hbHealthBarResetCols)) {
+                    bw.getProps().remove("colorHP1");
+                    bw.getProps().remove("colorHP2");
+                    bw.getProps().remove("colorHP3");
+                    bw.getProps().remove("colorHP4");
+                    bw.setRGBMode(false);
                     ui.saveConfig(); return true;
                 }
             }
@@ -1116,11 +1214,12 @@ public class GuiUIEditor extends GuiScreen {
         }
         if (draggingSpectrum) updateColorFromSpectrum(mx, my);
         if (draggingSlider != -1) { if (draggingSlider == 100) updateScaleFromSlider(mx); else updateColorFromSlider(mx); }
+        if (draggingHealthBarSlider != null) draggingHealthBarSlider.setFromMouse(mx);
     }
 
     @Override
     protected void mouseReleased(int mx, int my, int state) {
-        isDraggingWidget = false; isResizingWidget = false; wlDragging = false; sbDragging = false; ppDragging = false; mtDragging = false; mteDragging = false; ceDragging = false; hexDragSelecting = false; draggingSpectrum = false; draggingSlider = -1;
+        isDraggingWidget = false; isResizingWidget = false; wlDragging = false; sbDragging = false; ppDragging = false; mtDragging = false; mteDragging = false; ceDragging = false; hexDragSelecting = false; draggingSpectrum = false; draggingSlider = -1; draggingHealthBarSlider = null;
         snapLineX = -1; snapLineY = -1; ui.saveConfig(); super.mouseReleased(mx, my, state);
     }
 
@@ -1751,15 +1850,30 @@ public class GuiUIEditor extends GuiScreen {
     }
     private String friendlyName(String id) {
         switch (id) {
-            case "fps": return "FPS"; case "ping": return "Ping"; case "biome": return "Biome"; case "coords": return "Coordonnees";
-            case "dir": return "Direction"; case "date": return "Date"; case "helditem": return "Objet tenu";
-            case "armor_group": return "Armure"; case "potions": return "Potions"; case "cps": return "CPS";
-            case "toggle_sneak": return "Toggle Sneak"; case "toggle_sprint": return "Toggle Sprint";
-            case "auto_armor": return "Auto Armor";
-            case "combatlog": return "Combat Tag"; case "keystrokes": return "Keystrokes"; case "Keystrokes": return "Keystrokes";
-            case "reach": return "Reach Display"; case "Reach": return "Reach Display";
-            case "compass": return "Boussole HUD";
-            default: String s = id.replace('_', ' '); return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+            case "fps":             return "FPS";
+            case "ping":            return "Ping";
+            case "biome":           return "Biome";
+            case "coords":          return "Coordonnees";
+            case "dir":             return "Direction";
+            case "date":            return "Date";
+            case "helditem":        return "Objet tenu";
+            case "armor_group":     return "Armure";
+            case "potions":         return "Effets de Potion";
+            case "cps":             return "CPS";
+            case "toggle_sneak":    return "Affichage Sneak";
+            case "toggle_sprint":   return "Affichage Sprint";
+            case "auto_armor":      return "Auto Armor";
+            case "combatlog":       return "Combat Tag";
+            case "keystrokes":
+            case "Keystrokes":      return "Keystrokes";
+            case "reach":
+            case "Reach":           return "Reach Display";
+            case "compass":         return "Boussole HUD";
+            case "player_healthbar":return "Barre de vie joueurs";
+            case "faction_zone":    return "Zone Faction";
+            default:
+                String s = id.replace('_', ' ');
+                return Character.toUpperCase(s.charAt(0)) + s.substring(1);
         }
     }
     private void drawGrid(int step, int color) { for (int gx = 0; gx < this.width; gx += step) Gui.drawRect(gx, 0, gx + 1, this.height, color); for (int gy = 0; gy < this.height; gy += step) Gui.drawRect(0, gy, this.width, gy + 1, color); }
