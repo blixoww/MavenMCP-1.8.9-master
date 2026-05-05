@@ -284,6 +284,14 @@ public class GuiUIEditor extends GuiScreen {
     public void onGuiClosed() {
         UIManager.getInstance().setEditorActive(false);
         ui.saveConfig();
+        // Auto-sauvegarder le profil actif si l'utilisateur en a un.
+        // Cela garantit que les changements effectués dans l'éditeur (ex. rainbow)
+        // sont immédiatement persistés dans le profil, sans avoir à aller dans
+        // l'écran des profils et cliquer manuellement sur "Sauver".
+        HudProfileManager pm = HudProfileManager.getInstance();
+        if (pm.getActiveProfile() >= 0) {
+            pm.saveToSlot(pm.getActiveProfile());
+        }
         Keyboard.enableRepeatEvents(false);
         super.onGuiClosed();
     }
@@ -665,7 +673,10 @@ public class GuiUIEditor extends GuiScreen {
             BaseWidget bw = (BaseWidget) selected;
             items.add(new ToggleItem("Mode Rainbow", bw.isRGBMode(), hbRainbow, bw::setRGBMode));
             if (bw instanceof CombatLogWidget) items.add(new ToggleItem("Design circulaire", Boolean.TRUE.equals(bw.getProps().getOrDefault("originalDesign", false)), hbOrigDesign, v -> bw.getProps().put("originalDesign", v)));
-            items.add(new ToggleItem("Aligner (Smart)", Boolean.TRUE.equals(bw.getProps().getOrDefault("snapGrid", false)), hbAlignGrid, v -> bw.getProps().put("snapGrid", v)));
+            // "Aligner (Smart)" masqué pour PlayerHealthBarWidget (widget 3D, pas de grille HUD)
+            if (!(bw instanceof PlayerHealthBarWidget)) {
+                items.add(new ToggleItem("Aligner (Smart)", Boolean.TRUE.equals(bw.getProps().getOrDefault("snapGrid", false)), hbAlignGrid, v -> bw.getProps().put("snapGrid", v)));
+            }
             // Couleur principale (masquée pour FactionZoneWidget et PlayerHealthBarWidget
             // qui gèrent leurs propres couleurs par relation/stade)
             if (!(bw instanceof FactionZoneWidget) && !(bw instanceof PlayerHealthBarWidget)) {

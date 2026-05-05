@@ -44,19 +44,37 @@ public class GuiInventory extends InventoryEffectRenderer {
         this.updateActivePotionEffects();
     }
 
+    /** Référence au bouton livre pour repositionnement dynamique. */
+    private GuiButtonBook bookButton = null;
+
     /**
      * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
      * window resizes, the buttonList is cleared beforehand.
      */
     public void initGui() {
         this.buttonList.clear();
+        this.bookButton = null;
 
         if (this.mc.playerController.isInCreativeMode()) {
             this.mc.displayGuiScreen(new GuiContainerCreative(this.mc.thePlayer));
         } else {
             super.initGui();
             // Bouton livre repositionné en haut à droite de l'inventaire
-            this.buttonList.add(new GuiButtonBook(2, this.guiLeft + this.xSize - 25, this.guiTop + 5));
+            bookButton = new GuiButtonBook(2, this.guiLeft + this.xSize - 25, this.guiTop + 5);
+            this.buttonList.add(bookButton);
+        }
+    }
+
+    /**
+     * Mise à jour de guiLeft quand les effets de potion apparaissent/disparaissent.
+     * On repositionne aussi le bouton livre pour qu'il reste ancré à l'inventaire.
+     */
+    @Override
+    protected void updateActivePotionEffects() {
+        super.updateActivePotionEffects();
+        if (bookButton != null) {
+            bookButton.xPosition = this.guiLeft + this.xSize - 25;
+            bookButton.yPosition = this.guiTop + 5;
         }
     }
 

@@ -57,6 +57,7 @@ public class GuiHudProfiles extends GuiScreen {
     private static final int BTN_H     = 15;   // hauteur des boutons d'action
     private static final int BTN_SAVE  = 46;   // largeur fixe bouton Sauver
     private static final int BTN_LOAD  = 46;   // largeur fixe bouton Charger
+    private static final int BTN_RELOAD = 60;  // largeur fixe bouton Recharger (profil actif)
     private static final int BTN_DEL   = 20;   // largeur fixe bouton Supprimer (carré)
     private static final int BTN_CONF  = 58;   // largeur bouton "Sur ?"
     private static final int BTN_RES   = 54;   // largeur bouton Restaurer
@@ -300,6 +301,7 @@ public class GuiHudProfiles extends GuiScreen {
         } else {
             // Sauver toujours présent
             total += BTN_SAVE + BTN_GAP;
+            if (active && used)  total += BTN_RELOAD + BTN_GAP;  // Recharger pour le profil actif
             if (used && !active) total += BTN_LOAD + BTN_GAP;
             if (used) total += (confirmDeleteSlot == slot ? BTN_CONF : BTN_DEL) + BTN_GAP;
         }
@@ -330,8 +332,13 @@ public class GuiHudProfiles extends GuiScreen {
                     isConf ? "Sur ?" : "\u2715", h, COL_DEL);
                 rx -= BTN_GAP;
             }
-            // Bouton charger
-            if (used && !active) {
+            // Bouton charger (profil non actif) ou Recharger (profil actif)
+            if (active && used) {
+                rx -= BTN_RELOAD;
+                boolean h = inRect(mx, my, rx, btnY, BTN_RELOAD, BTN_H);
+                drawSmallBtn(rx, btnY, BTN_RELOAD, BTN_H, "\u21BA Recharger", h, COL_LOAD);
+                rx -= BTN_GAP;
+            } else if (used && !active) {
                 rx -= BTN_LOAD;
                 boolean h = inRect(mx, my, rx, btnY, BTN_LOAD, BTN_H);
                 drawSmallBtn(rx, btnY, BTN_LOAD, BTN_H, "Charger", h, COL_LOAD);
@@ -480,8 +487,15 @@ public class GuiHudProfiles extends GuiScreen {
                     }
                     rx -= BTN_GAP;
                 }
-                // Charger
-                if (used && !active) {
+                // Charger / Recharger
+                if (active && used) {
+                    rx -= BTN_RELOAD;
+                    if (inRect(mx, my, rx, btnY2, BTN_RELOAD, BTN_H)) {
+                        pm.loadFromSlot(i); confirmDeleteSlot = -1;
+                        showToast("\"" + pm.getProfileName(i) + "\" rechargé", COL_LOAD); return;
+                    }
+                    rx -= BTN_GAP;
+                } else if (used && !active) {
                     rx -= BTN_LOAD;
                     if (inRect(mx, my, rx, btnY2, BTN_LOAD, BTN_H)) {
                         pm.loadFromSlot(i); confirmDeleteSlot = -1;

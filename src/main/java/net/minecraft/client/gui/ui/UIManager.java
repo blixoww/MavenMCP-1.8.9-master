@@ -163,11 +163,11 @@ public class UIManager {
     }
 
     public void renderAll(int mouseX, int mouseY, float partialTicks) {
-        // Initialiser les profils par défaut une seule fois après que l'instance est prête
         if (!defaultProfilesInitialized) {
             defaultProfilesInitialized = true;
-            HudProfileManager.getInstance().initDefaultPvPProfile();
-            HudProfileManager.getInstance().initDefaultExplorationProfile();
+            HudProfileManager pm = HudProfileManager.getInstance();
+            if (!pm.isSlotUsed(0)) pm.initDefaultPvPProfile();
+            if (!pm.isSlotUsed(1)) pm.initDefaultExplorationProfile();
         }
 
         // Recalculate proportional positions after config load (resolution is now known)

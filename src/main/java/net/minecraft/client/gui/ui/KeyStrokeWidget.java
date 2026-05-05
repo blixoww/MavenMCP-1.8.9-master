@@ -48,10 +48,6 @@ public class KeyStrokeWidget extends BaseWidget {
         this.height = 96;
         if (getPropOrDefault("showBackground", null) == null) setProp("showBackground", Boolean.FALSE);
         if (getPropOrDefault("showSpaceRainbow", null) == null) setProp("showSpaceRainbow", Boolean.FALSE);
-        try {
-            this.setRGBMode(true);
-        } catch (Throwable ignored) {
-        }
     }
 
     // ── Accesseurs éditeur ────────────────────────────────────────────────────

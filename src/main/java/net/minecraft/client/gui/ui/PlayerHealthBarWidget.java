@@ -1,6 +1,5 @@
 package net.minecraft.client.gui.ui;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
@@ -14,8 +13,9 @@ import org.lwjgl.opengl.GL11;
 /**
  * Widget barre de vie au-dessus de la tête des joueurs (rendu en monde 3D).
  *
- * Le widget HUD n'affiche qu'un micro-aperçu en mode éditeur ; le rendu réel
- * est assuré par {@link #renderAboveHead} appelé depuis {@code RenderPlayer}.
+ * Aucun rendu sur le HUD — le rendu réel est assuré par {@link #renderAboveHead}
+ * appelé depuis {@code RenderPlayer}. Le widget HUD maintient uniquement des
+ * dimensions pour la zone cliquable de l'éditeur.
  *
  * Props de configuration :
  *  - "barWidth"    (Number,  défaut 40)       largeur de la barre en px
@@ -96,43 +96,18 @@ public class PlayerHealthBarWidget extends BaseWidget {
 
     // ── Aperçu éditeur ────────────────────────────────────────────────────────
 
+    /**
+     * Le widget ne s'affiche PAS sur le HUD — uniquement via {@link #renderAboveHead}.
+     * On met à jour les dimensions pour que l'éditeur puisse afficher une zone cliquable.
+     */
     @Override
     protected void draw() {
-        if (!UIManager.getInstance().isEditorActive()) return;
-        Minecraft mc = Minecraft.getMinecraft();
-        FontRenderer fr = mc.fontRendererObj;
-
         int bw = getBarWidth();
         int bh = getBarHeight();
-
-//        // Petit label indicatif
-//        fr.drawStringWithShadow("Barre de vie", 0, 0, 0xFF888888);
-//
-//        // Aperçu : une seule barre à 60 % HP
-//        int y = 11;
-//        float previewRatio = 0.6f;
-//        drawBarPreview(0, y, bw, bh, previewRatio);
-
-        this.height = y + bh + 4;
+        this.height = bh + 4;
         this.width  = Math.max(55, bw + 4);
     }
 
-    private void drawBarPreview(int x, int y, int w, int h, float ratio) {
-        // Contour — basé sur les coordonnées exactes pour éviter les artefacts
-        int right = x + w;
-        if (isBorderEnabled()) {
-            Gui.drawRect(x - 1, y - 1, right + 1, y + h + 1, 0xFF000000);
-        }
-        // Fond
-        Gui.drawRect(x, y, right, y + h, 0xFF141414);
-        // Remplissage
-        int fw = (int)(w * ratio);
-        if (fw > 0) {
-            Gui.drawRect(x, y, x + fw, y + h, getFillColor(ratio));
-            // Highlight top
-            if (h > 2) Gui.drawRect(x, y, x + fw, y + 1, 0x44FFFFFF);
-        }
-    }
 
     // ── Rendu 3D au-dessus de la tête ─────────────────────────────────────────
 

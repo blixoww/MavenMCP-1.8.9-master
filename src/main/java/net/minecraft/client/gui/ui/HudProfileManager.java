@@ -200,16 +200,25 @@ public class HudProfileManager {
             }
         }
         activeProfile = slot;
-        ui.saveConfig();
 
-        // Appliquer le thème personnalisé associé s'il y en a un
         int ctIdx = getProfileCustomThemeIdx(slot);
         if (ctIdx >= 0) {
             CustomThemeManager.CustomTheme ct = CustomThemeManager.getInstance().get(ctIdx);
             if (ct != null) {
                 CustomThemeManager.applyToWidgets(ct, ui);
             }
+            // Ré-appliquer les flags rgb depuis le profil (le thème applique les couleurs,
+            // mais chaque widget conserve son propre choix rainbow)
+            for (Map.Entry<String, Map<String, Object>> en : profileData.entrySet()) {
+                UIElement e = ui.get(en.getKey());
+                if (e == null) continue;
+                Map<String, Object> m = en.getValue();
+                if (m.containsKey("rgb")) e.setRGBMode(Boolean.parseBoolean(String.valueOf(m.get("rgb"))));
+            }
         }
+
+        // Persister l'état final (après application du thème + rgb overrides) dans ui_widgets.json
+        ui.saveConfig();
     }
 
     private int[] getScreenSize() {
