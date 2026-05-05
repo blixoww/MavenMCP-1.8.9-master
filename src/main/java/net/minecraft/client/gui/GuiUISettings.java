@@ -528,10 +528,23 @@ public class GuiUISettings extends GuiScreen {
             if ("sneak".equals(settingKey)) {
                 gs.toggleSneakEnabled = !gs.toggleSneakEnabled;
                 if (!gs.toggleSneakEnabled) gs.isToggleSneakActive = false;
+                // Synchroniser l'état enabled du widget HUD pour garder la cohérence
+                UIElement sneakWidget = UIManager.getInstance().get("toggle_sneak");
+                if (sneakWidget != null) {
+                    // On appelle directement super.setEnabled via l'interface pour éviter
+                    // une boucle — on utilise UIElement.setEnabled qui est la méthode de base
+                    // (ToggleSneakWidget.setEnabled est déjà synchro dans l'autre sens)
+                    sneakWidget.setEnabled(gs.toggleSneakEnabled);
+                }
             }
             if ("sprint".equals(settingKey)) {
                 gs.toggleSprintEnabled = !gs.toggleSprintEnabled;
                 if (!gs.toggleSprintEnabled) gs.isToggleSprintActive = false;
+                // Synchroniser l'état enabled du widget HUD
+                UIElement sprintWidget = UIManager.getInstance().get("toggle_sprint");
+                if (sprintWidget != null) {
+                    sprintWidget.setEnabled(gs.toggleSprintEnabled);
+                }
             }
             try {
                 gs.saveOptions();

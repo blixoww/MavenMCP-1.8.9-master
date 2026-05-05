@@ -15,6 +15,23 @@ public class ToggleSneakWidget extends BaseWidget {
 
     @Override public boolean supportsLabelColor() { return true; }
 
+    /**
+     * Active/désactive à la fois le widget HUD ET la fonctionnalité Toggle Sneak dans GameSettings.
+     * Ainsi, décocher "Active" dans l'éditeur arrête réellement le sneak automatique.
+     */
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc != null && mc.gameSettings != null) {
+            mc.gameSettings.toggleSneakEnabled = enabled;
+            if (!enabled) {
+                mc.gameSettings.isToggleSneakActive = false;
+            }
+            try { mc.gameSettings.saveOptions(); } catch (Throwable ignored) {}
+        }
+    }
+
     @Override
     protected void draw() {
         Minecraft mc = Minecraft.getMinecraft();

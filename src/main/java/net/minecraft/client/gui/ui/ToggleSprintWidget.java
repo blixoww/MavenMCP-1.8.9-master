@@ -15,6 +15,23 @@ public class ToggleSprintWidget extends BaseWidget {
 
     @Override public boolean supportsLabelColor() { return true; }
 
+    /**
+     * Active/désactive à la fois le widget HUD ET la fonctionnalité Toggle Sprint dans GameSettings.
+     * Ainsi, décocher "Active" dans l'éditeur arrête réellement le sprint automatique.
+     */
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc != null && mc.gameSettings != null) {
+            mc.gameSettings.toggleSprintEnabled = enabled;
+            if (!enabled) {
+                mc.gameSettings.isToggleSprintActive = false;
+            }
+            try { mc.gameSettings.saveOptions(); } catch (Throwable ignored) {}
+        }
+    }
+
     @Override
     protected void draw() {
         Minecraft mc = Minecraft.getMinecraft();
