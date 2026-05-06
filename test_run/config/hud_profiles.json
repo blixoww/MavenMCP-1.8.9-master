@@ -932,8 +932,8 @@
         }
       },
       "helditem": {
-        "x": 470,
-        "y": 295,
+        "x": 573,
+        "y": 312,
         "enabled": true,
         "color": -1,
         "rgb": false,
@@ -972,8 +972,8 @@
         }
       },
       "potions": {
-        "x": 10,
-        "y": 170,
+        "x": 13,
+        "y": 190,
         "enabled": true,
         "color": -1,
         "rgb": false,
@@ -1018,14 +1018,14 @@
         }
       },
       "toggle_sneak": {
-        "x": 7,
-        "y": 300,
+        "x": 11,
+        "y": 252,
         "enabled": false,
         "color": -1,
         "rgb": false,
         "scale": 1.0,
-        "relX": 0.01232394366197183,
-        "relY": 0.9287925696594427,
+        "relX": 0.01936619718309859,
+        "relY": 0.7801857585139319,
         "refW": 640,
         "refH": 337,
         "width": 72,
@@ -1073,9 +1073,9 @@
         "width": 94,
         "height": 12,
         "props": {
-          "showDisplay": true,
+          "showDisplay": false,
           "colorLabel": -65536.0,
-          "autoActive": true,
+          "autoActive": false,
           "syncColors": false
         }
       },
@@ -1181,7 +1181,7 @@
         "x": 547,
         "y": 16,
         "enabled": true,
-        "color": -1684946,
+        "color": -13734426,
         "rgb": true,
         "scale": 1.0,
         "relX": 0.9838129496402878,

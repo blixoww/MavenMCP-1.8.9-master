@@ -16,6 +16,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.client.gui.GuiProfil;
 
 public class GuiInventory extends InventoryEffectRenderer {
     /**
@@ -46,6 +47,8 @@ public class GuiInventory extends InventoryEffectRenderer {
 
     /** Référence au bouton livre pour repositionnement dynamique. */
     private GuiButtonBook bookButton = null;
+    /** Bouton profil à gauche du bouton livre. */
+    private GuiButtonProfil profilButton = null;
 
     /**
      * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
@@ -54,14 +57,17 @@ public class GuiInventory extends InventoryEffectRenderer {
     public void initGui() {
         this.buttonList.clear();
         this.bookButton = null;
+        this.profilButton = null;
 
         if (this.mc.playerController.isInCreativeMode()) {
             this.mc.displayGuiScreen(new GuiContainerCreative(this.mc.thePlayer));
         } else {
             super.initGui();
-            // Bouton livre repositionné en haut à droite de l'inventaire
+            // Boutons d'acces rapide ancrés en haut à droite de l'inventaire
             bookButton = new GuiButtonBook(2, this.guiLeft + this.xSize - 25, this.guiTop + 5);
             this.buttonList.add(bookButton);
+            profilButton = new GuiButtonProfil(3, this.guiLeft + this.xSize - 46, this.guiTop + 5);
+            this.buttonList.add(profilButton);
         }
     }
 
@@ -75,6 +81,10 @@ public class GuiInventory extends InventoryEffectRenderer {
         if (bookButton != null) {
             bookButton.xPosition = this.guiLeft + this.xSize - 25;
             bookButton.yPosition = this.guiTop + 5;
+        }
+        if (profilButton != null) {
+            profilButton.xPosition = this.guiLeft + this.xSize - 46;
+            profilButton.yPosition = this.guiTop + 5;
         }
     }
 
@@ -168,32 +178,116 @@ public class GuiInventory extends InventoryEffectRenderer {
             // Ouvrir l'interface du guide de craft
             this.mc.displayGuiScreen(new GuiCraftGuide(this));
         }
+        if (button.id == 3) {
+            // Demande au serveur des données fraîches (kills, morts, killstreak,
+            // bounty, temps de jeu...). Le GUI ouvert en local lit en live le
+            // cache, donc dès que la réponse arrive l'affichage se met à jour.
+            net.minecraft.client.custompackets.handler.PlayerDataHandler.requestProfile();
+            net.minecraft.client.custompackets.handler.PlayerDataHandler.requestData();
+            this.mc.displayGuiScreen(GuiProfil.forSelf());
+        }
     }
 
-    // Bouton livre : affiche un vrai item livre via itemRender (aucun problème de texture atlas)
-    public static class GuiButtonBook extends GuiButton {
-        private static final ItemStack BOOK = new ItemStack(Items.writable_book);
-
-        public GuiButtonBook(int buttonId, int x, int y) {
+    // Style commun pour les petits boutons d'outils dans l'inventaire
+    private static abstract class GuiIconButtonBase extends GuiButton {
+        protected GuiIconButtonBase(int buttonId, int x, int y) {
             super(buttonId, x, y, 18, 18, "");
         }
+
+        protected abstract ItemStack getIconStack();
+        protected abstract String getTooltip();
+        protected int getAccentColor() { return 0xFF3D8EFF; }
 
         @Override
         public void drawButton(Minecraft mc, int mouseX, int mouseY) {
             if (!this.visible) return;
 
-            // Fond de la case
             boolean hovered = mouseX >= xPosition && mouseX < xPosition + width
                     && mouseY >= yPosition && mouseY < yPosition + height;
-            int bg = hovered ? 0xBBFFFFFF : 0x88AAAAAA;
-            drawRect(xPosition, yPosition, xPosition + width, yPosition + height, bg);
 
-            // Rendu de l'item livre
+            int accent = getAccentColor();
+            float pulse = hovered ? (float)(Math.sin(System.currentTimeMillis() / 320.0) * 0.5 + 0.5) : 0f;
+
+            // Fond dégradé du haut (plus clair) vers le bas (plus sombre) - en blanc
+            int bgTop    = hovered ? 0xEEFFFFFF : 0xCCF0F0F0;
+            int bgBottom = hovered ? 0xEEF0F0F0 : 0xCCE0E0E0;
+            net.minecraft.client.gui.GuiRenderUtils.drawGradientRect(
+                    xPosition, yPosition, xPosition + width, yPosition + height, bgTop, bgBottom);
+
+            // Reflet subtil en haut
+            drawRect(xPosition + 1, yPosition + 1, xPosition + width - 1, yPosition + 3,
+                    hovered ? 0x28FFFFFF : 0x12FFFFFF);
+
+            // Contour plein : accent animé sur hover, discret sinon
+            int borderColor;
+            if (hovered) {
+                int baseAlpha = (int)(0x88 + 0x44 * pulse);
+                borderColor = (baseAlpha << 24) | (accent & 0x00FFFFFF);
+            } else {
+                borderColor = 0x55253444;
+            }
+            net.minecraft.client.gui.GuiRenderUtils.drawRectOutline(
+                    xPosition, yPosition, width, height, borderColor);
+
+            // Ligne d'accent en bas uniquement au survol (soulignement)
+            if (hovered) {
+                int accentAlpha = (int)(0x99 + 0x55 * pulse);
+                int accentLine  = (accentAlpha << 24) | (accent & 0x00FFFFFF);
+                drawRect(xPosition + 1, yPosition + height - 1,
+                        xPosition + width - 1, yPosition + height, accentLine);
+            }
+
+            // Halo externe léger au survol
+            if (hovered) {
+                int glowAlpha = (int)(0x18 + 0x18 * pulse);
+                net.minecraft.client.gui.GuiRenderUtils.drawRectOutline(
+                        xPosition - 1, yPosition - 1, width + 2, height + 2,
+                        (glowAlpha << 24) | (accent & 0x00FFFFFF));
+            }
+
+            // Rendu de l'icône item
             RenderHelper.enableGUIStandardItemLighting();
             GlStateManager.enableDepth();
-            mc.getRenderItem().renderItemAndEffectIntoGUI(BOOK, xPosition + 1, yPosition + 1);
+            mc.getRenderItem().renderItemAndEffectIntoGUI(getIconStack(), xPosition + 1, yPosition + 1);
             GlStateManager.disableDepth();
             RenderHelper.disableStandardItemLighting();
+
+            // Tooltip amélioro
+            if (hovered) {
+                net.minecraft.client.gui.FontRenderer fr = mc.fontRendererObj;
+                String tooltip = getTooltip();
+                int tw = fr.getStringWidth(tooltip);
+                // Repositionner pour ne pas déborder à droite
+                int tx = xPosition + width / 2 - tw / 2;
+                int ty = yPosition + height + 4;
+                // Fond + outline du tooltip
+                drawRect(tx - 4, ty - 2, tx + tw + 4, ty + 10, 0xF0060B16);
+                net.minecraft.client.gui.GuiRenderUtils.drawRectOutline(
+                        tx - 4, ty - 2, tw + 8, 12, 0x33FFFFFF);
+                // Ligne d'accent au-dessus du texte
+                int lineAlpha = (int)(0xBB + 0x33 * pulse);
+                drawRect(tx - 4, ty - 2, tx + tw + 4, ty - 1,
+                        (lineAlpha << 24) | (accent & 0x00FFFFFF));
+                fr.drawStringWithShadow("§f" + tooltip, tx, ty, 0xFFFFFFFF);
+            }
         }
+    }
+
+    // Bouton livre : guide craft
+    public static class GuiButtonBook extends GuiIconButtonBase {
+        private static final ItemStack BOOK = new ItemStack(Items.writable_book);
+        public GuiButtonBook(int buttonId, int x, int y) { super(buttonId, x, y); }
+        @Override protected ItemStack getIconStack() { return BOOK; }
+        @Override protected String getTooltip() { return "Guide"; }
+        @Override protected int getAccentColor() { return 0xFF3D8EFF; }
+    }
+
+    // Bouton profil : tête de joueur (skull de type 3)
+    public static class GuiButtonProfil extends GuiIconButtonBase {
+        private static final ItemStack SKULL = new ItemStack(Items.skull, 1, 3);
+        public GuiButtonProfil(int buttonId, int x, int y) { super(buttonId, x, y); }
+        @Override protected ItemStack getIconStack() { return SKULL; }
+        @Override protected String getTooltip() { return "Profil"; }
+        @Override protected int getAccentColor() { return 0xFFE8A030; }
     }
 }

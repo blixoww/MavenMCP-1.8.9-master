@@ -86,7 +86,7 @@ public class GuiHudProfiles extends GuiScreen {
 
     @Override
     public void initGui() {
-        this.lastTime = Minecraft.getSystemTime();
+        this.lastTime = -1L;
         this.openAnim = 0f;
         this.confirmDeleteSlot = -1;
         Keyboard.enableRepeatEvents(true);
@@ -137,7 +137,7 @@ public class GuiHudProfiles extends GuiScreen {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         long now = Minecraft.getSystemTime();
-        if (lastTime > 0) {
+        if (lastTime >= 0) {
             float dt = (now - lastTime) / 1000f;
             openAnim = MathHelper.clamp_float(openAnim + dt * 6f, 0f, 1f);
         }

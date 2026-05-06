@@ -470,8 +470,8 @@ public class GuiUISettings extends GuiScreen {
             case "armor_group":     return "Armure";
             case "potions":         return "Effets de Potion";
             case "cps":             return "CPS";
-            case "toggle_sneak":    return "Affichage Sneak";
-            case "toggle_sprint":   return "Affichage Sprint";
+            case "toggle_sneak":    return "Toggle Sneak";
+            case "toggle_sprint":   return "Toggle Sprint";
             case "auto_armor":      return "Auto Armor";
             case "combatlog":       return "Combat Tag";
             case "keystrokes":

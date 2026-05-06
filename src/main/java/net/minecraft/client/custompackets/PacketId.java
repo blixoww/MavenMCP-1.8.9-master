@@ -102,6 +102,12 @@ public final class PacketId {
 
     public static final int PLAYER_DATA_REQUEST = 0x58;
 
+    /**
+     * Demande au serveur d'envoyer le profil complet du joueur local
+     * (réponse attendue : {@link #PROFILE_OPEN} sur PLAYER_DATA_S2C).
+     */
+    public static final int PROFILE_REQUEST_OWN = 0x59;
+
     // ════════════════════════════════════════════════════════════════════════
     //  Items custom – Client → Serveur
     // ════════════════════════════════════════════════════════════════════════
@@ -135,5 +141,23 @@ public final class PacketId {
      * relation : 0=own, 1=ally, 2=truce, 3=enemy, 4=neutral
      */
     public static final int FACTION_ZONE = 0x81;
+
+    // ════════════════════════════════════════════════════════════════════════
+    //  Profil joueur – Serveur → Client (canal PLAYER_DATA_S2C)
+    // ════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Ouvre le profil du joueur local (données fraîches depuis la BD).
+     * Format : String name | String faction | String rank
+     *        | VarInt kills | VarInt deaths | VarInt playTimeMin
+     *        | long balance | VarInt streak | long bounty
+     */
+    public static final int PROFILE_OPEN = 0x90;
+
+    /**
+     * Ouvre le profil d'un autre joueur (demandé via /profil <joueur>).
+     * Même format que PROFILE_OPEN.
+     */
+    public static final int PROFILE_DATA = 0x91;
 }
 

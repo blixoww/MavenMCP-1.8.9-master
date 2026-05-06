@@ -756,11 +756,6 @@ public class GuiUIEditor extends GuiScreen {
                 boolean showDisp = !Boolean.FALSE.equals(bw.getPropOrDefault("showDisplay", Boolean.TRUE));
                 items.add(new ToggleItem("Afficher widget", showDisp, hbShowDisplay,
                         v -> { bw.getProps().put("showDisplay", v); ui.saveConfig(); }));
-                if (bw instanceof AutoArmorWidget) {
-                    boolean autoAct = !Boolean.FALSE.equals(bw.getPropOrDefault("autoActive", Boolean.TRUE));
-                    items.add(new ToggleItem("Auto actif", autoAct, hbAutoActive,
-                            v -> { bw.getProps().put("autoActive", v); ui.saveConfig(); }));
-                }
             }
         }
         // Pour la barre de vie, "Blanc" n'a aucun sens → on n'affiche que Reset Position
@@ -1065,10 +1060,6 @@ public class GuiUIEditor extends GuiScreen {
                 if (clickHB(mx, my, hbShowDisplay)) {
                     boolean cur = !Boolean.FALSE.equals(bw.getPropOrDefault("showDisplay", Boolean.TRUE));
                     bw.getProps().put("showDisplay", !cur); ui.saveConfig(); return true;
-                }
-                if (bw instanceof AutoArmorWidget && clickHB(mx, my, hbAutoActive)) {
-                    boolean cur = !Boolean.FALSE.equals(bw.getPropOrDefault("autoActive", Boolean.TRUE));
-                    bw.getProps().put("autoActive", !cur); ui.saveConfig(); return true;
                 }
             }
         }
@@ -1871,8 +1862,8 @@ public class GuiUIEditor extends GuiScreen {
             case "armor_group":     return "Armure";
             case "potions":         return "Effets de Potion";
             case "cps":             return "CPS";
-            case "toggle_sneak":    return "Affichage Sneak";
-            case "toggle_sprint":   return "Affichage Sprint";
+            case "toggle_sneak":    return "Toggle Sneak";
+            case "toggle_sprint":   return "Toggle Sprint";
             case "auto_armor":      return "Auto Armor";
             case "combatlog":       return "Combat Tag";
             case "keystrokes":

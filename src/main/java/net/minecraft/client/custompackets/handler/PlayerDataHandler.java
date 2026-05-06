@@ -70,6 +70,15 @@ public final class PlayerDataHandler {
         PacketSender.sendSimple(PacketChannel.PLAYER_DATA_C2S, PacketId.PLAYER_DATA_REQUEST);
     }
 
+    /**
+     * Demande au serveur d'ouvrir le profil du joueur local.
+     * Le serveur répondra par un packet PROFILE_OPEN qui ouvrira l'écran
+     * avec des données fraîches (kills, morts, killstreak, bounty, etc.).
+     */
+    public static void requestProfile() {
+        PacketSender.sendSimple(PacketChannel.PLAYER_DATA_C2S, PacketId.PROFILE_REQUEST_OWN);
+    }
+
     // ── Accesseurs ────────────────────────────────────────────────────────────
 
     public static PlayerData getCachedData() { return cachedData; }

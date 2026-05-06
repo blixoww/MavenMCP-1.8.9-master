@@ -76,6 +76,48 @@ public final class CustomPacketSystem {
         });
         LOGGER.info("[CustomPackets] ✓ FactionZone handler enregistré");
 
+        // Profil joueur – PROFILE_OPEN (0x90) : propre profil depuis la BD
+        PacketDispatcher.register(PacketChannel.PLAYER_DATA_S2C, PacketId.PROFILE_OPEN, buf -> {
+            final String name    = buf.readStringFromBuffer(32);
+            final String faction = buf.readStringFromBuffer(64);
+            final String rank    = buf.readStringFromBuffer(32);
+            final int    kills   = buf.readVarIntFromBuffer();
+            final int    deaths  = buf.readVarIntFromBuffer();
+            final int    ptMin   = buf.readVarIntFromBuffer();
+            final long   balance = buf.readLong();
+            final int    streak  = buf.readVarIntFromBuffer();
+            final long   bounty  = buf.readLong();
+            int factionRelation = 0; // propre profil → toujours own (vert)
+            try { factionRelation = buf.readVarIntFromBuffer(); } catch (Exception ignored) {}
+            final int finalRel = factionRelation;
+            net.minecraft.client.Minecraft.getMinecraft().addScheduledTask(() ->
+                net.minecraft.client.Minecraft.getMinecraft().displayGuiScreen(
+                    new net.minecraft.client.gui.GuiProfil(
+                        name, faction, rank, kills, deaths, ptMin, balance, streak, bounty, true, finalRel)));
+        });
+        LOGGER.info("[CustomPackets] ✓ PROFILE_OPEN handler enregistré");
+
+        // Profil joueur – PROFILE_DATA (0x91) : profil d'un autre joueur
+        PacketDispatcher.register(PacketChannel.PLAYER_DATA_S2C, PacketId.PROFILE_DATA, buf -> {
+            final String name    = buf.readStringFromBuffer(32);
+            final String faction = buf.readStringFromBuffer(64);
+            final String rank    = buf.readStringFromBuffer(32);
+            final int    kills   = buf.readVarIntFromBuffer();
+            final int    deaths  = buf.readVarIntFromBuffer();
+            final int    ptMin   = buf.readVarIntFromBuffer();
+            final long   balance = buf.readLong();
+            final int    streak  = buf.readVarIntFromBuffer();
+            final long   bounty  = buf.readLong();
+            int factionRelation = 4; // neutre par défaut
+            try { factionRelation = buf.readVarIntFromBuffer(); } catch (Exception ignored) {}
+            final int finalRel = factionRelation;
+            net.minecraft.client.Minecraft.getMinecraft().addScheduledTask(() ->
+                net.minecraft.client.Minecraft.getMinecraft().displayGuiScreen(
+                    new net.minecraft.client.gui.GuiProfil(
+                        name, faction, rank, kills, deaths, ptMin, balance, streak, bounty, false, finalRel)));
+        });
+        LOGGER.info("[CustomPackets] ✓ PROFILE_DATA handler enregistré");
+
         // Initialiser le combat log
         net.minecraft.client.combatlog.CombatLogManager.INSTANCE.init();
         LOGGER.info("[CustomPackets] ✓ CombatLogManager initialisé");

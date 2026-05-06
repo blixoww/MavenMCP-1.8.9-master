@@ -48,9 +48,9 @@ public class GuiCraftGuide extends GuiScreen {
     private static final int C_SCR_TRACK   = 0xFF060710;
     private static final int C_SCR_THUMB   = 0xFF1A2C50;
     private static final int C_SCR_ACTIVE  = 0xFF3D8EFF;
-    private static final int C_BTN         = 0xFF0B1022;
-    private static final int C_BTN_HOV     = 0xFF162038;
-    private static final int C_BTN_BDR     = 0xFF162040;
+    private static final int C_BTN         = 0xFFEAEAEA;
+    private static final int C_BTN_HOV     = 0xFFFFFFFF;
+    private static final int C_BTN_BDR     = 0xFFAAAAAA;
     private static final int C_TXT_TITLE   = 0xFFFFFFFF;
     private static final int C_TXT_DIM     = 0xFF445870;
     private static final int C_TXT_HINT    = 0xFF2A3648;
@@ -303,8 +303,38 @@ public class GuiCraftGuide extends GuiScreen {
     }
 
     private void drawNavButton(int x, int y, int w, int h, String text, boolean hover, int accentCol) {
-        GuiRenderUtils.drawStyledButton(x, y, w, h, hover ? C_BTN_HOV : C_BTN, hover ? accentCol : C_BTN_BDR, hover);
-        drawCenteredString(fontRendererObj, text, x + w/2, y + (h-8)/2, hover ? 0xFFFFFFFF : 0xFFAABBCC);
+        float pulse = hover ? (float)(Math.sin(System.currentTimeMillis() / 350.0) * 0.5 + 0.5) : 0f;
+
+        // Fond sombre dégradé — thème cohérent avec le panneau
+        int bgTop    = hover ? 0xFF1A1C2E : 0xFF111320;
+        int bgBottom = hover ? 0xFF10111E : 0xFF0C0D18;
+        GuiRenderUtils.drawGradientRect(x, y, x + w, y + h, bgTop, bgBottom);
+
+        // Reflet subtil en haut
+        drawRect(x + 1, y + 1, x + w - 1, y + 2, hover ? 0x22FFFFFF : 0x10FFFFFF);
+
+        // Contour coloré avec animation hover
+        int borderAlpha = hover ? (int)(0x99 + 0x50 * pulse) : 0x44;
+        int borderColor = (borderAlpha << 24) | (accentCol & 0x00FFFFFF);
+        GuiRenderUtils.drawRectOutline(x, y, w, h, borderColor);
+
+        // Ligne d'accent pleine en bas (soulignement — toujours visible, plus vif au survol)
+        int lineAlpha = hover ? (int)(0xBB + 0x44 * pulse) : 0x55;
+        int lineColor = (lineAlpha << 24) | (accentCol & 0x00FFFFFF);
+        drawRect(x + 1, y + h - 1, x + w - 1, y + h, lineColor);
+
+        // Halo externe léger au survol
+        if (hover) {
+            int glowAlpha = (int)(0x14 + 0x14 * pulse);
+            GuiRenderUtils.drawRectOutline(x - 1, y - 1, w + 2, h + 2,
+                    (glowAlpha << 24) | (accentCol & 0x00FFFFFF));
+        }
+
+        // Texte blanc, légèrement teinté de la couleur d'accent au survol
+        int textColor = hover
+                ? GuiRenderUtils.colorLerp(0xFFDDDDDD, 0xFFFFFFFF, 0.5f + 0.4f * pulse)
+                : 0xFFAAAAAA;
+        drawCenteredString(fontRendererObj, text, x + w / 2, y + (h - 8) / 2, textColor);
     }
 
     /** Compact coloured badge — no Unicode symbols that may not render */
@@ -537,7 +567,7 @@ public class GuiCraftGuide extends GuiScreen {
         drawNavButton(btnBack.xPosition,  btnBack.yPosition,  btnW, btnH, "< Retour",
                 inside(mx,my,btnBack.xPosition,btnBack.yPosition,btnW,btnH), accent);
         drawNavButton(btnClose.xPosition, btnClose.yPosition, btnW, btnH, "Fermer",
-                inside(mx,my,btnClose.xPosition,btnClose.yPosition,btnW,btnH), C_ACCENT);
+                inside(mx,my,btnClose.xPosition,btnClose.yPosition,btnW,btnH), 0xFFE03040);
     }
 
     // ── Craft grid ─────────────────────────────────────────────────────────────
