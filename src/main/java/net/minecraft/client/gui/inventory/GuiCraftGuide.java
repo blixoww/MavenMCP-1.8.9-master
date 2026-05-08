@@ -14,6 +14,7 @@ import net.minecraft.item.crafting.*;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.client.gui.ui.UITheme;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
@@ -30,33 +31,33 @@ import java.util.*;
  */
 public class GuiCraftGuide extends GuiScreen {
 
-    // ── Palette ────────────────────────────────────────────────────────────────
-    private static final int C_OVERLAY     = 0xCC030511;
-    private static final int C_PANEL       = 0xFF0B0C17;
-    private static final int C_PANEL_HDR   = 0xFF080A14;
-    private static final int C_PANEL_INNER = 0xFF0E0F1C;
-    private static final int C_RECIPE_BG   = 0xFF09090F;
-    private static final int C_ACCENT      = 0xFF3D8EFF;
-    private static final int C_BREW        = 0xFF00BBEE;
-    private static final int C_FURNACE     = 0xFFFF7822;
-    private static final int C_GOLD        = 0xFFE8A030;
-    private static final int C_BORDER_DIM  = 0xFF080C18;
-    private static final int C_BORDER_MID  = 0xFF182040;
-    private static final int C_SLOT        = 0xFF0B0C18;
-    private static final int C_SLOT_LT     = 0xFF1C1E30;
-    private static final int C_SLOT_DK     = 0xFF040408;
-    private static final int C_SCR_TRACK   = 0xFF060710;
-    private static final int C_SCR_THUMB   = 0xFF1A2C50;
-    private static final int C_SCR_ACTIVE  = 0xFF3D8EFF;
+    // ── Palette — thème sombre rouge, cohérent avec GuiWiki / GuiUISettings ──
+    private static final int C_OVERLAY     = 0xA0000000;  // overlay neutre
+    private static final int C_PANEL       = 0xFF0A0808;  // fond panneau (rouge sombre)
+    private static final int C_PANEL_HDR   = 0xFF0E0606;  // header
+    private static final int C_PANEL_INNER = 0xFF0C0808;  // inner bg
+    private static final int C_RECIPE_BG   = 0xFF080404;  // fond recette
+    private static final int C_ACCENT      = 0xFFE02828;  // rouge vif (accent principal)
+    private static final int C_BREW        = 0xFF00BBEE;  // cyan — alchimie
+    private static final int C_FURNACE     = 0xFFFF7822;  // orange — cuisson
+    private static final int C_GOLD        = 0xFFE8A030;  // or — résultat craft
+    private static final int C_BORDER_DIM  = 0xFF100606;  // bord sombre
+    private static final int C_BORDER_MID  = 0xFF2A0C0C;  // bord moyen
+    private static final int C_SLOT        = 0xFF0A0808;  // fond slot
+    private static final int C_SLOT_LT     = 0xFF1A1010;  // clair slot
+    private static final int C_SLOT_DK     = 0xFF040202;  // sombre slot
+    private static final int C_SCR_TRACK   = 0xFF060404;  // piste scrollbar
+    private static final int C_SCR_THUMB   = 0xFF2A0A0A;  // thumb inactif
+    private static final int C_SCR_ACTIVE  = 0xFFE02828;  // thumb actif
     private static final int C_BTN         = 0xFFEAEAEA;
     private static final int C_BTN_HOV     = 0xFFFFFFFF;
     private static final int C_BTN_BDR     = 0xFFAAAAAA;
     private static final int C_TXT_TITLE   = 0xFFFFFFFF;
-    private static final int C_TXT_DIM     = 0xFF445870;
-    private static final int C_TXT_HINT    = 0xFF2A3648;
+    private static final int C_TXT_DIM     = 0xFF445060;
+    private static final int C_TXT_HINT    = 0xFF334040;
     private static final int C_TXT_BREW    = 0xFF44CCFF;
     private static final int C_GLOW_BREW   = 0x2200BBEE;
-    private static final int C_GLOW_CRAFT  = 0x223D8EFF;
+    private static final int C_GLOW_CRAFT  = 0x22E02828;  // rouge glow
     private static final int C_GLOW_FURN   = 0x22FF7822;
 
     // ── Grid / scrollbar constants ─────────────────────────────────────────────
@@ -212,7 +213,8 @@ public class GuiCraftGuide extends GuiScreen {
     // ══════════════════════════════════════════════════════════════════════════
     //  Init
     // ══════════════════════════════════════════════════════════════════════════
-    public GuiCraftGuide(GuiScreen parent) {}
+    private final GuiScreen parent;
+    public GuiCraftGuide(GuiScreen parent) { this.parent = parent; }
     public GuiCraftGuide(GuiScreen parent, ItemStack initial) { this(parent); this.initialStack = initial; }
 
     @Override
@@ -298,16 +300,16 @@ public class GuiCraftGuide extends GuiScreen {
     private void drawSlotHover(int x, int y) {
         long t = System.currentTimeMillis() % 1200;
         float p = t < 600 ? t / 600f : (1200f - t) / 600f;
-        drawRect(x, y, x+SZ, y+SZ, ((int)(0x30 + 0x30 * p) << 24) | 0x3D8EFF);
-        drawRect(x, y, x+SZ, y+1,  ((int)(0x60 + 0x40 * p) << 24) | 0x3D8EFF);
+        drawRect(x, y, x+SZ, y+SZ, ((int)(0x30 + 0x30 * p) << 24) | 0xE02828);
+        drawRect(x, y, x+SZ, y+1,  ((int)(0x60 + 0x40 * p) << 24) | 0xE02828);
     }
 
     private void drawNavButton(int x, int y, int w, int h, String text, boolean hover, int accentCol) {
         float pulse = hover ? (float)(Math.sin(System.currentTimeMillis() / 350.0) * 0.5 + 0.5) : 0f;
 
-        // Fond sombre dégradé — thème cohérent avec le panneau
-        int bgTop    = hover ? 0xFF1A1C2E : 0xFF111320;
-        int bgBottom = hover ? 0xFF10111E : 0xFF0C0D18;
+        // Fond sombre rouge-teinté
+        int bgTop    = hover ? 0xFF1A1010 : 0xFF110808;
+        int bgBottom = hover ? 0xFF100808 : 0xFF0C0606;
         GuiRenderUtils.drawGradientRect(x, y, x + w, y + h, bgTop, bgBottom);
 
         // Reflet subtil en haut
@@ -386,10 +388,17 @@ public class GuiCraftGuide extends GuiScreen {
             String countStr = filtered.size() + " items";
             fontRendererObj.drawStringWithShadow("\u00a77" + countStr,
                     panelX + panelW - pad - fontRendererObj.getStringWidth(countStr),
-                    panelY + (titleH-8)/2, C_TXT_DIM);
+                    panelY + (float) (titleH - 8) /2, C_TXT_DIM);
 
             drawSearchBox();
             drawItemGrid(mx, my);
+
+            // ── Bouton "Retour" en bas à droite ──────────────────────────────
+            int listBtnY = panelY + panelH - btnH - 10;
+            boolean hRetour = inside(mx, my, panelX + panelW - pad - btnW, listBtnY, btnW, btnH);
+            // Séparateur fin au-dessus du bouton
+            drawRect(panelX + pad, listBtnY - 5, panelX + panelW - pad, listBtnY - 4, 0xFF0E0606);
+            drawNavButton(panelX + panelW - pad - btnW, listBtnY, btnW, btnH, "Retour", hRetour, C_ACCENT);
         } else {
             drawRecipeMode(mx, my);
         }
@@ -399,7 +408,7 @@ public class GuiCraftGuide extends GuiScreen {
     // ── Search bar ─────────────────────────────────────────────────────────────
     private void drawSearchBox() {
         int sx = panelX + pad, sy = panelY + searchY, sw = panelW - pad*2 - SBP - SBW;
-        drawRect(sx, sy, sx+sw, sy+searchH, 0xFF080A14);
+        drawRect(sx, sy, sx+sw, sy+searchH, 0xFF0A0808);
         int focusColor = GuiRenderUtils.colorLerp(C_BORDER_MID, C_ACCENT, searchFocusAnim);
         drawRect(sx,     sy+searchH-1, sx+sw, sy+searchH, focusColor);
         drawRect(sx,     sy,           sx+sw, sy+1,        0x10FFFFFF);
@@ -1019,7 +1028,7 @@ public class GuiCraftGuide extends GuiScreen {
 
         if (mode != Mode.LIST) {
             if (inside(mx,my,btnBack.xPosition, btnBack.yPosition, btnW,btnH)) { goBack(); return; }
-            if (inside(mx,my,btnClose.xPosition,btnClose.yPosition,btnW,btnH)) { mc.displayGuiScreen(null); return; }
+            if (inside(mx,my,btnClose.xPosition,btnClose.yPosition,btnW,btnH)) { mc.displayGuiScreen(parent); return; }
 
             if (btn == 0) {
                 // Brew nav arrows
@@ -1080,6 +1089,12 @@ public class GuiCraftGuide extends GuiScreen {
         }
 
         if (btn == 0) {
+            // Bouton "Retour" en mode liste
+            int listBtnY = panelY + panelH - btnH - 10;
+            if (inside(mx, my, panelX + panelW - pad - btnW, listBtnY, btnW, btnH)) {
+                mc.displayGuiScreen(parent);
+                return;
+            }
             if (inside(mx,my,sbX,sbY,SBW,sbH)) { draggingSB = true; applyScrollFromMouse(my); return; }
             int scrollRow   = (int) smoothScroll;
             int pixelOffset = (int)((smoothScroll - scrollRow) * SZ);
@@ -1108,7 +1123,7 @@ public class GuiCraftGuide extends GuiScreen {
     @Override
     protected void keyTyped(char ch, int key) throws IOException {
         if (key == Keyboard.KEY_ESCAPE) {
-            if (mode != Mode.LIST) goBack(); else mc.displayGuiScreen(null);
+            if (mode != Mode.LIST) goBack(); else mc.displayGuiScreen(parent);
         } else if (key == Keyboard.KEY_BACK) {
             if (mode != Mode.LIST) goBack();
             else if (searchBox.textboxKeyTyped(ch, key)) filter(searchBox.getText());
@@ -1132,6 +1147,6 @@ public class GuiCraftGuide extends GuiScreen {
     @Override
     protected void actionPerformed(GuiButton btn) throws IOException {
         if (btn.id == 1) goBack();
-        else if (btn.id == 2) mc.displayGuiScreen(null);
+        else if (btn.id == 2) mc.displayGuiScreen(parent);
     }
 }

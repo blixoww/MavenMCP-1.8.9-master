@@ -17,6 +17,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.client.gui.GuiProfil;
+import net.minecraft.client.gui.GuiWiki;
 
 public class GuiInventory extends InventoryEffectRenderer {
     /**
@@ -45,10 +46,15 @@ public class GuiInventory extends InventoryEffectRenderer {
         this.updateActivePotionEffects();
     }
 
+    /** Active/désactive l'affichage des 3 boutons dans l'inventaire. */
+    public static boolean showInventoryButtons = true;
+
     /** Référence au bouton livre pour repositionnement dynamique. */
     private GuiButtonBook bookButton = null;
     /** Bouton profil à gauche du bouton livre. */
     private GuiButtonProfil profilButton = null;
+    /** Bouton wiki entre profil et livre. */
+    private GuiButtonWiki wikiButton = null;
 
     /**
      * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
@@ -58,16 +64,27 @@ public class GuiInventory extends InventoryEffectRenderer {
         this.buttonList.clear();
         this.bookButton = null;
         this.profilButton = null;
+        this.wikiButton = null;
 
         if (this.mc.playerController.isInCreativeMode()) {
             this.mc.displayGuiScreen(new GuiContainerCreative(this.mc.thePlayer));
         } else {
             super.initGui();
-            // Boutons d'acces rapide ancrés en haut à droite de l'inventaire
-            bookButton = new GuiButtonBook(2, this.guiLeft + this.xSize - 25, this.guiTop + 5);
-            this.buttonList.add(bookButton);
-            profilButton = new GuiButtonProfil(3, this.guiLeft + this.xSize - 46, this.guiTop + 5);
-            this.buttonList.add(profilButton);
+            if (showInventoryButtons) {
+                // Boutons positionnés juste SOUS la table de craft (2x2 grid y=18-54),
+                // centrés sur la zone crafting (x=86-172, centre=129).
+                // 3 boutons × 18px + 2 gaps × 2px = 58px → start = 129 - 29 = 100
+                //   wiki   : x+100  (livre enchante rouge)
+                //   profil : x+120  (tête de joueur)
+                //   guide  : x+140  (livre bleu)
+                // y = 57 : 3px en dessous du bas de la grille de craft (y=54)
+                wikiButton   = new GuiButtonWiki  (4, this.guiLeft + 108, this.guiTop + 62);
+                profilButton = new GuiButtonProfil(3, this.guiLeft + 128, this.guiTop + 62);
+                bookButton   = new GuiButtonBook  (2, this.guiLeft + 148, this.guiTop + 62);
+                this.buttonList.add(wikiButton);
+                this.buttonList.add(profilButton);
+                this.buttonList.add(bookButton);
+            }
         }
     }
 
@@ -79,12 +96,16 @@ public class GuiInventory extends InventoryEffectRenderer {
     protected void updateActivePotionEffects() {
         super.updateActivePotionEffects();
         if (bookButton != null) {
-            bookButton.xPosition = this.guiLeft + this.xSize - 25;
-            bookButton.yPosition = this.guiTop + 5;
+            bookButton.xPosition  = this.guiLeft + 148;
+            bookButton.yPosition  = this.guiTop  + 62;
+        }
+        if (wikiButton != null) {
+            wikiButton.xPosition  = this.guiLeft + 108;
+            wikiButton.yPosition  = this.guiTop  + 62;
         }
         if (profilButton != null) {
-            profilButton.xPosition = this.guiLeft + this.xSize - 46;
-            profilButton.yPosition = this.guiTop + 5;
+            profilButton.xPosition = this.guiLeft + 128;
+            profilButton.yPosition = this.guiTop  + 62;
         }
     }
 
@@ -177,6 +198,10 @@ public class GuiInventory extends InventoryEffectRenderer {
         if (button.id == 2) {
             // Ouvrir l'interface du guide de craft
             this.mc.displayGuiScreen(new GuiCraftGuide(this));
+        }
+        if (button.id == 4) {
+            // Ouvrir le Wiki
+            this.mc.displayGuiScreen(new GuiWiki(this));
         }
         if (button.id == 3) {
             // Demande au serveur des données fraîches (kills, morts, killstreak,
@@ -280,6 +305,15 @@ public class GuiInventory extends InventoryEffectRenderer {
         @Override protected ItemStack getIconStack() { return BOOK; }
         @Override protected String getTooltip() { return "Guide"; }
         @Override protected int getAccentColor() { return 0xFF3D8EFF; }
+    }
+
+    // Bouton wiki : livre enchante (rouge) pour le distinguer du Guide Craft
+    public static class GuiButtonWiki extends GuiIconButtonBase {
+        private static final ItemStack WIKI = new ItemStack(Items.enchanted_book);
+        public GuiButtonWiki(int buttonId, int x, int y) { super(buttonId, x, y); }
+        @Override protected ItemStack getIconStack() { return WIKI; }
+        @Override protected String getTooltip() { return "Wiki du serveur"; }
+        @Override protected int getAccentColor() { return 0xFFE02828; }
     }
 
     // Bouton profil : tête de joueur (skull de type 3)

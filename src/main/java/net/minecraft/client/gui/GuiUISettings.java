@@ -35,6 +35,14 @@ public class GuiUISettings extends GuiScreen {
     // Animation maps
     private final Map<String, Float> toggleAnimMap = new HashMap<>();
     private final Map<String, Float> hoverAnimMap = new HashMap<>();
+    private final Map<String, Float> infoHoverMap = new HashMap<>();
+
+    // Info bubble overlay state
+    private boolean infoOpen = false;
+    private String infoTitle = "";
+    private List<String> infoBody = new ArrayList<>();
+    private float infoAnim = 0f;
+    private String hoveredRowId = null;
 
     // Open/close animation
     private float openAnim = 0.0f;
@@ -62,6 +70,35 @@ public class GuiUISettings extends GuiScreen {
     private static final int TEXT_SECONDARY = 0xFF8A9AB0;  // Cool blue-grey
     private static final int TEXT_MUTED     = 0xFF445060;
 
+    // ── Descriptions (info bubbles) ─────────────────────────────────
+    private static final Map<String, String[]> DESCRIPTIONS = new HashMap<>();
+    static {
+        DESCRIPTIONS.put("fps",              new String[]{"FPS", "Affiche le nombre d'images par seconde rendues. Utile pour evaluer la fluidite et reperer les chutes de performance."});
+        DESCRIPTIONS.put("ping",             new String[]{"Ping", "Latence reseau entre votre client et le serveur, en millisecondes. Plus c'est bas, mieux c'est."});
+        DESCRIPTIONS.put("biome",            new String[]{"Biome", "Affiche le biome dans lequel vous vous trouvez actuellement (Plaines, Foret, Desert, ...)."});
+        DESCRIPTIONS.put("coords",           new String[]{"Coordonnees", "Affiche votre position X / Y / Z dans le monde. Pratique pour partager un emplacement."});
+        DESCRIPTIONS.put("dir",              new String[]{"Direction", "Affiche la direction cardinale dans laquelle vous regardez (N, S, E, W) avec l'angle precis."});
+        DESCRIPTIONS.put("date",             new String[]{"Date", "Affiche la date et l'heure systeme (machine locale)."});
+        DESCRIPTIONS.put("helditem",         new String[]{"Objet tenu", "Affiche le nom et la durabilite de l'objet en main, avec barre de progression coloree."});
+        DESCRIPTIONS.put("armor_group",      new String[]{"Armure", "Affiche les 4 pieces d'armure equipees (casque, plastron, jambieres, bottes) avec leur durabilite restante en pourcentage."});
+        DESCRIPTIONS.put("potions",          new String[]{"Effets de Potion", "Liste vos effets de potion actifs avec le temps restant. Codage couleur selon le type d'effet (buff/debuff)."});
+        DESCRIPTIONS.put("cps",              new String[]{"CPS", "Clicks Per Second. Affiche votre vitesse de clic gauche / droit en temps reel. Tres utile en PvP."});
+        DESCRIPTIONS.put("toggle_sneak",     new String[]{"Toggle Sneak", "Indicateur HUD du mode Sneak active. Active aussi le toggle (appui simple = sneak permanent)."});
+        DESCRIPTIONS.put("toggle_sprint",    new String[]{"Toggle Sprint", "Indicateur HUD du mode Sprint active. Active aussi le toggle (appui simple = sprint permanent)."});
+        DESCRIPTIONS.put("auto_armor",       new String[]{"Auto Armor", "Equipe automatiquement la meilleure armure disponible dans votre inventaire des qu'un slot est vide ou casse."});
+        DESCRIPTIONS.put("combatlog",        new String[]{"Combat Tag", "Affiche un compte a rebours quand vous etes en combat (Combat Tag). Vous interdit de quitter sans mourir."});
+        DESCRIPTIONS.put("Keystrokes",       new String[]{"Keystrokes", "Affiche en direct les touches Z Q S D, espace, et les clics de souris. Utile pour les replays / streams."});
+        DESCRIPTIONS.put("keystrokes",       new String[]{"Keystrokes", "Affiche en direct les touches Z Q S D, espace, et les clics de souris. Utile pour les replays / streams."});
+        DESCRIPTIONS.put("Reach",            new String[]{"Reach Display", "Affiche la distance en blocs au dernier joueur que vous avez touche. Permet de mesurer votre allonge effective."});
+        DESCRIPTIONS.put("reach",            new String[]{"Reach Display", "Affiche la distance en blocs au dernier joueur que vous avez touche. Permet de mesurer votre allonge effective."});
+        DESCRIPTIONS.put("compass",          new String[]{"Boussole HUD", "Bande de boussole horizontale en haut de l'ecran indiquant les directions cardinales et l'angle de vue."});
+        DESCRIPTIONS.put("player_healthbar", new String[]{"Barre de vie joueurs", "Affiche la barre de vie au-dessus des autres joueurs visibles, avec leur nom et armure."});
+        DESCRIPTIONS.put("faction_zone",     new String[]{"Zone Faction", "Affiche le nom du territoire dans lequel vous vous trouvez, avec la relation (alliee / ennemie / neutre)."});
+        DESCRIPTIONS.put("sneak",            new String[]{"Toggle Sneak", "Active le sneak en bascule : un appui = sneak permanent, un autre appui = arret. Sans cette option, vous devez maintenir la touche."});
+        DESCRIPTIONS.put("sprint",           new String[]{"Toggle Sprint", "Active le sprint en bascule : un appui = sprint permanent jusqu'a impact ou changement de direction."});
+        DESCRIPTIONS.put("inv_buttons",      new String[]{"Boutons inventaire", "Affiche ou masque les 3 boutons d'acces rapide (Wiki, Profil, Guide Craft) sous la table de craft dans l'inventaire."});
+    }
+
     public GuiUISettings(GuiScreen parent) {
         this.parent = parent;
     }
@@ -82,6 +119,9 @@ public class GuiUISettings extends GuiScreen {
                 rows.add(new SettingRow("Toggle Sprint", "sprint"));
             }
         }
+        // Section Interface — options visuelles hors widgets HUD
+        rows.add(new SettingRow("INTERFACE", true));
+        rows.add(new SettingRow("Boutons inventaire", "inv_buttons"));
 
         // Layout
         panelW = MathHelper.clamp_int(this.width - 60, 260, 360);
@@ -212,9 +252,15 @@ public class GuiUISettings extends GuiScreen {
         GuiRenderUtils.drawRectOutline(panelX, panelY, panelW, panelH, UITheme.primary(0x2B));
 
         GlStateManager.popMatrix();
+
+        // Info bubble overlay (above everything)
+        if (infoOpen) {
+            drawInfoBubble(mouseX, mouseY);
+        }
     }
 
     private void drawContent(int mouseX, int mouseY) {
+        hoveredRowId = null;
         int y = contentTop + 4 - (int) scrollOffset;
 
         for (int i = 0; i < rows.size(); i++) {
@@ -305,8 +351,37 @@ public class GuiUISettings extends GuiScreen {
             this.fontRendererObj.drawString(">", x + w - 52, y + (h - 8) / 2, (hintAlpha << 24) | 0xFFDDCC);
         }
 
+        // Info "i" badge — décalé à w-72 pour plus d'espace avec la flèche ">" (w-52)
+        if (DESCRIPTIONS.containsKey(row.getId())) {
+            drawInfoBadge(x + w - 72, y + (h - 11) / 2, row.getId(), hAnim, mx, my);
+        }
+
+        // Track hovered row for keyboard "i" shortcut
+        if (hovered) hoveredRowId = row.getId();
+
         // Toggle switch
         drawToggle(x + w - 41, y + (h - 12) / 2, enabled, row.getId());
+    }
+
+    /**
+     * Badge "i" 11x11 dans le style du panneau (cadre accent + lettre).
+     * Place a gauche de la fleche ">" pour ne pas la chevaucher.
+     */
+    private void drawInfoBadge(int x, int y, String id, float rowHover, int mx, int my) {
+        boolean iconHover = inRect(mx, my, x, y, 11, 11) && my >= contentTop && my < contentBottom;
+        String key = "i_" + id;
+        float a = infoHoverMap.getOrDefault(key, 0f);
+        float target = iconHover ? 1f : Math.min(0.5f, rowHover);
+        a = GuiRenderUtils.lerp(a, target, 0.2f);
+        infoHoverMap.put(key, a);
+
+        int border = (int)(0x40 + a * 0x90);
+        int fill   = (int)(0x08 + a * 0x30);
+        Gui.drawRect(x, y, x + 11, y + 11, (fill << 24) | 0xFFFFFF);
+        GuiRenderUtils.drawRectOutline(x, y, 11, 11, (border << 24) | (UITheme.getPrimary() & 0xFFFFFF));
+        int col = GuiRenderUtils.colorLerp(0xFF8A9AB0, 0xFFFFFFFF, a);
+        int tw = this.fontRendererObj.getStringWidth("i");
+        this.fontRendererObj.drawString("i", x + (11 - tw) / 2 + 1, y + 2, col);
     }
 
     private void drawToggle(int x, int y, boolean value, String id) {
@@ -347,6 +422,12 @@ public class GuiUISettings extends GuiScreen {
     @Override
     protected void mouseClicked(int mx, int my, int btn) throws IOException {
         if (btn != 0) return;
+
+        // Info bubble: any click closes it
+        if (infoOpen) {
+            infoOpen = false;
+            return;
+        }
 
         // Footer layout logic — must match drawScreen values exactly
         int btnW = (panelW - 20);
@@ -392,6 +473,13 @@ public class GuiUISettings extends GuiScreen {
             int rh = row.isHeader ? 20 : rowH;
 
             if (!row.isHeader && inRect(mx, my, panelX, y, panelW - 8, rh)) {
+                // Info "i" badge (priority over row click) — position cohérente avec le rendu (w-72)
+                int infoX = panelX + panelW - 72;
+                int infoY = y + (rh - 11) / 2;
+                if (inRect(mx, my, infoX, infoY, 11, 11) && DESCRIPTIONS.containsKey(row.getId())) {
+                    openInfoBubble(row);
+                    return;
+                }
                 // Toggle area (right side)
                 if (inRect(mx, my, panelX + panelW - 46, y, 40, rh)) {
                     row.toggle(this.mc.gameSettings);
@@ -444,9 +532,87 @@ public class GuiUISettings extends GuiScreen {
 
     @Override
     protected void keyTyped(char c, int keyCode) throws IOException {
+        if (infoOpen) {
+            if (keyCode == 1) infoOpen = false;
+            return;
+        }
+        // 'i' (KEY_I = 23) -> ouvre la bulle pour la ligne survolee
+        if (keyCode == 23 && hoveredRowId != null && DESCRIPTIONS.containsKey(hoveredRowId)) {
+            for (SettingRow r : rows) {
+                if (!r.isHeader && hoveredRowId.equals(r.getId())) {
+                    openInfoBubble(r);
+                    return;
+                }
+            }
+        }
         if (keyCode == 1) {
             this.mc.displayGuiScreen(parent);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void openInfoBubble(SettingRow row) {
+        String[] desc = DESCRIPTIONS.get(row.getId());
+        if (desc == null) return;
+        infoTitle = desc[0];
+        int wrapW = MathHelper.clamp_int(panelW - 60, 200, 280);
+        infoBody = (List<String>) this.fontRendererObj.listFormattedStringToWidth(desc[1], wrapW);
+        infoOpen = true;
+        infoAnim = 0f;
+    }
+
+    private void drawInfoBubble(int mouseX, int mouseY) {
+        infoAnim = MathHelper.clamp_float(infoAnim + 0.15f, 0f, 1f);
+        float ease = infoAnim * infoAnim * (3f - 2f * infoAnim);
+
+        // Dim screen behind
+        Gui.drawRect(0, 0, this.width, this.height, (int)(ease * 0xB0) << 24);
+
+        int bw = MathHelper.clamp_int(panelW - 30, 220, 300);
+        int titleH = 12;
+        int padTop = 10, padBot = 12, padX = 14;
+        int lineH = 11;
+        int bh = padTop + titleH + 6 + Math.max(1, infoBody.size()) * lineH + padBot;
+        int bx = (this.width - bw) / 2;
+        int by = (this.height - bh) / 2;
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(0, (1f - ease) * 6, 0);
+
+        GuiRenderUtils.drawShadow(bx, by, bw, bh, 6, (int)(ease * 0x80));
+        Gui.drawRect(bx, by, bx + bw, by + bh, BG_PANEL);
+        // Top accent line
+        Gui.drawRect(bx, by, bx + bw, by + 2, UITheme.getPrimary());
+        GuiRenderUtils.drawGradientRect(bx, by + 2, bx + bw, by + 8, UITheme.primary(0x18), 0x00000000);
+
+        // Title
+        int tw = fontRendererObj.getStringWidth(infoTitle);
+        int tw1 = fontRendererObj.getStringWidth(infoTitle.substring(0, 1));
+        int ttx = bx + (bw - tw) / 2;
+        int tty = by + padTop;
+        fontRendererObj.drawStringWithShadow(infoTitle.substring(0, 1), ttx, tty, UITheme.getPrimary());
+        if (infoTitle.length() > 1) {
+            fontRendererObj.drawStringWithShadow(infoTitle.substring(1), ttx + tw1, tty, TEXT_PRIMARY);
+        }
+        // Subtle underline
+        GuiRenderUtils.drawGradientRect(bx + padX, tty + 11, bx + bw - padX, tty + 12, 0x00000000, UITheme.primary(0x55));
+        GuiRenderUtils.drawGradientRect(bx + padX, tty + 11, bx + bw - padX, tty + 12, UITheme.primary(0x55), 0x00000000);
+
+        // Body
+        int by0 = tty + titleH + 6;
+        for (int i = 0; i < infoBody.size(); i++) {
+            fontRendererObj.drawString(infoBody.get(i), bx + padX, by0 + i * lineH, TEXT_SECONDARY);
+        }
+
+        // Footer hint
+        String hint = "Cliquez pour fermer";
+        int hw = fontRendererObj.getStringWidth(hint);
+        fontRendererObj.drawString(hint, bx + (bw - hw) / 2, by + bh - 10, TEXT_MUTED);
+
+        // Outline
+        GuiRenderUtils.drawRectOutline(bx, by, bw, bh, UITheme.primary(0x33));
+
+        GlStateManager.popMatrix();
     }
 
     @Override
@@ -520,6 +686,7 @@ public class GuiUISettings extends GuiScreen {
             if (element != null) return element.isEnabled();
             if ("sneak".equals(settingKey)) return gs.toggleSneakEnabled;
             if ("sprint".equals(settingKey)) return gs.toggleSprintEnabled;
+            if ("inv_buttons".equals(settingKey)) return net.minecraft.client.gui.inventory.GuiInventory.showInventoryButtons;
             return false;
         }
 
@@ -545,6 +712,10 @@ public class GuiUISettings extends GuiScreen {
                 if (sprintWidget != null) {
                     sprintWidget.setEnabled(gs.toggleSprintEnabled);
                 }
+            }
+            if ("inv_buttons".equals(settingKey)) {
+                net.minecraft.client.gui.inventory.GuiInventory.showInventoryButtons =
+                        !net.minecraft.client.gui.inventory.GuiInventory.showInventoryButtons;
             }
             try {
                 gs.saveOptions();

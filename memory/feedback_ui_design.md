@@ -14,3 +14,10 @@ L'utilisateur veut un design UI **vraiment professionnel et épuré**, inspiré 
 - Privilégier : logo image net, typo soignée (scale + letterspacing si fontRenderer vanilla), boutons plats, fond panorama assombri.
 - Si un élément ne sert pas une fonction claire (lisibilité, hiérarchie, action), le supprimer.
 - Réf esthétique : Lunar Client main menu — fond très sombre, logo central, boutons sobres, presque rien d'autre.
+
+**MAIS attention — ne pas confondre minimal avec "supprimer aussi les éléments fonctionnels existants" :**
+quand on ajoute un élément à une UI existante, il ne faut pas en profiter pour retirer des
+éléments fonctionnels que l'utilisateur a déjà validés (ex : flèches `>` indiquant qu'une
+ligne est cliquable dans GuiUISettings). Ajouter un nouvel élément (badge "i") =
+trouver une place qui ne chevauche pas, **sans toucher** aux éléments existants. Si l'espace
+manque, dire le problème ou demander, plutôt que supprimer un élément utile.
