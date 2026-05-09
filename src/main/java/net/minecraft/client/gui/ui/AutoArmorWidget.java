@@ -28,13 +28,19 @@ public class AutoArmorWidget extends BaseWidget {
     }
 
     @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+    }
+
+
+    @Override
     public boolean supportsLabelColor() { return true; }
 
     // ---- Feature state ----
 
     /** Retourne true si la feature auto-armor est activée. */
     public boolean isAutoActive() {
-        return !Boolean.FALSE.equals(getPropOrDefault("autoActive", Boolean.TRUE));
+        return this.enabled;
     }
 
     // ---- Render (logique + affichage) ----

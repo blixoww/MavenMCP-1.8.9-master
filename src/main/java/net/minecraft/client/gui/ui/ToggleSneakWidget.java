@@ -42,7 +42,9 @@ public class ToggleSneakWidget extends BaseWidget {
         // Respect du prop showDisplay (feature inexistante ici — only display)
         if (Boolean.FALSE.equals(getPropOrDefault("showDisplay", Boolean.TRUE))) return;
 
-        boolean sneaking = gs.toggleSneakEnabled && gs.isToggleSneakActive;
+        // isToggleSneakActive est mis à true/false par updateToggleKeys() en temps réel.
+        // On n'utilise pas toggleSneakEnabled ici car il peut être désynchronisé au chargement.
+        boolean sneaking = gs.toggleSneakEnabled;
         String value = sneaking ? "ON" : "OFF";
         drawLabelValue(fr, "Sneak: ", value, 0, 0);
     }

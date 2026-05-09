@@ -345,8 +345,8 @@ public class GuiUISettings extends GuiScreen {
         );
         this.fontRendererObj.drawStringWithShadow(displayLabel, x + 27, y + (h - 8) / 2, labelCol);
 
-        // Arrow hint on hover (widget rows only)
-        if (row.element != null && hAnim > 0.2f) {
+        // Arrow hint on hover (all setting rows)
+        if (hAnim > 0.2f) {
             int hintAlpha = (int)(Math.min(1f, (hAnim - 0.2f) / 0.8f) * 0x80);
             this.fontRendererObj.drawString(">", x + w - 52, y + (h - 8) / 2, (hintAlpha << 24) | 0xFFDDCC);
         }
@@ -491,6 +491,15 @@ public class GuiUISettings extends GuiScreen {
                 if (row.element != null) {
                     this.mc.displayGuiScreen(new GuiUIEditor(this, row.element.getId()));
                     return;
+                }
+                // Rows sneak/sprint -> open editor for corresponding widget
+                if ("sneak".equals(row.settingKey)) {
+                    UIElement w = UIManager.getInstance().get("toggle_sneak");
+                    if (w != null) { this.mc.displayGuiScreen(new GuiUIEditor(this, w.getId())); return; }
+                }
+                if ("sprint".equals(row.settingKey)) {
+                    UIElement w = UIManager.getInstance().get("toggle_sprint");
+                    if (w != null) { this.mc.displayGuiScreen(new GuiUIEditor(this, w.getId())); return; }
                 }
             }
             y += rh;

@@ -686,10 +686,11 @@ public class EntityPlayerSP extends AbstractClientPlayer {
                 && ((float) this.getFoodStats().getFoodLevel() > 6.0F || this.capabilities.allowFlying)) {
             this.setSprinting(true);
         }
-        // Toggle Sprint : si on ne peut plus sprinter (faim, collision, item), désactiver le toggle
+        // Toggle Sprint : désactiver le mode si item en main ou conditions impossibles (faim, cécité)
+        // La collision n'annule pas le mode : setSprinting(false) plus bas gère l'arrêt physique,
+        // et le sprint reprend automatiquement à la frame suivante si le joueur avance encore.
         if (this.mc.gameSettings.toggleSprintEnabled && this.mc.gameSettings.isToggleSprintActive
-                && (this.isCollidedHorizontally
-                    || this.isUsingItem()
+                && (this.isUsingItem()
                     || this.isPotionActive(net.minecraft.potion.Potion.blindness)
                     || ((float) this.getFoodStats().getFoodLevel() <= 6.0F && !this.capabilities.allowFlying))) {
             this.mc.gameSettings.isToggleSprintActive = false;

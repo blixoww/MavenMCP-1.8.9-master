@@ -199,7 +199,6 @@ public class GuiIngame extends Gui {
     // Suivi du front montant pour Toggle Sneak/Sprint (vrai toggle)
     private boolean prevToggleSneakDown = false;
     private boolean prevToggleSprintDown = false;
-    private boolean prevForwardDown = false;
 
     public void updateToggleKeys() {
         GameSettings gs = this.mc.gameSettings;
@@ -226,21 +225,10 @@ public class GuiIngame extends Gui {
                 gs.isToggleSprintActive = !gs.isToggleSprintActive;
             }
             prevToggleSprintDown = sprintDown;
-
-            // Si l'utilisateur appuie sur la touche Avant (front-edge) alors
-            // qu'on est en mode Toggle Sprint activé, on démarre/arrête aussi le toggle.
-            // Cela permet de ré-appuyer sur Avancer pour lancer immédiatement le sprint.
-            boolean forwardDown = GameSettings.isKeyDown(gs.keyBindForward);
-            if (forwardDown && !prevForwardDown) {
-                // Utilisateur vient d'appuyer sur Avancer
-                gs.isToggleSprintActive = !gs.isToggleSprintActive;
-            }
-            prevForwardDown = forwardDown;
         } else {
             // Mode normal : on reset l'état toggle
             gs.isToggleSprintActive = false;
             prevToggleSprintDown = false;
-            prevForwardDown = false;
         }
 
         // Zoom : maintenu (pas un toggle)
