@@ -108,7 +108,7 @@ public class GuiWiki extends GuiScreen {
         // ── SYSTEMES ─────────────────────────────────────────────────────────
         sections.add(new Section("SYSTEMES", Arrays.asList(
             new Entry("Profil joueur",
-                "Vue detaillee du profil : kills, deaths, killstreak, bounty, temps de jeu, solde, rang et faction. " +
+                "Vue detaillee du profil : kills, deaths, killstreak, prime, temps de jeu, solde, rang et faction. " +
                 "Ouverture via l'inventaire (tete joueur) ou /profil <joueur>."),
             new Entry("Guide Craft",
                 "Catalogue complet des recettes : crafting, four et brassage (potions vanilla + custom). " +
@@ -118,38 +118,34 @@ public class GuiWiki extends GuiScreen {
                 "S'applique a tous les widgets, menus et indicateurs du client."),
             new Entry("Waypoints",
                 "Marqueurs 3D posables dans le monde. Ils sont visibles dans le widget Boussole HUD sous forme de reperes " +
-                "colores avec label. Couleur et nom personnalisables. Ajoutez un waypoint via la Boussole ou la commande dediee."),
+                "colores avec label. Couleur et nom personnalisables."),
             new Entry("Visuals",
-                "Options visuelles avancees : particules de hit personnalisees, indicateurs de degats flottants " +
-                "(damage numbers), effets de sang, full bright, champ de vision (FOV) HUD, hitbox render. " +
-                "Activables dans les parametres client (Options > Visuals)."),
+                "Options visuelles avancees : particules de hit personnalisees, ping à la counter strike " +
+                ", particules de potions. "),
             new Entry("Shaders",
                 "Le client supporte les shaderpacks compatibles OptiFine/GLSL. Changez de shaderpack dans les " +
-                "parametres graphiques (Options > Graphismes > Shaders). Des presets sont disponibles dans le dossier " +
-                "shaderpacks/ du client. Certains presets sont optimises pour le PvP (sans ombres lourdes).")
+                "parametres graphiques.")
         )));
 
         // ── ÉVÉNEMENTS ───────────────────────────────────────────────────────
         sections.add(new Section("EVENEMENTS", Arrays.asList(
-            new Entry("KOTH — King of the Hill",
-                "Une zone delimitee doit etre capturee en restant a l'interieur sans adversaire. " +
+            new Entry("KOTH - King of the Hill",
+                "Une zone delimitee doit etre capturee en restant a l'interieur. " +
                 "Un timer (~5 min) se declenche. Sortir ou etre tue remet le timer a zero. " +
-                "Duree max ~30 min. Victoire : grosses recompenses pour le joueur et sa faction."),
-            new Entry("Totem — Defense de structure",
-                "Une structure (Totem) est placee sur la map. La faction qui la controle accumule des points. " +
-                "Les blocs peuvent etre detruits par les ennemis. Victoire par score en fin de timer (~30 min)."),
+                "Duree max ~30 min."),
+            new Entry("Totem - Defense de structure",
+                "Une structure (Totem) est placee sur la map. Les joueurs doivent détruire les blocks de la structure. " +
+                "Victoire pour la faction qui a détruit tous les blocks (~30 min)."),
             new Entry("LMS — Last Man Standing",
                 "Combat en arene : chaque faction envoie un seul representant. Aucune alliance. " +
                 "Le dernier joueur en vie remporte l'event et des recompenses majeures."),
-            new Entry("Domination — Controle de zones",
+            new Entry("Domination - Controle de zones",
                 "Plusieurs zones a capturer simultanement. Rester dans une zone accumule des points. " +
                 "Les kills donnent des bonus. Multiplicateur dynamique si zone tres disputee. " +
                 "La faction avec le plus de points en fin de timer gagne."),
-            new Entry("Purge — 30 min de chaos",
+            new Entry("Purge - 30 min de chaos",
                 "30 minutes : les portes dans les AP s'ouvrent pour tous. Tuer en warzone rapporte argent et items. " +
-                "Un seul joueur UNIQUE compte par kill. Objectif : maximiser le nombre de joueurs differents tues."),
-            new Entry("/plannings",
-                "Commande pour voir les prochains evenements planifies : date, heure et type.")
+                "Un seul joueur UNIQUE compte par kill. Objectif : maximiser le nombre de joueurs differents tues.")
         )));
 
         // ── COMMANDES ────────────────────────────────────────────────────────
