@@ -51,7 +51,10 @@ public class AutoArmorWidget extends BaseWidget {
         if (mc == null || mc.thePlayer == null) return;
 
         // ── 1. Logique auto-armor — tourne indépendamment de showDisplay ──
-        if (isAutoActive() && !UIManager.getInstance().isEditorActive()) {
+        // Ne pas tourner quand un GUI est ouvert (inventaire, coffre, etc.) sinon
+        // ça réquipe les armures que le joueur vient de retirer (shift-clic),
+        // ce qui provoque des "duplications" visuelles et des items mal retirés.
+        if (isAutoActive() && !UIManager.getInstance().isEditorActive() && mc.currentScreen == null) {
             runAutoArmor(mc);
         }
 

@@ -826,7 +826,7 @@
         "props": {
           "snapGrid": true,
           "snapAlign": false,
-          "colorLabel": -65536.0,
+          "colorLabel": -65536,
           "syncColors": false
         }
       },
@@ -845,7 +845,7 @@
         "height": 12,
         "props": {
           "snapAlign": true,
-          "colorLabel": -65536.0,
+          "colorLabel": -65536,
           "syncColors": false
         }
       },
@@ -865,7 +865,7 @@
         "props": {
           "snapGrid": false,
           "snapAlign": true,
-          "colorLabel": -65536.0,
+          "colorLabel": -65536,
           "syncColors": false
         }
       },
@@ -886,7 +886,7 @@
           "rgbMode": false,
           "snapGrid": true,
           "snapAlign": true,
-          "colorLabel": -65536.0,
+          "colorLabel": -65536,
           "rawColor": -1.0,
           "syncColors": false
         }
@@ -907,7 +907,7 @@
         "props": {
           "snapGrid": false,
           "snapAlign": false,
-          "colorLabel": -65536.0,
+          "colorLabel": -65536,
           "syncColors": false
         }
       },
@@ -927,13 +927,13 @@
         "props": {
           "snapGrid": false,
           "snapAlign": true,
-          "colorLabel": -65536.0,
+          "colorLabel": -65536,
           "syncColors": false
         }
       },
       "helditem": {
-        "x": 573,
-        "y": 312,
+        "x": 501,
+        "y": 295,
         "enabled": true,
         "color": -1,
         "rgb": false,
@@ -972,8 +972,8 @@
         }
       },
       "potions": {
-        "x": 13,
-        "y": 190,
+        "x": 10,
+        "y": 170,
         "enabled": true,
         "color": -1,
         "rgb": false,
@@ -1013,7 +1013,7 @@
           "showBackground": false,
           "dynamicColor": true,
           "initialized": false,
-          "colorLabel": -65536.0,
+          "colorLabel": -65536,
           "syncColors": false
         }
       },
@@ -1034,7 +1034,7 @@
           "showDisplay": false,
           "snapGrid": false,
           "snapAlign": true,
-          "colorLabel": -65536.0,
+          "colorLabel": -65536,
           "syncColors": false
         }
       },
@@ -1052,10 +1052,10 @@
         "width": 72,
         "height": 14,
         "props": {
-          "showDisplay": false,
+          "showDisplay": true,
           "snapGrid": false,
           "snapAlign": true,
-          "colorLabel": -65536.0,
+          "colorLabel": -65536,
           "syncColors": false
         }
       },
@@ -1074,7 +1074,7 @@
         "height": 12,
         "props": {
           "showDisplay": false,
-          "colorLabel": -65536.0,
+          "colorLabel": -65536,
           "autoActive": false,
           "syncColors": false
         }
@@ -1115,7 +1115,7 @@
         "props": {
           "snapGrid": false,
           "customSize": true,
-          "colorLabel": -65536.0,
+          "colorLabel": -65536,
           "syncColors": false
         }
       },
@@ -1130,7 +1130,7 @@
         "relY": 0.16819571865443425,
         "refW": 640,
         "refH": 337,
-        "width": 80,
+        "width": 65,
         "height": 9,
         "props": {
           "showWilderness": false,
@@ -1158,7 +1158,7 @@
       },
       "player_healthbar": {
         "x": 54,
-        "y": 319,
+        "y": 318,
         "enabled": true,
         "color": -1,
         "rgb": false,
@@ -1181,7 +1181,7 @@
         "x": 547,
         "y": 16,
         "enabled": true,
-        "color": -1692034,
+        "color": -13749530,
         "rgb": true,
         "scale": 1.0,
         "relX": 0.9838129496402878,

@@ -83,6 +83,8 @@ public final class PlayerDataHandler {
 
     public static PlayerData getCachedData() { return cachedData; }
 
+    public static void setCachedData(PlayerData data) { cachedData = data; }
+
     public static void setListener(DataListener l) { listener = l; }
 
     private static void notifyListener() {

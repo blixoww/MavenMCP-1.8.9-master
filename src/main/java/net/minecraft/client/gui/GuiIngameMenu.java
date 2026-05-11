@@ -6,9 +6,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.ResourceLocation;
 
 public class GuiIngameMenu extends GuiScreen {
-    
+
+    private static final ResourceLocation LOGO_TEXTURE = new ResourceLocation("textures/logo/logo.png");
+
     private float animation = 0.0f;
     private long lastTime = -1L;
     private final int accentColor = new Color(220, 30, 30).getRGB();
@@ -131,6 +134,41 @@ public class GuiIngameMenu extends GuiScreen {
         renderStats(px, py, pW, pH);
 
         GlStateManager.popMatrix();
+
+        renderBrandingCorner();
+    }
+
+    private void renderBrandingCorner() {
+        float alpha = animation * 0.60f;
+        int a = (int)(alpha * 255);
+        if (a <= 2) return;
+
+        final int LOGO_SIZE = 22;
+        final int MARGIN    = 10;
+        final int GAP       = 6;  // logo ↔ texte
+
+        // Calcul de la largeur totale (logo + gap + "RED " + "CONFLICT")
+        int redW      = fontRendererObj.getStringWidth("RED ");
+        int conflictW = fontRendererObj.getStringWidth("CONFLICT");
+        int textW     = redW + conflictW;
+        int totalW    = LOGO_SIZE + GAP + textW;
+
+        int x     = this.width  - totalW - MARGIN;
+        int y     = this.height - LOGO_SIZE - MARGIN;
+        int textY = y + (LOGO_SIZE - 8) / 2;
+
+        // Logo
+        mc.getTextureManager().bindTexture(LOGO_TEXTURE);
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(770, 771);
+        GlStateManager.color(1f, 1f, 1f, alpha);
+        Gui.drawModalRectWithCustomSizedTexture(x, y, 0f, 0f, LOGO_SIZE, LOGO_SIZE, LOGO_SIZE, LOGO_SIZE);
+        GlStateManager.color(1f, 1f, 1f, 1f);
+
+        // "RED" rouge + "CONFLICT" blanc — même palette que GuiMainMenu
+        int textX = x + LOGO_SIZE + GAP;
+        fontRendererObj.drawStringWithShadow("RED ", textX, textY, (a << 24) | 0xE63946);
+        fontRendererObj.drawStringWithShadow("CONFLICT", textX + redW, textY, (a << 24) | 0xFFFFFF);
     }
 
     private void renderStats(int px, int py, int pW, int pH) {

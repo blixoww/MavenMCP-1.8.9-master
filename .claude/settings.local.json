@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/Valentin/Desktop/JAVA MC/Project/**)",
+      "Read(//c/Users/Valentin/Desktop/**)",
+      "Bash(grep -iE \"^\\(Item|Packet|Navigation|Pathfind|Item.*Book|.*Sign\\).*\\\\.java$\")"
+    ]
+  }
+}

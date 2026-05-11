@@ -43,9 +43,12 @@ public class PlayerData {
     public long   getBalance()        { return balance; }
     public void   setBalance(long b)  { this.balance = b; }
 
-    public int    getKills()          { return kills; }
-    public int    getDeaths()         { return deaths; }
-    public int    getPlayTimeMinutes(){ return playTimeMinutes; }
+    public int    getKills()              { return kills; }
+    public void   setKills(int k)         { this.kills = k; }
+    public int    getDeaths()             { return deaths; }
+    public void   setDeaths(int d)        { this.deaths = d; }
+    public int    getPlayTimeMinutes()    { return playTimeMinutes; }
+    public void   setPlayTimeMinutes(int m) { this.playTimeMinutes = m; }
 
     /** KD ratio – retourne 0 si aucune mort */
     public float  getKDRatio() {

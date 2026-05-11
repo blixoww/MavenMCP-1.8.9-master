@@ -90,6 +90,18 @@ public final class CustomPacketSystem {
             int factionRelation = 0; // propre profil → toujours own (vert)
             try { factionRelation = buf.readVarIntFromBuffer(); } catch (Exception ignored) {}
             final int finalRel = factionRelation;
+            // Mettre à jour les caches avec les données fraîches du serveur pour
+            // que GuiProfil(selfProfile=true) les lise correctement dès l'ouverture.
+            net.minecraft.client.custompackets.data.PlayerData fresh =
+                new net.minecraft.client.custompackets.data.PlayerData();
+            fresh.setRank(rank);
+            fresh.setBalance(balance);
+            fresh.setKills(kills);
+            fresh.setDeaths(deaths);
+            fresh.setPlayTimeMinutes(ptMin);
+            net.minecraft.client.custompackets.handler.PlayerDataHandler.setCachedData(fresh);
+            net.minecraft.client.custompackets.data.KillstreakCache.setCount(streak);
+            net.minecraft.client.custompackets.data.BountyCache.setSelfBounty(bounty);
             net.minecraft.client.Minecraft.getMinecraft().addScheduledTask(() ->
                 net.minecraft.client.Minecraft.getMinecraft().displayGuiScreen(
                     new net.minecraft.client.gui.GuiProfil(
