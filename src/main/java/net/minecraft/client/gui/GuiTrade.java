@@ -96,7 +96,17 @@ public class GuiTrade extends GuiScreen {
         Keyboard.enableRepeatEvents(true);
         PlayerData pd = PlayerDataHandler.getCachedData();
         if (pd != null) playerBalance = pd.getBalance();
-        PlayerDataHandler.setListener(d -> playerBalance = d.getBalance());
+        PlayerDataHandler.setListener(d -> {
+            playerBalance = d.getBalance();
+            // Si le solde a baissé en dessous de l'offre courante, on re-cap
+            if (myMoney > playerBalance) {
+                myMoney = playerBalance;
+                if (moneyField != null) {
+                    moneyField.setText(myMoney == 0 ? "" : String.valueOf(myMoney));
+                }
+                TradePacketHandler.sendMoneyOffer(myMoney);
+            }
+        });
     }
 
     @Override
@@ -114,7 +124,28 @@ public class GuiTrade extends GuiScreen {
         if (moneyField != null && moneyField.isFocused()) {
             String before = moneyField.getText();
             if (moneyField.textboxKeyTyped(c, key)) {
-                if (!moneyField.getText().equals(before)) commitMoney();
+                String after = moneyField.getText();
+                if (!after.equals(before)) {
+                    // Validation : la saisie ne doit pas dépasser le solde
+                    long v;
+                    String trimmed = after.trim();
+                    if (trimmed.isEmpty()) {
+                        v = 0L;
+                    } else {
+                        try { v = Long.parseLong(trimmed); }
+                        catch (NumberFormatException e) {
+                            // Non numérique → revert
+                            moneyField.setText(before);
+                            return;
+                        }
+                    }
+                    if (v < 0 || v > playerBalance) {
+                        // Dépasse le solde → on bloque la saisie
+                        moneyField.setText(before);
+                        return;
+                    }
+                    commitMoney();
+                }
                 return;
             }
         }
@@ -138,7 +169,7 @@ public class GuiTrade extends GuiScreen {
             mc.displayGuiScreen(null);
             return;
         }
-        if (hovConfirm && !TradePacketHandler.myConfirmed) {
+        if (hovConfirm && !TradePacketHandler.myConfirmed && myMoney <= playerBalance) {
             TradePacketHandler.sendConfirm();
             return;
         }
@@ -580,6 +611,8 @@ public class GuiTrade extends GuiScreen {
             try { v = Math.max(0L, Long.parseLong(txt)); }
             catch (NumberFormatException e) { return; }
         }
+        // Défensif : cap par le solde (la validation keyTyped est censée empêcher ça)
+        v = Math.min(v, playerBalance);
         if (v == myMoney) return;
         myMoney = v;
         TradePacketHandler.sendMoneyOffer(myMoney);

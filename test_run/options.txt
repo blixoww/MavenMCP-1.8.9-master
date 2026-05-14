@@ -10,7 +10,7 @@ bobView:true
 anaglyph3d:false
 maxFps:260
 fboEnable:true
-difficulty:2
+difficulty:1
 fancyGraphics:true
 ao:2
 renderClouds:true
@@ -83,8 +83,8 @@ key_Waypoints:17
 key_Craft:34
 key_Zoom:29
 key_Ping:46
-soundCategory_master:0.11589404
-soundCategory_music:0.0
+soundCategory_master:0.10067114
+soundCategory_music:0.007246377
 soundCategory_record:0.02112676
 soundCategory_weather:0.0
 soundCategory_block:0.02112676

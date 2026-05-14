@@ -1,5 +1,5 @@
 {
-  "activeProfile": 2,
+  "activeProfile": 1,
   "profileNames": [
     "PvP",
     "Exploration",
@@ -9,7 +9,7 @@
   ],
   "profileCustomThemeIdx": [
     -1,
-    -1,
+    0,
     0,
     -1,
     -1
@@ -417,7 +417,7 @@
         "x": 5,
         "y": 5,
         "enabled": true,
-        "color": -2236963,
+        "color": -1,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.008445945945945946,
@@ -429,7 +429,7 @@
         "props": {
           "snapGrid": true,
           "snapAlign": false,
-          "colorLabel": -5592406.0,
+          "colorLabel": -65536,
           "syncColors": false
         }
       },
@@ -437,7 +437,7 @@
         "x": 5,
         "y": 19,
         "enabled": false,
-        "color": -2236963,
+        "color": -1,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.008305647840531562,
@@ -448,7 +448,7 @@
         "height": 12,
         "props": {
           "snapAlign": true,
-          "colorLabel": -5592406.0,
+          "colorLabel": -65536,
           "syncColors": false
         }
       },
@@ -456,7 +456,7 @@
         "x": 5,
         "y": 41,
         "enabled": true,
-        "color": -2236963,
+        "color": -1,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.009615384615384616,
@@ -468,7 +468,7 @@
         "props": {
           "snapGrid": false,
           "snapAlign": true,
-          "colorLabel": -5592406.0,
+          "colorLabel": -65536,
           "syncColors": false
         }
       },
@@ -476,7 +476,7 @@
         "x": 5,
         "y": 17,
         "enabled": true,
-        "color": -2236963,
+        "color": -1,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.009057971014492754,
@@ -489,7 +489,7 @@
           "rgbMode": false,
           "snapGrid": true,
           "snapAlign": true,
-          "colorLabel": -5592406.0,
+          "colorLabel": -65536,
           "rawColor": -1.0,
           "syncColors": false
         }
@@ -498,7 +498,7 @@
         "x": 5,
         "y": 29,
         "enabled": true,
-        "color": -2236963,
+        "color": -1,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.01,
@@ -510,7 +510,7 @@
         "props": {
           "snapGrid": false,
           "snapAlign": false,
-          "colorLabel": -5592406.0,
+          "colorLabel": -65536,
           "syncColors": false
         }
       },
@@ -518,7 +518,7 @@
         "x": 5,
         "y": 53,
         "enabled": true,
-        "color": -2236963,
+        "color": -1,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.01,
@@ -530,7 +530,7 @@
         "props": {
           "snapGrid": false,
           "snapAlign": true,
-          "colorLabel": -5592406.0,
+          "colorLabel": -65536,
           "syncColors": false
         }
       },
@@ -538,7 +538,7 @@
         "x": 560,
         "y": 317,
         "enabled": true,
-        "color": -2236963,
+        "color": -1,
         "rgb": false,
         "scale": 1.0,
         "relX": 1.0,
@@ -557,7 +557,7 @@
         "x": 581,
         "y": 237,
         "enabled": false,
-        "color": -2236963,
+        "color": -1,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.9847457627118644,
@@ -578,7 +578,7 @@
         "x": 10,
         "y": 170,
         "enabled": false,
-        "color": -2236963,
+        "color": -1,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.01984126984126984,
@@ -601,7 +601,7 @@
         "x": 416,
         "y": 317,
         "enabled": false,
-        "color": -2236963,
+        "color": -1,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.6910299003322259,
@@ -616,15 +616,15 @@
           "showBackground": false,
           "dynamicColor": true,
           "initialized": false,
-          "colorLabel": -5592406.0,
+          "colorLabel": -65536,
           "syncColors": false
         }
       },
       "toggle_sneak": {
         "x": 7,
         "y": 300,
-        "enabled": false,
-        "color": -2236963,
+        "enabled": true,
+        "color": -1,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.01232394366197183,
@@ -637,15 +637,15 @@
           "showDisplay": false,
           "snapGrid": false,
           "snapAlign": true,
-          "colorLabel": -5592406.0,
+          "colorLabel": -65536,
           "syncColors": false
         }
       },
       "toggle_sprint": {
         "x": 5,
         "y": 319,
-        "enabled": false,
-        "color": -2236963,
+        "enabled": true,
+        "color": -1,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.008802816901408451,
@@ -658,15 +658,15 @@
           "showDisplay": false,
           "snapGrid": false,
           "snapAlign": true,
-          "colorLabel": -5592406.0,
+          "colorLabel": -65536,
           "syncColors": false
         }
       },
       "auto_armor": {
         "x": 10,
         "y": 224,
-        "enabled": false,
-        "color": -2236963,
+        "enabled": true,
+        "color": -1,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.018315018315018316,
@@ -676,8 +676,8 @@
         "width": 94,
         "height": 12,
         "props": {
-          "showDisplay": true,
-          "colorLabel": -5592406.0,
+          "showDisplay": false,
+          "colorLabel": -65536,
           "autoActive": true,
           "syncColors": false
         }
@@ -686,7 +686,7 @@
         "x": 10,
         "y": 273,
         "enabled": false,
-        "color": -2236963,
+        "color": -1,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.016556291390728478,
@@ -706,7 +706,7 @@
         "x": 10,
         "y": 43,
         "enabled": false,
-        "color": -2236963,
+        "color": -1,
         "rgb": false,
         "scale": 1.02,
         "relX": 0.017271157167530225,
@@ -718,7 +718,7 @@
         "props": {
           "snapGrid": false,
           "customSize": true,
-          "colorLabel": -5592406.0,
+          "colorLabel": -65536,
           "syncColors": false
         }
       },
@@ -744,7 +744,7 @@
         "x": 180,
         "y": 5,
         "enabled": true,
-        "color": -2236963,
+        "color": -1,
         "rgb": false,
         "scale": 1.4,
         "relX": 0.5,
@@ -762,8 +762,8 @@
       "player_healthbar": {
         "x": 54,
         "y": 308,
-        "enabled": false,
-        "color": -2236963,
+        "enabled": true,
+        "color": -1,
         "rgb": false,
         "scale": 1.0124223,
         "relX": 0.09230769230769231,
@@ -771,7 +771,7 @@
         "refW": 640,
         "refH": 337,
         "width": 55,
-        "height": 20,
+        "height": 9,
         "props": {
           "barWidth": 45.0,
           "border": true,
@@ -784,7 +784,7 @@
         "x": 547,
         "y": 16,
         "enabled": false,
-        "color": -2236963,
+        "color": -1,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.9838129496402878,
@@ -932,7 +932,7 @@
         }
       },
       "helditem": {
-        "x": 492,
+        "x": 501,
         "y": 295,
         "enabled": true,
         "color": -1,
@@ -942,7 +942,7 @@
         "relY": 0.9247648902821317,
         "refW": 640,
         "refH": 337,
-        "width": 147,
+        "width": 80,
         "height": 18,
         "props": {
           "snapGrid": false,
@@ -995,14 +995,14 @@
         }
       },
       "cps": {
-        "x": 416,
-        "y": 317,
+        "x": 506,
+        "y": 312,
         "enabled": false,
         "color": -1,
         "rgb": false,
         "scale": 1.0,
-        "relX": 0.6910299003322259,
-        "relY": 0.9814241486068112,
+        "relX": 0.840531561461794,
+        "relY": 0.9659442724458205,
         "refW": 640,
         "refH": 337,
         "width": 38,
@@ -1138,14 +1138,14 @@
         }
       },
       "compass": {
-        "x": 196,
-        "y": 10,
+        "x": 217,
+        "y": 0,
         "enabled": true,
         "color": -1,
         "rgb": false,
-        "scale": 1.3012422,
-        "relX": 0.5157894736842106,
-        "relY": 0.03289473684210526,
+        "scale": 1.1055901,
+        "relX": 0.5178997613365155,
+        "relY": 0.0,
         "refW": 640,
         "refH": 337,
         "width": 200,
@@ -1181,7 +1181,7 @@
         "x": 547,
         "y": 16,
         "enabled": true,
-        "color": -1691967,
+        "color": -13715738,
         "rgb": true,
         "scale": 1.0,
         "relX": 0.9838129496402878,
