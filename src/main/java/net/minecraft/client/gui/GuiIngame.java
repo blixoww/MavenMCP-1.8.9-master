@@ -850,6 +850,8 @@ public class GuiIngame extends Gui {
                         this.drawTexturedModalRect(i9, i7, l7 + 45, 27, 9, 9);
                     }
                 }
+                net.minecraft.client.applesskin.AppleSkinHud.get().render();
+                this.mc.getTextureManager().bindTexture(icons);
             } else if (entity instanceof EntityLivingBase) {
                 this.mc.mcProfiler.endStartSection("mountHealth");
                 EntityLivingBase entitylivingbase = (EntityLivingBase) entity;

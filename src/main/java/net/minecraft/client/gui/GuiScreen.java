@@ -170,6 +170,8 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
         }
 
         this.drawHoveringText(list, x, y);
+        net.minecraft.client.applesskin.AppleSkinTooltip.renderAfterTooltip(
+                this.mc, stack, x, y, list, this.fontRendererObj);
     }
 
     /**

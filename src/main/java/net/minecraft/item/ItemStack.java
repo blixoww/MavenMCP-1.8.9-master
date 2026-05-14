@@ -858,6 +858,7 @@ public final class ItemStack
             }
         }
 
+        net.minecraft.client.applesskin.AppleSkinTooltip.appendFoodInfo(this, list);
         return list;
     }
 
