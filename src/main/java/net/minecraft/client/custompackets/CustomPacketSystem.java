@@ -32,6 +32,9 @@ public final class CustomPacketSystem {
         HdvPacketHandler.registerHandlers();
         LOGGER.info("[CustomPackets] ✓ HdvPacketHandler enregistré");
 
+        net.minecraft.client.custompackets.handler.TradePacketHandler.registerHandlers();
+        LOGGER.info("[CustomPackets] ✓ TradePacketHandler enregistré");
+
         ShopPacketHandler.registerHandlers();
         PlayerDataHandler.registerHandlers();
 
@@ -159,6 +162,7 @@ public final class CustomPacketSystem {
                               PacketChannel.CLIENT_TO_SERVER + "\0" + PacketChannel.SERVER_TO_CLIENT + "\0" +
                               PacketChannel.PING_C2S + "\0" + PacketChannel.PING_S2C + "\0" +
                               PacketChannel.FACTION_S2C + "\0" +
+                              PacketChannel.TRADE_S2C + "\0" + PacketChannel.TRADE_C2S + "\0" +
                               PacketChannel.COMBATLOG;
             buf.writeBytes(channels.getBytes(java.nio.charset.StandardCharsets.UTF_8));
             PacketSender.send("REGISTER", buf);

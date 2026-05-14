@@ -159,5 +159,21 @@ public final class PacketId {
      * Même format que PROFILE_OPEN.
      */
     public static final int PROFILE_DATA = 0x91;
+
+    // ════════════════════════════════════════════════════════════════════════
+    //  Trade – Serveur → Client  (canal TRADE_S2C)
+    // ════════════════════════════════════════════════════════════════════════
+    public static final int TRADE_OPEN   = 0xA0;
+    public static final int TRADE_UPDATE = 0xA1;
+    public static final int TRADE_CLOSE  = 0xA2;
+
+    // ════════════════════════════════════════════════════════════════════════
+    //  Trade – Client → Serveur  (canal TRADE_C2S)
+    // ════════════════════════════════════════════════════════════════════════
+    public static final int TRADE_OFFER   = 0xA0;
+    public static final int TRADE_TAKE    = 0xA1;
+    public static final int TRADE_CONFIRM = 0xA2;
+    public static final int TRADE_CANCEL  = 0xA3;
+    public static final int TRADE_MONEY   = 0xA4;
 }
 

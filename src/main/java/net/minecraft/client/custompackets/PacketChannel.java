@@ -51,4 +51,8 @@ public final class PacketChannel {
     // ── Canal dédié aux données de faction ──────────────────────────────────
     /** Faction data – serveur → client (tags et relations des joueurs proches) */
     public static final String FACTION_S2C = "CUSTOM:FACTION_S2C";
+
+    // ── Canal dédié au trade ─────────────────────────────────────────────────
+    public static final String TRADE_S2C = "CUSTOM:TRADE_S2C";
+    public static final String TRADE_C2S = "CUSTOM:TRADE_C2S";
 }

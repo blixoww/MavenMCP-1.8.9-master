@@ -72,7 +72,9 @@ public final class PacketDispatcher {
                 || PacketChannel.COMBATLOG.equals(channel)
                 || PacketChannel.PING_S2C.equals(channel)
                 || PacketChannel.PING_C2S.equals(channel)
-                || PacketChannel.FACTION_S2C.equals(channel);
+                || PacketChannel.FACTION_S2C.equals(channel)
+                || PacketChannel.TRADE_S2C.equals(channel)
+                || PacketChannel.TRADE_C2S.equals(channel);
     }
 
     // ── Interne ──────────────────────────────────────────────────────────────
