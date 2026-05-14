@@ -160,9 +160,13 @@ public class GuiLanguage extends GuiScreen
         {
             boolean sel = isSelected(id);
             if (sel) {
-                // Ligne de sélection rouge à gauche
-                Gui.drawRect(x - 2, y, x - 2 + 2, y + 18, ACCENT);
-                Gui.drawRect(x, y, x + this.width - 20, y + 18, 0x22FFFFFF);
+                int lw = this.getListWidth();
+                int lx = this.width / 2 - lw / 2;
+                int rx = this.width / 2 + lw / 2;
+                int y0 = y - 2;
+                int y1 = y + h + 2;
+                Gui.drawRect(lx, y0, lx + 2, y1, ACCENT);
+                Gui.drawRect(lx + 2, y0, rx, y1, 0x22FFFFFF);
             }
             GuiLanguage.this.fontRendererObj.setBidiFlag(true);
             String label = this.languageMap.get(this.langCodeList.get(id)).toString();

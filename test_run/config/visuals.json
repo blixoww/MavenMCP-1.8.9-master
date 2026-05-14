@@ -38,8 +38,8 @@
   "particleSize": 1.0,
   "particleFilter": 2,
   "heartsEnabled": true,
-  "heartsColor": -52429,
+  "heartsColor": -13369549,
   "heartsShowDamage": true,
-  "heartsQuantity": 3,
-  "heartsFilter": 2
+  "heartsQuantity": 10,
+  "heartsFilter": 0
 }

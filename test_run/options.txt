@@ -10,14 +10,14 @@ bobView:true
 anaglyph3d:false
 maxFps:260
 fboEnable:true
-difficulty:1
+difficulty:2
 fancyGraphics:true
 ao:2
 renderClouds:true
 resourcePacks:[]
 incompatibleResourcePacks:[]
 lastServer:play.demeryamc.fr
-lang:en_US
+lang:fr_FR
 chatVisibility:0
 chatColors:true
 chatLinks:true
