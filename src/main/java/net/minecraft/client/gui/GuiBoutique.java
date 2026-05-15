@@ -239,12 +239,12 @@ public class GuiBoutique extends GuiScreen {
     }
 
     private void handleConfirmClick(int mx, int my) {
-        int cw = 360;
+        int cw = 340;
         int ch = computeModalHeight();
         int cx = px + pw / 2 - cw / 2, cy = py + ph / 2 - ch / 2;
-        int bw = 148, bh = 26, by = cy + ch - bh - 10;
-        if (inBox(mx, my, cx + 14, by, bw, bh))               { confirmOpen = false; }
-        else if (inBox(mx, my, cx + cw - bw - 14, by, bw, bh)) { doConfirm(); confirmOpen = false; }
+        int bw = 140, bh = 24, by = cy + ch - bh - 10;
+        if (inBox(mx, my, cx + 16, by, bw, bh))                { confirmOpen = false; }
+        else if (inBox(mx, my, cx + cw - 16 - bw, by, bw, bh)) { doConfirm(); confirmOpen = false; }
     }
 
     private void openConfirm(BoutiqueData.Entry e, BoutiqueData.OffreData o, boolean pb, long price) {
@@ -384,8 +384,6 @@ public class GuiBoutique extends GuiScreen {
             if (active) {
                 drawRect(tabsX + 4, ty, tabsX + tabsW - 4, ty + TAB_H, C_TAB_ACT);
                 drawRect(tabsX + 4, ty, tabsX + 7, ty + TAB_H, col);
-                GuiRenderUtils.drawGradientRect(tabsX + 7, ty, tabsX + 22, ty + TAB_H,
-                        (col & 0x00FFFFFF) | 0x18000000, 0x00000000);
             } else if (hov) {
                 drawRect(tabsX + 4, ty, tabsX + tabsW - 4, ty + TAB_H, C_TAB_HOV);
                 drawRect(tabsX + 4, ty, tabsX + 6, ty + TAB_H, (col & 0x00FFFFFF) | 0x55000000);
@@ -512,44 +510,40 @@ public class GuiBoutique extends GuiScreen {
 
             if (isPacks) {
                 // ── Rendu pack ─────────────────────────────────────────────
-                // Bande dor\u00e9e \u00e0 gauche
-                GuiRenderUtils.drawGradientRect(listX, rowY, listX + 18, rowY + rowH,
-                        (accentCol & 0x00FFFFFF) | 0x22000000, 0x00000000);
-
                 // Nom du pack
                 fontRendererObj.drawStringWithShadow(e.nom != null ? fmt(e.nom) : "", textX, rowY + 5, C_GOLD);
 
-                // Contenu : premi\u00e8re ligne de description
+                // Badge économie + prix original — alignés à droite, sur la ligne du nom
+                int badgeRightEdge = pbBtnX - 6;
+                if (e.prixPBP > 0 && e.prixPB > 0) {
+                    int saved = e.prixPBP - e.prixPB;
+                    int pct   = (int)(100L * saved / e.prixPBP);
+                    String saveStr = "-" + pct + "%";
+                    int bw2 = fontRendererObj.getStringWidth(saveStr) + 8;
+                    int bx2 = badgeRightEdge - bw2;
+                    int by2 = rowY + 4;
+                    drawRect(bx2, by2, bx2 + bw2, by2 + 11, 0x88003300);
+                    GuiRenderUtils.drawRectOutline(bx2, by2, bw2, 11, C_OK);
+                    fontRendererObj.drawString("§a" + saveStr, bx2 + 4, by2 + 2, 0);
+                    // Prix original barré
+                    String origStr = FMT.format(e.prixPBP) + " PB";
+                    int ow = fontRendererObj.getStringWidth(origStr);
+                    int ox = bx2 - ow - 5;
+                    fontRendererObj.drawString("§8" + origStr, ox, by2 + 2, 0);
+                    drawRect(ox, by2 + 5, ox + ow, by2 + 6, 0x88888888);
+                    badgeRightEdge = ox - 6;
+                }
+
+                // Contenu : description sur la ligne du bas, trimée à gauche du badge
                 if (e.description != null && !e.description.isEmpty()) {
+                    int descTrimW = Math.max(40, badgeRightEdge - textX);
                     StringBuilder sb = new StringBuilder();
                     for (String dl : e.description) {
                         String cl = stripColor(fmt(dl));
                         if (!cl.isEmpty()) { if (sb.length() > 0) sb.append("  ·  "); sb.append(cl); }
                     }
-                    String contenu = sb.toString();
-                    contenu = fontRendererObj.trimStringToWidth(contenu, listW - textX + listX - 85);
-                    fontRendererObj.drawString("§8" + contenu, textX, rowY + 17, 0);
-                }
-
-                // Prix original barr\u00e9 + \u00e9conomie
-                if (e.prixPBP > 0 && e.prixPB > 0) {
-                    int saved = e.prixPBP - e.prixPB;
-                    // Badge \u00e9conomie
-                    String saveStr = "-" + saved + " PB";
-                    int bw2 = fontRendererObj.getStringWidth(saveStr) + 8;
-                    int bx2 = listX + listW - btnW - 14 - bw2;
-                    int by2 = rowY + rowH / 2 - 6;
-                    drawRect(bx2, by2, bx2 + bw2, by2 + 11, 0x88003300);
-                    GuiRenderUtils.drawRectOutline(bx2, by2, bw2, 11, C_OK);
-                    fontRendererObj.drawString("§a" + saveStr, bx2 + 4, by2 + 2, 0);
-
-                    // Prix original (simul\u00e9 barr\u00e9)
-                    String origStr = FMT.format(e.prixPBP) + " PB";
-                    int ow = fontRendererObj.getStringWidth(origStr);
-                    int ox = bx2 - ow - 8;
-                    int oy = rowY + rowH / 2 - 5;
-                    fontRendererObj.drawString("§8" + origStr, ox, oy, 0);
-                    drawRect(ox, oy + 4, ox + ow + (int)(fontRendererObj.getStringWidth("§8")), oy + 5, 0x88888888);
+                    String contenu = fontRendererObj.trimStringToWidth(sb.toString(), descTrimW);
+                    fontRendererObj.drawString("§8" + contenu, textX, rowY + 18, 0);
                 }
 
             } else {
@@ -701,168 +695,108 @@ public class GuiBoutique extends GuiScreen {
     }
 
     private void drawConfirmModal(int mx, int my) {
-        drawRect(0, 0, width, height, 0xDD000011);
+        drawRect(0, 0, width, height, 0xCC000011);
 
-        int cw = 360;
+        int cw = 340;
         int ch = computeModalHeight();
         int cx = px + pw / 2 - cw / 2, cy = py + ph / 2 - ch / 2;
-        int hdrH = 60;
-        int bw = 148, bh = 26, by = cy + ch - bh - 10;
+        int bw = 140, bh = 24, by = cy + ch - bh - 10;
+        int padX = 16;
 
-        // Couleur d'accent selon l'onglet / type
         int[] tabCols = { 0xFF9944CC, 0xFFCC4488, 0xFF2299CC, 0xFF44BB66, 0xFFFF8800, 0xFFCCAA00 };
-        int hdrCol = (confirmOffre != null) ? 0xFFCCAA00
+        int accentCol = (confirmOffre != null) ? 0xFFCCAA00
                 : tabCols[Math.min(activeTab.ordinal(), tabCols.length - 1)];
 
-        int hdrColSoft = (hdrCol & 0x00FFFFFF) | 0x33000000;
-        int hdrColMed  = (hdrCol & 0x00FFFFFF) | 0x66000000;
+        // Fond sobre + bordure accent
+        drawRect(cx, cy, cx + cw, cy + ch, 0xF2040912);
+        drawRect(cx, cy, cx + cw, cy + 3, accentCol);
+        GuiRenderUtils.drawGradientRect(cx, cy + 3, cx + cw, cy + 12,
+                (accentCol & 0x00FFFFFF) | 0x40000000, 0x00000000);
+        GuiRenderUtils.drawRectOutline(cx, cy, cw, ch, (accentCol & 0x00FFFFFF) | 0x88000000);
+        GuiRenderUtils.drawRectOutline(cx + 1, cy + 1, cw - 2, ch - 2, 0x18FFFFFF);
 
-        // Fond + ombres + bordures
-        GuiRenderUtils.drawShadow(cx, cy, cw, ch, 14, 0xB0);
-        drawRect(cx, cy, cx + cw, cy + ch, 0xF6030B16);
-        GuiRenderUtils.drawRectOutline(cx - 1, cy - 1, cw + 2, ch + 2, hdrColSoft);
-        GuiRenderUtils.drawRectOutline(cx, cy, cw, ch, 0x55FFFFFF);
+        int ly = cy + 14;
 
-        // Header
-        drawRect(cx, cy, cx + cw, cy + 3, hdrCol);
-        GuiRenderUtils.drawGradientRect(cx, cy + 3, cx + cw, cy + 18,
-                (hdrCol & 0x00FFFFFF) | 0x55000000, 0x00000000);
-        GuiRenderUtils.drawGradientRect(cx + 1, cy + 3, cx + cw - 1, cy + hdrH, hdrColMed, 0x00000000);
-        GuiRenderUtils.drawGradientRect(cx + 1, cy + 3, cx + 90, cy + hdrH, hdrColMed, 0x00000000);
-        drawRect(cx, cy + hdrH, cx + cw, cy + hdrH + 1, 0x66FFFFFF);
-        GuiRenderUtils.drawGradientRect(cx, cy + hdrH + 1, cx + cw, cy + hdrH + 5, 0x33000000, 0x00000000);
-
-        // Coins decoratifs
-        drawRect(cx + 3, cy + 3, cx + 13, cy + 4, hdrCol);
-        drawRect(cx + 3, cy + 3, cx + 4, cy + 13, hdrCol);
-        drawRect(cx + cw - 13, cy + 3, cx + cw - 3, cy + 4, hdrCol);
-        drawRect(cx + cw - 4, cy + 3, cx + cw - 3, cy + 13, hdrCol);
-
-        // Cadre icone 32x32
-        ItemStack hdrIcon = null;
-        if (confirmEntry != null) hdrIcon = getIconStack(confirmEntry);
-        else if (confirmOffre != null && confirmOffre.item != null) hdrIcon = confirmOffre.item;
-
-        int iconBoxS = 36;
-        int iconBoxX = cx + 12, iconBoxY = cy + (hdrH - iconBoxS) / 2;
-        drawRect(iconBoxX, iconBoxY, iconBoxX + iconBoxS, iconBoxY + iconBoxS, 0xFF0A1424);
-        GuiRenderUtils.drawRectOutline(iconBoxX, iconBoxY, iconBoxS, iconBoxS, hdrColMed);
-        GuiRenderUtils.drawGradientRect(iconBoxX + 1, iconBoxY + 1, iconBoxX + iconBoxS - 1, iconBoxY + iconBoxS / 2,
-                hdrColSoft, 0x00000000);
+        // ── Icone + Nom ──────────────────────────────────────────────────────
+        ItemStack hdrIcon = confirmEntry != null ? getIconStack(confirmEntry)
+                : (confirmOffre != null && confirmOffre.item != null ? confirmOffre.item : null);
         if (hdrIcon != null) {
             GlStateManager.enableDepth();
-            GlStateManager.pushMatrix();
-            GlStateManager.translate(iconBoxX + 2, iconBoxY + 2, 0);
-            GlStateManager.scale(2f, 2f, 1f);
             RenderHelper.enableGUIStandardItemLighting();
-            itemRender.renderItemAndEffectIntoGUI(hdrIcon, 0, 0);
+            itemRender.renderItemAndEffectIntoGUI(hdrIcon, cx + padX, ly);
             RenderHelper.disableStandardItemLighting();
-            GlStateManager.popMatrix();
             GlStateManager.disableDepth();
         }
-
-        // Texte du header
-        int textX = iconBoxX + iconBoxS + 12;
-
-        // Badge categorie
-        String catLabel = getCategoryLabel();
-        int catLabelW = fontRendererObj.getStringWidth(catLabel);
-        int catBadgeX = cx + cw - catLabelW - 22;
-        int catBadgeY = cy + 14;
-        drawRect(catBadgeX - 6, catBadgeY, catBadgeX + catLabelW + 6, catBadgeY + 14,
-                (hdrCol & 0x00FFFFFF) | 0x88000000);
-        GuiRenderUtils.drawRectOutline(catBadgeX - 6, catBadgeY, catLabelW + 12, 14,
-                (hdrCol & 0x00FFFFFF) | 0xCC000000);
-        drawRect(catBadgeX - 6, catBadgeY, catBadgeX - 4, catBadgeY + 14, hdrCol);
-        fontRendererObj.drawStringWithShadow(catLabel, catBadgeX, catBadgeY + 3, hdrCol);
-
-        // Nom de l'article
-        String nomRaw = confirmOffre != null ? fmt(confirmOffre.nom)
+        String nom = confirmOffre != null ? fmt(confirmOffre.nom)
                 : (confirmEntry != null ? fmt(confirmEntry.nom) : "?");
-        int maxNomW = catBadgeX - textX - 14;
-        if (fontRendererObj.getStringWidth(nomRaw) > maxNomW)
-            nomRaw = fontRendererObj.trimStringToWidth(nomRaw, maxNomW) + "..";
-        fontRendererObj.drawStringWithShadow("§f§l" + nomRaw, textX, cy + 18, C_TEXT);
-
-        // Sous-titre
+        int nomMaxW = cw - padX - 22 - padX;
+        if (fontRendererObj.getStringWidth(nom) > nomMaxW)
+            nom = fontRendererObj.trimStringToWidth(nom, nomMaxW) + "..";
+        fontRendererObj.drawStringWithShadow("§f§l" + nom, cx + padX + 22, ly + 2, C_TEXT);
+        fontRendererObj.drawString("§8" + getCategoryLabel(), cx + padX + 22, ly + 12, 0);
         String subtitle = getSubtitle();
-        if (subtitle != null) fontRendererObj.drawString("§7" + subtitle, textX, cy + 32, 0);
+        if (subtitle != null) {
+            int sw = fontRendererObj.getStringWidth("§8" + subtitle);
+            fontRendererObj.drawString("§8" + subtitle, cx + cw - padX - sw, ly + 2, 0);
+        }
+        ly += 26;
 
-        // Confirmation tag
-        fontRendererObj.drawString("§8>> CONFIRMATION D'ACHAT", textX, cy + 44, 0);
+        // Séparateur
+        drawRect(cx + padX, ly, cx + cw - padX, ly + 1, 0x28FFFFFF);
+        ly += 8;
 
-        // Corps
-        int bodyX = cx + 14;
-        int bodyW = cw - 28;
-        int ly    = cy + hdrH + 10;
+        // ── Bloc Prix / Durée ────────────────────────────────────────────────
+        int halfW = (cw - padX * 2) / 2;
+        int boxH = 32;
+        drawRect(cx + padX, ly, cx + cw - padX, ly + boxH, 0x22000000);
+        GuiRenderUtils.drawRectOutline(cx + padX, ly, cw - padX * 2, boxH, 0x22FFFFFF);
+        drawRect(cx + padX + halfW, ly + 4, cx + padX + halfW + 1, ly + boxH - 4, 0x20FFFFFF);
 
         boolean isPBPay = confirmPayPB;
+        String priceVal = (isPBPay ? "§e§l" : "§6§l") + FMT.format(confirmPrice)
+                + (isPBPay ? " §ePB" : " §6$");
+        fontRendererObj.drawString("§8Prix", cx + padX + 8, ly + 4, 0);
+        fontRendererObj.drawStringWithShadow(priceVal, cx + padX + 8, ly + 15, C_TEXT);
 
+        String durStr = confirmTemporary ? "§b§l1 mois" : "§a§lPermanent";
+        fontRendererObj.drawString("§8Duree", cx + padX + halfW + 8, ly + 4, 0);
+        fontRendererObj.drawStringWithShadow(durStr, cx + padX + halfW + 8, ly + 15, C_TEXT);
+        ly += boxH + 8;
+
+        // ── Contenu pack / teaser grade ──────────────────────────────────────
         if (activeTab == Tab.PACKS && confirmEntry != null
                 && confirmEntry.description != null && !confirmEntry.description.isEmpty()) {
-
             int nLines = Math.min(5, confirmEntry.description.size());
-            int boxH = 14 + nLines * 11 + 6;
-            drawRect(bodyX, ly, bodyX + bodyW, ly + boxH, 0x44000000);
-            drawRect(bodyX, ly, bodyX + 3, ly + boxH, hdrCol);
-            GuiRenderUtils.drawRectOutline(bodyX, ly, bodyW, boxH, (hdrCol & 0x00FFFFFF) | 0x55000000);
-            fontRendererObj.drawString("§6§lCONTENU DU PACK", bodyX + 10, ly + 4, 0);
-            int lly = ly + 16;
+            int dboxH = 12 + nLines * 11 + 4;
+            drawRect(cx + padX, ly, cx + cw - padX, ly + dboxH, 0x28000000);
+            drawRect(cx + padX, ly, cx + padX + 2, ly + dboxH, accentCol);
+            fontRendererObj.drawString("§7§lContenu :", cx + padX + 8, ly + 3, 0);
+            int lly = ly + 13;
             for (int idx = 0; idx < nLines; idx++) {
-                String clean = stripColor(fmt(confirmEntry.description.get(idx)));
-                fontRendererObj.drawString("§e+ §f" + clean, bodyX + 12, lly, 0);
+                fontRendererObj.drawString("§7+ §f" + stripColor(fmt(confirmEntry.description.get(idx))),
+                        cx + padX + 8, lly, 0);
                 lly += 11;
             }
-            ly += boxH + 6;
-
+            ly += dboxH + 6;
             if (confirmEntry.prixPBP > confirmEntry.prixPB) {
                 int saved = confirmEntry.prixPBP - confirmEntry.prixPB;
-                int pct   = (int)(100L * saved / confirmEntry.prixPBP);
-
-                int ecoH = 34;
-                drawRect(bodyX, ly, bodyX + bodyW, ly + ecoH, 0x66003300);
-                drawRect(bodyX, ly, bodyX + 3, ly + ecoH, C_OK);
-                GuiRenderUtils.drawRectOutline(bodyX, ly, bodyW, ecoH, 0xAA33CC77);
-                GuiRenderUtils.drawGradientRect(bodyX + 3, ly + 1, bodyX + bodyW - 1, ly + ecoH - 1,
-                        0x3333CC77, 0x00000000);
-
-                fontRendererObj.drawString("§a§l-" + pct + "%§r §7§lECONOMIE", bodyX + 10, ly + 4, 0);
-                String prixCmp = "§8" + FMT.format(confirmEntry.prixPBP) + " PB §7-> §e§l" + FMT.format(confirmEntry.prixPB) + " §ePB";
-                fontRendererObj.drawStringWithShadow(prixCmp, bodyX + 10, ly + 19, C_TEXT);
-                String savedStr = "§a-" + saved + " PB";
-                int svw = fontRendererObj.getStringWidth(savedStr);
-                fontRendererObj.drawStringWithShadow(savedStr, bodyX + bodyW - svw - 10, ly + 19, C_OK);
-                ly += ecoH + 4;
+                int pct = (int)(100L * saved / confirmEntry.prixPBP);
+                fontRendererObj.drawString("§a-" + pct + "% §7eco. §8("
+                        + FMT.format(confirmEntry.prixPBP) + " -> §e"
+                        + FMT.format(confirmEntry.prixPB) + " PB§8)",
+                        cx + padX + 4, ly, 0);
+                ly += 13;
             }
-        } else {
-            if ((activeTab == Tab.GRADES || activeTab == Tab.KITS)
-                    && confirmEntry != null && confirmEntry.description != null
-                    && !confirmEntry.description.isEmpty()) {
-                String teaser = stripColor(fmt(confirmEntry.description.get(0)));
-                teaser = fontRendererObj.trimStringToWidth(teaser, bodyW - 16);
-                drawRect(bodyX, ly + 3, bodyX + 3, ly + 11, hdrCol);
-                fontRendererObj.drawString("§7" + teaser, bodyX + 10, ly + 4, 0);
-                ly += 16;
-            }
-
-            int boxH = 36;
-            drawRect(bodyX, ly, bodyX + bodyW, ly + boxH, 0x55000000);
-            GuiRenderUtils.drawRectOutline(bodyX, ly, bodyW, boxH, 0x44FFFFFF);
-            drawRect(bodyX + bodyW / 2, ly + 4, bodyX + bodyW / 2 + 1, ly + boxH - 4, 0x33FFFFFF);
-
-            String priceVal = (isPBPay ? "§e§l" : "§6§l") + FMT.format(confirmPrice)
-                    + (isPBPay ? " §ePB" : " §6$");
-            fontRendererObj.drawString("§7PRIX", bodyX + 12, ly + 5, 0);
-            fontRendererObj.drawStringWithShadow(priceVal, bodyX + 12, ly + 18, C_TEXT);
-
-            String durStr = confirmTemporary ? "§b§l1 MOIS" : "§a§lPERMANENT";
-            fontRendererObj.drawString("§7DUREE", bodyX + bodyW / 2 + 12, ly + 5, 0);
-            fontRendererObj.drawStringWithShadow(durStr, bodyX + bodyW / 2 + 12, ly + 18, C_TEXT);
-
-            ly += boxH + 6;
+        } else if ((activeTab == Tab.GRADES || activeTab == Tab.KITS)
+                && confirmEntry != null && confirmEntry.description != null
+                && !confirmEntry.description.isEmpty()) {
+            String teaser = fontRendererObj.trimStringToWidth(
+                    stripColor(fmt(confirmEntry.description.get(0))), cw - padX * 2 - 12);
+            fontRendererObj.drawString("§8" + teaser, cx + padX + 4, ly, 0);
+            ly += 13;
         }
 
-        // Solde apres achat
+        // ── Solde après achat ────────────────────────────────────────────────
         BoutiqueData d = BoutiquePacketHandler.getCached();
         boolean enough = true;
         if (d != null) {
@@ -870,51 +804,35 @@ public class GuiBoutique extends GuiScreen {
                     ? Math.max(0L, (long) d.pb - confirmPrice)
                     : Math.max(0L, d.balance - confirmPrice);
             enough = isPBPay ? (long) d.pb >= confirmPrice : d.balance >= confirmPrice;
-            String afterStr = "§7Solde apr\u00e8s :  " + (isPBPay ? "§e§l" : "§6§l")
+            String afterStr = "§7Solde apres : " + (isPBPay ? "§e" : "§6")
                     + FMT.format(after) + (isPBPay ? " §7PB" : " §7$");
-            fontRendererObj.drawStringWithShadow(afterStr, bodyX + 4, ly, C_TEXT);
-
+            fontRendererObj.drawStringWithShadow(afterStr, cx + padX, ly, C_TEXT);
             if (!enough) {
-                String warn = "§lINSUFFISANT";
-                int warnW = fontRendererObj.getStringWidth(warn);
-                drawRect(bodyX + bodyW - warnW - 14, ly - 2, bodyX + bodyW - 2, ly + 10, 0x88440000);
-                GuiRenderUtils.drawRectOutline(bodyX + bodyW - warnW - 14, ly - 2, warnW + 12, 12, 0xFFDD3333);
-                fontRendererObj.drawStringWithShadow("§c" + warn, bodyX + bodyW - warnW - 8, ly, C_KO);
-            } else {
-                String ok = "§lOK";
-                int okW = fontRendererObj.getStringWidth(ok);
-                drawRect(bodyX + bodyW - okW - 12, ly - 2, bodyX + bodyW - 2, ly + 10, 0x55003300);
-                GuiRenderUtils.drawRectOutline(bodyX + bodyW - okW - 12, ly - 2, okW + 10, 12, 0xFF33CC77);
-                fontRendererObj.drawStringWithShadow("§a" + ok, bodyX + bodyW - okW - 7, ly, C_OK);
+                int aw = fontRendererObj.getStringWidth(afterStr);
+                int badgeX = cx + padX + aw + 8;
+                drawRect(badgeX, ly - 1, badgeX + 56, ly + 9, 0x66330000);
+                GuiRenderUtils.drawRectOutline(badgeX, ly - 1, 56, 10, 0xFFCC3333);
+                fontRendererObj.drawString("§c INSUF.", badgeX + 4, ly, 0);
             }
         }
 
-        // Boutons
-        boolean hovNo = inBox(mx, my, cx + 14, by, bw, bh);
-        int noBg   = hovNo ? 0xFF8A2828 : 0xFF3A1414;
-        int noBord = hovNo ? 0xFFEE5555 : 0xFF883333;
-        drawRect(cx + 14, by, cx + 14 + bw, by + bh, noBg);
-        GuiRenderUtils.drawRectOutline(cx + 14, by, bw, bh, noBord);
-        if (hovNo) {
-            drawRect(cx + 14, by, cx + 17, by + bh, 0xFFEE5555);
-            GuiRenderUtils.drawGradientRect(cx + 14, by, cx + 14 + bw, by + 4, 0x40FFFFFF, 0x00000000);
-        }
-        drawCenteredStr("§l§cANNULER", cx + 14 + bw / 2, by + (bh - 8) / 2, C_TEXT);
+        // ── Boutons ──────────────────────────────────────────────────────────
+        boolean hovNo = inBox(mx, my, cx + padX, by, bw, bh);
+        drawRect(cx + padX, by, cx + padX + bw, by + bh, hovNo ? 0xFF5C1E1E : 0xFF2E0E0E);
+        GuiRenderUtils.drawRectOutline(cx + padX, by, bw, bh, hovNo ? 0xFFDD4444 : 0xFF602020);
+        if (hovNo) drawRect(cx + padX, by, cx + padX + bw, by + 1, 0x55FFFFFF);
+        drawCenteredStr("§cAnnuler", cx + padX + bw / 2, by + (bh - 8) / 2, C_TEXT);
 
-        boolean hovYes = inBox(mx, my, cx + cw - bw - 14, by, bw, bh);
-        int yBg   = enough ? (hovYes ? 0xFF22A052 : 0xFF114526) : 0xFF252525;
-        int yBord = enough ? (hovYes ? 0xFF66EE99 : 0xFF338855) : 0xFF444444;
-        drawRect(cx + cw - bw - 14, by, cx + cw - 14, by + bh, yBg);
-        GuiRenderUtils.drawRectOutline(cx + cw - bw - 14, by, bw, bh, yBord);
-        if (enough) {
-            if (hovYes) {
-                drawRect(cx + cw - bw - 14, by, cx + cw - bw - 11, by + bh, 0xFF66EE99);
-                GuiRenderUtils.drawGradientRect(cx + cw - bw - 14, by, cx + cw - 14, by + 4, 0x40FFFFFF, 0x00000000);
-            }
-            drawCenteredStr("§l§aCONFIRMER L'ACHAT", cx + cw - bw - 14 + bw / 2, by + (bh - 8) / 2, C_TEXT);
-        } else {
-            drawCenteredStr("§l§8SOLDE INSUFFISANT", cx + cw - bw - 14 + bw / 2, by + (bh - 8) / 2, C_MUTED2);
-        }
+        boolean hovYes = inBox(mx, my, cx + cw - padX - bw, by, bw, bh);
+        int yBg   = enough ? (hovYes ? 0xFF1E5C30 : 0xFF0E2E18) : 0xFF1E1E1E;
+        int yBord = enough ? (hovYes ? 0xFF55DD77 : 0xFF206030) : 0xFF333333;
+        drawRect(cx + cw - padX - bw, by, cx + cw - padX, by + bh, yBg);
+        GuiRenderUtils.drawRectOutline(cx + cw - padX - bw, by, bw, bh, yBord);
+        if (enough && hovYes) drawRect(cx + cw - padX - bw, by, cx + cw - padX, by + 1, 0x55FFFFFF);
+        String confirmLabel = enough ? "§aConfirmer" : "§8Solde insuf.";
+        drawCenteredStr(confirmLabel, cx + cw - padX - bw + bw / 2, by + (bh - 8) / 2,
+                enough ? C_TEXT : C_MUTED2);
+
     }
 
     private String getSubtitle() {
@@ -1060,100 +978,176 @@ public class GuiBoutique extends GuiScreen {
         return o.item;
     }
 
-    /** Affiche un panneau tooltip style GuiWiki pour l'article survol\u00e9. */
+    /** Affiche un panneau tooltip premium pour l'article survole. */
     private void drawEntryTooltip(BoutiqueData.Entry e, int mx, int my) {
         if (e == null) return;
 
         int[] tabColors = { 0xFF9944CC, 0xFFCC4488, 0xFF2299CC, 0xFF44BB66, 0xFFFF8800, 0xFFCCAA00 };
         int barCol = tabColors[Math.min(activeTab.ordinal(), tabColors.length - 1)];
 
-        // Titre
         String title = e.nom != null ? stripColor(fmt(e.nom)) : "";
+        String catLabel = getCategoryLabel();
 
-        // Description avec retour a la ligne automatique
-        int wrapW = 180;
-        List<String> descLines = new ArrayList<>();
+        // Description — chaque ligne conserve ses codes couleur
+        int wrapW = 190;
+        List<String>  descLines = new ArrayList<>();
+        List<Boolean> descIsCont = new ArrayList<>();
         if (e.description != null) {
-            for (String d : e.description) {
-                String clean = fmt(d);
+            for (String dl : e.description) {
+                String clean = fmt(dl);
                 if (!clean.isEmpty()) {
-                    @SuppressWarnings("unchecked")
-                    List<String> wrapped = fontRendererObj.listFormattedStringToWidth(clean, wrapW);
-                    descLines.addAll(wrapped);
+                    List<String> wrapped = fontRendererObj.listFormattedStringToWidth(clean, wrapW - 8);
+                    for (int wi = 0; wi < wrapped.size(); wi++) {
+                        descLines.add(wrapped.get(wi));
+                        descIsCont.add(wi > 0);
+                    }
                 }
             }
         }
 
-        // Pied : dur\u00e9e uniquement, sans redondance
-        String footerLine;
+        // Accroche marketing selon catégorie (si desc vide ou complément)
+        String hook = null;
+        if (descLines.isEmpty()) {
+            switch (activeTab) {
+                case GRADES:    hook = "§7Débloquez de nouveaux avantages en jeu !"; break;
+                case KITS:      hook = "§7Partez prêt au combat dès le spawn !"; break;
+                case COMMANDES: hook = "§7Gagnez du temps et de la facilité !"; break;
+                case SPAWNERS:  hook = "§7Générez des ressources automatiquement !"; break;
+                case PACKS:     hook = "§7La meilleure offre du moment !"; break;
+                default: break;
+            }
+        }
+
+        // Prix selon le toggle actuel
+        boolean usePerma = !buyTemporary && (e.prixMonnaieP > 0 || e.prixPBP > 0);
+        long showMoney = usePerma ? e.prixMonnaieP : e.prixMonnaie;
+        int  showPB    = usePerma ? e.prixPBP      : e.prixPB;
         boolean hasPerm = (e.prixMonnaieP > 0 || e.prixPBP > 0);
-        if ((e.mob != null && !e.mob.isEmpty()) || e.duree <= 0) {
-            footerLine = "Achat definitif";
+
+        String durInfo;
+        boolean isDefinitif = (e.mob != null && !e.mob.isEmpty()) || e.duree <= 0;
+        if (isDefinitif) {
+            durInfo = "§a✔ §7Achat §adéfinitif";
         } else {
             String dur = (e.duree >= 2500000) ? "1 mois" : formatDuration(e.duree);
-            footerLine = "Duree : " + dur + (hasPerm ? "  ·  Permanent disponible" : "");
+            durInfo = "§7⏱ §7Durée : §f" + dur + (hasPerm && buyTemporary ? "  §a(perma dispo)" : "");
         }
 
         // Dimensions
-        int padX = 10, padTop = 7, padBot = 7;
-        int titleW = fontRendererObj.getStringWidth(title);
-        int footW  = fontRendererObj.getStringWidth(footerLine);
-        int maxDescW = 0;
-        for (String l : descLines) maxDescW = Math.max(maxDescW, fontRendererObj.getStringWidth(l));
-        int tw = Math.max(Math.max(titleW, maxDescW) + padX * 2, Math.max(140, footW + padX * 2 + 8));
-
+        int padX = 10, padTop = 8, padBot = 8;
+        int catBadgeH = 12;
         int lineH = 10;
-        int th = padTop
-               + 10                                           // titre
-               + 4                                            // separateur titre
-               + (descLines.isEmpty() ? 0 : descLines.size() * lineH + 4)
-               + 1                                            // separateur pied
-               + 4
-               + 9                                            // pied
-               + padBot;
+        int descCount = descLines.size() + (hook != null ? 1 : 0);
 
-        // Position (evite les bords de l'ecran)
+        // Largeur maximale
+        int titleW     = fontRendererObj.getStringWidth("§l" + title);
+        int catLabelW  = fontRendererObj.getStringWidth(catLabel) + 10;
+        int maxDescW   = 0;
+        for (String l : descLines) maxDescW = Math.max(maxDescW, fontRendererObj.getStringWidth(l));
+        if (hook != null) maxDescW = Math.max(maxDescW, fontRendererObj.getStringWidth(stripColor(hook)));
+        int priceLineW = 0;
+        if (showMoney > 0) priceLineW = Math.max(priceLineW, fontRendererObj.getStringWidth("§6" + FMT.format(showMoney) + " $"));
+        if (showPB    > 0) priceLineW = Math.max(priceLineW, fontRendererObj.getStringWidth("§e" + FMT.format(showPB)    + " PB"));
+        int priceCount = (showMoney > 0 ? 1 : 0) + (showPB > 0 ? 1 : 0);
+        int footW      = fontRendererObj.getStringWidth(stripColor(durInfo));
+
+        int tw = Math.max(Math.max(titleW + catLabelW + 12, maxDescW + 8),
+                          Math.max(Math.max(140, footW), priceLineW)) + padX * 2 + 8;
+        tw = Math.min(tw, wrapW + padX * 2 + 12);
+
+        int th = padTop
+                + catBadgeH + 4          // badge catégorie
+                + 10 + 4                 // titre + séparateur
+                + (descCount > 0 ? descCount * lineH + 2 : 0)
+                + (descCount > 0 ? 6 : 0)
+                 + (priceCount > 0 ? 17 + priceCount * lineH + 4 : 0) // encadré prix
+                + 1 + 4 + 9              // séparateur + footer durée
+                + padBot;
+
+        // Position (évite les bords)
         int tx = mx + 14;
         int ty = my - th / 2;
         if (tx + tw > width  - 4) tx = mx - tw - 6;
         if (ty + th > height - 4) ty = height - th - 4;
         if (ty < 4) ty = 4;
 
-        // Fond
         GlStateManager.disableDepth();
-        GuiRenderUtils.drawShadow(tx, ty, tw, th, 5, 0x70);
-        drawRect(tx, ty, tx + tw, ty + th, 0xF2030B16);
-        drawRect(tx, ty, tx + 2, ty + th, barCol);
-        GuiRenderUtils.drawGradientRect(tx + 2, ty, tx + 16, ty + th,
-                (barCol & 0x00FFFFFF) | 0x28000000, 0x00000000);
-        GuiRenderUtils.drawRectOutline(tx, ty, tw, th, 0x30FFFFFF);
+
+        // ── Fond panel ───────────────────────────────────────────────────────
+        GuiRenderUtils.drawShadow(tx, ty, tw, th, 6, 0x80);
+        drawRect(tx, ty, tx + tw, ty + th, 0xF4030B16);
+        drawRect(tx, ty, tx + 3, ty + th, barCol);                              // barre gauche
+        drawRect(tx + 3, ty, tx + tw, ty + 2, (barCol & 0x00FFFFFF) | 0x55000000); // ligne top
+        GuiRenderUtils.drawRectOutline(tx, ty, tw, th, 0x22FFFFFF);
 
         int ly = ty + padTop;
 
-        // Titre (couleur d'accent de l'onglet)
-        fontRendererObj.drawStringWithShadow(title, tx + padX, ly, barCol);
+        // ── Badge catégorie ──────────────────────────────────────────────────
+        int badgeW = fontRendererObj.getStringWidth(catLabel) + 8;
+        drawRect(tx + padX + 4, ly, tx + padX + 4 + badgeW, ly + catBadgeH,
+                (barCol & 0x00FFFFFF) | 0x3A000000);
+        GuiRenderUtils.drawRectOutline(tx + padX + 4, ly, badgeW, catBadgeH,
+                (barCol & 0x00FFFFFF) | 0x77000000);
+        fontRendererObj.drawString(catLabel, tx + padX + 8, ly + 2,
+                (barCol & 0x00FFFFFF) | 0xDD000000);
+        ly += catBadgeH + 4;
+
+        // ── Titre ────────────────────────────────────────────────────────────
+        fontRendererObj.drawStringWithShadow("§l" + title, tx + padX + 4, ly, barCol);
         ly += 10;
 
-        // Separateur sous le titre
-        GuiRenderUtils.drawGradientRect(tx + padX, ly + 1, tx + tw - padX, ly + 2,
-                (barCol & 0x00FFFFFF) | 0x55000000, 0x00000000);
+        // ── Séparateur simple ────────────────────────────────────────────────
+        drawRect(tx + padX + 2, ly + 1, tx + tw - padX, ly + 2, (barCol & 0x00FFFFFF) | 0x44000000);
         ly += 5;
 
-        // Corps de la description
-        for (String l : descLines) {
-            fontRendererObj.drawString(l, tx + padX, ly, 0xFFB0B6C0);
-            ly += lineH;
+        // ── Description avec puces colorées ──────────────────────────────────
+        if (descCount > 0) {
+            int bulletW = fontRendererObj.getStringWidth("§7✦ ");
+            for (int di = 0; di < descLines.size(); di++) {
+                String l = descLines.get(di);
+                boolean isCont = di < descIsCont.size() && descIsCont.get(di);
+                if (isCont) {
+                    // Ligne de continuation : indentation alignée avec le texte de la puce
+                    fontRendererObj.drawString(l, tx + padX + 4 + bulletW, ly, 0xFFCCDDFF);
+                } else {
+                    fontRendererObj.drawString("§7✦ ", tx + padX + 4, ly, 0);
+                    fontRendererObj.drawString(l, tx + padX + 4 + bulletW, ly, 0xFFCCDDFF);
+                }
+                ly += lineH;
+            }
+            if (hook != null) {
+                fontRendererObj.drawString("§7» §o" + stripColor(hook), tx + padX + 4, ly, 0xFFAABBCC);
+                ly += lineH;
+            }
+            ly += 6;
         }
-        if (!descLines.isEmpty()) ly += 4;
 
-        // Separateur avant le pied
-        drawRect(tx + padX, ly, tx + tw - padX, ly + 1, 0x20FFFFFF);
+        // ── Encadré Prix ─────────────────────────────────────────────────────
+        if (priceCount > 0) {
+            int pboxH = 13 + priceCount * lineH + 2;
+            drawRect(tx + padX + 2, ly, tx + tw - padX - 2, ly + pboxH, 0x22000000);
+            GuiRenderUtils.drawRectOutline(tx + padX + 2, ly, tw - padX * 2 - 4, pboxH, 0x20FFFFFF);
+            fontRendererObj.drawString("§8Prix :", tx + padX + 6, ly + 3, 0);
+            int ply = ly + 13;
+            if (showMoney > 0) {
+                fontRendererObj.drawStringWithShadow("§6✦ §6" + FMT.format(showMoney) + " §7$ monnaie",
+                        tx + padX + 6, ply, C_TEXT);
+                ply += lineH;
+            }
+            if (showPB > 0) {
+                fontRendererObj.drawStringWithShadow("§e✦ §e" + FMT.format(showPB) + " §7PB",
+                        tx + padX + 6, ply, C_TEXT);
+                ply += lineH;
+            }
+            ly += pboxH + 4;
+        }
+
+        // ── Séparateur footer ─────────────────────────────────────────────────
+        drawRect(tx + padX + 2, ly, tx + tw - padX - 2, ly + 1, 0x18FFFFFF);
         ly += 4;
 
-        // Pied : petit carre accent + texte duree
-        drawRect(tx + padX, ly + 2, tx + padX + 4, ly + 7,
-                (barCol & 0x00FFFFFF) | 0xAA000000);
-        fontRendererObj.drawString(footerLine, tx + padX + 8, ly, 0xFF667080);
+        // ── Footer durée ──────────────────────────────────────────────────────
+        fontRendererObj.drawString(durInfo, tx + padX + 4, ly, 0);
 
         GlStateManager.enableDepth();
     }

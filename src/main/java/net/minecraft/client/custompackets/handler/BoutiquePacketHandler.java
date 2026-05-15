@@ -70,35 +70,47 @@ public final class BoutiquePacketHandler {
         PacketSender.sendSimple(PacketChannel.BOUTIQUE_C2S, PacketId.BOUTIQUE_REQUEST);
     }
 
-    /**
-     * @param category 0=grade 1=commande 2=spawner 3=offre
-     */
     // ── Packs par défaut (utilisés tant que le serveur n'en fournit pas) ──────
 
     private static void populateDemoPacks(BoutiqueData d) {
+        // ── Pack Starter ─────────────────────────────────────────────────────
+        // Valeur individuelle : Elite perm (1500) + 4 spawners (3500) + custom items (~600) + kit (~300) + cles (~150) ≈ 6050 PB
         d.packs.add(makePack("starter", "§b§lPack Starter",
-                "iron_sword", 95, 130,
-                "Grade VIP (Permanent)",
-                "Kit Starter (Permanent)",
-                "2 Spawners au choix"));
-        d.packs.add(makePack("aventurier", "§a§lPack Aventurier",
-                "diamond_chestplate", 140, 195,
-                "Kit Combat (Permanent)",
-                "3 Spawners au choix",
-                "Commande /heal (Permanent)"));
-        d.packs.add(makePack("elite", "§5§lPack Elite",
-                "diamond", 220, 310,
-                "Grade Elite (Permanent)",
-                "Kit Combat + Kit PvP (Permanent)",
-                "4 Spawners au choix",
-                "Commandes /fly + /heal (Permanent)"));
-        d.packs.add(makePack("mega", "§6§l§nMEGA PACK",
-                "nether_star", 480, 720,
-                "Grade Legend (Permanent)",
-                "Tous les kits (Permanent)",
-                "6 Spawners au choix",
-                "Toutes les commandes (Permanent)",
-                "Bonus : 500 PB offerts"));
+                "iron_chestplate", 2800, 6050,
+                "§bGrade Elite §7(Permanent)",
+                "§74 Spawners : 2 Zombie + 2 Squelette",
+                "§7Armure complete Prot.3 en Emeraude",
+                "§7Epee Ruby Tranchant IV",
+                "§7Pioche Ruby Efficacite IV Incassable III",
+                "§74 stacks d'Obsidienne",
+                "§aKit Starter §7(Permanent)",
+                "§73 Cles en Acier §8(steel_key)"));
+
+        // ── Pack Avancé ──────────────────────────────────────────────────────
+        // Valeur individuelle : Elite perm (1500) + 6 spawners (6300) + custom ruby stuff (~900) + kit (~500) + cles (~350) ≈ 9550 PB
+        d.packs.add(makePack("avance", "§6§lPack Avance",
+                "diamond_chestplate", 4200, 9550,
+                "§bGrade Elite §7(Permanent)",
+                "§76 Spawners : 2 Zombie + 2 Pig Zombie + 2 Squelette",
+                "§7Stuff complet Prot.3 en Ruby",
+                "§7Epee Cobalt Tranchant IV",
+                "§7Pioche Cobalt Efficacite IV Incassable III",
+                "§76 stacks d'Obsidienne",
+                "§aKit Bonus §7(Permanent)",
+                "§73 Cles en Ruby"));
+
+        // ── Mega Pack ────────────────────────────────────────────────────────
+        // Valeur individuelle : Immortel perm (2500) + 8 spawners (9100) + custom ruby P4 stuff (~1400) + kit (~700) + cles (~500) ≈ 14200 PB
+        d.packs.add(makePack("mega", "§c§l§nMEGA PACK",
+                "nether_star", 6500, 14200,
+                "§6Grade Immortel §7(Permanent)",
+                "§78 Spawners : 2 Zombie + 4 Pig Zombie + 2 Squelette",
+                "§7Stuff complet Prot.4 Ruby Incassable III",
+                "§7Epee Cobalt Tranchant V",
+                "§7Pioche Cobalt Efficacite V Incassable III",
+                "§710 stacks d'Obsidienne",
+                "§dKit Potion §7(Permanent)",
+                "§73 Cles en Cobalt"));
     }
 
     private static BoutiqueData.Entry makePack(String id, String nom, String icone,

@@ -60,16 +60,25 @@ public class GuiHDV extends GuiScreen {
     private HdvListing confirmListing = null;
 
     // ── Vente ─────────────────────────────────────────────────────────────────
-    private ItemStack    sellItem  = null;
-    private int          sellSlot  = -1;
-    private int          sellQty   = 1;
-    private long         sellPrice = 100L;
-    private boolean      sellPayPB = false;  // false = monnaie ($), true = PB
+    private ItemStack    sellItem     = null;
+    private int          sellSlot     = -1;
+    private int          sellQty      = 1;
+    private long         sellPrice    = 100L;
+    /** 0 = monnaie ($), 1 = PB, 2 = Les deux (double-devise) */
+    private int          sellCurrMode = 0;
+    private long         sellPricePB  = 100L;
     private GuiTextField priceField;
+    private GuiTextField pricePBField; // champ PB en mode double-devise
     private GuiTextField qtyField;
 
     // ── Recherche ─────────────────────────────────────────────────────────────
     private GuiTextField searchField;
+
+    // ── Filtres prix ──────────────────────────────────────────────────────────
+    private long filterMinMoney = -1L, filterMaxMoney = -1L;
+    private long filterMinPB    = -1L, filterMaxPB    = -1L;
+    private GuiTextField fldMinMoney, fldMaxMoney, fldMinPB, fldMaxPB;
+    private final int[] hbFltReset = new int[4];
 
     // ── Scroll ────────────────────────────────────────────────────────────────
     private int scroll     = 0;
@@ -114,7 +123,13 @@ public class GuiHDV extends GuiScreen {
     private final int[]   hbPrFld        = new int[4];
     private final int[]   hbOkBuy        = new int[4];
     private final int[]   hbCancelBuy    = new int[4];
-    private final int[]   hbCurrencyToggle = new int[4]; // toggle $ / PB
+    private final int[]   hbConfirmPB    = new int[4]; // bouton "Payer en PB" (annonce dual)
+    private final int[]   hbCurrencyToggle = new int[4]; // toggle $ / PB / Les deux
+    // Boutons ajustement prix PB (mode double-devise)
+    private final int[]   hbPrPBM1000    = new int[4];
+    private final int[]   hbPrPBM100     = new int[4];
+    private final int[]   hbPrPBP100     = new int[4];
+    private final int[]   hbPrPBP1000    = new int[4];
     private final int[][] hbRows         = new int[20][4];
     private final int[][] hbCancelRow    = new int[20][4];
     private final int[][] hbInvSlots     = new int[36][4];
@@ -131,9 +146,18 @@ public class GuiHDV extends GuiScreen {
         searchField = new GuiTextField(0, fontRendererObj, px + 12, py + 36, pw - 180, 12);
         searchField.setMaxStringLength(48);
 
+        fldMinMoney = new GuiTextField(10, fontRendererObj, 0, 0, 50, 12); fldMinMoney.setMaxStringLength(12);
+        fldMaxMoney = new GuiTextField(11, fontRendererObj, 0, 0, 50, 12); fldMaxMoney.setMaxStringLength(12);
+        fldMinPB    = new GuiTextField(12, fontRendererObj, 0, 0, 50, 12); fldMinPB.setMaxStringLength(8);
+        fldMaxPB    = new GuiTextField(13, fontRendererObj, 0, 0, 50, 12); fldMaxPB.setMaxStringLength(8);
+
         priceField = new GuiTextField(1, fontRendererObj, 0, 0, 80, 12);
         priceField.setMaxStringLength(10);
         priceField.setText(String.valueOf(sellPrice));
+
+        pricePBField = new GuiTextField(3, fontRendererObj, 0, 0, 80, 12);
+        pricePBField.setMaxStringLength(7);
+        pricePBField.setText(String.valueOf(sellPricePB));
 
         qtyField = new GuiTextField(2, fontRendererObj, 0, 0, 40, 12);
         qtyField.setMaxStringLength(4);
@@ -210,8 +234,9 @@ public class GuiHDV extends GuiScreen {
         hbQtyM10[2] = hbQtyM1[2] = hbQtyP1[2] = hbQtyP10[2] = 0;
         hbPrM10000[2] = hbPrM1000[2] = hbPrM100[2] = hbPrM10[2] = 0;
         hbPrP10[2] = hbPrP100[2] = hbPrP1000[2] = hbPrP10000[2] = 0;
-        hbPrFld[2] = hbOkBuy[2] = hbCancelBuy[2] = 0;
-        hbCurrencyToggle[2] = 0;
+        hbPrFld[2] = hbOkBuy[2] = hbCancelBuy[2] = hbConfirmPB[2] = 0;
+        hbCurrencyToggle[2] = hbFltReset[2] = 0;
+        hbPrPBM1000[2] = hbPrPBM100[2] = hbPrPBP100[2] = hbPrPBP1000[2] = 0;
         for (int[] h : hbRows)      h[2] = 0;
         for (int[] h : hbCancelRow) h[2] = 0;
         for (int[] h : hbInvSlots)  h[2] = 0;
@@ -324,12 +349,12 @@ public class GuiHDV extends GuiScreen {
 
     private void drawBuyTab(int mx, int my) {
         int cy = py + 60;
+        int lx = px + 10, lw = pw - 20;
 
-        // Barre de recherche optimisée
+        // ── Barre de recherche ─────────────────────────────────────────────────
         int sfW = pw - 210;
         drawRect(px + 10, cy, px + 10 + sfW, cy + 20, C_PANEL);
         drawBorder(px + 10, cy, sfW, 20, searchField.isFocused() ? C_ACCENT : 0xFF1A2A45);
-        
         searchField.xPosition = px + 15;
         searchField.yPosition = cy + 6;
         searchField.width = sfW - 35;
@@ -337,15 +362,13 @@ public class GuiHDV extends GuiScreen {
         if (searchField.getText().isEmpty() && !searchField.isFocused())
             fontRendererObj.drawString("\u00a78Rechercher un item...", px + 15, cy + 6, 0);
 
-        // Bouton Clear Search
         if (!searchField.getText().isEmpty()) {
-            int cx = px + 10 + sfW - 16, cy_ = cy + 6;
-            boolean ch = in(mx, my, cx, cy_, 10, 10);
-            fontRendererObj.drawString("\u00a7l\u00a7cx", cx, cy_ - 1, ch ? C_RED : C_GRAY);
-            hb(hbClearSearch, cx - 2, cy_ - 2, 14, 14);
+            int csx = px + 10 + sfW - 16, csy = cy + 6;
+            boolean csh = in(mx, my, csx, csy, 10, 10);
+            fontRendererObj.drawString("\u00a7l\u00a7cx", csx, csy - 1, csh ? C_RED : C_GRAY);
+            hb(hbClearSearch, csx - 2, csy - 2, 14, 14);
         } else hbClearSearch[2] = 0;
 
-        // Bouton Refresh / Search
         int bx = px + 15 + sfW, bw = 85;
         boolean bh = in(mx, my, bx, cy, bw, 20);
         drawRect(bx, cy, bx + bw, cy + 20, bh ? 0xFF224488 : 0xFF152545);
@@ -353,7 +376,6 @@ public class GuiHDV extends GuiScreen {
         drawCentered("\u00a7lChercher", bx + bw / 2, cy + 6, bh ? C_WHITE : 0xFFAABBFF);
         hb(hbSearchBtn, bx, cy, bw, 20);
 
-        // Bouton Tri
         int tx = bx + bw + 5, tw = 90;
         boolean th = in(mx, my, tx, cy, tw, 20);
         String[] sortNames = { "R\u00e9cent", "Prix \u25b2", "Prix \u25bc" };
@@ -362,17 +384,65 @@ public class GuiHDV extends GuiScreen {
         drawCentered("\u00a7l" + sortNames[sortMode], tx + tw / 2, cy + 6, th ? C_WHITE : 0xFFBBFFCC);
         hb(hbSort, tx, cy, tw, 20);
 
-        cy += 28;
+        cy += 24;
 
-        // Header de liste
-        int lx = px + 10, lw = pw - 20;
+        // ── Filtres de prix ────────────────────────────────────────────────────
+        drawRect(lx, cy, lx + lw, cy + 20, 0x18FFFFFF);
+        drawBorder(lx, cy, lw, 20, 0xFF1A2540);
+        int fx = lx + 8;
+        fontRendererObj.drawString("\u00a78Filtres :", fx, cy + 6, 0);
+        fx += 44;
+        // Min $
+        fontRendererObj.drawString("\u00a77$ \u2265", fx, cy + 6, 0); fx += 20;
+        fldMinMoney.xPosition = fx; fldMinMoney.yPosition = cy + 4; fldMinMoney.width = 52;
+        drawRect(fx - 2, cy + 2, fx + 54, cy + 18, C_PANEL);
+        drawBorder(fx - 2, cy + 2, 56, 16, fldMinMoney.isFocused() ? C_ACCENT : 0xFF1A2840);
+        fldMinMoney.drawTextBox();
+        fx += 58;
+        // Max $
+        fontRendererObj.drawString("\u00a77\u2264", fx, cy + 6, 0); fx += 11;
+        fldMaxMoney.xPosition = fx; fldMaxMoney.yPosition = cy + 4; fldMaxMoney.width = 52;
+        drawRect(fx - 2, cy + 2, fx + 54, cy + 18, C_PANEL);
+        drawBorder(fx - 2, cy + 2, 56, 16, fldMaxMoney.isFocused() ? C_ACCENT : 0xFF1A2840);
+        fldMaxMoney.drawTextBox();
+        fx += 56;
+        // Séparateur $
+        fontRendererObj.drawString("\u00a76$", fx, cy + 6, 0); fx += 16;
+        // Séparateur vertical
+        drawRect(fx + 2, cy + 4, fx + 3, cy + 16, 0x44FFFFFF); fx += 10;
+        // Min PB
+        fontRendererObj.drawString("\u00a7ePB \u2265", fx, cy + 6, 0); fx += 28;
+        fldMinPB.xPosition = fx; fldMinPB.yPosition = cy + 4; fldMinPB.width = 50;
+        drawRect(fx - 2, cy + 2, fx + 52, cy + 18, C_PANEL);
+        drawBorder(fx - 2, cy + 2, 54, 16, fldMinPB.isFocused() ? C_GOLD : 0xFF302218);
+        fldMinPB.drawTextBox();
+        fx += 55;
+        // Max PB
+        fontRendererObj.drawString("\u00a77\u2264", fx, cy + 6, 0); fx += 11;
+        fldMaxPB.xPosition = fx; fldMaxPB.yPosition = cy + 4; fldMaxPB.width = 50;
+        drawRect(fx - 2, cy + 2, fx + 52, cy + 18, C_PANEL);
+        drawBorder(fx - 2, cy + 2, 54, 16, fldMaxPB.isFocused() ? C_GOLD : 0xFF302218);
+        fldMaxPB.drawTextBox();
+        // Bouton Reset
+        {
+            int rbx = lx + lw - 48, rby = cy + 1, rbw = 46, rbh = 18;
+            boolean rh = in(mx, my, rbx, rby, rbw, rbh);
+            drawRect(rbx, rby, rbx + rbw, rby + rbh, rh ? 0xFF661111 : 0x33CC2222);
+            drawBorder(rbx, rby, rbw, rbh, rh ? C_RED : 0xFF442222);
+            fontRendererObj.drawString(rh ? "\u00a7cReset \u00d7" : "\u00a77Reset \u00d7", rbx + 5, rby + 5, 0);
+            hb(hbFltReset, rbx, rby, rbw, rbh);
+        }
+
+        cy += 24;
+
+        // ── Header de liste ────────────────────────────────────────────────────
         drawRect(lx, cy, lx + lw, cy + 16, 0x44000000);
         drawRect(lx, cy + 15, lx + lw, cy + 16, 0x882277EE);
-        fontRendererObj.drawString("\u00a77Item",       lx + 35,  cy + 4, 0);
-        fontRendererObj.drawString("\u00a77Vendeur",    lx + 230, cy + 4, 0);
-        fontRendererObj.drawString("\u00a77Quantit\u00e9", lx + 350, cy + 4, 0);
-        fontRendererObj.drawString("\u00a77Prix Total", lx + 430, cy + 4, 0);
-        fontRendererObj.drawString("\u00a77Unit\u00e9",   lx + 530, cy + 4, 0);
+        fontRendererObj.drawString("\u00a77Item",      lx + 35,  cy + 4, 0);
+        fontRendererObj.drawString("\u00a77Vendeur",   lx + 210, cy + 4, 0);
+        fontRendererObj.drawString("\u00a77Qt\u00e9",  lx + 310, cy + 4, 0);
+        fontRendererObj.drawString("\u00a76Prix $",    lx + 375, cy + 4, 0);
+        fontRendererObj.drawString("\u00a7ePrix PB",   lx + 470, cy + 4, 0);
         cy += 18;
 
         listY0 = cy;
@@ -395,16 +465,25 @@ public class GuiHDV extends GuiScreen {
         if (fl.size() > maxRows)
             drawScrollbar(px + pw - 18, listY0, listH, scroll, fl.size(), maxRows, mx, my, hbScrollUp, hbScrollDn);
 
-        fontRendererObj.drawString("\u00a78" + fl.size() + " annonce(s) trouv\u00e9e(s)", px + 12, py + ph - 14, 0);
+        fontRendererObj.drawString("\u00a78" + fl.size() + " annonce(s)", px + 12, py + ph - 14, 0);
     }
 
     private void drawBuyRow(int mx, int my, int x, int y, int w, HdvListing l, int idx) {
         boolean hov = in(mx, my, x, y, w, ROW_H - 1);
-        boolean canAfford = playerBalance >= l.getTotalPrice();
-        
+        boolean isDual = l.isDual();
+        boolean canAfford;
+        if (isDual) {
+            canAfford = (playerBalance >= l.getTotalPrice()) || (playerPB >= l.getPricePB());
+        } else if (l.isPayPB()) {
+            canAfford = playerPB >= l.getTotalPrice();
+        } else {
+            canAfford = playerBalance >= l.getTotalPrice();
+        }
+
         int bg = hov ? 0x22FFFFFF : (idx % 2 == 0 ? 0x11FFFFFF : 0);
         drawRect(x, y, x + w, y + ROW_H - 1, bg);
-        if (hov) drawRect(x, y, x + 2, y + ROW_H - 1, C_ACCENT);
+        int accentBar = isDual ? 0xFFAA55FF : (l.isPayPB() ? C_GOLD : C_ACCENT);
+        if (hov) drawRect(x, y, x + 2, y + ROW_H - 1, accentBar);
 
         ItemStack item = l.getItem();
         if (item != null) {
@@ -415,25 +494,44 @@ public class GuiHDV extends GuiScreen {
             RenderHelper.disableStandardItemLighting();
             GlStateManager.disableDepth();
             if (hov) { tooltipItem = item; tooltipX = mx; tooltipY = my; }
-            fontRendererObj.drawStringWithShadow(item.getDisplayName(), x + 35, y + 10, C_WHITE);
+            String dn = fontRendererObj.trimStringToWidth(item.getDisplayName(), 165);
+            fontRendererObj.drawStringWithShadow(dn, x + 35, y + 10, C_WHITE);
         }
 
-        fontRendererObj.drawString(l.getSellerName(), x + 230, y + 10, 0xFFAADDFF);
-        fontRendererObj.drawString("x" + l.getQuantity(), x + 350, y + 10, C_WHITE);
-        fontRendererObj.drawStringWithShadow(fmtGold(l.getTotalPrice()) + " $", x + 430, y + 10, C_GOLD);
-        fontRendererObj.drawString("\u00a77" + fmtGold(l.getPricePerUnit()) + "/u", x + 530, y + 10, C_GRAY);
+        String seller = fontRendererObj.trimStringToWidth(l.getSellerName(), 88);
+        fontRendererObj.drawString(seller, x + 210, y + 10, 0xFFAADDFF);
+        fontRendererObj.drawString("x" + l.getQuantity(), x + 308, y + 10, C_WHITE);
+
+        // Colonne $ monnaie
+        if (!l.isPayPB() || isDual) {
+            fontRendererObj.drawStringWithShadow("\u00a76" + fmtGold(l.getTotalPrice()) + " $", x + 375, y + 10, C_GOLD);
+        } else {
+            fontRendererObj.drawString("\u00a78\u2014", x + 375, y + 10, C_GRAY);
+        }
+
+        // Colonne PB
+        if (isDual) {
+            fontRendererObj.drawStringWithShadow("\u00a7e" + fmtGold(l.getPricePB()) + " PB", x + 470, y + 10, C_GOLD);
+        } else if (l.isPayPB()) {
+            fontRendererObj.drawStringWithShadow("\u00a7e" + fmtGold(l.getTotalPrice()) + " PB", x + 470, y + 10, C_GOLD);
+        } else {
+            fontRendererObj.drawString("\u00a78\u2014", x + 470, y + 10, C_GRAY);
+        }
 
         int bx = x + w - 75, by = y + 5, bw = 70, bh = 16;
         boolean bhov = in(mx, my, bx, by, bw, bh);
         if (canAfford) {
-            drawRect(bx, by, bx + bw, by + bh, bhov ? 0xFF228844 : 0xFF154525);
-            drawBorder(bx, by, bw, bh, bhov ? C_GREEN : 0xFF226644);
-            drawCentered("ACHETER", bx + bw / 2, by + 4, bhov ? C_WHITE : 0xFFBBFFCC);
+            int btnCol = isDual ? (bhov ? 0xFF553388 : 0xFF2A1A44) : (bhov ? 0xFF228844 : 0xFF154525);
+            int brdCol = isDual ? (bhov ? 0xFFAA55FF : 0xFF661199) : (bhov ? C_GREEN : 0xFF226644);
+            drawRect(bx, by, bx + bw, by + bh, btnCol);
+            drawBorder(bx, by, bw, bh, brdCol);
+            String btnLabel = isDual ? "CHOISIR" : "ACHETER";
+            drawCentered(btnLabel, bx + bw / 2, by + 4, bhov ? C_WHITE : (isDual ? 0xFFCC88FF : 0xFFBBFFCC));
         } else {
             drawRect(bx, by, bx + bw, by + bh, 0xFF451515);
             drawCentered("TROP CHER", bx + bw / 2, by + 4, 0xFFFFAAAA);
         }
-        
+
         if (idx < hbRows.length) hb(hbRows[idx], x, y, w, ROW_H);
     }
 
@@ -442,10 +540,11 @@ public class GuiHDV extends GuiScreen {
 
         drawRect(lx, hy, lx + lw, hy + 16, 0x44000000);
         drawRect(lx, hy + 15, lx + lw, hy + 16, 0x882277EE);
-        fontRendererObj.drawString("\u00a77Item",     lx + 35,  hy + 4, 0);
-        fontRendererObj.drawString("\u00a77Quantit\u00e9", lx + 260, hy + 4, 0);
-        fontRendererObj.drawString("\u00a77Prix Unit.", lx + 350, hy + 4, 0);
-        fontRendererObj.drawString("\u00a77Statut / Temps", lx + 450, hy + 4, 0);
+        fontRendererObj.drawString("\u00a77Item",        lx + 35,  hy + 4, 0);
+        fontRendererObj.drawString("\u00a77Qt\u00e9",    lx + 248, hy + 4, 0);
+        fontRendererObj.drawString("\u00a76$ /u",        lx + 302, hy + 4, 0);
+        fontRendererObj.drawString("\u00a7ePB /u",       lx + 398, hy + 4, 0);
+        fontRendererObj.drawString("\u00a77Statut",      lx + 490, hy + 4, 0);
 
         listMineY0 = hy + 18;
         listMineH  = ph - (listMineY0 - py) - 60;
@@ -470,23 +569,38 @@ public class GuiHDV extends GuiScreen {
                     RenderHelper.disableStandardItemLighting();
                     GlStateManager.disableDepth();
                     if (hov) { tooltipItem = l.getItem(); tooltipX = mx; tooltipY = my; }
-                    fontRendererObj.drawStringWithShadow(l.getItem().getDisplayName(), lx + 35, y + 10, C_WHITE);
+                    String mn = fontRendererObj.trimStringToWidth(l.getItem().getDisplayName(), 200);
+                    fontRendererObj.drawStringWithShadow(mn, lx + 35, y + 10, C_WHITE);
                 }
 
-                fontRendererObj.drawString("x" + l.getQuantity(), lx + 260, y + 10, C_WHITE);
-                fontRendererObj.drawStringWithShadow(fmtGold(l.getPricePerUnit()) + " $", lx + 350, y + 10, C_GOLD);
+                fontRendererObj.drawString("x" + l.getQuantity(), lx + 248, y + 10, C_WHITE);
+                // Colonne $ /u
+                if (!l.isPayPB() || l.isDual()) {
+                    fontRendererObj.drawStringWithShadow("\u00a76" + fmtGold(l.getPricePerUnit()) + " $/u", lx + 302, y + 10, C_WHITE);
+                } else {
+                    fontRendererObj.drawString("\u00a78\u2014", lx + 302, y + 10, C_GRAY);
+                }
+                // Colonne PB /u
+                if (l.isDual()) {
+                    long pbUnit = l.getQuantity() > 0 ? l.getPricePB() / l.getQuantity() : 0;
+                    fontRendererObj.drawStringWithShadow("\u00a7e" + fmtGold(pbUnit) + " PB/u", lx + 398, y + 10, C_WHITE);
+                } else if (l.isPayPB()) {
+                    fontRendererObj.drawStringWithShadow("\u00a7e" + fmtGold(l.getPricePerUnit()) + " PB/u", lx + 398, y + 10, C_WHITE);
+                } else {
+                    fontRendererObj.drawString("\u00a78\u2014", lx + 398, y + 10, C_GRAY);
+                }
 
                 int bx = lx + lw - 75, by = y + 5, bw = 70, bh = 16;
                 boolean bhov = in(mx, my, bx, by, bw, bh);
 
                 if (l.isSold()) {
-                    fontRendererObj.drawString("\u00a7aVENDU", lx + 450, y + 10, 0);
+                    fontRendererObj.drawString("\u00a7aVENDU", lx + 490, y + 10, 0);
                 } else {
                     long rem = l.getExpiresAt() - System.currentTimeMillis() / 1000L;
                     if (rem > 0) {
-                        fontRendererObj.drawString(fmtTime(rem), lx + 450, y + 10, C_WHITE);
+                        fontRendererObj.drawString(fmtTime(rem), lx + 490, y + 10, C_WHITE);
                     } else {
-                        fontRendererObj.drawString("\u00a7cExpir\u00e9", lx + 450, y + 10, C_RED);
+                        fontRendererObj.drawString("\u00a7cExpir\u00e9", lx + 490, y + 10, C_RED);
                     }
 
                     drawRect(bx, by, bx + bw, by + bh, bhov ? 0xFF882222 : 0xFF451515);
@@ -543,89 +657,134 @@ public class GuiHDV extends GuiScreen {
 
         // ── Configuration vente (droite) ──────────────────────────────────────
         int cx = mid + pad / 2, cy = iy, cw = iw, ch = ih;
-        // Fond sombre thémé bleu nuit (non plus gris)
         drawRect(cx, cy, cx + cw, cy + ch, 0xFF070D18);
         drawBorder(cx, cy, cw, ch, 0xFF1A3050);
         drawRect(cx, cy, cx + cw, cy + 18, 0xFF030810);
         fontRendererObj.drawStringWithShadow("§b§lCONFIGURATION VENTE", cx + 8, cy + 5, C_ACCENT2);
 
         if (sellItem != null) {
-            // Item affiché
-            // Carré 28×28, item 16×16 centré → offset +6 depuis le coin du carré
-            int sqX = cx + cw / 2 - 14, sqY = cy + 24;
-            drawRect(sqX, sqY, sqX + 28, sqY + 28, 0x33FFFFFF);
-            drawBorder(sqX, sqY, 28, 28, C_ACCENT);
+            // Item affiché — layout horizontal compact pour gagner de la place verticale
+            int sqX = cx + 10, sqY = cy + 22;
+            drawRect(sqX, sqY, sqX + 24, sqY + 24, 0x33FFFFFF);
+            drawBorder(sqX, sqY, 24, 24, C_ACCENT);
             GlStateManager.enableDepth();
             RenderHelper.enableGUIStandardItemLighting();
-            itemRender.renderItemAndEffectIntoGUI(sellItem, sqX + 6, sqY + 6);
+            itemRender.renderItemAndEffectIntoGUI(sellItem, sqX + 4, sqY + 4);
             RenderHelper.disableStandardItemLighting();
             GlStateManager.disableDepth();
-            drawCentered(sellItem.getDisplayName(), cx + cw / 2, sqY + 34, C_WHITE);
+            String dispName = fontRendererObj.trimStringToWidth(sellItem.getDisplayName(), cw - 50);
+            fontRendererObj.drawStringWithShadow(dispName, sqX + 32, sqY + 8, C_WHITE);
 
-            // ── Toggle devise ($ | PB) ────────────────────────────────────────
-            int tw = (cw - 28) / 2;
-            int t1x = cx + 8, t2x = cx + 8 + tw + 6, tby = cy + 66, tbh = 16;
-            boolean t1hov = in(mx, my, t1x, tby, tw, tbh);
-            boolean t2hov = in(mx, my, t2x, tby, tw, tbh);
+            // ── Toggle devise ($ | PB | Les deux) ────────────────────────────
+            int tw3 = (cw - 24) / 3;
+            int t1x = cx + 8, t2x = cx + 8 + tw3 + 4, t3x = cx + 8 + 2 * (tw3 + 4);
+            int tby = cy + 52, tbh = 16;
+            boolean sel0 = (sellCurrMode == 0), sel1 = (sellCurrMode == 1), sel2 = (sellCurrMode == 2);
             // $ bouton
-            drawRect(t1x, tby, t1x + tw, tby + tbh, !sellPayPB ? 0xFF1A3030 : (t1hov ? 0xFF0A1818 : 0xFF050C0C));
-            drawBorder(t1x, tby, tw, tbh, !sellPayPB ? C_ACCENT2 : (t1hov ? 0xFF226644 : 0xFF0A2020));
-            drawCentered(!sellPayPB ? "§b§l$ Monnaie ✔" : "§7$ Monnaie", t1x + tw / 2, tby + 4, !sellPayPB ? C_WHITE : C_GRAY);
+            boolean t1hov = in(mx, my, t1x, tby, tw3, tbh);
+            drawRect(t1x, tby, t1x + tw3, tby + tbh, sel0 ? 0xFF1A3030 : (t1hov ? 0xFF0A1818 : 0xFF050C0C));
+            drawBorder(t1x, tby, tw3, tbh, sel0 ? C_ACCENT2 : (t1hov ? 0xFF226644 : 0xFF0A2020));
+            drawCentered(sel0 ? "§b§l$ ✔" : "§7$", t1x + tw3 / 2, tby + 4, sel0 ? C_WHITE : C_GRAY);
             // PB bouton
-            drawRect(t2x, tby, t2x + tw, tby + tbh, sellPayPB ? 0xFF2A2000 : (t2hov ? 0xFF100E00 : 0xFF080600));
-            drawBorder(t2x, tby, tw, tbh, sellPayPB ? C_GOLD : (t2hov ? 0xFF443300 : 0xFF1A1200));
-            drawCentered(sellPayPB ? "§e§lPB ✔" : "§7PB", t2x + tw / 2, tby + 4, sellPayPB ? C_GOLD : C_GRAY);
-            hb(hbCurrencyToggle, t1x, tby, tw * 2 + 6, tbh);
+            boolean t2hov = in(mx, my, t2x, tby, tw3, tbh);
+            drawRect(t2x, tby, t2x + tw3, tby + tbh, sel1 ? 0xFF2A2000 : (t2hov ? 0xFF100E00 : 0xFF080600));
+            drawBorder(t2x, tby, tw3, tbh, sel1 ? C_GOLD : (t2hov ? 0xFF443300 : 0xFF1A1200));
+            drawCentered(sel1 ? "§e§lPB ✔" : "§7PB", t2x + tw3 / 2, tby + 4, sel1 ? C_GOLD : C_GRAY);
+            // Les deux bouton
+            boolean t3hov = in(mx, my, t3x, tby, tw3, tbh);
+            drawRect(t3x, tby, t3x + tw3, tby + tbh, sel2 ? 0xFF2A1A44 : (t3hov ? 0xFF150E22 : 0xFF080610));
+            drawBorder(t3x, tby, tw3, tbh, sel2 ? 0xFFAA55FF : (t3hov ? 0xFF553388 : 0xFF1A0E33));
+            drawCentered(sel2 ? "§d§l$ + PB ✔" : "§7$ + PB", t3x + tw3 / 2, tby + 4, sel2 ? 0xFFDD99FF : C_GRAY);
+            hb(hbCurrencyToggle, t1x, tby, t3x + tw3 - t1x, tbh);
 
             // Séparateur
-            drawRect(cx + 8, cy + 87, cx + cw - 8, cy + 88, 0x44FFFFFF);
+            drawRect(cx + 8, cy + 72, cx + cw - 8, cy + 73, 0x44FFFFFF);
 
             // ── Quantité ─────────────────────────────────────────────────────
-            int qy = cy + 94;
+            int qy = cy + 78;
             fontRendererObj.drawStringWithShadow("§7Quantité :", cx + 12, qy + 2, C_GRAY);
             qtyField.xPosition = cx + 75; qtyField.yPosition = qy - 1; qtyField.width = 44;
             qtyField.drawTextBox();
             miniBtn(mx, my, cx + 126, qy - 1, 18, 13, "-10", 0xFF451515, C_RED,   C_WHITE, hbQtyM10);
             miniBtn(mx, my, cx + 148, qy - 1, 18, 13, "+10", 0xFF154515, C_GREEN, C_WHITE, hbQtyP10);
 
-            // ── Prix ─────────────────────────────────────────────────────────
-            int py_ = cy + 114;
-            String currLabel = sellPayPB ? "§7Prix en §ePB :" : "§7Prix en §b$ :";
+            // ── Prix principal ────────────────────────────────────────────────
+            int py_ = cy + 96;
+            String currLabel = (sellCurrMode == 1) ? "§7Prix en §ePB :" : "§7Prix en §b$ :";
             fontRendererObj.drawStringWithShadow(currLabel, cx + 12, py_ + 2, C_GRAY);
             priceField.xPosition = cx + 90; priceField.yPosition = py_ - 1; priceField.width = 88;
             priceField.drawTextBox();
-            fontRendererObj.drawStringWithShadow(sellPayPB ? "§ePB" : "§b$", cx + 183, py_ + 2, sellPayPB ? C_GOLD : C_ACCENT2);
+            fontRendererObj.drawStringWithShadow((sellCurrMode == 1) ? "§ePB" : "§b$", cx + 183, py_ + 2, (sellCurrMode == 1) ? C_GOLD : C_ACCENT2);
 
-            // 2 rangées de boutons prix
+            // Boutons ajustement prix
             int bw4 = (cw - 36) / 4;
             int bminus = py_ + 17, bplus = py_ + 33;
-            miniBtn(mx, my, cx + 8,                 bminus, bw4, 13, "-10K",  0xFF451515, C_RED,   C_WHITE, hbPrM10000);
+            miniBtn(mx, my, cx + 8,                bminus, bw4, 13, "-10K",  0xFF451515, C_RED,   C_WHITE, hbPrM10000);
             miniBtn(mx, my, cx + 8 +   (bw4 + 4),  bminus, bw4, 13, "-1K",   0xFF451515, C_RED,   C_WHITE, hbPrM1000);
             miniBtn(mx, my, cx + 8 + 2*(bw4 + 4),  bminus, bw4, 13, "-100",  0xFF451515, C_RED,   C_WHITE, hbPrM100);
             miniBtn(mx, my, cx + 8 + 3*(bw4 + 4),  bminus, bw4, 13, "-10",   0xFF451515, C_RED,   C_WHITE, hbPrM10);
-            miniBtn(mx, my, cx + 8,                 bplus,  bw4, 13, "+10",   0xFF154515, C_GREEN, C_WHITE, hbPrP10);
+            miniBtn(mx, my, cx + 8,                bplus,  bw4, 13, "+10",   0xFF154515, C_GREEN, C_WHITE, hbPrP10);
             miniBtn(mx, my, cx + 8 +   (bw4 + 4),  bplus,  bw4, 13, "+100",  0xFF154515, C_GREEN, C_WHITE, hbPrP100);
             miniBtn(mx, my, cx + 8 + 2*(bw4 + 4),  bplus,  bw4, 13, "+1K",   0xFF154515, C_GREEN, C_WHITE, hbPrP1000);
             miniBtn(mx, my, cx + 8 + 3*(bw4 + 4),  bplus,  bw4, 13, "+10K",  0xFF154515, C_GREEN, C_WHITE, hbPrP10000);
 
-            // Recap prix unitaire
+            // ── Prix PB (mode double-devise) ──────────────────────────────────
+            if (sellCurrMode == 2) {
+                int pby_ = cy + 152;
+                drawRect(cx + 8, pby_ - 5, cx + cw - 8, pby_ - 4, 0x33FFFFFF);
+                fontRendererObj.drawStringWithShadow("§7Prix en §ePB :", cx + 12, pby_ + 2, C_GRAY);
+                pricePBField.xPosition = cx + 90; pricePBField.yPosition = pby_ - 1; pricePBField.width = 88;
+                pricePBField.drawTextBox();
+                fontRendererObj.drawStringWithShadow("§ePB", cx + 183, pby_ + 2, C_GOLD);
+                int bwPB = (cw - 36) / 4, pbBtnsY = pby_ + 17;
+                miniBtn(mx, my, cx + 8,                pbBtnsY, bwPB, 13, "-10", 0xFF451515, C_RED,   C_WHITE, hbPrPBM1000);
+                miniBtn(mx, my, cx + 8 + (bwPB + 4),  pbBtnsY, bwPB, 13, "-1",  0xFF451515, C_RED,   C_WHITE, hbPrPBM100);
+                miniBtn(mx, my, cx + 8 + 2*(bwPB+4),  pbBtnsY, bwPB, 13, "+1",  0xFF154515, C_GREEN, C_WHITE, hbPrPBP100);
+                miniBtn(mx, my, cx + 8 + 3*(bwPB+4),  pbBtnsY, bwPB, 13, "+10", 0xFF154515, C_GREEN, C_WHITE, hbPrPBP1000);
+            } else {
+                hbPrPBM1000[2] = hbPrPBM100[2] = hbPrPBP100[2] = hbPrPBP1000[2] = 0;
+            }
+
+            // Recap + bouton vente : ancrés dynamiquement et clampés pour rester dans le panel.
+            // Bplus row se termine à cy+96+33+13 = cy+142 ; PB btns end à pby_+30 = cy+182
+            int controlsEndY = (sellCurrMode == 2) ? (cy + 182) : (cy + 142);
             long unit = sellQty > 0 ? sellPrice / sellQty : 0;
-            int recapY = cy + ch - 54;
+            int sellBhh = 24;
+            int sellMaxY = cy + ch - sellBhh - 4; // ne dépasse pas le panel en bas
+            int recapMaxY = sellMaxY - 15;
+            int recapY = Math.max(controlsEndY + 8, cy + ch - 54);
+            recapY = Math.min(recapY, recapMaxY);
             drawRect(cx + 8, recapY, cx + cw - 8, recapY + 13, 0x22FFFFFF);
-            String unitStr = sellPayPB
-                    ? "§7Prix unit. : §e" + fmtGold(unit) + " PB"
-                    : "§7Prix unit. : §b" + fmtGold(unit) + " $";
+            String unitStr;
+            if (sellCurrMode == 2) {
+                long unitPB = sellQty > 0 ? sellPricePB / sellQty : 0;
+                unitStr = "§7Unit.: §b" + fmtGold(unit) + " $ / §e" + fmtGold(unitPB) + " PB";
+            } else if (sellCurrMode == 1) {
+                unitStr = "§7Prix unit. : §e" + fmtGold(unit) + " PB";
+            } else {
+                unitStr = "§7Prix unit. : §b" + fmtGold(unit) + " $";
+            }
             fontRendererObj.drawString(unitStr, cx + 14, recapY + 3, 0);
 
-            // Bouton mettre en vente
-            int bx = cx + 8, by = cy + ch - 36, bww = cw - 16, bhh = 24;
+            // Bouton mettre en vente — juste sous le recap, clampé pour ne pas sortir du panel
+            int bx = cx + 8, by = Math.min(Math.max(recapY + 15, cy + ch - 36), sellMaxY), bww = cw - 16, bhh = sellBhh;
             boolean bhov = in(mx, my, bx, by, bww, bhh);
-            int btnBg     = sellPayPB ? (bhov ? 0xFF554400 : 0xFF2A2000) : (bhov ? 0xFF1A3A55 : 0xFF0A1828);
-            int btnBorder = sellPayPB ? (bhov ? C_GOLD : 0xFF664422)    : (bhov ? C_ACCENT2 : 0xFF1A3550);
+            int btnBg, btnBorder;
+            String sellLabel;
+            if (sellCurrMode == 1) {
+                btnBg = bhov ? 0xFF554400 : 0xFF2A2000; btnBorder = bhov ? C_GOLD : 0xFF664422;
+                sellLabel = "METTRE EN VENTE (PB)";
+            } else if (sellCurrMode == 2) {
+                btnBg = bhov ? 0xFF553388 : 0xFF2A1A44; btnBorder = bhov ? 0xFFAA55FF : 0xFF551199;
+                sellLabel = "METTRE EN VENTE ($ + PB)";
+            } else {
+                btnBg = bhov ? 0xFF1A3A55 : 0xFF0A1828; btnBorder = bhov ? C_ACCENT2 : 0xFF1A3550;
+                sellLabel = "METTRE EN VENTE ($)";
+            }
             drawRect(bx, by, bx + bww, by + bhh, btnBg);
             drawBorder(bx, by, bww, bhh, btnBorder);
-            String sellLabel = sellPayPB ? "METTRE EN VENTE (PB)" : "METTRE EN VENTE ($)";
-            drawCentered("§l" + sellLabel, bx + bww / 2, by + 8, bhov ? C_WHITE : (sellPayPB ? 0xFFDDCC88 : 0xFF88CCEE));
+            int sellTxtCol = bhov ? C_WHITE : (sellCurrMode == 1 ? 0xFFDDCC88 : (sellCurrMode == 2 ? 0xFFDD99FF : 0xFF88CCEE));
+            drawCentered("§l" + sellLabel, bx + bww / 2, by + 8, sellTxtCol);
             hb(hbSellBtn, bx, by, bww, bhh);
         } else {
             drawCentered("§8Sélectionnez un item", cx + cw / 2, cy + ch / 2 - 5, 0);
@@ -652,8 +811,10 @@ public class GuiHDV extends GuiScreen {
     }
 
     private void drawConfirmOverlay(int mx, int my) {
+        boolean isDual = confirmListing.isDual();
+        boolean isPB = confirmListing.isPayPB();
         drawRect(0, 0, width, height, 0xCC000000);
-        int cw = 280, ch = 140, cx = (width - cw) / 2, cy = (height - ch) / 2;
+        int cw = 280, ch = isDual ? 175 : 140, cx = (width - cw) / 2, cy = (height - ch) / 2;
         drawRect(cx, cy, cx + cw, cy + ch, C_BG);
         drawBorder(cx, cy, cw, ch, C_ACCENT);
         drawCentered("\u00a7b\u00a7lCONFIRMER L'ACHAT", cx + cw / 2, cy + 10, C_WHITE);
@@ -662,25 +823,72 @@ public class GuiHDV extends GuiScreen {
         if (item != null) {
             GlStateManager.enableDepth();
             RenderHelper.enableGUIStandardItemLighting();
-            itemRender.renderItemAndEffectIntoGUI(item, cx + 20, cy + 35);
+            itemRender.renderItemAndEffectIntoGUI(item, cx + 20, cy + 30);
             RenderHelper.disableStandardItemLighting();
             GlStateManager.disableDepth();
-            fontRendererObj.drawStringWithShadow(item.getDisplayName(), cx + 45, cy + 39, C_WHITE);
+            fontRendererObj.drawStringWithShadow(item.getDisplayName(), cx + 45, cy + 34, C_WHITE);
         }
-        fontRendererObj.drawString("\u00a77Prix Total : \u00a76" + fmtGold(confirmListing.getTotalPrice()) + " $", cx + 20, cy + 65, 0);
-        fontRendererObj.drawString("\u00a77Votre solde : \u00a7e" + fmtGold(playerBalance) + " $", cx + 20, cy + 80, 0);
 
-        int bw = 110, bh = 20, by = cy + ch - 30;
-        boolean h1 = in(mx, my, cx + 20, by, bw, bh);
-        drawRect(cx + 20, by, cx + 20 + bw, by + bh, h1 ? 0xFF882222 : 0xFF451515);
-        drawCentered("ANNULER", cx + 20 + bw / 2, by + 6, C_WHITE);
-        hb(hbCancelBuy, cx + 20, by, bw, bh);
+        int bw = 110, bh = 20;
+        int by2 = 0;
+        if (isDual) {
+            fontRendererObj.drawString("\u00a77Prix \u00a7b$\u00a77 : \u00a76" + fmtGold(confirmListing.getTotalPrice()) + " $", cx + 20, cy + 58, 0);
+            fontRendererObj.drawString("\u00a77Prix \u00a7ePB\u00a77 : \u00a7e" + fmtGold(confirmListing.getPricePB()) + " PB", cx + 20, cy + 73, 0);
+            fontRendererObj.drawString("\u00a77Solde : \u00a76" + fmtGold(playerBalance) + "$ \u00a77| \u00a7e" + fmtGold(playerPB) + " PB", cx + 20, cy + 88, 0);
 
-        boolean h2 = in(mx, my, cx + cw - bw - 20, by, bw, bh);
-        boolean can = playerBalance >= confirmListing.getTotalPrice();
-        drawRect(cx + cw - bw - 20, by, cx + cw - 20, by + bh, can ? (h2 ? 0xFF228844 : 0xFF154525) : 0xFF333333);
-        drawCentered(can ? "CONFIRMER" : "SOLDE INSUFF.", cx + cw - bw - 20 + bw / 2, by + 6, can ? C_WHITE : C_GRAY);
-        hb(hbOkBuy, cx + cw - bw - 20, by, bw, bh);
+            // Ligne 1 : Annuler (centré)
+            int by1 = cy + ch - 58;
+            boolean h0 = in(mx, my, cx + cw / 2 - 55, by1, 110, bh);
+            drawRect(cx + cw / 2 - 55, by1, cx + cw / 2 + 55, by1 + bh, h0 ? 0xFF882222 : 0xFF451515);
+            drawCentered("ANNULER", cx + cw / 2, by1 + 6, C_WHITE);
+            hb(hbCancelBuy, cx + cw / 2 - 55, by1, 110, bh);
+
+            // Ligne 2 : Payer en $ | Payer en PB
+            by2 = cy + ch - 30;
+            boolean canDollar = playerBalance >= confirmListing.getTotalPrice();
+            boolean h1 = in(mx, my, cx + 10, by2, bw, bh);
+            drawRect(cx + 10, by2, cx + 10 + bw, by2 + bh, canDollar ? (h1 ? 0xFF228844 : 0xFF154525) : 0xFF333333);
+            drawCentered(canDollar ? "PAYER EN $" : "INSUFF. $", cx + 10 + bw / 2, by2 + 6, canDollar ? C_WHITE : C_GRAY);
+            hb(hbOkBuy, cx + 10, by2, bw, bh);
+
+            boolean canPB = (long) playerPB >= confirmListing.getPricePB();
+            boolean h2 = in(mx, my, cx + cw - 10 - bw, by2, bw, bh);
+            drawRect(cx + cw - 10 - bw, by2, cx + cw - 10, by2 + bh, canPB ? (h2 ? 0xFF665500 : 0xFF332800) : 0xFF333333);
+            drawBorder(cx + cw - 10 - bw, by2, bw, bh, canPB ? C_GOLD : 0xFF444444);
+            drawCentered(canPB ? "PAYER EN PB" : "INSUFF. PB", cx + cw - 10 - bw + bw / 2, by2 + 6, canPB ? C_GOLD : C_GRAY);
+            hb(hbConfirmPB, cx + cw - 10 - bw, by2, bw, bh);
+        } else if (isPB) {
+            fontRendererObj.drawString("\u00a77Prix : \u00a7e" + fmtGold(confirmListing.getTotalPrice()) + " PB", cx + 20, cy + 58, 0);
+            fontRendererObj.drawString("\u00a78(offre PB uniquement)", cx + 20, cy + 73, 0);
+            fontRendererObj.drawString("\u00a77Solde : \u00a76" + fmtGold(playerBalance) + " $ \u00a77| \u00a7e" + fmtGold(playerPB) + " PB", cx + 20, cy + 88, 0);
+            int by = cy + ch - 30;
+            boolean h1 = in(mx, my, cx + 20, by, bw, bh);
+            drawRect(cx + 20, by, cx + 20 + bw, by + bh, h1 ? 0xFF882222 : 0xFF451515);
+            drawCentered("ANNULER", cx + 20 + bw / 2, by + 6, C_WHITE);
+            hb(hbCancelBuy, cx + 20, by, bw, bh);
+            boolean can = (long) playerPB >= confirmListing.getTotalPrice();
+            boolean h2 = in(mx, my, cx + cw - bw - 20, by, bw, bh);
+            drawRect(cx + cw - bw - 20, by, cx + cw - 20, by + bh, can ? (h2 ? 0xFF665500 : 0xFF332800) : 0xFF333333);
+            drawBorder(cx + cw - bw - 20, by, bw, bh, can ? C_GOLD : 0xFF444444);
+            drawCentered(can ? "CONFIRMER (PB)" : "SOLDE INSUFF.", cx + cw - bw - 20 + bw / 2, by + 6, can ? C_GOLD : C_GRAY);
+            hb(hbOkBuy, cx + cw - bw - 20, by, bw, bh);
+            hbConfirmPB[2] = 0;
+        } else {
+            fontRendererObj.drawString("\u00a77Prix Total : \u00a76" + fmtGold(confirmListing.getTotalPrice()) + " $", cx + 20, cy + 58, 0);
+            fontRendererObj.drawString("\u00a78(offre $ uniquement)", cx + 20, cy + 73, 0);
+            fontRendererObj.drawString("\u00a77Solde : \u00a76" + fmtGold(playerBalance) + " $ \u00a77| \u00a7e" + fmtGold(playerPB) + " PB", cx + 20, cy + 88, 0);
+            int by = cy + ch - 30;
+            boolean h1 = in(mx, my, cx + 20, by, bw, bh);
+            drawRect(cx + 20, by, cx + 20 + bw, by + bh, h1 ? 0xFF882222 : 0xFF451515);
+            drawCentered("ANNULER", cx + 20 + bw / 2, by + 6, C_WHITE);
+            hb(hbCancelBuy, cx + 20, by, bw, bh);
+            boolean can = playerBalance >= confirmListing.getTotalPrice();
+            boolean h2 = in(mx, my, cx + cw - bw - 20, by, bw, bh);
+            drawRect(cx + cw - bw - 20, by, cx + cw - 20, by + bh, can ? (h2 ? 0xFF228844 : 0xFF154525) : 0xFF333333);
+            drawCentered(can ? "CONFIRMER" : "SOLDE INSUFF.", cx + cw - bw - 20 + bw / 2, by + 6, can ? C_WHITE : C_GRAY);
+            hb(hbOkBuy, cx + cw - bw - 20, by, bw, bh);
+            hbConfirmPB[2] = 0;
+        }
     }
 
     private void drawScrollbar(int ax, int ly0, int lh, int cur, int total, int maxRows, int mx, int my, int[] hbUp, int[] hbDn) {
@@ -707,9 +915,30 @@ public class GuiHDV extends GuiScreen {
     protected void mouseClicked(int mx, int my, int btn) throws IOException {
         if (confirmListing != null) {
             if (ok(hbCancelBuy) && in(mx, my, hbCancelBuy)) confirmListing = null;
-            else if (ok(hbOkBuy) && in(mx, my, hbOkBuy) && playerBalance >= confirmListing.getTotalPrice()) {
-                HdvPacketHandler.buyItem(confirmListing.getId());
-                confirmListing = null;
+            else if (ok(hbOkBuy) && in(mx, my, hbOkBuy)) {
+                if (confirmListing.isDual()) {
+                    // Payer en $
+                    if (playerBalance >= confirmListing.getTotalPrice()) {
+                        HdvPacketHandler.buyItem(confirmListing.getId(), false);
+                        confirmListing = null;
+                    }
+                } else if (confirmListing.isPayPB()) {
+                    if ((long) playerPB >= confirmListing.getTotalPrice()) {
+                        HdvPacketHandler.buyItem(confirmListing.getId(), true);
+                        confirmListing = null;
+                    }
+                } else {
+                    if (playerBalance >= confirmListing.getTotalPrice()) {
+                        HdvPacketHandler.buyItem(confirmListing.getId(), false);
+                        confirmListing = null;
+                    }
+                }
+            } else if (ok(hbConfirmPB) && in(mx, my, hbConfirmPB) && confirmListing.isDual()) {
+                // Payer en PB (dual)
+                if ((long) playerPB >= confirmListing.getPricePB()) {
+                    HdvPacketHandler.buyItem(confirmListing.getId(), true);
+                    confirmListing = null;
+                }
             }
             return;
         }
@@ -723,6 +952,15 @@ public class GuiHDV extends GuiScreen {
         switch (activeTab) {
             case TAB_BUY:
                 searchField.mouseClicked(mx, my, btn);
+                fldMinMoney.mouseClicked(mx, my, btn);
+                fldMaxMoney.mouseClicked(mx, my, btn);
+                fldMinPB.mouseClicked(mx, my, btn);
+                fldMaxPB.mouseClicked(mx, my, btn);
+                if (ok(hbFltReset) && in(mx, my, hbFltReset)) {
+                    fldMinMoney.setText(""); fldMaxMoney.setText("");
+                    fldMinPB.setText(""); fldMaxPB.setText("");
+                    filterMinMoney = filterMaxMoney = filterMinPB = filterMaxPB = -1L;
+                }
                 if (ok(hbClearSearch) && in(mx, my, hbClearSearch)) { searchField.setText(""); requestList(); }
                 if (ok(hbSearchBtn) && in(mx, my, hbSearchBtn)) requestList();
                 if (ok(hbSort) && in(mx, my, hbSort)) sortMode = (sortMode + 1) % 3;
@@ -784,9 +1022,15 @@ public class GuiHDV extends GuiScreen {
                 if (ok(hbPrP1000)  && in(mx, my, hbPrP1000))  { sellPrice = Math.min(999999999, sellPrice + 1000);  priceField.setText(String.valueOf(sellPrice)); }
                 if (ok(hbPrP10000) && in(mx, my, hbPrP10000)) { sellPrice = Math.min(999999999, sellPrice + 10000); priceField.setText(String.valueOf(sellPrice)); }
                 if (ok(hbCurrencyToggle) && in(mx, my, hbCurrencyToggle)) {
-                    int mid = hbCurrencyToggle[0] + hbCurrencyToggle[2] / 2;
-                    sellPayPB = (mx >= mid);
+                    int rel = mx - hbCurrencyToggle[0];
+                    int seg = hbCurrencyToggle[2] / 3;
+                    sellCurrMode = rel < seg ? 0 : (rel < 2 * seg ? 1 : 2);
                 }
+                if (ok(hbPrPBM1000) && in(mx, my, hbPrPBM1000)) { sellPricePB = Math.max(1, sellPricePB - 10);   pricePBField.setText(String.valueOf(sellPricePB)); }
+                if (ok(hbPrPBM100)  && in(mx, my, hbPrPBM100))  { sellPricePB = Math.max(1, sellPricePB - 1);    pricePBField.setText(String.valueOf(sellPricePB)); }
+                if (ok(hbPrPBP100)  && in(mx, my, hbPrPBP100))  { sellPricePB = Math.min(9999999, sellPricePB + 1);   pricePBField.setText(String.valueOf(sellPricePB)); }
+                if (ok(hbPrPBP1000) && in(mx, my, hbPrPBP1000)) { sellPricePB = Math.min(9999999, sellPricePB + 10);  pricePBField.setText(String.valueOf(sellPricePB)); }
+                if (sellCurrMode == 2) pricePBField.mouseClicked(mx, my, btn);
                 if (ok(hbSellBtn) && in(mx, my, hbSellBtn)) doSell();
                 break;
         }
@@ -794,16 +1038,32 @@ public class GuiHDV extends GuiScreen {
 
     private void doSell() {
         if (sellItem == null || sellPrice <= 0 || sellQty <= 0) return;
-        HdvPacketHandler.postOffer(sellItem, sellPrice, sellQty, sellPayPB);
+        boolean payPB = (sellCurrMode == 1);
+        long pricePB  = (sellCurrMode == 2) ? sellPricePB : 0L;
+        HdvPacketHandler.postOffer(sellItem, sellPrice, sellQty, payPB, pricePB);
         sellItem = null; sellSlot = -1;
     }
 
     @Override
     protected void keyTyped(char c, int k) throws IOException {
         if (k == 1) { mc.displayGuiScreen(null); return; }
-        if (activeTab == TAB_BUY && searchField.isFocused()) {
-            searchField.textboxKeyTyped(c, k);
-            if (k == 28) requestList();
+        if (activeTab == TAB_BUY) {
+            if (searchField.isFocused()) {
+                searchField.textboxKeyTyped(c, k);
+                if (k == 28) requestList();
+            } else if (fldMinMoney.isFocused()) {
+                fldMinMoney.textboxKeyTyped(c, k);
+                filterMinMoney = parseLongFilter(fldMinMoney.getText());
+            } else if (fldMaxMoney.isFocused()) {
+                fldMaxMoney.textboxKeyTyped(c, k);
+                filterMaxMoney = parseLongFilter(fldMaxMoney.getText());
+            } else if (fldMinPB.isFocused()) {
+                fldMinPB.textboxKeyTyped(c, k);
+                filterMinPB = parseLongFilter(fldMinPB.getText());
+            } else if (fldMaxPB.isFocused()) {
+                fldMaxPB.textboxKeyTyped(c, k);
+                filterMaxPB = parseLongFilter(fldMaxPB.getText());
+            }
         } else if (activeTab == TAB_SELL) {
             if (qtyField.isFocused()) {
                 qtyField.textboxKeyTyped(c, k);
@@ -811,6 +1071,9 @@ public class GuiHDV extends GuiScreen {
             } else if (priceField.isFocused()) {
                 priceField.textboxKeyTyped(c, k);
                 sellPrice = parseLong(priceField.getText());
+            } else if (pricePBField.isFocused()) {
+                pricePBField.textboxKeyTyped(c, k);
+                sellPricePB = parseLong(pricePBField.getText());
             }
         }
     }
@@ -834,6 +1097,11 @@ public class GuiHDV extends GuiScreen {
         searchField.updateCursorCounter();
         qtyField.updateCursorCounter();
         priceField.updateCursorCounter();
+        pricePBField.updateCursorCounter();
+        fldMinMoney.updateCursorCounter();
+        fldMaxMoney.updateCursorCounter();
+        fldMinPB.updateCursorCounter();
+        fldMaxPB.updateCursorCounter();
         PlayerData pd = PlayerDataHandler.getCachedData();
         if (pd != null) { playerBalance = pd.getBalance(); playerPB = pd.getPb(); }
     }
@@ -843,7 +1111,24 @@ public class GuiHDV extends GuiScreen {
         List<HdvListing> r = new ArrayList<>();
         for (HdvListing l : listings) {
             String n = l.getItem() != null ? l.getItem().getDisplayName().toLowerCase() : "";
-            if (f.isEmpty() || n.contains(f) || l.getSellerName().toLowerCase().contains(f)) r.add(l);
+            if (!f.isEmpty() && !n.contains(f) && !l.getSellerName().toLowerCase().contains(f)) continue;
+            // Filtres prix $
+            if (filterMinMoney >= 0 || filterMaxMoney >= 0) {
+                long priceM = !l.isPayPB() ? l.getTotalPrice() : (l.isDual() ? l.getTotalPrice() : -1);
+                if (priceM >= 0) {
+                    if (filterMinMoney >= 0 && priceM < filterMinMoney) continue;
+                    if (filterMaxMoney >= 0 && priceM > filterMaxMoney) continue;
+                }
+            }
+            // Filtres prix PB
+            if (filterMinPB >= 0 || filterMaxPB >= 0) {
+                long pricePB = l.isPayPB() ? l.getTotalPrice() : (l.isDual() ? l.getPricePB() : -1);
+                if (pricePB >= 0) {
+                    if (filterMinPB >= 0 && pricePB < filterMinPB) continue;
+                    if (filterMaxPB >= 0 && pricePB > filterMaxPB) continue;
+                }
+            }
+            r.add(l);
         }
         r.sort((a, b) -> {
             if (sortMode == 1) return Long.compare(a.getTotalPrice(), b.getTotalPrice());
@@ -888,4 +1173,5 @@ public class GuiHDV extends GuiScreen {
         return (s / 3600) + "h " + (s % 3600 / 60) + "m";
     }
     private long parseLong(String s) { try { return Long.parseLong(s.trim()); } catch (Exception e) { return 0; } }
+    private long parseLongFilter(String s) { String t = s.trim(); if (t.isEmpty()) return -1L; try { return Long.parseLong(t); } catch (Exception e) { return -1L; } }
 }

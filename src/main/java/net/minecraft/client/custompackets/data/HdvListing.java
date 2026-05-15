@@ -22,8 +22,9 @@ public class HdvListing {
     private long totalPrice;
     private int quantity;
     private long expiresAt;
-    private boolean sold; // true = vendu, non encore collecté
+    private boolean sold;
     private boolean payPB; // true = l'acheteur paie en PB
+    private long pricePB;  // >0 = annonce double-devise (acheteur choisit $ ou PB)
 
     public HdvListing() {}
 
@@ -37,6 +38,7 @@ public class HdvListing {
             l.quantity   = buf.readVarIntFromBuffer();
             l.expiresAt  = buf.readLong();
             l.payPB      = buf.readBoolean();
+            try { l.pricePB = buf.readLong(); } catch (Exception ignored) { l.pricePB = 0; }
             l.sold       = false;
             return l;
         } catch (Exception e) {
@@ -56,6 +58,7 @@ public class HdvListing {
             l.expiresAt  = buf.readLong();
             l.sold       = buf.readBoolean();
             l.payPB      = buf.readBoolean();
+            try { l.pricePB = buf.readLong(); } catch (Exception ignored) { l.pricePB = 0; }
             return l;
         } catch (Exception e) {
             return null;
@@ -70,6 +73,10 @@ public class HdvListing {
     public long getExpiresAt()    { return expiresAt; }
     public boolean isSold()       { return sold; }
     public boolean isPayPB()      { return payPB; }
+    public long getPricePB()      { return pricePB; }
+
+    /** Vrai si l'annonce propose les deux devises (acheteur au choix). */
+    public boolean isDual()       { return !payPB && pricePB > 0 && totalPrice > 0; }
 
     /** Vrai si l'annonce n'a pas été vendue et que sa date d'expiration est dépassée (récupérable par le vendeur). */
     public boolean isExpired()    { return !sold && expiresAt > 0 && System.currentTimeMillis() / 1000L > expiresAt; }

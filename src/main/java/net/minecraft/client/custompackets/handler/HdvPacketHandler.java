@@ -128,11 +128,17 @@ public final class HdvPacketHandler {
                 String itemName = buf.readStringFromBuffer(64);
                 int    qty      = buf.readVarIntFromBuffer();
                 long   price    = buf.readLong();
-                final String n = itemName; final int q = qty; final long p = price;
+                boolean isPB    = false;
+                try { isPB = buf.readBoolean(); } catch (Exception ignored) {}
+                final String n = itemName; final int q = qty; final long p = price; final boolean pb = isPB;
                 net.minecraft.client.Minecraft.getMinecraft().addScheduledTask(() -> {
                     chat(HDV_BAR);
                     chat("\u00a7f  \u00a76[HDV] \u00a7aItem vendu !");
-                    chat("\u00a77  \u00a7f" + n + " \u00a77x" + q + "  \u00bb  \u00a76+" + fmtPrice(p) + " $");
+                    if (pb) {
+                        chat("\u00a77  \u00a7f" + n + " \u00a77x" + q + "  \u00bb  \u00a7e+" + fmtPrice(p) + " PB");
+                    } else {
+                        chat("\u00a77  \u00a7f" + n + " \u00a77x" + q + "  \u00bb  \u00a76+" + fmtPrice(p) + " $");
+                    }
                     chat(HDV_BAR);
                     previousSoldCount = Math.max(0, previousSoldCount) + 1;
                 });
@@ -158,16 +164,17 @@ public final class HdvPacketHandler {
         PacketSender.send(PacketChannel.HDV_C2S, buf);
     }
 
-    /** Achète un listing. */
-    public static void buyItem(int listingId) {
+    /** Achète un listing. buyerPayPB = true si l'acheteur choisit de payer en PB (annonce double-devise). */
+    public static void buyItem(int listingId, boolean buyerPayPB) {
         PacketBuffer buf = PacketSender.newBuffer();
         buf.writeVarIntToBuffer(PacketId.HDV_BUY_ITEM);
         buf.writeVarIntToBuffer(listingId);
+        buf.writeBoolean(buyerPayPB);
         PacketSender.send(PacketChannel.HDV_C2S, buf);
     }
 
-    /** Poste une annonce de vente. */
-    public static void postOffer(ItemStack item, long totalPrice, int quantity, boolean payPB) {
+    /** Poste une annonce de vente. pricePB > 0 = annonce double-devise (acheteur choisit $ ou PB). */
+    public static void postOffer(ItemStack item, long totalPrice, int quantity, boolean payPB, long pricePB) {
         if (item == null) return;
         try {
             PacketBuffer buf = PacketSender.newBuffer();
@@ -176,6 +183,7 @@ public final class HdvPacketHandler {
             buf.writeLong(totalPrice);
             buf.writeVarIntToBuffer(quantity);
             buf.writeBoolean(payPB);
+            buf.writeLong(pricePB);
             PacketSender.send(PacketChannel.HDV_C2S, buf);
         } catch (Exception ignored) {}
     }
@@ -204,8 +212,8 @@ public final class HdvPacketHandler {
     /** Affiche le message de collecte réussie dans le chat avec des barres alignées. */
     public static void showCollectMessage(long amount) {
         chat(HDV_BAR);
-        chat("\u00a7f  \u00a76[HDV] \u00a7aCollecte r\u00e9ussie !");
-        chat("\u00a77  Gains r\u00e9cup\u00e9r\u00e9s : \u00a76+" + fmtPrice(amount) + " $");
+        chat("\u00a7f  \u00a76[HDV] \u00a7aCollecte reussie !");
+        chat("\u00a77  Gains recuperes : \u00a76+" + fmtPrice(amount) + " $  \u00a78(Les PB ont ete credites directement)");
         chat(HDV_BAR);
     }
 
