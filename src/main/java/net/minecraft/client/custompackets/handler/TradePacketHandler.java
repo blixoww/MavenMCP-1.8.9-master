@@ -29,6 +29,11 @@ public final class TradePacketHandler {
     /** Montant offert par le partenaire (lu depuis le serveur). */
     public static long partnerOfferedMoney = 0L;
 
+    /** PB que j'offre. */
+    public static int  playerOfferedPB     = 0;
+    /** PB offerts par le partenaire. */
+    public static int  partnerOfferedPB    = 0;
+
     private TradePacketHandler() {}
 
     public static void registerHandlers() {
@@ -65,6 +70,12 @@ public final class TradePacketHandler {
         try {
             playerOfferedMoney  = buf.readLong();
             partnerOfferedMoney = buf.readLong();
+        } catch (Exception ignored) {}
+
+        // PB (optionnel — backward-compatible)
+        try {
+            playerOfferedPB  = buf.readVarIntFromBuffer();
+            partnerOfferedPB = buf.readVarIntFromBuffer();
         } catch (Exception ignored) {}
     }
 
@@ -107,6 +118,8 @@ public final class TradePacketHandler {
         partnerConfirmed = false;
         playerOfferedMoney  = 0L;
         partnerOfferedMoney = 0L;
+        playerOfferedPB     = 0;
+        partnerOfferedPB    = 0;
     }
 
     // ── C2S helpers (called from GuiTrade) ──────────────────────────────────
@@ -138,6 +151,14 @@ public final class TradePacketHandler {
         PacketBuffer buf = PacketSender.newBuffer();
         buf.writeVarIntToBuffer(PacketId.TRADE_MONEY);
         buf.writeLong(Math.max(0L, amount));
+        PacketSender.send(PacketChannel.TRADE_C2S, buf);
+    }
+
+    /** Envoie le montant de PB offert au serveur. */
+    public static void sendPBOffer(int amount) {
+        PacketBuffer buf = PacketSender.newBuffer();
+        buf.writeVarIntToBuffer(PacketId.TRADE_PB);
+        buf.writeVarIntToBuffer(Math.max(0, amount));
         PacketSender.send(PacketChannel.TRADE_C2S, buf);
     }
 }

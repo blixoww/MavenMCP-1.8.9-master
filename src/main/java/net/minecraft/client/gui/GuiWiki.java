@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * GuiWiki — Wiki client expliquant widgets, systemes, events et commandes.
+ * GuiWiki - Wiki client expliquant widgets, systemes, events et commandes.
  * Style sobre, dark, coherent avec le reste du client (Lunar-like).
  */
 public class GuiWiki extends GuiScreen {
@@ -109,157 +109,162 @@ public class GuiWiki extends GuiScreen {
         // ── WIDGETS ──────────────────────────────────────────────────────────
         sections.add(new Section("WIDGETS", COL_WIDGETS, Arrays.asList(
                 new Entry("FPS",
-                        "§7Nombre d'images par seconde. §cBas = lag§7 · §ahaut = fluide§7. Indicateur de performance en temps réel."),
+                        "§7Nombre d'images par seconde. §cBas = lag§7 \u00b7 §ahaut = fluide§7. Indicateur de performance en temps r\u00e9el."),
                 new Entry("Ping",
-                        "§7Latence réseau en §6ms§7. §a< 50 ms§7 = idéal · §e50–100 ms§7 = correct · §c> 150 ms§7 = élevé."),
+                        "§7Latence r\u00e9seau en §6ms§7. §a< 50 ms§7 = id\u00e9al \u00b7 §e50-100 ms§7 = correct \u00b7 §c> 150 ms§7 = \u00e9lev\u00e9."),
                 new Entry("Biome",
-                        "§7Biome actuel : §2Forêt§7, §6Désert§7, §bOcéan§7, §cNether§7, §dEnd§7..."),
-                new Entry("Coordonnées",
-                        "§7Position §eX §7/ §eY §7/ §eZ§7 dans le monde. Idéal pour partager un emplacement précis."),
+                        "§7Biome actuel : §2For\u00eat§7, §6D\u00e9sert§7, §bOc\u00e9an§7, §cNether§7, §dEnd§7..."),
+                new Entry("Coordonn\u00e9es",
+                        "§7Position §eX §7/ §eY §7/ §eZ§7 dans le monde. Id\u00e9al pour partager un emplacement pr\u00e9cis."),
                 new Entry("Direction",
-                        "§7Direction cardinale §e(N, S, E, W)§7 et angle de vue en degrés."),
+                        "§7Direction cardinale §e(N, S, E, W)§7 et angle de vue en degr\u00e9s."),
                 new Entry("Date",
-                        "§7Date et heure §fsystème§7 de votre machine locale."),
+                        "§7Date et heure §fsyst\u00e8me§7 de votre machine locale."),
                 new Entry("Objet tenu",
-                        "§7Nom et §edurabilité§7 de l'objet en main. Barre de progression §6colorée§7 selon l'état."),
+                        "§7Nom et §edurabilit\u00e9§7 de l'objet en main. Barre de progression §6color\u00e9e§7 selon l'\u00e9tat."),
                 new Entry("Armure",
-                        "§74 pièces d'armure avec leur durabilité restante en §6%§7. Layout horizontal ou vertical."),
+                        "§74 pi\u00e8ces d'armure avec leur durabilit\u00e9 restante en §6%§7. Layout horizontal ou vertical."),
                 new Entry("Effets de Potion",
-                        "§7Liste les effets actifs avec le temps restant. §abuffs§7 vs §cdebuffs§7 différenciés par couleur."),
+                        "§7Liste les effets actifs avec le temps restant. §abuffs§7 vs §cdebuffs§7 diff\u00e9renci\u00e9s par couleur."),
                 new Entry("CPS",
-                        "§fClicks Per Second§7. CPS §egauche§7 & §edroit§7 en temps réel — essentiel en §cPvP§7."),
+                        "§fClicks Per Second§7. CPS §egauche§7 & §edroit§7 en temps r\u00e9el - essentiel en §cPvP§7."),
                 new Entry("Toggle Sneak",
-                        "§7HUD du §eSneak permanent§7. Un appui = sneak activé jusqu'au prochain appui."),
+                        "§7HUD du §eSneak permanent§7. Un appui = sneak activ\u00e9 jusqu'au prochain appui."),
                 new Entry("Toggle Sprint",
-                        "§7HUD du §eSprint permanent§7. Un appui = sprint activé automatiquement."),
+                        "§7HUD du §eSprint permanent§7. Un appui = sprint activ\u00e9 automatiquement."),
                 new Entry("Auto Armor",
-                        "§7Indique si l'§eauto-équipement d'armure§7 est actif. Équipe le meilleur set disponible."),
+                        "§7Indique si l'§eauto-\u00e9quipement d'armure§7 est actif. \u00c9quipe le meilleur set disponible."),
                 new Entry("Combat Tag",
-                        "§cCompte à rebours§7 actif dès qu'on entre en combat. §cQuitter le serveur = mort instantanée§7."),
+                        "§cCompte \u00e0 rebours§7 actif d\u00e8s qu'on entre en combat. §cQuitter le serveur = mort instantan\u00e9e§7."),
                 new Entry("Keystrokes",
                         "§7Touches §eZ Q S D§7, espace et clics en direct. Utile pour §fstream / replay§7."),
                 new Entry("Reach Display",
-                        "§7Distance en §6blocs§7 au dernier joueur touché. Mesure votre §eallonge§7 effective en PvP."),
+                        "§7Distance en §6blocs§7 au dernier joueur touch\u00e9. Mesure votre §eallonge§7 effective en PvP."),
                 new Entry("Boussole HUD",
-                        "§7Bande horizontale avec §edirections cardinales§7, angle précis et §6Waypoints§7 visibles en temps réel."),
+                        "§7Bande horizontale avec §edirections cardinales§7, angle pr\u00e9cis et §6Waypoints§7 visibles en temps r\u00e9el."),
                 new Entry("Barre de vie joueurs",
-                        "§fBarre de vie§7 au-dessus des joueurs à portée, avec leur nom et armure."),
+                        "§fBarre de vie§7 au-dessus des joueurs \u00e0 port\u00e9e, avec leur nom et armure."),
                 new Entry("Zone Faction",
-                        "§7Territoire actuel. Relation : §aown§7 / §aallie§7 · §etruce§7 · §cenemy§7 · §7neutral."),
-                new Entry("Boutons inventaire", "§7Sous la table de craft : §cwiki§7 (rouge) · §6profil§7 · §bguide craft§7 (bleu).")
+                        "§7Territoire actuel. Relation : §aown§7 / §aallie§7 \u00b7 §etruce§7 \u00b7 §cenemy§7 \u00b7 §7neutral."),
+                new Entry("Boutons inventaire", "§7Sous la table de craft : §cwiki§7 (rouge) \u00b7 §6profil§7 \u00b7 §bguide craft§7 (bleu).")
 
         )));
 
-        // ── SYSTÈMES ─────────────────────────────────────────────────────────
+        // ── SYST\u00c8MES ─────────────────────────────────────────────────────────
         sections.add(new Section("SYSTEMES", COL_SYSTEMES, Arrays.asList(
                 new Entry("Profil joueur",
-                        "§7Vue détaillée : §ekills§7, §edeaths§7, §6killstreak§7, §cprime§7, solde, rang et faction. " +
-                                "Ouverture via §e/profil <joueur>§7 ou le bouton §ftête§7 dans l'inventaire."),
+                        "§7Vue d\u00e9taill\u00e9e : §ekills§7, §edeaths§7, §6killstreak§7, §cprime§7, solde, rang et faction. " +
+                                "Ouverture via §e/profil <joueur>§7 ou le bouton §ft\u00eate§7 dans l'inventaire."),
                 new Entry("Guide Craft",
                         "§7Catalogue complet des recettes : §ecrafting§7, §6four§7, §bbrassage§7 (potions vanilla & custom). " +
-                                "Barre de recherche intégrée. Bouton §flivre bleu§7 dans l'inventaire."),
-                new Entry("Thèmes UI",
-                        "§7Couleur de l'interface HUD, modifiable via §fThèmes§7 dans l'Éditeur HUD. " +
-                                "S'applique à tous les §ewidgets§7, menus et indicateurs du client."),
+                                "Barre de recherche int\u00e9gr\u00e9e. Bouton §flivre bleu§7 dans l'inventaire."),
+                new Entry("Th\u00e8mes UI",
+                        "§7Couleur de l'interface HUD, modifiable via §fTh\u00e8mes§7 dans l'\u00c9diteur HUD. " +
+                                "S'applique \u00e0 tous les §ewidgets§7, menus et indicateurs du client."),
                 new Entry("Waypoints",
                         "§6Marqueurs 3D§7 posables dans le monde, visibles dans la §eBoussole HUD§7. " +
                                 "Couleur et nom §fpersonnalisables§7."),
                 new Entry("Visuals",
-                        "§7Options visuelles avancées : §eparticules de hit§7, §bping CS:GO§7 3D in-world, " +
-                                "§eparticules de potions§7. Activables dans les paramètres client."),
+                        "§7Options visuelles avanc\u00e9es : §eparticules de hit§7, §bping CS:GO§7 3D in-world, " +
+                                "§eparticules de potions§7. Activables dans les param\u00e8tres client."),
                 new Entry("Shaders",
-                        "§7Shaderpacks §fcompatibles OptiFine / GLSL§7. Changez de pack dans §eles paramètres graphiques§7. " +
+                        "§7Shaderpacks §fcompatibles OptiFine / GLSL§7. Changez de pack dans §eles param\u00e8tres graphiques§7. " +
                                 "§cPeut impacter les performances.§7")
         )));
 
-        // ── ÉVÉNEMENTS ───────────────────────────────────────────────────────
+        // ── \u00c9V\u00c9NEMENTS ───────────────────────────────────────────────────────
         sections.add(new Section("EVENEMENTS", COL_EVENTS, Arrays.asList(
                 new Entry("KOTH - King of the Hill",
                         "§7Capturez une zone en y restant et en repoussant les autres joueurs. "),
                 new Entry("Totem - destruction de structure",
-                        "§7Une structure §e(Totem)§7 est placée sur la map. Détruisez les blocks pour gagner."),
+                        "§7Une structure §e(Totem)§7 est plac\u00e9e sur la map. D\u00e9truisez les blocks pour gagner."),
                 new Entry("LMS - Last Man Standing",
-                        "§fEn solo ou en duo par faction§7 en arène. §cAucune alliance§7. " +
-                                "Le §adernier en vie§7 remporte l'event et des §6récompenses majeures§7. §cMourir = élimination définitive§7."),
-                new Entry("Domination - Contrôle de zones",
-                        "§7Capturez plusieurs zones simultanément. §aRester dans une zone§7 = §6points§7. " +
+                        "§fEn solo ou en duo par faction§7 en ar\u00e8ne. §cAucune alliance§7. " +
+                                "Le §adernier en vie§7 remporte l'event et des §6r\u00e9compenses majeures§7. §cMourir = \u00e9limination d\u00e9finitive§7."),
+                new Entry("Domination - Contr\u00f4le de zones",
+                        "§7Capturez plusieurs zones simultan\u00e9ment. §aRester dans une zone§7 = §6points§7. " +
                                 "§eKills§7 = bonus. §fMultiplicateur§7 dynamique. §aLa faction avec le plus de points§7 gagne."),
                 new Entry("Purge - 30 min de chaos",
                         "§630 minutes§7 : les portes des §cAP s'ouvrent§7 pour tous. " +
-                                "§eKill en warzone§7 = argent + items. §fUn seul joueur unique§7 comptabilisé. " +
-                                "Objectif : §amaximiser§7 les joueurs différents éliminés."),
+                                "§eKill en warzone§7 = argent + items. §fUn seul joueur unique§7 comptabilis\u00e9. " +
+                                "Objectif : §amaximiser§7 les joueurs diff\u00e9rents \u00e9limin\u00e9s."),
                 new Entry("Nexus - Destruction de cristal",
-                        "§fEnder Crystal§7 (§eNexus§7) placé sur la map : §cdétruisez-le. " +
-                                "§6Récompenses§7 pour la faction qui fait le plus de dégâts.")
+                        "§fEnder Crystal§7 (§eNexus§7) plac\u00e9 sur la map : §cd\u00e9truisez-le. " +
+                                "§6R\u00e9compenses§7 pour la faction qui fait le plus de d\u00e9g\u00e2ts.")
         )));
 
         // ── COMMANDES ────────────────────────────────────────────────────────
         sections.add(new Section("COMMANDES", COL_COMMANDES, Arrays.asList(
-                new Entry("/duel <joueur>", "§7Défiez un joueur en §eduel§7 avec votre équipement. Le joueur doit §aaccepter§7."),
-                new Entry("/duelk <joueur>", "§7Duel avec §6kit défini§7 identique pour les deux. Requiert §aacceptation§7."),
-                new Entry("/duelrandom", "§7Duel §ealéatoire§7 avec votre équipement : entrée en §ffile d'attente§7 automatique."),
-                new Entry("/duelkrandom", "§7Duel §ealéatoire§7 avec §6kit défini§7. Même principe que §e/duelrandom§7."),
+                new Entry("/duel <joueur>", "§7D\u00e9fiez un joueur en §eduel§7 avec votre \u00e9quipement. Le joueur doit §aaccepter§7."),
+                new Entry("/duelk <joueur>", "§7Duel avec §6kit d\u00e9fini§7 identique pour les deux. Requiert §aacceptation§7."),
+                new Entry("/duelrandom", "§7Duel §eal\u00e9atoire§7 avec votre \u00e9quipement : entr\u00e9e en §ffile d'attente§7 automatique."),
+                new Entry("/duelkrandom", "§7Duel §eal\u00e9atoire§7 avec §6kit d\u00e9fini§7. M\u00eame principe que §e/duelrandom§7."),
                 new Entry("/ks", "§7Vos §ekills§7, §edeaths§7, ratio §6K/D§7 et temps de jeu."),
                 new Entry("/profil <joueur>", "§7Profil complet : §ekills§7, §edeaths§7, §6killstreak§7, §cprime§7, rang, faction."),
-                new Entry("/ct", "§7Vérifie votre §6Combat Tag§7. §cActif = ne pas quitter§7 le serveur."),
-                new Entry("/hdv", "§7Ouvre l'§eHôtel des Ventes§7 : listez, achetez et vendez entre joueurs."),
-                new Entry("/shop", "§7Boutique serveur aux §6prix fixes§7 par catégorie."),
+                new Entry("/ct", "§7V\u00e9rifie votre §6Combat Tag§7. §cActif = ne pas quitter§7 le serveur."),
+                new Entry("/hdv", "§7Ouvre l'§eH\u00f4tel des Ventes§7 : listez, achetez et vendez entre joueurs."),
+                new Entry("/shop", "§7Boutique serveur aux §6prix fixes§7 par cat\u00e9gorie."),
                 new Entry("/baltop", "§fClassement§7 des joueurs les plus §6riches§7 du serveur."),
                 new Entry("/prime <joueur> <$>", "§7Posez une §cprime§7 sur un joueur. §e/prime list§7 = primes actives."),
-                new Entry("/loto <montant>", "§7Participez au §6loto§7. §e/loto next§7 = prochain tirage · §e/loto help§7 = aide."),
-                new Entry("/friend add <joueur>", "§7Ajoutez un §eami§7. Les amis ne se font §apas de dégâts§7 mutuels."),
+                new Entry("/loto <montant>", "§7Participez au §6loto§7. §e/loto next§7 = prochain tirage \u00b7 §e/loto help§7 = aide."),
+                new Entry("/friend add <joueur>", "§7Ajoutez un §eami§7. Les amis ne se font §apas de d\u00e9g\u00e2ts§7 mutuels."),
                 new Entry("/friend list", "§7Liste de vos §famis§7 actuels."),
-                new Entry("/trade <joueur>", "§fÉchange sécurisé§7 d'items. Les deux parties doivent §aconfirmer§7."),
-                new Entry("/plannings", "§fÉvénements§7 à venir : §eKOTH§7, §eTotem§7, §eLMS§7, §ePurge§7, §6Loto§7..."),
-                new Entry("/repairall", "§aRépare§7 tous vos items. §cCooldown : §624h§7."),
-                new Entry("/cobble", "§7Toggle le filtre cobblestone. La cobble va dans une §ecases dédiée§7."),
-                new Entry("/furnace this|all", "§aCuit§7 sans four. §e/furnace this§7 = main · §e/furnace all§7 = inventaire."),
-                new Entry("/bottlexp", "§7Embouteille vos §6niveaux d'XP§7 dans une bouteille récupérable."),
-                new Entry("/poubelle", "§cPoubelle virtuelle§7 : tout ce qui est déposé est §csupprimé§7 à la fermeture."),
+                new Entry("/trade <joueur>", "§f\u00c9change s\u00e9curis\u00e9§7 d'items. Les deux parties doivent §aconfirmer§7."),
+                new Entry("/plannings", "§f\u00c9v\u00e9nements§7 \u00e0 venir : §eKOTH§7, §eTotem§7, §eLMS§7, §ePurge§7, §6Loto§7..."),
+                new Entry("/repairall", "§aR\u00e9pare§7 tous vos items. §cCooldown : §624h§7."),
+                new Entry("/cobble", "§7Toggle le filtre cobblestone. La cobble va dans une §ecases d\u00e9di\u00e9e§7."),
+                new Entry("/furnace this|all", "§aCuit§7 sans four. §e/furnace this§7 = main \u00b7 §e/furnace all§7 = inventaire."),
+                new Entry("/bottlexp", "§7Embouteille vos §6niveaux d'XP§7 dans une bouteille r\u00e9cup\u00e9rable."),
+                new Entry("/poubelle", "§cPoubelle virtuelle§7 : tout ce qui est d\u00e9pos\u00e9 est §csupprim\u00e9§7 \u00e0 la fermeture."),
                 new Entry("/vision", "§7Toggle la §fvision nocturne§7 permanente sans potion."),
-                new Entry("/wiki", "§7Ouvre le §fWiki§7 depuis le chat. Équivalent au §cbouton rouge§7 dans l'inventaire.")
+                new Entry("/wiki", "§7Ouvre le §fWiki§7 depuis le chat. \u00c9quivalent au §cbouton rouge§7 dans l'inventaire."),
+                new Entry("/boutique", "§7Ouvre la §eBoutique PB§7. Achetez des §6grades§7, §ecommandes§7 et §bspawners§7 avec vos §ePoints Boutique§7.")
         )));
 
-        // ── ÉCONOMIE ─────────────────────────────────────────────────────────
+        // ── \u00c9CONOMIE ─────────────────────────────────────────────────────────
         sections.add(new Section("ECONOMIE", COL_ECONOMIE, Arrays.asList(
-                new Entry("HDV — Hôtel des Ventes",
-                        "§fMarché§7 entre joueurs via §e/hdv§7. Listez vos objets à vendre, achetez aux autres. " +
-                                "§aNotification§7 en temps réel quand un item est vendu."),
-                new Entry("Shop — Boutique serveur",
+                new Entry("HDV - H\u00f4tel des Ventes",
+                        "§fMarch\u00e9§7 entre joueurs via §e/hdv§7. Listez vos objets \u00e0 vendre, achetez aux autres. " +
+                                "§aNotification§7 en temps r\u00e9el quand un item est vendu."),
+                new Entry("Shop - Boutique serveur",
                         "§7Achetez / vendez des ressources aux §6prix fixes§7 du serveur via §e/shop§7. " +
-                                "Catégories par type de ressource."),
+                                "Cat\u00e9gories par type de ressource."),
                 new Entry("/baltop",
-                        "§fClassement§7 économique. Qui domine le §6marché§7 du serveur ?"),
+                        "§fClassement§7 \u00e9conomique. Qui domine le §6march\u00e9§7 du serveur ?"),
                 new Entry("Loto",
-                        "§7Pariez avec §e/loto <montant>§7. Le §6jackpot§7 grossit à chaque mise. " +
-                                "Tirage §fpériodique§7. §e/loto next§7 = prochain tirage."),
+                        "§7Pariez avec §e/loto <montant>§7. Le §6jackpot§7 grossit \u00e0 chaque mise. " +
+                                "Tirage §fp\u00e9riodique§7. §e/loto next§7 = prochain tirage."),
                 new Entry("Coinflip",
-                        "§6Pile ou face§7 : deux joueurs misent la même somme. §aLe vainqueur§7 remporte §f×2 la mise§7."),
+                        "§6Pile ou face§7 : deux joueurs misent la m\u00eame somme. §aLe vainqueur§7 remporte §fx2 la mise§7."),
                 new Entry("Prime (/prime)",
                         "§e/prime <joueur> <montant>§7 : posez une prime. §aLe tueur§7 l'empoche. " +
                                 "§e/prime list§7 = primes actives."),
                 new Entry("Box Acier",
-                        "§7Coffre §fniveau 1§7. Clé §fAcier§7 requise. Ressources communes : outils, armures fer, matériaux."),
-                new Entry("Box Émeraude",
-                        "§7Coffre §aniveau 2§7. Clé §aÉmeraude§7 requise. Enchants, équipements diamant, potions."),
+                        "§7Coffre §fniveau 1§7. Cl\u00e9 §fAcier§7 requise. Ressources communes : outils, armures fer, mat\u00e9riaux."),
+                new Entry("Box \u00c9meraude",
+                        "§7Coffre §aniveau 2§7. Cl\u00e9 §a\u00c9meraude§7 requise. Enchants, \u00e9quipements diamant, potions."),
                 new Entry("Box Ruby",
-                        "§7Coffre §cniveau 3§7. Clé §cRuby§7 requise. Sets diamant enchantés, potions puissantes, items rares."),
+                        "§7Coffre §cniveau 3§7. Cl\u00e9 §cRuby§7 requise. Sets diamant enchant\u00e9s, potions puissantes, items rares."),
                 new Entry("Box Cobalt",
-                        "§7Coffre §bniveau 4§7. Clé §bCobalt§7 requise. §fMeilleures récompenses§7 : équipements max, §6grosses sommes§7, " +
-                                "items §ddisponibles exclusivement§7 ici.")
+                        "§7Coffre §bniveau 4§7. Cl\u00e9 §bCobalt§7 requise. §fMeilleures r\u00e9compenses§7 : \u00e9quipements max, §6grosses sommes§7, " +
+                                "items §ddisponibles exclusivement§7 ici."),
+                new Entry("Boutique PB - /boutique",
+                        "§7Boutique premium ouverte via §e/boutique§7. Utilisez vos §ePoints Boutique (PB)§7 ou votre §6monnaie§7. " +
+                                "§6Grades§7 \u00b7 §eCommandes§7 \u00b7 §bSpawners§7 \u00b7 §dOffres sp\u00e9ciales§7 (stock limit\u00e9). " +
+                                "§710 PB = 1 euro.")
         )));
 
         // ── GRADES ───────────────────────────────────────────────────────────
         sections.add(new Section("GRADES", COL_GRADES, Arrays.asList(
-                new Entry("Guerrier — Grade de base",
-                        "§7Grade attribué à §ftous§7 les joueurs à l'inscription. " +
-                                "Avantages : §e/cobble§7 · §e/kit guerrier§7 · §62 homes§7."),
+                new Entry("Guerrier - Grade de base",
+                        "§7Grade attribu\u00e9 \u00e0 §ftous§7 les joueurs \u00e0 l'inscription. " +
+                                "Avantages : §e/cobble§7 \u00b7 §e/kit guerrier§7 \u00b7 §62 homes§7."),
                 new Entry("Elite",
-                        "§7Grade §asupérieur§7 débloquant de nouvelles commandes. " +
-                                "Avantages : §e/back§7 · §e/craft§7 · §e/furnace§7 · §e/vision§7 · §e/kit elite§7 · §66 homes§7."),
+                        "§7Grade §asup\u00e9rieur§7 d\u00e9bloquant de nouvelles commandes. " +
+                                "Avantages : §e/back§7 \u00b7 §e/craft§7 \u00b7 §e/furnace§7 \u00b7 §e/vision§7 \u00b7 §e/kit elite§7 \u00b7 §66 homes§7."),
                 new Entry("Immortel",
-                        "§7Grade §6premium§7 — le plus élevé du serveur. " +
-                                "Avantages : §e/near§7 · §e/ec§7 · §e/repairall§7 · §e/kit immortel§7 · §610 homes§7.")
+                        "§7Grade §6premium§7 - le plus \u00e9lev\u00e9 du serveur. " +
+                                "Avantages : §e/near§7 \u00b7 §e/ec§7 \u00b7 §e/repairall§7 \u00b7 §e/kit immortel§7 \u00b7 §610 homes§7.")
         )));
     }
 
@@ -604,7 +609,7 @@ public class GuiWiki extends GuiScreen {
         int eh = entryHeight(e);
         Gui.drawRect(contentX + 8, y + 1, panelX + panelW - 8, y + eh,
                 even ? 0x06FFFFFF : 0x03FFFFFF);
-        // Accent dot — couleur par section
+        // Accent dot - couleur par section
         Gui.drawRect(contentX + 10, y + 5, contentX + 14, y + 11, accentColor);
         Gui.drawRect(contentX + 10, y + 11, contentX + 12, y + 13, (accentColor & 0xFFFFFF) | 0x44000000);
         // Titre : le "/" des commandes en couleur d'accent

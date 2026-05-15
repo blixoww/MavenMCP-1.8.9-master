@@ -95,6 +95,8 @@ public final class PacketId {
     public static final int PLAYER_RANK      = 0x51;
     /** Stats personnalisées (kills, deaths…) */
     public static final int PLAYER_STATS     = 0x52;
+    /** Solde Points Boutique (PB) — int VarInt */
+    public static final int PLAYER_PB        = 0x53;
 
     // ════════════════════════════════════════════════════════════════════════
     //  Données joueur – Client → Serveur
@@ -175,5 +177,41 @@ public final class PacketId {
     public static final int TRADE_CONFIRM = 0xA2;
     public static final int TRADE_CANCEL  = 0xA3;
     public static final int TRADE_MONEY   = 0xA4;
+    /** C2S — montant de Points Boutique offert (long) */
+    public static final int TRADE_PB      = 0xA5;
+
+    // ════════════════════════════════════════════════════════════════════════
+    //  Boutique PB – Serveur → Client  (canal BOUTIQUE_S2C)
+    // ════════════════════════════════════════════════════════════════════════
+    /**
+     * Snapshot complet de la boutique : catégories (grades/commandes/spawners) +
+     * offre spéciale active (peut être absente).
+     * Format :
+     *   String  titre
+     *   long    balance (monnaie du joueur)
+     *   VarInt  pb      (PB du joueur)
+     *   VarInt  nbGrades       puis pour chaque : id, nom, [lines lore], prix_monnaie(long), prix_pb(int)
+     *   VarInt  nbCommandes    idem + duree(int)
+     *   VarInt  nbSpawners     idem + mob(String)
+     *   bool    hasOffre
+     *   (si hasOffre) ItemStack(via writeItemStackToBuffer), nom, [lore], prix_monnaie, prix_pb,
+     *                  stock(VarInt), stockInitial(VarInt), expiresAt(long), id(String)
+     */
+    public static final int BOUTIQUE_DATA   = 0xB0;
+    /** Résultat d'un achat : bool success | String message */
+    public static final int BOUTIQUE_RESULT = 0xB1;
+
+    // ════════════════════════════════════════════════════════════════════════
+    //  Boutique PB – Client → Serveur  (canal BOUTIQUE_C2S)
+    // ════════════════════════════════════════════════════════════════════════
+    /** Demande de rafraîchissement de la snapshot boutique */
+    public static final int BOUTIQUE_REQUEST = 0xB0;
+    /**
+     * Demande d'achat.
+     * Format : byte categorie (0=grade, 1=cmd, 2=spawner, 3=offre)
+     *          String id
+     *          bool   payerEnPB
+     */
+    public static final int BOUTIQUE_BUY     = 0xB1;
 }
 

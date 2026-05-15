@@ -269,6 +269,27 @@ public class EntityPlayerSP extends AbstractClientPlayer {
      * Sends a chat message from the player. Args: chatMessage
      */
     public void sendChatMessage(String message) {
+        if (message.equals("/boutique")) {
+            net.minecraft.client.custompackets.handler.BoutiquePacketHandler.requestData();
+            return;
+        }
+        if (message.equals("/wiki")) {
+            // On délègue à un thread séparé pour que addScheduledTask file vraiment
+            // pour le tick suivant (sinon il s'exécute immédiatement et GuiChat
+            // referme aussitôt notre écran via displayGuiScreen(null)).
+            new Thread(new Runnable() {
+                @Override public void run() {
+                    try { Thread.sleep(40); } catch (InterruptedException ignored) {}
+                    net.minecraft.client.Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+                        @Override public void run() {
+                            net.minecraft.client.Minecraft.getMinecraft().displayGuiScreen(
+                                new net.minecraft.client.gui.GuiWiki(null));
+                        }
+                    });
+                }
+            }, "WikiOpener").start();
+            return;
+        }
         if (message.startsWith("/hdvexpire ")) {
             try {
                 int id = Integer.parseInt(message.substring("/hdvexpire ".length()).trim());
@@ -686,9 +707,9 @@ public class EntityPlayerSP extends AbstractClientPlayer {
                 && ((float) this.getFoodStats().getFoodLevel() > 6.0F || this.capabilities.allowFlying)) {
             this.setSprinting(true);
         }
-        // Toggle Sprint : désactiver le mode si item en main ou conditions impossibles (faim, cécité)
-        // La collision n'annule pas le mode : setSprinting(false) plus bas gère l'arrêt physique,
-        // et le sprint reprend automatiquement à la frame suivante si le joueur avance encore.
+        // Toggle Sprint : d\u00e9sactiver le mode si item en main ou conditions impossibles (faim, c\u00e9cit\u00e9)
+        // La collision n'annule pas le mode : setSprinting(false) plus bas g\u00e8re l'arr\u00eat physique,
+        // et le sprint reprend automatiquement \u00e0 la frame suivante si le joueur avance encore.
         if (this.mc.gameSettings.toggleSprintEnabled && this.mc.gameSettings.isToggleSprintActive
                 && (this.isUsingItem()
                     || this.isPotionActive(net.minecraft.potion.Potion.blindness)

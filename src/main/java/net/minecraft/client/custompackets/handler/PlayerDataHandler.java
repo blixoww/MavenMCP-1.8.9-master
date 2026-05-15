@@ -61,6 +61,14 @@ public final class PlayerDataHandler {
             LOGGER.debug("[PlayerData] Données complètes reçues : {}", cachedData);
             notifyListener();
         });
+
+        PacketDispatcher.register(PacketChannel.PLAYER_DATA_S2C, PacketId.PLAYER_PB, buf -> {
+            int pb = buf.readVarIntFromBuffer();
+            if (cachedData == null) cachedData = new PlayerData();
+            cachedData.setPb(pb);
+            LOGGER.debug("[PlayerData] Solde PB mis à jour : {}", pb);
+            notifyListener();
+        });
     }
 
     // ── API sortante ──────────────────────────────────────────────────────────

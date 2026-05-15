@@ -12,6 +12,8 @@ public class PlayerData {
     private int kills;
     private int deaths;
     private int playTimeMinutes;
+    /** Solde Points Boutique. 1€ = 10 PB. */
+    private int pb;
 
     public PlayerData() {}
 
@@ -24,6 +26,8 @@ public class PlayerData {
         d.kills           = buf.readVarIntFromBuffer();
         d.deaths          = buf.readVarIntFromBuffer();
         d.playTimeMinutes = buf.readVarIntFromBuffer();
+        // PB optionnel — backward-compatible avec d'anciens serveurs
+        try { d.pb = buf.readVarIntFromBuffer(); } catch (Exception ignored) { d.pb = 0; }
         return d;
     }
 
@@ -33,6 +37,7 @@ public class PlayerData {
         buf.writeVarIntToBuffer(kills);
         buf.writeVarIntToBuffer(deaths);
         buf.writeVarIntToBuffer(playTimeMinutes);
+        buf.writeVarIntToBuffer(pb);
     }
 
     // ── Getters / Setters ────────────────────────────────────────────────────
@@ -49,6 +54,9 @@ public class PlayerData {
     public void   setDeaths(int d)        { this.deaths = d; }
     public int    getPlayTimeMinutes()    { return playTimeMinutes; }
     public void   setPlayTimeMinutes(int m) { this.playTimeMinutes = m; }
+
+    public int    getPb()                 { return pb; }
+    public void   setPb(int v)            { this.pb = v; }
 
     /** KD ratio – retourne 0 si aucune mort */
     public float  getKDRatio() {

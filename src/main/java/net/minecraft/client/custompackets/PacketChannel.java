@@ -55,4 +55,8 @@ public final class PacketChannel {
     // ── Canal dédié au trade ─────────────────────────────────────────────────
     public static final String TRADE_S2C = "CUSTOM:TRADE_S2C";
     public static final String TRADE_C2S = "CUSTOM:TRADE_C2S";
+
+    // ── Canal dédié à la boutique PB ─────────────────────────────────────────
+    public static final String BOUTIQUE_S2C = "CUSTOM:BOUTIQUE_S2C";
+    public static final String BOUTIQUE_C2S = "CUSTOM:BOUTIQUE_C2S";
 }

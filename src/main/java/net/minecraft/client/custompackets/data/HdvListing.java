@@ -23,6 +23,7 @@ public class HdvListing {
     private int quantity;
     private long expiresAt;
     private boolean sold; // true = vendu, non encore collecté
+    private boolean payPB; // true = l'acheteur paie en PB
 
     public HdvListing() {}
 
@@ -31,11 +32,11 @@ public class HdvListing {
             HdvListing l = new HdvListing();
             l.id         = buf.readVarIntFromBuffer();
             l.sellerName = buf.readStringFromBuffer(64);
-            // Format vanilla : auto-délimité, PAS de VarInt de longueur devant
             l.item       = buf.readItemStackFromBuffer();
             l.totalPrice = buf.readLong();
             l.quantity   = buf.readVarIntFromBuffer();
             l.expiresAt  = buf.readLong();
+            l.payPB      = buf.readBoolean();
             l.sold       = false;
             return l;
         } catch (Exception e) {
@@ -54,6 +55,7 @@ public class HdvListing {
             l.quantity   = buf.readVarIntFromBuffer();
             l.expiresAt  = buf.readLong();
             l.sold       = buf.readBoolean();
+            l.payPB      = buf.readBoolean();
             return l;
         } catch (Exception e) {
             return null;
@@ -63,13 +65,11 @@ public class HdvListing {
     public int getId()            { return id; }
     public String getSellerName() { return sellerName; }
     public ItemStack getItem()    { return item; }
-
-    /** Renvoie le prix TOTAL du lot. */
     public long getTotalPrice()   { return totalPrice; }
-
     public int getQuantity()      { return quantity; }
     public long getExpiresAt()    { return expiresAt; }
     public boolean isSold()       { return sold; }
+    public boolean isPayPB()      { return payPB; }
 
     /** Vrai si l'annonce n'a pas été vendue et que sa date d'expiration est dépassée (récupérable par le vendeur). */
     public boolean isExpired()    { return !sold && expiresAt > 0 && System.currentTimeMillis() / 1000L > expiresAt; }

@@ -5,6 +5,7 @@ import net.minecraft.client.custompackets.handler.FactionDataCache;
 import net.minecraft.client.custompackets.handler.HdvPacketHandler;
 import net.minecraft.client.custompackets.handler.PlayerDataHandler;
 import net.minecraft.client.custompackets.handler.ShopPacketHandler;
+import net.minecraft.client.custompackets.handler.BoutiquePacketHandler;
 import net.minecraft.client.visuals.ping.PingManager;
 import net.minecraft.network.PacketBuffer;
 import org.apache.logging.log4j.LogManager;
@@ -37,6 +38,8 @@ public final class CustomPacketSystem {
 
         ShopPacketHandler.registerHandlers();
         PlayerDataHandler.registerHandlers();
+        BoutiquePacketHandler.registerHandlers();
+        LOGGER.info("[CustomPackets] ✓ BoutiquePacketHandler enregistré");
 
         // Système de ping : réception d'un ping S2C (faction/allié/ami proche)
         // Format : double x | double y | double z | String sender (max 64)
@@ -163,6 +166,7 @@ public final class CustomPacketSystem {
                               PacketChannel.PING_C2S + "\0" + PacketChannel.PING_S2C + "\0" +
                               PacketChannel.FACTION_S2C + "\0" +
                               PacketChannel.TRADE_S2C + "\0" + PacketChannel.TRADE_C2S + "\0" +
+                              PacketChannel.BOUTIQUE_S2C + "\0" + PacketChannel.BOUTIQUE_C2S + "\0" +
                               PacketChannel.COMBATLOG;
             buf.writeBytes(channels.getBytes(java.nio.charset.StandardCharsets.UTF_8));
             PacketSender.send("REGISTER", buf);

@@ -220,9 +220,33 @@ public class GuiPlayerTabOverlay extends Gui
             }
         }
 
+        // Affichage PB sous la liste des joueurs
+        net.minecraft.client.custompackets.data.PlayerData tabPd =
+                net.minecraft.client.custompackets.handler.PlayerDataHandler.getCachedData();
+
+        int pbBlockY = k1 + i4 * 9 + 1;
+        int pbBlockH = 0;
+
+        if (tabPd != null) {
+            int fh = this.mc.fontRendererObj.FONT_HEIGHT;
+            pbBlockH = fh + 6;
+            int bx = width / 2 - l1 / 2 - 1;
+            int bw = l1 + 2;
+
+            drawRect(bx, pbBlockY, bx + bw, pbBlockY + pbBlockH, 0xAA0A1525);
+            drawRect(bx, pbBlockY, bx + bw, pbBlockY + 1, 0xFFFFAA00);
+
+            String pbStr = "§7PB : §e§l" + tabPd.getPb();
+            int sw = this.mc.fontRendererObj.getStringWidth(pbStr);
+            this.mc.fontRendererObj.drawStringWithShadow(pbStr,
+                    (float)(width / 2 - sw / 2), (float)(pbBlockY + 3), -1);
+        }
+
+        int footerStartY = pbBlockY + pbBlockH;
+
         if (list2 != null)
         {
-            k1 = k1 + i4 * 9 + 1;
+            k1 = footerStartY;
             drawRect(width / 2 - l1 / 2 - 1, k1 - 1, width / 2 + l1 / 2 + 1, k1 + list2.size() * this.mc.fontRendererObj.FONT_HEIGHT, Integer.MIN_VALUE);
 
             for (String s4 : list2)

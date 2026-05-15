@@ -61,6 +61,8 @@ public class GuiTrade extends GuiScreen {
     private long openMs;
     private long myMoney;
     private long playerBalance;
+    private int  myPB;
+    private int  playerPB;
     private GuiTextField moneyField;
     private boolean fieldInit;
 
@@ -68,6 +70,7 @@ public class GuiTrade extends GuiScreen {
     private int hovMySlot = -1, hovPtSlot = -1, hovInvSlot = -1;
     private boolean hovConfirm, hovCancel, hovClose;
     private boolean hovMinus, hovPlus;
+    private boolean hovPBMinus, hovPBPlus, hovPBLabel;
 
     // ── Layout ───────────────────────────────────────────────────────────────
     private int px, py, pw, ph;
@@ -76,6 +79,8 @@ public class GuiTrade extends GuiScreen {
     private int leftCardX, rightCardX;
     private int leftGridX, rightGridX, gridY;
     private int moneyY;
+    private int pbRowY;
+    private int pbMinusX, pbPlusX, pbValueX, pbValueW;
     private int statusY;
     private int actionsY, actionsH = 16;
     private int bConfX, bConfY, bConfW, bCancX, bCancY, bCancW;
@@ -91,20 +96,26 @@ public class GuiTrade extends GuiScreen {
     public void initGui() {
         openMs = System.currentTimeMillis();
         myMoney = TradePacketHandler.playerOfferedMoney;
+        myPB    = TradePacketHandler.playerOfferedPB;
         fieldInit = false;
         moneyField = null;
         Keyboard.enableRepeatEvents(true);
         PlayerData pd = PlayerDataHandler.getCachedData();
-        if (pd != null) playerBalance = pd.getBalance();
+        if (pd != null) { playerBalance = pd.getBalance(); playerPB = pd.getPb(); }
         PlayerDataHandler.setListener(d -> {
             playerBalance = d.getBalance();
-            // Si le solde a baissé en dessous de l'offre courante, on re-cap
+            playerPB      = d.getPb();
+            // Re-cap si le solde a baissé en dessous des offres en cours
             if (myMoney > playerBalance) {
                 myMoney = playerBalance;
                 if (moneyField != null) {
                     moneyField.setText(myMoney == 0 ? "" : String.valueOf(myMoney));
                 }
                 TradePacketHandler.sendMoneyOffer(myMoney);
+            }
+            if (myPB > playerPB) {
+                myPB = playerPB;
+                TradePacketHandler.sendPBOffer(myPB);
             }
         });
     }
@@ -162,6 +173,15 @@ public class GuiTrade extends GuiScreen {
         // ± : gauche = ±100, droit = ±1000
         if (hovMinus) { adjustMoney(btn == 1 ? -1000 : -100); return; }
         if (hovPlus)  { adjustMoney(btn == 1 ?  1000 :  100); return; }
+        // ± PB : gauche = ±10, droit = ±100
+        if (hovPBMinus) { adjustPB(btn == 1 ? -100 : -10); return; }
+        if (hovPBPlus)  { adjustPB(btn == 1 ?  100 :  10); return; }
+        // Clic sur la valeur PB : remet à 0 (clic droit) / met le max (clic gauche)
+        if (hovPBLabel) {
+            if (btn == 1) { myPB = 0; TradePacketHandler.sendPBOffer(0); }
+            else { myPB = Math.max(0, playerPB); TradePacketHandler.sendPBOffer(myPB); }
+            return;
+        }
         if (btn != 0) return;
 
         if (hovClose || hovCancel) {
@@ -225,7 +245,7 @@ public class GuiTrade extends GuiScreen {
 
     private void layout() {
         pw = Math.min(width - 20, 280);
-        ph = Math.min(height - 12, 264);
+        ph = Math.min(height - 12, 282); // +16 pour la ligne PB
         px = (width  - pw) / 2;
         py = (height - ph) / 2;
 
@@ -235,7 +255,7 @@ public class GuiTrade extends GuiScreen {
         int outerPad = 10;
         int gap = 8;
         cardW = (pw - outerPad * 2 - gap) / 2;  // ~126
-        cardH = 102;
+        cardH = 118; // +16 pour la ligne PB
         cardY = subtitleY + 14;
         leftCardX  = px + outerPad;
         rightCardX = leftCardX + cardW + gap;
@@ -246,7 +266,8 @@ public class GuiTrade extends GuiScreen {
         gridY      = cardY + 14;
 
         moneyY  = gridY + GRID_H + 5;
-        statusY = moneyY + 15;
+        pbRowY  = moneyY + 15;
+        statusY = pbRowY + 15;
 
         // Actions
         actionsY = cardY + cardH + 8;
@@ -291,6 +312,11 @@ public class GuiTrade extends GuiScreen {
             moneyField.yPosition = fieldY;
             moneyField.width     = fieldW;
         }
+        // Coordonnées de la ligne PB (mêmes X que la ligne argent)
+        pbMinusX = minusX;
+        pbPlusX  = plusX;
+        pbValueX = pbMinusX + mBtnW + 2;
+        pbValueW = pbPlusX - pbValueX - 2;
     }
 
     private void updateHover(int mx, int my) {
@@ -302,6 +328,9 @@ public class GuiTrade extends GuiScreen {
         hovClose   = in(mx, my, closeX, closeY, closeS, closeS);
         hovMinus   = in(mx, my, minusX, moneyY, mBtnW, 13);
         hovPlus    = in(mx, my, plusX,  moneyY, mBtnW, 13);
+        hovPBMinus = in(mx, my, pbMinusX, pbRowY, mBtnW, 13);
+        hovPBPlus  = in(mx, my, pbPlusX,  pbRowY, mBtnW, 13);
+        hovPBLabel = in(mx, my, pbValueX, pbRowY, pbValueW, 13);
     }
 
     // ── Sous-routines ────────────────────────────────────────────────────────
@@ -404,8 +433,42 @@ public class GuiTrade extends GuiScreen {
         if (isMine) drawMyMoneyRow();
         else        drawPartnerMoney(gridX, money);
 
+        // Ligne PB
+        if (isMine) drawMyPBRow();
+        else        drawPartnerPB(gridX, TradePacketHandler.partnerOfferedPB);
+
         // Status badge (sobre, juste pastille + texte)
         drawStatusInline(gridX, statusY, confirmed);
+    }
+
+    private void drawMyPBRow() {
+        int rowH = 13;
+        boolean over = myPB > playerPB;
+        drawSmallBtn(pbMinusX, pbRowY, mBtnW, rowH, "−", hovPBMinus, false);
+        drawSmallBtn(pbPlusX,  pbRowY, mBtnW, rowH, "+", hovPBPlus,  true);
+        int fbgX = pbValueX - 2, fbgY = pbRowY, fbgW = pbValueW + 4;
+        drawRect(fbgX, fbgY, fbgX + fbgW, fbgY + rowH, C_INPUT);
+        GuiRenderUtils.drawRectOutline(fbgX, fbgY, fbgW, rowH,
+                over ? C_OVER : (hovPBLabel ? UITheme.primary(0xAA) : C_BORDER2));
+        String s = "PB " + fmtPB(myPB);
+        int sw = fontRendererObj.getStringWidth(s);
+        fontRendererObj.drawString(s, pbValueX + (pbValueW - sw) / 2, pbRowY + (rowH - 8) / 2 + 1,
+                myPB > 0 ? 0xFFFFEE55 : C_MUTED);
+        if (hovPBLabel) {
+            // Tooltip "G: max | D: 0"
+            fontRendererObj.drawString("§8/" + fmtPB(playerPB),
+                    pbValueX + pbValueW + 2, pbRowY + 3, C_MUTED);
+        }
+    }
+
+    private void drawPartnerPB(int gx, int pb) {
+        int rowH = 13;
+        drawRect(gx, pbRowY, gx + GRID_W, pbRowY + rowH, C_INPUT);
+        GuiRenderUtils.drawRectOutline(gx, pbRowY, GRID_W, rowH, C_BORDER2);
+        String s = pb > 0 ? "PB " + fmtPB(pb) : "PB —";
+        int sw = fontRendererObj.getStringWidth(s);
+        fontRendererObj.drawString(s, gx + (GRID_W - sw) / 2, pbRowY + (rowH - 8) / 2 + 1,
+                pb > 0 ? 0xFFFFEE55 : C_MUTED);
     }
 
     private void drawGrid(int gx, ItemStack[] items, int count, int hov, boolean inter) {
@@ -621,6 +684,21 @@ public class GuiTrade extends GuiScreen {
     private static String fmtMoney(long v) {
         if (v >= 1_000_000L) return String.format("%.1fM", v / 1_000_000.0);
         if (v >= 10_000L)    return String.format("%.1fk", v / 1_000.0);
+        return String.valueOf(v);
+    }
+
+    // ── PB ───────────────────────────────────────────────────────────────────
+
+    private void adjustPB(int delta) {
+        int v = Math.max(0, Math.min(playerPB, myPB + delta));
+        if (v == myPB) return;
+        myPB = v;
+        TradePacketHandler.sendPBOffer(myPB);
+    }
+
+    private static String fmtPB(int v) {
+        if (v >= 1_000_000)  return String.format("%.1fM", v / 1_000_000.0);
+        if (v >= 10_000)     return String.format("%.1fk", v / 1_000.0);
         return String.valueOf(v);
     }
 

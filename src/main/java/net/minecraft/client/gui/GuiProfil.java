@@ -319,6 +319,11 @@ public class GuiProfil extends GuiScreen {
 
         int rowY = y + 24;
         rowY = drawStatRow(x, w, rowY, "Monnaie",      "§e" + formatNum(balance) + "$");
+        if (selfProfile) {
+            PlayerData pdPb = PlayerDataHandler.getCachedData();
+            int pb = pdPb != null ? pdPb.getPb() : 0;
+            rowY = drawStatRow(x, w, rowY, "Points Boutique", "§e" + formatNum(pb) + " §7PB");
+        }
         rowY = drawStatRow(x, w, rowY, "Temps de jeu", "§f" + formatPlaytime(playTime));
         int rel = currentFactionRelation();
         rowY = drawStatRow(x, w, rowY, "Faction", rel < 0 ? "§8Aucune faction" : factionColor(rel) + fac);

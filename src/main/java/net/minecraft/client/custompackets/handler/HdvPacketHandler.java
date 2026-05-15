@@ -167,7 +167,7 @@ public final class HdvPacketHandler {
     }
 
     /** Poste une annonce de vente. */
-    public static void postOffer(ItemStack item, long totalPrice, int quantity) {
+    public static void postOffer(ItemStack item, long totalPrice, int quantity, boolean payPB) {
         if (item == null) return;
         try {
             PacketBuffer buf = PacketSender.newBuffer();
@@ -175,6 +175,7 @@ public final class HdvPacketHandler {
             buf.writeItemStackToBuffer(item);
             buf.writeLong(totalPrice);
             buf.writeVarIntToBuffer(quantity);
+            buf.writeBoolean(payPB);
             PacketSender.send(PacketChannel.HDV_C2S, buf);
         } catch (Exception ignored) {}
     }
