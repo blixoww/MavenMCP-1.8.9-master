@@ -144,6 +144,12 @@ public final class PacketId {
      */
     public static final int FACTION_ZONE = 0x81;
 
+    /**
+     * État anonyme d'un joueur (par /annonyme).
+     * Format : String playerName | boolean isAnonymous
+     */
+    public static final int ANONYMOUS_STATUS = 0x82;
+
     // ════════════════════════════════════════════════════════════════════════
     //  Profil joueur – Serveur → Client (canal PLAYER_DATA_S2C)
     // ════════════════════════════════════════════════════════════════════════

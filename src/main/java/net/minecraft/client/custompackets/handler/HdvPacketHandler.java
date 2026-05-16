@@ -24,7 +24,8 @@ public final class HdvPacketHandler {
 
     private static final List<HdvListing> cachedListings   = new ArrayList<>();
     private static final List<HdvListing> cachedMyListings = new ArrayList<>();
-    private static long cachedPendingEarnings = 0L;
+    private static long cachedPendingEarnings   = 0L;
+    private static long cachedPendingPBEarnings = 0L;
 
     /** Nb d'items vendus lors de la dernière réponse. -1 = non initialisé (première co). */
     private static int previousSoldCount = -1;
@@ -39,7 +40,7 @@ public final class HdvPacketHandler {
 
     public interface ListListener       { void onListReceived(List<HdvListing> listings); }
     public interface ActionListener     { void onActionResult(boolean success, String message); }
-    public interface MyListingsListener { void onMyListingsReceived(List<HdvListing> mine, long pendingEarnings); }
+    public interface MyListingsListener { void onMyListingsReceived(List<HdvListing> mine, long pendingEarnings, long pendingPBEarnings); }
 
     // ── Enregistrement des handlers S2C ─────────────────────────────────────
 
@@ -91,6 +92,8 @@ public final class HdvPacketHandler {
             try {
                 int count            = buf.readVarIntFromBuffer();
                 long pendingEarnings = buf.readLong();
+                long pendingPBEarnings = 0L;
+                try { pendingPBEarnings = buf.readLong(); } catch (Exception ignored) {}
                 List<HdvListing> mine = new ArrayList<>(count);
                 for (int i = 0; i < count; i++) {
                     HdvListing l = HdvListing.readMyListing(buf);
@@ -98,17 +101,19 @@ public final class HdvPacketHandler {
                 }
                 cachedMyListings.clear();
                 cachedMyListings.addAll(mine);
-                if (pendingEarnings >= 0) cachedPendingEarnings = pendingEarnings;
+                if (pendingEarnings   >= 0) cachedPendingEarnings   = pendingEarnings;
+                if (pendingPBEarnings >= 0) cachedPendingPBEarnings = pendingPBEarnings;
                 final List<HdvListing> snapshot = Collections.unmodifiableList(new ArrayList<>(cachedMyListings));
-                final long ep = cachedPendingEarnings;
+                final long ep   = cachedPendingEarnings;
+                final long epPB = cachedPendingPBEarnings;
                 int sc = 0;
                 for (HdvListing l : mine) { if (l.isSold()) sc++; }
                 final int soldCount = sc;
                 net.minecraft.client.Minecraft.getMinecraft().addScheduledTask(() -> {
-                    if (myListingsListener != null) myListingsListener.onMyListingsReceived(snapshot, ep);
+                    if (myListingsListener != null) myListingsListener.onMyListingsReceived(snapshot, ep, epPB);
                     net.minecraft.client.gui.GuiScreen cur = net.minecraft.client.Minecraft.getMinecraft().currentScreen;
                     if (cur instanceof net.minecraft.client.gui.GuiHDV)
-                        ((net.minecraft.client.gui.GuiHDV) cur).onMyListingsReceived(snapshot, ep);
+                        ((net.minecraft.client.gui.GuiHDV) cur).onMyListingsReceived(snapshot, ep, epPB);
                     // Notification connexion : items vendus pendant la déconnexion
                     if (!(cur instanceof net.minecraft.client.gui.GuiHDV)
                             && previousSoldCount < 0 && soldCount > 0) {
@@ -130,10 +135,16 @@ public final class HdvPacketHandler {
                 long   price    = buf.readLong();
                 boolean isPB    = false;
                 try { isPB = buf.readBoolean(); } catch (Exception ignored) {}
-                final String n = itemName; final int q = qty; final long p = price; final boolean pb = isPB;
+                String buyer = "?";
+                try { buyer = buf.readStringFromBuffer(64); } catch (Exception ignored) {}
+                net.minecraft.item.ItemStack stack = null;
+                try { stack = buf.readItemStackFromBuffer(); } catch (Exception ignored) {}
+                final String n = itemName; final int q = qty; final long p = price;
+                final boolean pb = isPB; final String b = buyer;
+                final net.minecraft.item.ItemStack s = stack;
                 net.minecraft.client.Minecraft.getMinecraft().addScheduledTask(() -> {
                     chat(HDV_BAR);
-                    chat("\u00a7f  \u00a76[HDV] \u00a7aItem vendu !");
+                    chat("\u00a7f  \u00a76[HDV] \u00a7aItem vendu \u00a77\u00e0 \u00a7f" + b + " \u00a7a!");
                     if (pb) {
                         chat("\u00a77  \u00a7f" + n + " \u00a77x" + q + "  \u00bb  \u00a7e+" + fmtPrice(p) + " PB");
                     } else {
@@ -141,6 +152,7 @@ public final class HdvPacketHandler {
                     }
                     chat(HDV_BAR);
                     previousSoldCount = Math.max(0, previousSoldCount) + 1;
+                    net.minecraft.client.gui.GuiHdvSaleToast.enqueue(n, q, p, pb, b, s);
                 });
             } catch (Exception ignored) {}
         });
@@ -210,10 +222,11 @@ public final class HdvPacketHandler {
     }
 
     /** Affiche le message de collecte réussie dans le chat avec des barres alignées. */
-    public static void showCollectMessage(long amount) {
+    public static void showCollectMessage(long amount, long amountPB) {
         chat(HDV_BAR);
         chat("\u00a7f  \u00a76[HDV] \u00a7aCollecte reussie !");
-        chat("\u00a77  Gains recuperes : \u00a76+" + fmtPrice(amount) + " $  \u00a78(Les PB ont ete credites directement)");
+        if (amount   > 0L) chat("\u00a77  Gains      : \u00a76+" + fmtPrice(amount)   + " $");
+        if (amountPB > 0L) chat("\u00a77  Gains \u00a7ePB\u00a77   : \u00a7e+" + fmtPrice(amountPB) + " PB");
         chat(HDV_BAR);
     }
 
@@ -231,6 +244,7 @@ public final class HdvPacketHandler {
     public static List<HdvListing> getCachedListings()   { return Collections.unmodifiableList(cachedListings); }
     public static List<HdvListing> getCachedMyListings() { return Collections.unmodifiableList(cachedMyListings); }
     public static long getCachedPendingEarnings()         { return cachedPendingEarnings; }
+    public static long getCachedPendingPBEarnings()       { return cachedPendingPBEarnings; }
 
     // ── Helpers privés ────────────────────────────────────────────────────────
 

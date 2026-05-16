@@ -139,19 +139,24 @@ public class RenderPlayer extends RendererLivingEntity<AbstractClientPlayer>
 
     protected void renderOffsetLivingLabel(AbstractClientPlayer entityIn, double x, double y, double z, String str, float p_177069_9_, double p_177069_10_)
     {
-        if (p_177069_10_ < 100.0D)
-        {
-            Scoreboard scoreboard = entityIn.getWorldScoreboard();
-            ScoreObjective scoreobjective = scoreboard.getObjectiveInDisplaySlot(2);
+        boolean anonymous = net.minecraft.client.custompackets.handler.AnonymousCache.isAnonymous(entityIn.getName());
 
-            if (scoreobjective != null)
+        if (p_177069_10_ < 128.0D * 128.0D)
+        {
+            // Score scoreboard : masqué pour les anonymes
+            if (!anonymous)
             {
-                Score score = scoreboard.getValueFromObjective(entityIn.getName(), scoreobjective);
-                this.renderLivingLabel(entityIn, score.getScorePoints() + " " + scoreobjective.getDisplayName(), x, y, z, 64);
-                y += (double)((float)this.getFontRendererFromRenderManager().FONT_HEIGHT * 1.15F * p_177069_9_);
+                Scoreboard scoreboard = entityIn.getWorldScoreboard();
+                ScoreObjective scoreobjective = scoreboard.getObjectiveInDisplaySlot(2);
+                if (scoreobjective != null)
+                {
+                    Score score = scoreboard.getValueFromObjective(entityIn.getName(), scoreobjective);
+                    this.renderLivingLabel(entityIn, score.getScorePoints() + " " + scoreobjective.getDisplayName(), x, y, z, 128);
+                    y += (double)((float)this.getFontRendererFromRenderManager().FONT_HEIGHT * 1.15F * p_177069_9_);
+                }
             }
 
-            // Barre de vie — juste au-dessus du scoreboard
+            // Barre de vie — toujours visible (utile pour repérer une cible anonyme aussi)
             PlayerHealthBarWidget hb = getHealthBarWidget();
             if (hb != null && hb.isEnabled())
             {
@@ -159,16 +164,21 @@ public class RenderPlayer extends RendererLivingEntity<AbstractClientPlayer>
                 y += consumed;
             }
 
-            // Tag de faction coloré entre la barre de vie et le pseudo
-            FactionInfo factionInfo = FactionDataCache.get(entityIn.getName());
-            if (factionInfo != null && !factionInfo.tag.isEmpty())
+            // Tag de faction : masqué pour les anonymes
+            if (!anonymous)
             {
-                this.renderLivingLabel(entityIn, factionInfo.getColoredTag(), x, y, z, 64);
-                y += (double)((float)this.getFontRendererFromRenderManager().FONT_HEIGHT * 1.15F * p_177069_9_);
+                FactionInfo factionInfo = FactionDataCache.get(entityIn.getName());
+                if (factionInfo != null && !factionInfo.tag.isEmpty())
+                {
+                    this.renderLivingLabel(entityIn, factionInfo.getColoredTag(), x, y, z, 128);
+                    y += (double)((float)this.getFontRendererFromRenderManager().FONT_HEIGHT * 1.15F * p_177069_9_);
+                }
             }
         }
 
-        renderNameTagWithLogo(entityIn, str, x, y, z, 64);
+        // Pseudo (ou "Identité masquée" pour les anonymes — masque aussi le grade/prefix LP)
+        String displayedName = anonymous ? "§7§oIdentité masquée" : str;
+        renderNameTagWithLogo(entityIn, displayedName, x, y, z, 128);
     }
 
     private static PlayerHealthBarWidget getHealthBarWidget()

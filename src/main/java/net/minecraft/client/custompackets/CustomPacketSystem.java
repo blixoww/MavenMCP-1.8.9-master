@@ -82,6 +82,15 @@ public final class CustomPacketSystem {
         });
         LOGGER.info("[CustomPackets] ✓ FactionZone handler enregistré");
 
+        // Anonymat (commande /annonyme) – masquage côté client
+        PacketDispatcher.register(PacketChannel.FACTION_S2C, PacketId.ANONYMOUS_STATUS, buf -> {
+            final String playerName  = buf.readStringFromBuffer(32);
+            boolean anon = false;
+            try { anon = buf.readBoolean(); } catch (Exception ignored) {}
+            net.minecraft.client.custompackets.handler.AnonymousCache.set(playerName, anon);
+        });
+        LOGGER.info("[CustomPackets] ✓ AnonymousStatus handler enregistré");
+
         // Profil joueur – PROFILE_OPEN (0x90) : propre profil depuis la BD
         PacketDispatcher.register(PacketChannel.PLAYER_DATA_S2C, PacketId.PROFILE_OPEN, buf -> {
             final String name    = buf.readStringFromBuffer(32);
@@ -95,7 +104,10 @@ public final class CustomPacketSystem {
             final long   bounty  = buf.readLong();
             int factionRelation = 0; // propre profil → toujours own (vert)
             try { factionRelation = buf.readVarIntFromBuffer(); } catch (Exception ignored) {}
+            int pb = 0;
+            try { pb = buf.readVarIntFromBuffer(); } catch (Exception ignored) {}
             final int finalRel = factionRelation;
+            final int finalPB  = pb;
             // Mettre à jour les caches avec les données fraîches du serveur pour
             // que GuiProfil(selfProfile=true) les lise correctement dès l'ouverture.
             net.minecraft.client.custompackets.data.PlayerData fresh =
@@ -105,13 +117,14 @@ public final class CustomPacketSystem {
             fresh.setKills(kills);
             fresh.setDeaths(deaths);
             fresh.setPlayTimeMinutes(ptMin);
+            fresh.setPb(finalPB);
             net.minecraft.client.custompackets.handler.PlayerDataHandler.setCachedData(fresh);
             net.minecraft.client.custompackets.data.KillstreakCache.setCount(streak);
             net.minecraft.client.custompackets.data.BountyCache.setSelfBounty(bounty);
             net.minecraft.client.Minecraft.getMinecraft().addScheduledTask(() ->
                 net.minecraft.client.Minecraft.getMinecraft().displayGuiScreen(
                     new net.minecraft.client.gui.GuiProfil(
-                        name, faction, rank, kills, deaths, ptMin, balance, streak, bounty, true, finalRel)));
+                        name, faction, rank, kills, deaths, ptMin, balance, streak, bounty, true, finalRel, finalPB)));
         });
         LOGGER.info("[CustomPackets] ✓ PROFILE_OPEN handler enregistré");
 
@@ -128,11 +141,14 @@ public final class CustomPacketSystem {
             final long   bounty  = buf.readLong();
             int factionRelation = 4; // neutre par défaut
             try { factionRelation = buf.readVarIntFromBuffer(); } catch (Exception ignored) {}
+            int pb = 0;
+            try { pb = buf.readVarIntFromBuffer(); } catch (Exception ignored) {}
             final int finalRel = factionRelation;
+            final int finalPB  = pb;
             net.minecraft.client.Minecraft.getMinecraft().addScheduledTask(() ->
                 net.minecraft.client.Minecraft.getMinecraft().displayGuiScreen(
                     new net.minecraft.client.gui.GuiProfil(
-                        name, faction, rank, kills, deaths, ptMin, balance, streak, bounty, false, finalRel)));
+                        name, faction, rank, kills, deaths, ptMin, balance, streak, bounty, false, finalRel, finalPB)));
         });
         LOGGER.info("[CustomPackets] ✓ PROFILE_DATA handler enregistré");
 

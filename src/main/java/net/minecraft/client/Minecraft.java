@@ -1320,6 +1320,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
         }
 
         this.guiAchievement.updateAchievementWindow();
+        net.minecraft.client.gui.GuiHdvSaleToast.getInstance().render();
         this.framebufferMc.unbindFramebuffer();
         GlStateManager.popMatrix();
         GlStateManager.pushMatrix();

@@ -64,6 +64,7 @@ public class GuiTrade extends GuiScreen {
     private int  myPB;
     private int  playerPB;
     private GuiTextField moneyField;
+    private GuiTextField pbField;
     private boolean fieldInit;
 
     // ── Hover ────────────────────────────────────────────────────────────────
@@ -99,6 +100,7 @@ public class GuiTrade extends GuiScreen {
         myPB    = TradePacketHandler.playerOfferedPB;
         fieldInit = false;
         moneyField = null;
+        pbField    = null;
         Keyboard.enableRepeatEvents(true);
         PlayerData pd = PlayerDataHandler.getCachedData();
         if (pd != null) { playerBalance = pd.getBalance(); playerPB = pd.getPb(); }
@@ -115,6 +117,9 @@ public class GuiTrade extends GuiScreen {
             }
             if (myPB > playerPB) {
                 myPB = playerPB;
+                if (pbField != null) {
+                    pbField.setText(myPB == 0 ? "" : String.valueOf(myPB));
+                }
                 TradePacketHandler.sendPBOffer(myPB);
             }
         });
@@ -160,6 +165,31 @@ public class GuiTrade extends GuiScreen {
                 return;
             }
         }
+        if (pbField != null && pbField.isFocused()) {
+            String before = pbField.getText();
+            if (pbField.textboxKeyTyped(c, key)) {
+                String after = pbField.getText();
+                if (!after.equals(before)) {
+                    int v;
+                    String trimmed = after.trim();
+                    if (trimmed.isEmpty()) {
+                        v = 0;
+                    } else {
+                        try { v = Integer.parseInt(trimmed); }
+                        catch (NumberFormatException e) {
+                            pbField.setText(before);
+                            return;
+                        }
+                    }
+                    if (v < 0 || v > playerPB) {
+                        pbField.setText(before);
+                        return;
+                    }
+                    commitPB();
+                }
+                return;
+            }
+        }
         if (key >= Keyboard.KEY_1 && key <= Keyboard.KEY_9) {
             ItemStack it = mc.thePlayer.inventory.mainInventory[key - Keyboard.KEY_1];
             if (it != null) TradePacketHandler.sendOffer(key - Keyboard.KEY_1);
@@ -169,6 +199,7 @@ public class GuiTrade extends GuiScreen {
     @Override
     protected void mouseClicked(int mx, int my, int btn) throws IOException {
         if (moneyField != null) moneyField.mouseClicked(mx, my, btn);
+        if (pbField    != null) pbField.mouseClicked(mx, my, btn);
 
         // ± : gauche = ±100, droit = ±1000
         if (hovMinus) { adjustMoney(btn == 1 ? -1000 : -100); return; }
@@ -176,12 +207,6 @@ public class GuiTrade extends GuiScreen {
         // ± PB : gauche = ±10, droit = ±100
         if (hovPBMinus) { adjustPB(btn == 1 ? -100 : -10); return; }
         if (hovPBPlus)  { adjustPB(btn == 1 ?  100 :  10); return; }
-        // Clic sur la valeur PB : remet à 0 (clic droit) / met le max (clic gauche)
-        if (hovPBLabel) {
-            if (btn == 1) { myPB = 0; TradePacketHandler.sendPBOffer(0); }
-            else { myPB = Math.max(0, playerPB); TradePacketHandler.sendPBOffer(myPB); }
-            return;
-        }
         if (btn != 0) return;
 
         if (hovClose || hovCancel) {
@@ -301,22 +326,35 @@ public class GuiTrade extends GuiScreen {
         fieldY = moneyY + 2;
         fieldW = plusX - fieldX - 2;
 
-        if (!fieldInit) {
-            moneyField = new GuiTextField(99, fontRendererObj, fieldX, fieldY, fieldW, 10);
-            moneyField.setMaxStringLength(10);
-            moneyField.setText(myMoney == 0 ? "" : String.valueOf(myMoney));
-            moneyField.setEnableBackgroundDrawing(false);
-            fieldInit = true;
-        } else {
-            moneyField.xPosition = fieldX;
-            moneyField.yPosition = fieldY;
-            moneyField.width     = fieldW;
-        }
         // Coordonnées de la ligne PB (mêmes X que la ligne argent)
         pbMinusX = minusX;
         pbPlusX  = plusX;
         pbValueX = pbMinusX + mBtnW + 2;
         pbValueW = pbPlusX - pbValueX - 2;
+        int pbFieldX = pbValueX;
+        int pbFieldY = pbRowY + 2;
+        int pbFieldW = pbValueW;
+
+        if (!fieldInit) {
+            moneyField = new GuiTextField(99, fontRendererObj, fieldX, fieldY, fieldW, 10);
+            moneyField.setMaxStringLength(10);
+            moneyField.setText(myMoney == 0 ? "" : String.valueOf(myMoney));
+            moneyField.setEnableBackgroundDrawing(false);
+            pbField = new GuiTextField(98, fontRendererObj, pbFieldX, pbFieldY, pbFieldW, 10);
+            pbField.setMaxStringLength(10);
+            pbField.setText(myPB == 0 ? "" : String.valueOf(myPB));
+            pbField.setEnableBackgroundDrawing(false);
+            fieldInit = true;
+        } else {
+            moneyField.xPosition = fieldX;
+            moneyField.yPosition = fieldY;
+            moneyField.width     = fieldW;
+            if (pbField != null) {
+                pbField.xPosition = pbFieldX;
+                pbField.yPosition = pbFieldY;
+                pbField.width     = pbFieldW;
+            }
+        }
     }
 
     private void updateHover(int mx, int my) {
@@ -444,20 +482,16 @@ public class GuiTrade extends GuiScreen {
     private void drawMyPBRow() {
         int rowH = 13;
         boolean over = myPB > playerPB;
+        boolean focused = pbField != null && pbField.isFocused();
         drawSmallBtn(pbMinusX, pbRowY, mBtnW, rowH, "−", hovPBMinus, false);
         drawSmallBtn(pbPlusX,  pbRowY, mBtnW, rowH, "+", hovPBPlus,  true);
         int fbgX = pbValueX - 2, fbgY = pbRowY, fbgW = pbValueW + 4;
         drawRect(fbgX, fbgY, fbgX + fbgW, fbgY + rowH, C_INPUT);
         GuiRenderUtils.drawRectOutline(fbgX, fbgY, fbgW, rowH,
-                over ? C_OVER : (hovPBLabel ? UITheme.primary(0xAA) : C_BORDER2));
-        String s = "PB " + fmtPB(myPB);
-        int sw = fontRendererObj.getStringWidth(s);
-        fontRendererObj.drawString(s, pbValueX + (pbValueW - sw) / 2, pbRowY + (rowH - 8) / 2 + 1,
-                myPB > 0 ? 0xFFFFEE55 : C_MUTED);
-        if (hovPBLabel) {
-            // Tooltip "G: max | D: 0"
-            fontRendererObj.drawString("§8/" + fmtPB(playerPB),
-                    pbValueX + pbValueW + 2, pbRowY + 3, C_MUTED);
+                over ? C_OVER : (focused ? UITheme.primary(0xBB) : C_BORDER2));
+        if (pbField != null) pbField.drawTextBox();
+        if (pbField != null && !focused && pbField.getText().isEmpty()) {
+            fontRendererObj.drawString("§7PB 0", pbValueX, pbRowY + 2, C_MUTED);
         }
     }
 
@@ -691,6 +725,22 @@ public class GuiTrade extends GuiScreen {
 
     private void adjustPB(int delta) {
         int v = Math.max(0, Math.min(playerPB, myPB + delta));
+        if (v == myPB) return;
+        myPB = v;
+        if (pbField != null) pbField.setText(v == 0 ? "" : String.valueOf(v));
+        TradePacketHandler.sendPBOffer(myPB);
+    }
+
+    private void commitPB() {
+        if (pbField == null) return;
+        String txt = pbField.getText().trim();
+        int v;
+        if (txt.isEmpty()) v = 0;
+        else {
+            try { v = Math.max(0, Integer.parseInt(txt)); }
+            catch (NumberFormatException e) { return; }
+        }
+        v = Math.min(v, playerPB);
         if (v == myPB) return;
         myPB = v;
         TradePacketHandler.sendPBOffer(myPB);

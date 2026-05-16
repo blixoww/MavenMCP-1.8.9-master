@@ -45,6 +45,7 @@ public class GuiHDV extends GuiScreen {
     private final List<HdvListing> listings   = new ArrayList<>();
     private final List<HdvListing> myListings = new ArrayList<>();
     private long    pendingEarnings = 0L;
+    private long    pendingPBEarnings = 0L;
     private long    playerBalance   = 0L;
     private int     playerPB        = 0;
     private boolean loading         = true;
@@ -179,7 +180,7 @@ public class GuiHDV extends GuiScreen {
                         listings.clear(); loading = true;
                         HdvPacketHandler.requestList(0, "");
                     } else { // COLLECT
-                        HdvPacketHandler.showCollectMessage(pendingEarnings);
+                        HdvPacketHandler.showCollectMessage(pendingEarnings, pendingPBEarnings);
                         myListings.clear(); loadingMine = true;
                         HdvPacketHandler.requestMyListings();
                     }
@@ -192,8 +193,8 @@ public class GuiHDV extends GuiScreen {
             }
         }));
 
-        HdvPacketHandler.setMyListingsListener((mine, earnings) -> Minecraft.getMinecraft().addScheduledTask(() -> {
-            onMyListingsReceived(mine, earnings);
+        HdvPacketHandler.setMyListingsListener((mine, earnings, earningsPB) -> Minecraft.getMinecraft().addScheduledTask(() -> {
+            onMyListingsReceived(mine, earnings, earningsPB);
         }));
 
         PlayerDataHandler.setListener(data -> { playerBalance = data.getBalance(); playerPB = data.getPb(); });
@@ -206,7 +207,9 @@ public class GuiHDV extends GuiScreen {
         List<HdvListing> cachedMine = new ArrayList<>(HdvPacketHandler.getCachedMyListings());
         if (!cachedMine.isEmpty()) {
             myListings.clear(); myListings.addAll(cachedMine);
-            pendingEarnings = HdvPacketHandler.getCachedPendingEarnings(); loadingMine = false;
+            pendingEarnings   = HdvPacketHandler.getCachedPendingEarnings();
+            pendingPBEarnings = HdvPacketHandler.getCachedPendingPBEarnings();
+            loadingMine = false;
         }
 
         requestList();
@@ -217,8 +220,11 @@ public class GuiHDV extends GuiScreen {
         listings.clear(); listings.addAll(nl); loading = false; scroll = 0;
     }
 
-    public void onMyListingsReceived(List<HdvListing> mine, long earnings) {
-        myListings.clear(); myListings.addAll(mine); pendingEarnings = earnings; loadingMine = false;
+    public void onMyListingsReceived(List<HdvListing> mine, long earnings, long earningsPB) {
+        myListings.clear(); myListings.addAll(mine);
+        pendingEarnings   = earnings;
+        pendingPBEarnings = earningsPB;
+        loadingMine = false;
     }
 
     private void requestList() {
@@ -619,10 +625,19 @@ public class GuiHDV extends GuiScreen {
         int gy = py + ph - 45;
         int gx = px + 10, gw = pw - 20, gh = 30;
         boolean ghov = in(mx, my, gx, gy, gw, gh);
-        if (pendingEarnings > 0) {
+        if (pendingEarnings > 0 || pendingPBEarnings > 0) {
             drawRect(gx, gy, gx + gw, gy + gh, ghov ? 0xFF228844 : 0xFF154525);
             drawBorder(gx, gy, gw, gh, ghov ? C_GREEN : 0xFF226644);
-            drawCentered("\u00a7fCollecter vos gains : \u00a76" + fmtGold(pendingEarnings) + " $ \u00a7a(cliquez)", gx + gw / 2, gy + 10, C_WHITE);
+            StringBuilder label = new StringBuilder("\u00a7fCollecter vos gains : ");
+            if (pendingEarnings > 0) {
+                label.append("\u00a76").append(fmtGold(pendingEarnings)).append(" $");
+                if (pendingPBEarnings > 0) label.append(" \u00a77| ");
+            }
+            if (pendingPBEarnings > 0) {
+                label.append("\u00a7e").append(fmtGold(pendingPBEarnings)).append(" PB");
+            }
+            label.append(" \u00a7a(cliquez)");
+            drawCentered(label.toString(), gx + gw / 2, gy + 10, C_WHITE);
             hb(hbCollect, gx, gy, gw, gh);
         } else {
             drawRect(gx, gy, gx + gw, gy + gh, 0x33000000);

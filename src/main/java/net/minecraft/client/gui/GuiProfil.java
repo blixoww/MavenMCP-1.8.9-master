@@ -50,6 +50,7 @@ public class GuiProfil extends GuiScreen {
     private final long   fixedBalance;
     private final int    fixedStreak;
     private final long   fixedBounty;
+    private final int    fixedPB;
     /** Relation de l'observateur envers la faction affichée. 0=own(vert),1=ally(violet),2=truce(violet),3=enemy(rouge),4=neutral */
     private final int    fixedFactionRelation;
 
@@ -73,12 +74,18 @@ public class GuiProfil extends GuiScreen {
     public GuiProfil(String targetName, String faction, String rank,
                      int kills, int deaths, int playTimeMin,
                      long balance, int streak, long bounty, boolean selfProfile) {
-        this(targetName, faction, rank, kills, deaths, playTimeMin, balance, streak, bounty, selfProfile, selfProfile ? 0 : 4);
+        this(targetName, faction, rank, kills, deaths, playTimeMin, balance, streak, bounty, selfProfile, selfProfile ? 0 : 4, 0);
     }
 
     public GuiProfil(String targetName, String faction, String rank,
                      int kills, int deaths, int playTimeMin,
                      long balance, int streak, long bounty, boolean selfProfile, int factionRelation) {
+        this(targetName, faction, rank, kills, deaths, playTimeMin, balance, streak, bounty, selfProfile, factionRelation, 0);
+    }
+
+    public GuiProfil(String targetName, String faction, String rank,
+                     int kills, int deaths, int playTimeMin,
+                     long balance, int streak, long bounty, boolean selfProfile, int factionRelation, int pb) {
         this.targetName           = targetName != null ? targetName : "Inconnu";
         this.selfProfile          = selfProfile;
         this.fixedFaction         = faction != null ? faction : "";
@@ -90,12 +97,13 @@ public class GuiProfil extends GuiScreen {
         this.fixedStreak          = streak;
         this.fixedBounty          = bounty;
         this.fixedFactionRelation = factionRelation;
+        this.fixedPB              = pb;
     }
 
     public static GuiProfil forSelf() {
         Minecraft mc = Minecraft.getMinecraft();
         String name = mc.thePlayer != null ? mc.thePlayer.getName() : "Inconnu";
-        return new GuiProfil(name, "", "Joueur", 0, 0, 0, 0L, 0, 0L, true, 0);
+        return new GuiProfil(name, "", "Joueur", 0, 0, 0, 0L, 0, 0L, true, 0, 0);
     }
 
     // ── Lecture dynamique en mode self ──────────────────────────────────────
@@ -319,11 +327,15 @@ public class GuiProfil extends GuiScreen {
 
         int rowY = y + 24;
         rowY = drawStatRow(x, w, rowY, "Monnaie",      "§e" + formatNum(balance) + "$");
+        // PB : prend la valeur reçue dans le packet profil (toujours fraîche côté
+        // serveur via PBManager.get(uuid)). Pour soi, le cache local peut être plus
+        // récent si un /pb add tombe pendant l'affichage → on prend le max.
+        int pb = fixedPB;
         if (selfProfile) {
             PlayerData pdPb = PlayerDataHandler.getCachedData();
-            int pb = pdPb != null ? pdPb.getPb() : 0;
-            rowY = drawStatRow(x, w, rowY, "Points Boutique", "§e" + formatNum(pb) + " §7PB");
+            if (pdPb != null && pdPb.getPb() > pb) pb = pdPb.getPb();
         }
+        rowY = drawStatRow(x, w, rowY, "Points Boutique", "§e" + formatNum(pb) + " §7PB");
         rowY = drawStatRow(x, w, rowY, "Temps de jeu", "§f" + formatPlaytime(playTime));
         int rel = currentFactionRelation();
         rowY = drawStatRow(x, w, rowY, "Faction", rel < 0 ? "§8Aucune faction" : factionColor(rel) + fac);
