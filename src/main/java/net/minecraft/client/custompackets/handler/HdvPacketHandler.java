@@ -143,14 +143,7 @@ public final class HdvPacketHandler {
                 final boolean pb = isPB; final String b = buyer;
                 final net.minecraft.item.ItemStack s = stack;
                 net.minecraft.client.Minecraft.getMinecraft().addScheduledTask(() -> {
-                    chat(HDV_BAR);
-                    chat("\u00a7f  \u00a76[HDV] \u00a7aItem vendu \u00a77\u00e0 \u00a7f" + b + " \u00a7a!");
-                    if (pb) {
-                        chat("\u00a77  \u00a7f" + n + " \u00a77x" + q + "  \u00bb  \u00a7e+" + fmtPrice(p) + " PB");
-                    } else {
-                        chat("\u00a77  \u00a7f" + n + " \u00a77x" + q + "  \u00bb  \u00a76+" + fmtPrice(p) + " $");
-                    }
-                    chat(HDV_BAR);
+                    // Le toast top-droite suffit \u2014 pas de spam chat.
                     previousSoldCount = Math.max(0, previousSoldCount) + 1;
                     net.minecraft.client.gui.GuiHdvSaleToast.enqueue(n, q, p, pb, b, s);
                 });

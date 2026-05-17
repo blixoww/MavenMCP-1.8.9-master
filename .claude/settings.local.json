@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Read(//c/Users/Valentin/Desktop/JAVA MC/Project/IntelliJ/OriginsFightCore/src/**)"
+      "Read(//c/Users/Valentin/Desktop/JAVA MC/Project/IntelliJ/OriginsFightCore/src/**)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Valentin\\\\Desktop\\\\JAVA MC\\\\Project\\\\IntelliJ\\\\MavenMCP-1.8.9-master\" -Recurse -Include \"BlockAnvil.java\", \"ContainerRepair.java\" -ErrorAction SilentlyContinue)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(xargs grep -l \"steel\")",
+      "Bash(Remove-Item *)",
+      "PowerShell(Remove-Item *)"
     ]
   }
 }

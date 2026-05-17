@@ -103,7 +103,9 @@ public class GuiProfil extends GuiScreen {
     public static GuiProfil forSelf() {
         Minecraft mc = Minecraft.getMinecraft();
         String name = mc.thePlayer != null ? mc.thePlayer.getName() : "Inconnu";
-        return new GuiProfil(name, "", "Joueur", 0, 0, 0, 0L, 0, 0L, true, 0, 0);
+        PlayerData cached = PlayerDataHandler.getCachedData();
+        int pb = cached != null ? cached.getPb() : 0;
+        return new GuiProfil(name, "", "Joueur", 0, 0, 0, 0L, 0, 0L, true, 0, pb);
     }
 
     // ── Lecture dynamique en mode self ──────────────────────────────────────

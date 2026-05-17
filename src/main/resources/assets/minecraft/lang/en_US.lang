@@ -2761,6 +2761,12 @@ tile.obsidianTrapdoor.name=Obsidian Trapdoor
 # ── Steel Ladder ──────────────────────────────────────────────────────────────
 tile.steelLadder.name=Steel Ladder
 
+# ── Steel Anvil ───────────────────────────────────────────────────────────────
+tile.steel_anvil.name=Steel Anvil
+tile.steel_anvil.intact.name=Steel Anvil
+tile.steel_anvil.slightlyDamaged.name=Slightly Damaged Steel Anvil
+tile.steel_anvil.veryDamaged.name=Very Damaged Steel Anvil
+
 # ── Heal Stick ────────────────────────────────────────────────────────────────
 item.healStick.name=Heal Stick
 

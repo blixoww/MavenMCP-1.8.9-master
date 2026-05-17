@@ -24,7 +24,7 @@ public class TileEntitySteelChestRenderer extends TileEntitySpecialRenderer<Tile
         GlStateManager.depthFunc(515);
         GlStateManager.depthMask(true);
 
-        int meta = te.hasWorldObj() ? te.getBlockMetadata() : 2;
+        int meta = te.hasWorldObj() ? te.getBlockMetadata() : 3;
 
         GlStateManager.pushMatrix();
         GlStateManager.enableRescaleNormal();

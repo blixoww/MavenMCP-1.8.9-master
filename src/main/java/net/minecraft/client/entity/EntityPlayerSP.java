@@ -595,6 +595,8 @@ public class EntityPlayerSP extends AbstractClientPlayer {
             this.mc.displayGuiScreen(new GuiEnchantment(this.inventory, this.worldObj, guiOwner));
         } else if ("minecraft:anvil".equals(s)) {
             this.mc.displayGuiScreen(new GuiRepair(this.inventory, this.worldObj));
+        } else if ("minecraft:steel_anvil".equals(s)) {
+            this.mc.displayGuiScreen(new net.minecraft.client.gui.GuiSteelRepair(this.inventory, this.worldObj));
         }
     }
 

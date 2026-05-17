@@ -252,6 +252,7 @@ public class Blocks {
     public static final Block double_obsidian_slab;
     public static final Block obsidian_slab;
     public static final Block obsidian_stairs;
+    public static final Block steel_anvil;
 
     /**
      * Returns the Block in the blockRegistry with the specified name.
@@ -481,6 +482,7 @@ public class Blocks {
             double_obsidian_slab = getRegisteredBlock("double_obsidian_slab");
             obsidian_slab = getRegisteredBlock("obsidian_slab");
             obsidian_stairs = getRegisteredBlock("obsidian_stairs");
+            steel_anvil = getRegisteredBlock("steel_anvil");
         }
     }
 }

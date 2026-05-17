@@ -1319,6 +1319,7 @@ public class Block {
         registerBlock(210, "obsidian_slab", (new BlockHalfObsidianSlab()).setHardness(50.0F).setResistance(2000.0F).setStepSound(soundTypePiston).setUnlocalizedName("obsidianSlab").setCreativeTab(CreativeTabs.tabBlock));
         registerBlock(211, "obsidian_stairs", (new BlockStairs(blockRegistry.getObject(new ResourceLocation("obsidian")).getDefaultState())).setUnlocalizedName("stairsObsidian").setCreativeTab(CreativeTabs.tabBlock));
 
+        registerBlock(212, "steel_anvil", (new BlockSteelAnvil()).setHardness(5.0F).setResistance(6000.0F).setStepSound(soundTypePiston).setUnlocalizedName("steel_anvil").setCreativeTab(CreativeTabs.tabDecorations));
 
         blockRegistry.validateKey();
 

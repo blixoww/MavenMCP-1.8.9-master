@@ -104,8 +104,13 @@ public final class CustomPacketSystem {
             final long   bounty  = buf.readLong();
             int factionRelation = 0; // propre profil → toujours own (vert)
             try { factionRelation = buf.readVarIntFromBuffer(); } catch (Exception ignored) {}
-            int pb = 0;
-            try { pb = buf.readVarIntFromBuffer(); } catch (Exception ignored) {}
+            // Garder l'ancien PB si le packet n'en envoie pas — sinon on écrase
+            // la valeur poussée en continu par PLAYER_PB et l'affichage tombe à 0.
+            net.minecraft.client.custompackets.data.PlayerData previous =
+                net.minecraft.client.custompackets.handler.PlayerDataHandler.getCachedData();
+            int pb = previous != null ? previous.getPb() : 0;
+            boolean pbReceived = false;
+            try { pb = buf.readVarIntFromBuffer(); pbReceived = true; } catch (Exception ignored) {}
             final int finalRel = factionRelation;
             final int finalPB  = pb;
             // Mettre à jour les caches avec les données fraîches du serveur pour
@@ -119,6 +124,11 @@ public final class CustomPacketSystem {
             fresh.setPlayTimeMinutes(ptMin);
             fresh.setPb(finalPB);
             net.minecraft.client.custompackets.handler.PlayerDataHandler.setCachedData(fresh);
+            // Si le packet n'a pas fourni de PB, redemander au serveur pour
+            // garantir un affichage à jour à la prochaine ouverture.
+            if (!pbReceived) {
+                net.minecraft.client.custompackets.handler.PlayerDataHandler.requestData();
+            }
             net.minecraft.client.custompackets.data.KillstreakCache.setCount(streak);
             net.minecraft.client.custompackets.data.BountyCache.setSelfBounty(bounty);
             net.minecraft.client.Minecraft.getMinecraft().addScheduledTask(() ->

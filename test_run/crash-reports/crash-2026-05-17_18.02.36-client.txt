@@ -1,0 +1,84 @@
+---- Minecraft Crash Report ----
+// Hi. I'm Minecraft, and I'm a crashaholic.
+
+Time: 17/05/26 18:02
+Description: Unexpected error
+
+java.lang.IllegalArgumentException: Cannot set property PropertyInteger{name=damage, clazz=class java.lang.Integer, values=[0, 1, 2]} to 4 on block minecraft:steel_anvil, it is not an allowed value
+	at net.minecraft.block.state.BlockState$StateImplementation.withProperty(BlockState.java:143)
+	at net.minecraft.block.BlockSteelAnvil.onBlockPlaced(BlockSteelAnvil.java:54)
+	at net.minecraft.item.ItemBlock.onItemUse(ItemBlock.java:59)
+	at net.minecraft.item.ItemStack.onItemUse(ItemStack.java:148)
+	at net.minecraft.client.multiplayer.PlayerControllerMP.onPlayerRightClick(PlayerControllerMP.java:436)
+	at net.optifine.override.PlayerControllerOF.onPlayerRightClick(PlayerControllerOF.java:58)
+	at net.minecraft.client.Minecraft.rightClickMouse(Minecraft.java:1752)
+	at net.minecraft.client.Minecraft.runTick(Minecraft.java:2330)
+	at net.minecraft.client.Minecraft.runGameLoop(Minecraft.java:1274)
+	at net.minecraft.client.Minecraft.run(Minecraft.java:416)
+	at net.minecraft.client.main.Main.main(Main.java:113)
+	at StartDev.main(StartDev.java:22)
+
+
+A detailed walkthrough of the error, its code path and all known details is as follows:
+---------------------------------------------------------------------------------------
+
+-- Head --
+Stacktrace:
+	at net.minecraft.block.state.BlockState$StateImplementation.withProperty(BlockState.java:143)
+	at net.minecraft.block.BlockSteelAnvil.onBlockPlaced(BlockSteelAnvil.java:54)
+	at net.minecraft.item.ItemBlock.onItemUse(ItemBlock.java:59)
+	at net.minecraft.item.ItemStack.onItemUse(ItemStack.java:148)
+	at net.minecraft.client.multiplayer.PlayerControllerMP.onPlayerRightClick(PlayerControllerMP.java:436)
+	at net.optifine.override.PlayerControllerOF.onPlayerRightClick(PlayerControllerOF.java:58)
+	at net.minecraft.client.Minecraft.rightClickMouse(Minecraft.java:1752)
+
+-- Affected level --
+Details:
+	Level name: MpServer
+	All players: 1 total; [EntityPlayerSP['leziink'/237, l='MpServer', x=-320,65, y=70,00, z=285,79]]
+	Chunk stats: MultiplayerChunkCache: 370, 370
+	Level seed: 0
+	Level generator: ID 00 - default, ver 1. Features enabled: false
+	Level generator options: 
+	Level spawn location: -220,00,64,00,256,00 - World: (-220,64,256), Chunk: (at 4,4,0 in -14,16; contains blocks -224,0,256 to -209,255,271), Region: (-1,0; contains chunks -32,0 to -1,31, blocks -512,0,0 to -1,255,511)
+	Level time: 925260 game time, 14761 day time
+	Level dimension: 0
+	Level storage version: 0x00000 - Unknown?
+	Level weather: Rain time: 0 (now: false), thunder time: 0 (now: false)
+	Level game mode: Game mode: creative (ID 1). Hardcore: false. Cheats: false
+	Forced entities: 102 total; [EntitySkeleton['Squelette'/24, l='MpServer', x=-402,30, y=51,00, z=268,69], EntitySkeleton['Squelette'/25, l='MpServer', x=-387,50, y=53,00, z=260,50], EntitySpider['Araignée'/26, l='MpServer', x=-396,72, y=20,00, z=274,84], EntityBat['Chauve-souris'/27, l='MpServer', x=-396,33, y=20,39, z=280,78], EntitySpider['Araignée'/28, l='MpServer', x=-396,50, y=63,00, z=302,50], EntityZombie['Zombie'/29, l='MpServer', x=-396,66, y=14,00, z=309,34], EntityCow['Vache'/30, l='MpServer', x=-387,13, y=63,00, z=309,06], EntityCow['Vache'/31, l='MpServer', x=-389,84, y=63,00, z=311,84], EntitySpider['Araignée'/32, l='MpServer', x=-392,50, y=63,00, z=317,50], EntitySpider['Araignée'/33, l='MpServer', x=-398,50, y=63,00, z=308,50], EntityChicken['Poule'/34, l='MpServer', x=-393,38, y=62,54, z=335,25], EntityBat['Chauve-souris'/36, l='MpServer', x=-388,59, y=31,10, z=349,63], EntitySpider['Araignée'/37, l='MpServer', x=-398,50, y=67,00, z=362,50], EntityCreeper['Creeper'/43, l='MpServer', x=-378,03, y=22,00, z=270,41], EntityCow['Vache'/44, l='MpServer', x=-381,22, y=62,24, z=301,22], EntityCow['Vache'/45, l='MpServer', x=-380,13, y=63,00, z=317,13], EntityCow['Vache'/46, l='MpServer', x=-381,25, y=63,00, z=314,19], EntityPig['Cochon'/47, l='MpServer', x=-372,03, y=64,00, z=320,97], EntityPlayerSP['leziink'/237, l='MpServer', x=-320,65, y=70,00, z=285,79], EntityChicken['Poule'/48, l='MpServer', x=-369,56, y=69,00, z=352,63], EntityCow['Vache'/49, l='MpServer', x=-382,94, y=72,00, z=362,78], EntityPig['Cochon'/59, l='MpServer', x=-360,88, y=65,00, z=311,06], EntityPig['Cochon'/60, l='MpServer', x=-364,94, y=64,00, z=348,97], EntityCow['Vache'/61, l='MpServer', x=-367,41, y=70,00, z=353,34], EntitySquid['Poulpe'/73, l='MpServer', x=-337,56, y=61,13, z=220,15], EntitySquid['Poulpe'/74, l='MpServer', x=-340,05, y=57,04, z=226,75], EntitySquid['Poulpe'/75, l='MpServer', x=-343,05, y=59,21, z=226,65], EntityZombie['Zombie'/76, l='MpServer', x=-347,59, y=64,00, z=288,00], EntityCow['Vache'/83, l='MpServer', x=-330,31, y=63,00, z=237,53], EntitySquid['Poulpe'/84, l='MpServer', x=-330,16, y=58,25, z=230,51], EntitySkeleton['Squelette'/85, l='MpServer', x=-320,50, y=13,00, z=285,50], EntityCreeper['Creeper'/86, l='MpServer', x=-333,33, y=43,00, z=295,29], EntityCreeper['Creeper'/87, l='MpServer', x=-327,49, y=50,00, z=300,47], EntitySkeleton['Squelette'/88, l='MpServer', x=-326,50, y=25,00, z=314,50], EntityCreeper['Creeper'/89, l='MpServer', x=-327,50, y=31,00, z=315,50], EntityChicken['Poule'/90, l='MpServer', x=-329,31, y=62,45, z=310,75], EntityCreeper['Creeper'/91, l='MpServer', x=-334,50, y=14,00, z=321,50], EntityCow['Vache'/92, l='MpServer', x=-326,97, y=69,00, z=329,88], EntityPig['Cochon'/93, l='MpServer', x=-322,69, y=68,00, z=344,44], EntityZombie['Zombie'/94, l='MpServer', x=-321,41, y=24,00, z=352,00], EntityCow['Vache'/95, l='MpServer', x=-334,28, y=67,00, z=352,66], EntitySkeleton['Squelette'/103, l='MpServer', x=-308,53, y=28,00, z=225,88], EntityPig['Cochon'/104, l='MpServer', x=-315,47, y=65,00, z=228,06], EntityCow['Vache'/105, l='MpServer', x=-316,92, y=65,00, z=233,51], EntityCreeper['Creeper'/106, l='MpServer', x=-309,50, y=16,00, z=250,50], EntityCreeper['Creeper'/107, l='MpServer', x=-308,50, y=16,00, z=252,50], EntityEnderman['Enderman'/108, l='MpServer', x=-319,50, y=34,00, z=301,50], EntityCreeper['Creeper'/109, l='MpServer', x=-314,50, y=34,00, z=301,50], EntityCreeper['Creeper'/110, l='MpServer', x=-319,50, y=34,00, z=298,50], EntityBat['Chauve-souris'/111, l='MpServer', x=-307,53, y=64,10, z=308,25], EntityZombie['Zombie'/112, l='MpServer', x=-315,50, y=24,00, z=329,50], EntitySkeleton['Squelette'/113, l='MpServer', x=-306,50, y=26,00, z=343,50], EntityCow['Vache'/114, l='MpServer', x=-311,59, y=71,00, z=345,53], EntitySkeleton['Squelette'/116, l='MpServer', x=-311,50, y=22,00, z=363,50], EntityCow['Vache'/123, l='MpServer', x=-297,63, y=63,00, z=247,28], EntityCow['Vache'/124, l='MpServer', x=-289,13, y=64,00, z=250,94], EntitySkeleton['Squelette'/125, l='MpServer', x=-289,50, y=46,00, z=279,50], EntityBat['Chauve-souris'/126, l='MpServer', x=-290,54, y=20,75, z=292,50], EntityBat['Chauve-souris'/127, l='MpServer', x=-289,44, y=20,95, z=295,33], EntityBat['Chauve-souris'/128, l='MpServer', x=-301,68, y=21,92, z=297,16], EntityBat['Chauve-souris'/129, l='MpServer', x=-299,39, y=22,84, z=306,80], EntityBat['Chauve-souris'/130, l='MpServer', x=-297,77, y=19,33, z=299,46], EntityBat['Chauve-souris'/131, l='MpServer', x=-302,99, y=21,28, z=304,25], EntityBat['Chauve-souris'/132, l='MpServer', x=-304,13, y=22,07, z=310,84], EntityBat['Chauve-souris'/133, l='MpServer', x=-296,25, y=19,10, z=339,75], EntitySkeleton['Squelette'/134, l='MpServer', x=-300,50, y=17,00, z=339,50], EntitySkeleton['Squelette'/135, l='MpServer', x=-298,50, y=17,00, z=340,50], EntitySkeleton['Squelette'/143, l='MpServer', x=-275,50, y=14,00, z=220,50], EntitySkeleton['Squelette'/144, l='MpServer', x=-274,50, y=14,00, z=218,50], EntitySkeleton['Squelette'/145, l='MpServer', x=-276,50, y=14,00, z=217,50], EntityZombie['Zombie'/146, l='MpServer', x=-280,50, y=15,00, z=226,50], EntityCreeper['Creeper'/147, l='MpServer', x=-276,50, y=24,00, z=284,50], EntityCreeper['Creeper'/148, l='MpServer', x=-276,50, y=24,00, z=285,50], EntitySkeleton['Squelette'/149, l='MpServer', x=-283,50, y=22,00, z=297,50], EntitySkeleton['Squelette'/150, l='MpServer', x=-282,50, y=22,00, z=298,50], EntityBat['Chauve-souris'/151, l='MpServer', x=-283,35, y=23,16, z=295,44], EntityCow['Vache'/152, l='MpServer', x=-287,75, y=71,00, z=315,50], EntityCow['Vache'/153, l='MpServer', x=-279,44, y=65,00, z=308,63], EntityCow['Vache'/154, l='MpServer', x=-279,25, y=65,00, z=307,47], EntityZombie['Zombie'/155, l='MpServer', x=-284,50, y=17,00, z=326,50], EntityRabbit['Lapin'/156, l='MpServer', x=-279,25, y=65,00, z=334,84], EntityChicken['Poule'/157, l='MpServer', x=-287,38, y=70,00, z=353,63], EntityBat['Chauve-souris'/161, l='MpServer', x=-263,23, y=16,05, z=279,68], EntityCow['Vache'/162, l='MpServer', x=-266,25, y=68,00, z=279,50], EntityCreeper['Creeper'/163, l='MpServer', x=-271,50, y=21,00, z=298,50], EntityCow['Vache'/164, l='MpServer', x=-264,50, y=64,00, z=302,50], EntityCow['Vache'/165, l='MpServer', x=-267,22, y=67,00, z=315,19], EntityChicken['Poule'/166, l='MpServer', x=-256,59, y=66,00, z=319,56], EntitySkeleton['Squelette'/167, l='MpServer', x=-262,50, y=20,00, z=325,50], EntityCow['Vache'/168, l='MpServer', x=-259,03, y=66,00, z=362,97], EntityCow['Vache'/169, l='MpServer', x=-258,13, y=68,00, z=359,47], EntityCow['Vache'/176, l='MpServer', x=-241,75, y=64,00, z=230,56], EntityCow['Vache'/177, l='MpServer', x=-248,31, y=65,00, z=241,47], EntityCow['Vache'/178, l='MpServer', x=-242,00, y=65,00, z=276,59], EntityCow['Vache'/179, l='MpServer', x=-254,47, y=64,00, z=293,72], EntityCow['Vache'/180, l='MpServer', x=-250,78, y=68,00, z=290,50], EntitySkeleton['Squelette'/181, l='MpServer', x=-248,50, y=48,00, z=345,50], EntityCreeper['Creeper'/182, l='MpServer', x=-244,50, y=70,00, z=336,50], EntityCow['Vache'/184, l='MpServer', x=-244,09, y=69,00, z=356,94], EntityCow['Vache'/185, l='MpServer', x=-244,44, y=68,00, z=363,44], EntityBat['Chauve-souris'/463, l='MpServer', x=-291,50, y=18,10, z=356,50], EntityBat['Chauve-souris'/468, l='MpServer', x=-290,50, y=18,10, z=355,50]]
+	Retry entities: 0 total; []
+	Server brand: vanilla
+	Server type: Integrated singleplayer server
+Stacktrace:
+	at net.minecraft.client.multiplayer.WorldClient.addWorldInfoToCrashReport(WorldClient.java:356)
+	at net.minecraft.client.Minecraft.addGraphicsAndWorldToCrashReport(Minecraft.java:2950)
+	at net.minecraft.client.Minecraft.run(Minecraft.java:445)
+	at net.minecraft.client.main.Main.main(Main.java:113)
+	at StartDev.main(StartDev.java:22)
+
+-- System Details --
+Details:
+	Minecraft Version: 1.8.9
+	Operating System: Windows 10 (amd64) version 10.0
+	Java Version: 1.8.0_181, Oracle Corporation
+	Java VM Version: Java HotSpot(TM) 64-Bit Server VM (mixed mode), Oracle Corporation
+	Memory: 470392512 bytes (448 MB) / 1697644544 bytes (1619 MB) up to 7432306688 bytes (7088 MB)
+	JVM Flags: 0 total; 
+	IntCache: cache: 0, tcache: 32, allocated: 13, tallocated: 95
+	Launched Version: MavenMCP
+	LWJGL: 2.9.4
+	OpenGL: AMD Radeon RX 7800 XT GL version 4.6.0 Compatibility Profile Context 26.5.2.260505, ATI Technologies Inc.
+	GL Caps: Using GL 1.3 multitexturing.
+Using GL 1.3 texture combiners.
+Using framebuffer objects because OpenGL 3.0 is supported and separate blending is supported.
+Shaders are available because OpenGL 2.1 is supported.
+VBOs are available because OpenGL 1.5 is supported.
+
+	Using VBOs: Yes
+	Is Modded: Very likely; Jar signature invalidated
+	Type: Client (map_client.txt)
+	Resource Packs: 
+	Current Language: Français (France)
+	Profiler Position: N/A (disabled)
+	CPU: 16x AMD Ryzen 7 7700X 8-Core Processor 

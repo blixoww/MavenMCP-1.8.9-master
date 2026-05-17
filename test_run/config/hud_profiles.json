@@ -730,11 +730,11 @@
         "rgb": false,
         "scale": 1.0,
         "relX": 0.017391304347826087,
-        "relY": 0.1676829268292683,
+        "relY": 0.16819571865443425,
         "refW": 640.0,
         "refH": 337.0,
         "width": 65.0,
-        "height": 9.0,
+        "height": 10.0,
         "props": {
           "showWilderness": false,
           "snapGrid": false
@@ -748,7 +748,7 @@
         "rgb": false,
         "scale": 1.4,
         "relX": 0.5,
-        "relY": 0.016181229773462782,
+        "relY": 0.016611295681063124,
         "refW": 640.0,
         "refH": 337.0,
         "width": 200.0,
@@ -761,17 +761,17 @@
       },
       "player_healthbar": {
         "x": 54.0,
-        "y": 318.0,
+        "y": 317.0,
         "enabled": false,
         "color": -2236963.0,
         "rgb": false,
         "scale": 1.0124223,
         "relX": 0.09230769230769231,
-        "relY": 0.9695121951219512,
+        "relY": 0.9694189602446484,
         "refW": 640.0,
         "refH": 337.0,
         "width": 55.0,
-        "height": 9.0,
+        "height": 10.0,
         "props": {
           "barWidth": 45.0,
           "border": true,
@@ -905,7 +905,7 @@
         "width": 140,
         "height": 12,
         "props": {
-          "snapGrid": false,
+          "snapGrid": true,
           "snapAlign": false,
           "colorLabel": -65536.0,
           "syncColors": false
@@ -932,13 +932,13 @@
         }
       },
       "helditem": {
-        "x": 501,
+        "x": 502,
         "y": 295,
         "enabled": true,
         "color": -1,
         "rgb": false,
         "scale": 1.0,
-        "relX": 0.8946428571428572,
+        "relX": 0.8964285714285715,
         "relY": 0.9247648902821317,
         "refW": 640,
         "refH": 337,
@@ -1053,7 +1053,7 @@
         "height": 14,
         "props": {
           "showDisplay": true,
-          "snapGrid": false,
+          "snapGrid": true,
           "snapAlign": true,
           "colorLabel": -65536.0,
           "syncColors": false
@@ -1062,7 +1062,7 @@
       "auto_armor": {
         "x": 10,
         "y": 224,
-        "enabled": true,
+        "enabled": false,
         "color": -1,
         "rgb": false,
         "scale": 1.0,
@@ -1081,13 +1081,13 @@
       },
       "combatlog": {
         "x": 10,
-        "y": 273,
+        "y": 279,
         "enabled": true,
         "color": -1,
         "rgb": false,
         "scale": 1.0,
         "relX": 0.016556291390728478,
-        "relY": 0.9069767441860465,
+        "relY": 0.9269102990033222,
         "refW": 640,
         "refH": 337,
         "width": 36,
@@ -1113,7 +1113,7 @@
         "width": 60,
         "height": 12,
         "props": {
-          "snapGrid": false,
+          "snapGrid": true,
           "customSize": true,
           "colorLabel": -65536.0,
           "syncColors": false
@@ -1138,12 +1138,12 @@
         }
       },
       "compass": {
-        "x": 212,
+        "x": 213,
         "y": 0,
         "enabled": true,
         "color": -1,
         "rgb": false,
-        "scale": 1.1055901,
+        "scale": 1.0962733,
         "relX": 0.5059665871121718,
         "relY": 0.0,
         "refW": 640,
@@ -1157,22 +1157,22 @@
         }
       },
       "player_healthbar": {
-        "x": 54,
-        "y": 318,
+        "x": 10,
+        "y": 10,
         "enabled": true,
         "color": -1,
         "rgb": false,
         "scale": 1.0124223,
-        "relX": 0.09230769230769231,
-        "relY": 0.9716088328075709,
+        "relX": 0.017094017094017096,
+        "relY": 0.03058103975535168,
         "refW": 640,
         "refH": 337,
         "width": 55,
-        "height": 9,
+        "height": 10,
         "props": {
-          "barWidth": 45.0,
+          "barWidth": 50.0,
           "border": true,
-          "barHeight": 5.0,
+          "barHeight": 6.0,
           "snapGrid": false,
           "showText": false
         }
@@ -1181,7 +1181,7 @@
         "x": 547,
         "y": 16,
         "enabled": true,
-        "color": -13703482,
+        "color": -13703454,
         "rgb": true,
         "scale": 1.0,
         "relX": 0.9838129496402878,

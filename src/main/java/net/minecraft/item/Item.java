@@ -881,6 +881,7 @@ public class Item {
         registerItemBlock(Blocks.cobalt_block);
         registerItemBlock(Blocks.random_ore);
         registerItemBlock(Blocks.steel_ladder);
+        registerItemBlock(Blocks.steel_anvil, new ItemSteelAnvilBlock(Blocks.steel_anvil));
 
 
         // ── Items matériaux custom ───────────────────────────────────────────────

@@ -1121,7 +1121,18 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
         }
         else if (!packetIn.hasSlots())
         {
-            entityplayersp.displayGui(new LocalBlockIntercommunication(packetIn.getGuiId(), packetIn.getWindowTitle()));
+            String guiId = packetIn.getGuiId();
+            // Si on reçoit une fenêtre d'enclume et que le joueur regarde une steel_anvil, utiliser le GUI acier
+            if ("minecraft:anvil".equals(guiId) && this.gameController.objectMouseOver != null
+                    && this.gameController.objectMouseOver.typeOfHit == net.minecraft.util.MovingObjectPosition.MovingObjectType.BLOCK)
+            {
+                net.minecraft.block.state.IBlockState bs = this.gameController.theWorld.getBlockState(this.gameController.objectMouseOver.getBlockPos());
+                if (bs.getBlock() == net.minecraft.init.Blocks.steel_anvil)
+                {
+                    guiId = "minecraft:steel_anvil";
+                }
+            }
+            entityplayersp.displayGui(new LocalBlockIntercommunication(guiId, packetIn.getWindowTitle()));
             entityplayersp.openContainer.windowId = packetIn.getWindowId();
         }
         else
