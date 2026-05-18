@@ -284,14 +284,6 @@ public class GuiUIEditor extends GuiScreen {
     public void onGuiClosed() {
         UIManager.getInstance().setEditorActive(false);
         ui.saveConfig();
-        // Auto-sauvegarder le profil actif si l'utilisateur en a un.
-        // Cela garantit que les changements effectués dans l'éditeur (ex. rainbow)
-        // sont immédiatement persistés dans le profil, sans avoir à aller dans
-        // l'écran des profils et cliquer manuellement sur "Sauver".
-        HudProfileManager pm = HudProfileManager.getInstance();
-        if (pm.getActiveProfile() >= 0) {
-            pm.saveToSlot(pm.getActiveProfile());
-        }
         Keyboard.enableRepeatEvents(false);
         super.onGuiClosed();
     }
@@ -328,12 +320,13 @@ public class GuiUIEditor extends GuiScreen {
 
         // Render all widgets (BACKGROUND LAYER)
         for (UIElement e : ui.all()) {
+            if (e instanceof PlayerHealthBarWidget) continue;
             e.render(mouseX, mouseY, partialTicks);
             if (selected == e) GuiRenderUtils.drawSelectionHalo(e.getX(), e.getY(), e.getWidth(), e.getHeight(), ACCENT);
         }
 
-        // Draw resize handles on selected widget
-        if (selected != null) drawResizeHandles(selected);
+        // Draw resize handles on selected widget (not for PlayerHealthBarWidget — 3D widget, no HUD position)
+        if (selected != null && !(selected instanceof PlayerHealthBarWidget)) drawResizeHandles(selected);
 
         // Panel animations
         sidebarAnim = GuiRenderUtils.lerp(sidebarAnim, selected != null ? 1.0f : 0.0f, 0.15f);
@@ -963,20 +956,28 @@ public class GuiUIEditor extends GuiScreen {
             if (e.containsPoint(mx, my)) { clicked = e; break; }
         }
         if (clicked != null) {
-            // If clicking on a resize handle of this widget, start resizing (select it first)
-            int edge = getResizeEdge(mx, my, clicked);
-            if (edge != 0) {
-                selected = clicked;
-                isResizingWidget = true; resizeEdge = edge;
-                resizeStartX = mx; resizeStartY = my;
-                resizeStartW = selected.getWidth(); resizeStartH = selected.getHeight();
-                resizeStartWidgetX = selected.getX(); resizeStartWidgetY = selected.getY();
-                if (selected instanceof BaseWidget) resizeStartScale = ((BaseWidget)selected).getScale();
-                bringToFront("sidebar"); sbScroll = 0; return;
+            // PlayerHealthBarWidget est un widget 3D (rendu au-dessus des têtes) :
+            // on interdit le déplacement et le redimensionnement dans l'éditeur HUD.
+            boolean isHealthBar = clicked instanceof PlayerHealthBarWidget;
+            if (!isHealthBar) {
+                // If clicking on a resize handle of this widget, start resizing (select it first)
+                int edge = getResizeEdge(mx, my, clicked);
+                if (edge != 0) {
+                    selected = clicked;
+                    isResizingWidget = true; resizeEdge = edge;
+                    resizeStartX = mx; resizeStartY = my;
+                    resizeStartW = selected.getWidth(); resizeStartH = selected.getHeight();
+                    resizeStartWidgetX = selected.getX(); resizeStartWidgetY = selected.getY();
+                    if (selected instanceof BaseWidget) resizeStartScale = ((BaseWidget)selected).getScale();
+                    bringToFront("sidebar"); sbScroll = 0; return;
+                }
             }
-            // Otherwise select and start dragging
-            selected = clicked; isDraggingWidget = true;
-            dragOffsetX = mx - selected.getX(); dragOffsetY = my - selected.getY();
+            // Select (always) and start dragging only for non-3D widgets
+            selected = clicked;
+            if (!isHealthBar) {
+                isDraggingWidget = true;
+                dragOffsetX = mx - selected.getX(); dragOffsetY = my - selected.getY();
+            }
             bringToFront("sidebar"); sbScroll = 0; return;
          }
         selected = null;

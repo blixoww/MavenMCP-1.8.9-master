@@ -548,8 +548,8 @@ public class GuiHDV extends GuiScreen {
         drawRect(lx, hy + 15, lx + lw, hy + 16, 0x882277EE);
         fontRendererObj.drawString("\u00a77Item",        lx + 35,  hy + 4, 0);
         fontRendererObj.drawString("\u00a77Qt\u00e9",    lx + 248, hy + 4, 0);
-        fontRendererObj.drawString("\u00a76$ /u",        lx + 302, hy + 4, 0);
-        fontRendererObj.drawString("\u00a7ePB /u",       lx + 398, hy + 4, 0);
+        fontRendererObj.drawString("\u00a76Prix $",       lx + 302, hy + 4, 0);
+        fontRendererObj.drawString("\u00a7ePrix PB",      lx + 398, hy + 4, 0);
         fontRendererObj.drawString("\u00a77Statut",      lx + 490, hy + 4, 0);
 
         listMineY0 = hy + 18;
@@ -572,26 +572,26 @@ public class GuiHDV extends GuiScreen {
                     GlStateManager.enableDepth();
                     RenderHelper.enableGUIStandardItemLighting();
                     itemRender.renderItemAndEffectIntoGUI(l.getItem(), lx + 8, y + 4);
+                    itemRender.renderItemOverlayIntoGUI(fontRendererObj, l.getItem(), lx + 8, y + 4, null);
                     RenderHelper.disableStandardItemLighting();
                     GlStateManager.disableDepth();
                     if (hov) { tooltipItem = l.getItem(); tooltipX = mx; tooltipY = my; }
-                    String mn = fontRendererObj.trimStringToWidth(l.getItem().getDisplayName(), 200);
+                    String mn = fontRendererObj.trimStringToWidth(l.getItem().getDisplayName(), 165);
                     fontRendererObj.drawStringWithShadow(mn, lx + 35, y + 10, C_WHITE);
                 }
 
                 fontRendererObj.drawString("x" + l.getQuantity(), lx + 248, y + 10, C_WHITE);
-                // Colonne $ /u
+                // Colonne Prix $
                 if (!l.isPayPB() || l.isDual()) {
-                    fontRendererObj.drawStringWithShadow("\u00a76" + fmtGold(l.getPricePerUnit()) + " $/u", lx + 302, y + 10, C_WHITE);
+                    fontRendererObj.drawStringWithShadow("\u00a76" + fmtGold(l.getTotalPrice()) + " $", lx + 302, y + 10, C_WHITE);
                 } else {
                     fontRendererObj.drawString("\u00a78\u2014", lx + 302, y + 10, C_GRAY);
                 }
-                // Colonne PB /u
+                // Colonne Prix PB
                 if (l.isDual()) {
-                    long pbUnit = l.getQuantity() > 0 ? l.getPricePB() / l.getQuantity() : 0;
-                    fontRendererObj.drawStringWithShadow("\u00a7e" + fmtGold(pbUnit) + " PB/u", lx + 398, y + 10, C_WHITE);
+                    fontRendererObj.drawStringWithShadow("\u00a7e" + fmtGold(l.getPricePB()) + " PB", lx + 398, y + 10, C_WHITE);
                 } else if (l.isPayPB()) {
-                    fontRendererObj.drawStringWithShadow("\u00a7e" + fmtGold(l.getPricePerUnit()) + " PB/u", lx + 398, y + 10, C_WHITE);
+                    fontRendererObj.drawStringWithShadow("\u00a7e" + fmtGold(l.getPricePB()) + " PB", lx + 398, y + 10, C_WHITE);
                 } else {
                     fontRendererObj.drawString("\u00a78\u2014", lx + 398, y + 10, C_GRAY);
                 }

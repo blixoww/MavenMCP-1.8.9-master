@@ -50,6 +50,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSleepMP;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.achievement.GuiAchievement;
+import net.minecraft.client.gui.inventory.GuiCraftGuide;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.macro.MacroManager;
 import net.minecraft.client.main.GameConfiguration;
@@ -2235,6 +2236,16 @@ public class Minecraft implements IThreadListener, IPlayerUsage
             while (this.gameSettings.keyBindWaypoints.isPressed())
             {
                 this.displayGuiScreen(new net.minecraft.client.waypoint.GuiWaypoints());
+            }
+
+            while (this.gameSettings.keyBindBoutique.isPressed())
+            {
+                if (this.thePlayer != null) this.thePlayer.sendChatMessage("/boutique");
+            }
+
+            while (this.gameSettings.keyBindGuide.isPressed())
+            {
+                if (this.thePlayer != null) this.displayGuiScreen(new GuiCraftGuide(null));
             }
 
             while (this.gameSettings.keyBindDrop.isPressed())

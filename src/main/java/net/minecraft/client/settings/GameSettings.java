@@ -151,6 +151,8 @@ public class GameSettings {
     public KeyBinding keyBindShop = new KeyBinding("Shop", 48, "key.categories.misc");
     public KeyBinding keyBindWaypoints = new KeyBinding("Waypoints", 25, "key.categories.misc");
     public KeyBinding keyBindOpenCraftGuide = new KeyBinding("Craft", 34, "key.categories.misc");
+    public KeyBinding keyBindBoutique = new KeyBinding("Boutique", 0, "key.categories.misc");
+    public KeyBinding keyBindGuide = new KeyBinding("Guide", 0, "key.categories.misc");
     public KeyBinding keyBindPing = new KeyBinding("Ping", -98, "key.categories.gameplay");
 
     // Activation du mode Toggle Sneak/Sprint (option dans le menu)
@@ -326,7 +328,9 @@ public class GameSettings {
         this.keyBindZoom = this.ofKeyBindZoom;
         this.keyBindings = ArrayUtils.add(this.keyBindings, this.ofKeyBindZoom);
         this.keyBindings = ArrayUtils.add(this.keyBindings, this.keyBindPing);
-        KeyUtils.fixKeyConflicts(this.keyBindings, new KeyBinding[]{this.ofKeyBindZoom, this.keyBindPing, this.keyBindHDV, this.keyBindShop, this.keyBindWaypoints, this.keyBindOpenCraftGuide});
+        this.keyBindings = ArrayUtils.add(this.keyBindings, this.keyBindBoutique);
+        this.keyBindings = ArrayUtils.add(this.keyBindings, this.keyBindGuide);
+        KeyUtils.fixKeyConflicts(this.keyBindings, new KeyBinding[]{this.ofKeyBindZoom, this.keyBindPing, this.keyBindHDV, this.keyBindShop, this.keyBindWaypoints, this.keyBindOpenCraftGuide, this.keyBindBoutique, this.keyBindGuide});
         this.renderDistanceChunks = 8;
         this.loadOptions();
         Config.initGameSettings(this);
@@ -338,6 +342,8 @@ public class GameSettings {
         this.keyBindings = ArrayUtils.add(this.keyBindings, this.keyBindShop);
         this.keyBindings = ArrayUtils.add(this.keyBindings, this.keyBindWaypoints);
         this.keyBindings = ArrayUtils.add(this.keyBindings, this.keyBindOpenCraftGuide);
+        this.keyBindings = ArrayUtils.add(this.keyBindings, this.keyBindBoutique);
+        this.keyBindings = ArrayUtils.add(this.keyBindings, this.keyBindGuide);
         this.difficulty = EnumDifficulty.NORMAL;
         this.lastServer = "";
         this.fovSetting = 70.0F;

@@ -219,5 +219,11 @@ public final class PacketId {
      *          bool   payerEnPB
      */
     public static final int BOUTIQUE_BUY     = 0xB1;
+
+    // ════════════════════════════════════════════════════════════════════════
+    //  Guide de craft – Serveur → Client  (canal SERVER_TO_CLIENT)
+    // ════════════════════════════════════════════════════════════════════════
+    /** Demande au client d'ouvrir le GuiCraftGuide. Payload : aucun. */
+    public static final int GUIDE_OPEN = 0xC0;
 }
 

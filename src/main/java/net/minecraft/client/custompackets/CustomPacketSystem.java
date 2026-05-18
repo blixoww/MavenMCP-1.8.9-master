@@ -172,6 +172,14 @@ public final class CustomPacketSystem {
             LOGGER.debug("[CustomPackets] Pong reçu – latence applicative : {} ms", latency);
         });
 
+        // Guide de craft (0xC0) : ouvre GuiCraftGuide côté client
+        PacketDispatcher.register(PacketChannel.SERVER_TO_CLIENT, PacketId.GUIDE_OPEN, buf -> {
+            LOGGER.info("[CustomPackets] GUIDE_OPEN reçu – ouverture du guide de craft");
+            net.minecraft.client.Minecraft.getMinecraft().addScheduledTask(() ->
+                net.minecraft.client.Minecraft.getMinecraft().displayGuiScreen(
+                    new net.minecraft.client.gui.inventory.GuiCraftGuide(null)));
+        });
+
         if (net.minecraft.client.Minecraft.getMinecraft().thePlayer != null) {
             sendRegisterPacket();
         }

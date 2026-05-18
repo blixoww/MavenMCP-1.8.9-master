@@ -83,6 +83,8 @@ key_Waypoints:17
 key_Craft:34
 key_Zoom:29
 key_Ping:46
+key_Boutique:50
+key_Guide:0
 soundCategory_master:0.10067114
 soundCategory_music:0.007246377
 soundCategory_record:0.02112676
